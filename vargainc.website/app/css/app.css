@@ -1,0 +1,296 @@
+@import url(https://fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic);
+.callout.alert {
+  background: #bd5151;
+  color: #fff;
+}
+.callout.alert i, .callout.alert span {
+  color: #fff;
+}
+
+i {
+  color: #dedede;
+}
+
+a:hover i, a:active i, i.active {
+  color: #8a8a8a;
+}
+
+.dropdown-pane {
+  box-shadow: 0 0.5em 1em 0 rgba(0, 0, 0, 0.1);
+  font-size: 1rem !important;
+}
+.dropdown-pane .button {
+  margin-bottom: 0 !important;
+}
+
+.list-group {
+  background-clip: padding-box;
+  margin: 0 0 1rem 0;
+}
+.list-group .list-group-item {
+  background-color: #5479aa;
+  border-color: transparent;
+  color: #555;
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  margin-bottom: -1px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+.list-group .list-group-item.active {
+  z-index: 2;
+  background-color: #337ab7;
+  border-color: #337ab7;
+  color: #fff;
+}
+.list-group .list-group-item:hover, .list-group .list-group-item:active {
+  background-color: #f5f5f5;
+}
+
+.has-tip {
+  border: none !important;
+  cursor: pointer !important;
+}
+
+html, body {
+  font-family: 'Ubuntu', verdana, arial, sans-serif;
+  color: #8a8a8a;
+  font-weight: 300;
+  background-color: #f8f8f8;
+}
+
+.logo {
+  background: #131e30;
+  height: 50px;
+  top: 0px;
+  left: 0px;
+  width: 250px;
+  text-align: center;
+  position: fixed;
+}
+
+.sidebar {
+  width: 50px !important;
+  overflow: visible;
+  position: fixed;
+  bottom: 0;
+  left: 0 !important;
+  color: #adb8ca;
+  background: #1a2a42;
+}
+.sidebar .menu a {
+  color: #fff;
+}
+.sidebar .menu a:hover, .sidebar .menu a.active {
+  color: rgba(245, 159, 26, 0.8);
+  background-color: #162439;
+}
+.sidebar .menu a:hover i, .sidebar .menu a.active i {
+  color: rgba(245, 159, 26, 0.8);
+  text-shadow: 1px 4px 6px #1a2a42,0 0 0 #F59F1A,1px 4px 6px #1a2a42;
+}
+.sidebar .menu .submenu a {
+  padding-left: 45px;
+  font-size: 12px;
+}
+.sidebar .menu span, .sidebar .menu .submenu {
+  display: none;
+}
+
+.menu-icon:after {
+  background: #2199e8;
+  box-shadow: 0 7px 0 #2199e8, 0 14px 0 #2199e8;
+}
+
+.menu-icon:hover:after, .menu-icon:focus:after {
+  background: rgba(245, 159, 26, 0.8);
+  box-shadow: 0 7px 0 rgba(245, 159, 26, 0.8), 0 14px 0 rgba(245, 159, 26, 0.8);
+}
+
+.main {
+  left: 50px;
+  position: relative;
+  margin-right: 50px;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  background: #f8f8f8 !important;
+  box-shadow: none !important;
+}
+.main .title-bar .title-text {
+  font-size: 18px;
+  position: relative;
+  top: 2px;
+}
+
+.off-canvas-wrapper-inner {
+  position: fixed;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.off-canvas-wrapper-inner.is-off-canvas-open {
+  overflow-y: visible;
+  overflow-x: visible;
+}
+
+.is-off-canvas-open .sidebar {
+  width: 250px !important;
+  left: -250px !important;
+  max-height: none !important;
+}
+.is-off-canvas-open .sidebar span, .is-off-canvas-open .sidebar .submenu {
+  display: inline !important;
+}
+
+.is-off-canvas-open .main {
+  left: 0px !important;
+}
+
+.title-bar-center {
+  position: absolute;
+  width: 60%;
+  left: 50%;
+  margin-left: -30%;
+  display: block;
+}
+.title-bar-center input {
+  margin: 0;
+  height: 32px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size: 12px;
+}
+.title-bar-center .topSearchBar {
+  margin: 0 50px;
+}
+
+.section .section-header {
+  font-size: 12px;
+  line-height: 30px;
+  padding-left: 5px;
+  margin-top: 25px;
+}
+.section button, .section .button.row-button {
+  background: transparent;
+  color: #2199e8;
+  text-align: center;
+  padding: 5px 10px;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+.section button.cirle, .section .button.row-button.cirle {
+  margin-bottom: 0;
+  height: 24px;
+  width: 24px;
+  background: transparent;
+  color: #000;
+  text-align: center;
+  padding: 0;
+  border-radius: 50%;
+  margin-left: 5px;
+}
+.section button.cirle:hover, .section button.cirle:focus, .section .button.row-button.cirle:hover, .section .button.row-button.cirle:focus {
+  background-color: #1583cc;
+}
+.section button:hover, .section button:focus, .section .button.row-button:hover, .section .button.row-button:focus {
+  color: #fff;
+  background-color: #1583cc;
+}
+.section button:hover i, .section button:hover small, .section button:hover span, .section button:focus i, .section button:focus small, .section button:focus span, .section .button.row-button:hover i, .section .button.row-button:hover small, .section .button.row-button:hover span, .section .button.row-button:focus i, .section .button.row-button:focus small, .section .button.row-button:focus span {
+  color: #fff;
+}
+.section button i, .section .button.row-button i {
+  color: #2199e8;
+}
+.section button small, .section button span, .section .button.row-button small, .section .button.row-button span {
+  margin-left: 5px;
+  color: #2199e8;
+}
+.section .section-button {
+  position: relative;
+  top: 10px;
+  font-weight: 500;
+}
+
+.scroll-list-section-body {
+  margin-bottom: 20px;
+  background: #fff;
+  color: #555;
+  font-size: 14px;
+  font-weight: 400;
+}
+.scroll-list-section-body a {
+  color: #555;
+}
+
+.scroll-list-header {
+  font-weight: 500;
+  margin: 2px 0;
+  color: #fff;
+  background: #5479aa;
+}
+.scroll-list-header a {
+  font-weight: 500;
+  color: #fff;
+}
+.scroll-list-header i {
+  color: #8a8a8a;
+}
+.scroll-list-header a:hover i, .scroll-list-header a:active i, .scroll-list-header i.active {
+  color: #fff !important;
+}
+
+.scroll-list-item {
+  margin: 1px 0;
+  cursor: pointer;
+  background: #fff;
+}
+.scroll-list-item .dropdown-pane {
+  padding: 0;
+  max-width: 120px;
+}
+.scroll-list-item table {
+  margin: 0 auto 20px auto;
+  width: 90% !important;
+}
+.scroll-list-item table .button {
+  margin: 0;
+}
+.scroll-list-item table td {
+  padding: 0 10px !important;
+}
+.scroll-list-item table tr {
+  cursor: pointer;
+}
+.scroll-list-item table .cirle {
+  margin-left: 5px;
+}
+
+.scroll-list-header, .scroll-list-item {
+  line-height: 50px;
+  position: relative;
+}
+.scroll-list-header:before, .scroll-list-item:before {
+  bottom: 0;
+  box-shadow: 0 -1px 0 #e5e5e5, 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+  content: '';
+  display: block;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+iframe {
+  border: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+}

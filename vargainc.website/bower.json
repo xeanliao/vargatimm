@@ -1,0 +1,40 @@
+{
+  "name": "vargainc_front-end_application",
+  "dependencies": {
+    "lodash": "~4.0.0",
+    "requirejs": "~2.1.22",
+    "backbone": "~1.2.3",
+    "foundation-sites": "~6.1.1",
+    "react": "~0.14.6",
+    "react.backbone": "~0.6.0",
+    "underscore": "~1.8.3",
+    "motion-ui": "~1.1.1",
+    "font-awesome": "~4.5.0",
+    "moment": "~2.11.1",
+    "pubsub.js": "~0.1.0",
+    "react-day-picker": "~1.2.0",
+    "react-select": "~0.9.1"
+  },
+  "description": "",
+  "main": "",
+  "moduleType": [
+    "amd"
+  ],
+  "authors": [
+    "steve.yin"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "resolutions": {
+    "react": "~0.14.6",
+    "moment": "~2.11.1"
+  }
+}
