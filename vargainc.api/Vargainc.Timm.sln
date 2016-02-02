@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.Models", "Vargainc.Timm.Models\Vargainc.Timm.Models.csproj", "{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.EF", "Vargainc.Timm.EF\Vargainc.Timm.EF.csproj", "{51901696-9A1D-4B06-9B8E-8185A33F984F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.REST", "Vargainc.Timm.REST\Vargainc.Timm.REST.csproj", "{668345C6-4A4B-46DC-B1D5-B20080337C04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.Extentions", "Vargainc.Timm.Extentions\Vargainc.Timm.Extentions.csproj", "{28DC8819-C55C-4D82-92BC-0481B847AEBC}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51901696-9A1D-4B06-9B8E-8185A33F984F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51901696-9A1D-4B06-9B8E-8185A33F984F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51901696-9A1D-4B06-9B8E-8185A33F984F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51901696-9A1D-4B06-9B8E-8185A33F984F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{668345C6-4A4B-46DC-B1D5-B20080337C04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{668345C6-4A4B-46DC-B1D5-B20080337C04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{668345C6-4A4B-46DC-B1D5-B20080337C04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{668345C6-4A4B-46DC-B1D5-B20080337C04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28DC8819-C55C-4D82-92BC-0481B847AEBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28DC8819-C55C-4D82-92BC-0481B847AEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28DC8819-C55C-4D82-92BC-0481B847AEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28DC8819-C55C-4D82-92BC-0481B847AEBC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
