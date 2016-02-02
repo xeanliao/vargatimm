@@ -1,0 +1,33 @@
+<div class="row">
+  <div class="small-12 columns text-center title"><span class="editable" role="title">SUB MAP {{submap.OrderId}}({{submap.Name}})</span></div>
+</div>
+<div class="row list" role="list">
+  <div class="small-4 columns">&nbsp;<span class="editable" role="key">SUB MAP #</span>:</div>
+  <div class="small-8 columns">&nbsp;<span class="editable" role="text">{{submap.OrderId}}</span></div>
+  <div class="small-4 columns">&nbsp;<span class="editable" role="key">SUB MAP NAME</span>:</div>
+  <div class="small-8 columns">&nbsp;<span class="editable" role="text">{{submap.Name}}</span></div>
+  <div class="small-4 columns">&nbsp;<span class="editable" role="key">TARGETING METHOD</span>:</div>
+  <div class="small-8 columns">&nbsp;<span class="editable" role="text">{{campaign.targetMethod}}</span></div>
+  <div class="small-4 columns">&nbsp;<span class="editable" role="key">TOTAL HOUSEHOLDS</span>:</div>
+  <div class="small-8 columns">&nbsp;<span class="editable" role="text">{{formatNumber submap.TotalHouseHold}}</span></div>
+  <div class="small-4 columns">&nbsp;<span class="editable" role="key">TARGET HOUSEHOLDS</span>:</div>
+  <div class="small-8 columns">&nbsp;<span class="editable" role="text">{{formatNumber submap.TargetHouseHold}}</span></div>
+  <div class="small-4 columns">&nbsp;<span class="editable" role="key">PENETRATION</span>:</div>
+  <div class="small-8 columns">&nbsp;<span class="editable" role="text">{{formatNumber submap.Penetration style="percent"}}</span></div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center title"><span class="editable" role="title">Map</span></div>
+</div>
+<div class="row collapse">
+  <div class="small-12 columns">
+    <div class="map-container" role="map" color="false" legend="true">
+      <div class="loading hexdots-loader"></div>
+    </div>
+  </div>
+  <div class="small-12 columns">
+      <div class="color-legend">
+      </div>
+      <div class="direction-legend"></div>
+    </div>
+</div>
+{{> footer}}

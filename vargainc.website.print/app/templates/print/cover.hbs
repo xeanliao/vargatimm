@@ -1,0 +1,44 @@
+<div class="row">
+  <div class="small-12 columns text-center title" ><span class="editable" role="title">This Custom Campaign is Presented to:</span></div>
+  </div>
+<div class="row">
+  <div class="small-12 columns">
+    <span class="hide" role="key"></span>
+    <div class="text-center">
+      {{#if Logo}}
+      <img class="client-logo" src="{{Logo}}" alt="" role="image" p-height="80" p-align="center" p-top="40" p-bottom="40">
+      {{else}}
+      <div class="client-logo" role="image" src="" role="image" p-height="80" p-align="center" p-top="40" p-bottom="40" ></div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center"><label class="editable" role="key">Client Name:</label></div>
+  <div class="small-12 columns text-center"><span class="editable" role="text">{{ClientName}}</span></div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center"><label class="editable" role="key">Created for:</label></div>
+  <div class="small-12 columns text-center"><span class="editable" role="text">{{ContactName}}</span></div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center"><label class="editable" role="key">Created on:</label></div>
+  <div class="small-12 columns text-center"><span class="editable" role="text">{{Date}}</span></div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center"><label class="" role="key">&nbsp;</label></div>
+  <div class="small-12 columns text-center"><span class="" role="text">&nbsp;</span></div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center"><label class="editable" role="key">Presented by:</label></div>
+  <div class="small-12 columns text-center"><img class="vargainc-log" src="images/vargainc-logo.png" role="image" p-height="40" p-align="center" p-top="10" p-bottom="10" /></div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center"><label class="editable" role="key">Master Campaign #:</label></div>
+  <div class="small-12 columns text-center"><span class="editable" role="text">{{DisplayName}}</span></div>
+</div>
+<div class="row">
+  <div class="small-12 columns text-center"><label class="editable" role="key">Created by:</label></div>
+  <div class="small-12 columns text-center"><span class="editable" role="text">{{CreatorName}}</span></div>
+</div>
+{{> footer}}

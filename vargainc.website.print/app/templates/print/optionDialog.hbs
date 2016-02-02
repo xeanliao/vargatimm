@@ -1,0 +1,109 @@
+<h4>Print Options</h4>
+<form>
+    <div class="row">
+        <div class="small-2 columns">
+            <label>Map Type</label>
+        </div>
+        <div class="small-10 columns mapTypeContainer">
+            <ul class="button-group">
+                <li>
+                    <input id="mapType-ROADMAP" type="radio" name='mapType' /><label for="mapType-ROADMAP">RoadMap</label>
+                </li>
+                <li>
+                    <input id="mapType-HYBRID" type="radio" name='mapType' /><label for="mapType-HYBRID">Aerial</label>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row hideForDistribute">
+        <div class="small-12 columns">
+            <label>
+                Target Method
+                <input id="targetMethod" type="text" />
+            </label>
+        </div>
+    </div>
+    <div class="panel hideForDistribute">
+        <h6>Campaign Maps</h6>
+        <ul class="small-block-grid-2">
+            <li>
+                <input id="suppressCover" type="checkbox" /><label for="suppressCover">Suppress Cover</label>
+            </li>
+            <li>
+                <input id="suppressCampaign" type="checkbox" /><label for="suppressCampaign">Suppress Campaign Page</label>
+            </li>
+            <li>
+                <input id="suppressSubMap" type="checkbox" /><label for="suppressSubMap">Suppress Sub Maps</label>
+            </li>
+            <li>
+                <input id="suppressCampaignSummary" type="checkbox" /><label for="suppressCampaignSummary">Suppress Sub Map Summary</label>
+            </li>
+            <li>
+                <input id="suppressSubMapCountDetail" type="checkbox" /><label for="suppressSubMapCountDetail">Suppress Sub Map Croute Counts</label>
+            </li>
+            <li>
+                <input id="suppressNDAInCampaign" type="checkbox"><label for="suppressNDAInCampaign">Suppress non-deliverables for campaign map</label>  
+            </li>
+            <li>
+                <input id="suppressNDAInSubMap" type="checkbox"><label for="suppressNDAInSubMap">Suppress non-deliverables for sub map</label>  
+            </li>
+            <li>
+                <input id="suppressLocations" type="checkbox" /><label for="suppressLocations">Suppress Locations</label>
+            </li>
+            <li>
+                <input id="suppressRadii" type="checkbox" /><label for="suppressRadii">Suppress Radii</label>
+            </li>
+        </ul>
+        {{!-- Penetration colors --}}
+        <ul class="small-block-grid-1">
+            <li>
+                <input id="showPenetrationColors" type="checkbox"><label for="showPenetrationColors">Show Penetration Colors:</label> 
+            </li>
+            <li>
+                <div class="row">
+                    <div class="custom-colors small-10 columns">
+                        <label>
+                            <span>Blue (0% - 20%) Green (20% - 40%) Yellow (40% - 60%) Orange (60% - 80%) Red (80% - 100%) </span>
+                            <div id="colorSlider" class="slider"></div>
+                        </label>
+                    </div>
+                    <div class="small-2 columns">
+                        <button id="btnRestPenetration" class="tiny alert">Reset</button>
+                    </div>
+                </div>            
+            </li>
+        </ul>
+    </div>
+    <div class="panel hideForDistribute hideForCampaign">
+        <h6>GTU Reports</h6>
+        <ul class="small-block-grid-2">
+            <li>
+                <input id="suppressGTU" type="checkbox" /><label for="suppressGTU">Suppress GTU Tracking</label>
+            </li>
+        </ul>
+    </div>
+    <div class="panel hideForCampaign">
+        <h6>Distribution Maps</h6>
+        <ul class="small-block-grid-1">
+            <li>
+                <input id="suppressDMap" type="checkbox" /><label for="suppressDMap">Suppress Distribution Maps</label>
+            </li>
+            <li>
+                <input id="suppressNDAInDMap" type="checkbox"><label for="suppressNDAInDMap">Suppress non-deliverables for distribution map</label>  
+            </li>
+            
+        </ul>
+    </div>
+    <div class="panel callout radius dMapContainer hideForCampaign">
+        <input id="btnCheckAllDMap" class='btnCheckAllDMap' type="checkbox"><label for="btnCheckAllDMap">Suppress All Distribute Maps</label>
+        <ul class="small-block-grid-2 medium-block-grid-4 large-block-grid-6">
+            {{#each DMaps}}
+                <li><input id="optionDmap-{{Id}}" type="checkbox"><label for="optionDmap-{{Id}}">{{Name}}</label> </li>
+            {{/each}}
+        </ul>
+    </div>
+</form>
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+<button class="button tiny secondary btnCloseOption right">Cancel</button>
+<button class="button tiny btnApplyOption right">Apply</button>

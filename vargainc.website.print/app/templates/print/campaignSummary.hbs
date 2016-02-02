@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="small-12 columns text-center title"><span class="editable" role="title">Summary of Sub Maps</span></div>
+</div>
+<div class="row collapse" role="table" datasource="submap-list">
+  <div class="small-12 columns">
+    <table>
+      <thead>
+        <tr>
+          <th><span class="editable">#</span></th>
+          <th><span class="editable">SUB MAP NAME</span></th>
+          <th><span class="editable">TOTAL H/H</span></th>
+          <th><span class="editable">TARGET H/H</span></th>
+          <th><span class="editable">PENETRATION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+      {{#each SubMaps}}
+        <tr>
+          <td>{{OrderId}}</td>
+          <td>{{Name}}</td>
+          <td>{{formatNumber TotalHouseHold}}</td>
+          <td>{{formatNumber TargetHouseHold}}</td>
+          <td>{{formatNumber Penetration style="percent"}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{> footer}}
