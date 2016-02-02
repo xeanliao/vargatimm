@@ -1,0 +1,1 @@
+{"tiles":"6DA8D2DC-9BAF-4F82-A3B8-B6FF225F7A83.jpg","geometry":"BA287EBF-2EB7-4049-8D48-62BF5DCE2413.png","success":true,"campaignId":"7","submapId":"15"}

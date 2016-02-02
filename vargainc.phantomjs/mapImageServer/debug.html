@@ -1,0 +1,43 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Map</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            html, body, #map{width:100%; height: 100%; padding: 0; margin: 0;}
+        </style>
+    </head>
+    <body>
+        <div id="map" style="width:100%; height: 100%;"></div>
+        <script src="js/jquery-2.1.4.min.js"></script>
+        
+        <script>
+            function initMap(){
+                var mapDom = $('#map');
+                
+                 window.map = new google.maps.Map(mapDom[0], {
+                    center: new google.maps.LatLng(40.744556,-73.987378),
+                    zoom: 18,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    disableDefaultUI: true
+                });
+
+                google.maps.event.addListenerOnce(map, 'tilesloaded', function(){
+                    console.log("tilesloaded");
+                        console.log("map is ready");
+                        window.mapIsReady = true;
+                        callback('ok');
+                });
+            }
+
+            function callback(msg){
+                typeof window.callPhantom === 'function' && window.callPhantom(msg);
+            }
+        </script>
+        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBOhGHk0xE1WEG0laS4QGRp_AGhtB5LMHw&callback=initMap"></script>
+
+    </body>
+</html>
