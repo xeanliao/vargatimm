@@ -96,6 +96,9 @@ define([
 							</colgroup>
 							<tbody>
 							{model.get('Tasks').map(function(task){
+								if(task.visiable === false){
+									return null;
+								}
 								return (
 									<tr key={task.Id}>
 										<td onClick={self.onGotoReport.bind(null, task.Id)}>
@@ -264,16 +267,30 @@ define([
 			}
 			if(this.state.search){
 				var keyword = this.state.search.toLowerCase(),
-					values = null;
+					campaignValues = null,
+					campaignSearch = null,
+					taskValues = null,
+					taskSearch = null;
 				dataSource = _.filter(dataSource, function(i) {
-					values  = _.values(i.attributes);
-					return _.some(values, function(i){
+					campaignValues  = _.values(i.attributes);
+					campaignSearch = _.some(campaignValues, function(i){
 						var dateCheck = moment(i, moment.ISO_8601);
 						if(dateCheck.isValid()){
 							return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;
 						}
 						return _.toString(i).toLowerCase().indexOf(keyword) > -1;
 					});
+					/**
+					 * update task visiable logical.
+					 * if campaign in search keyward. show all task
+					 * otherwise only show task name in search word.
+					 * if there is no task need show hide this campaign.
+					 */
+					taskValues = _.values(i.attributes.Tasks);
+					_.forEach(taskValues, function(i){
+						i.visiable = campaignSearch || i.Name.toLowerCase().indexOf(keyword) > -1;
+					});
+					return campaignSearch || _.some(taskValues, {visiable:true});
 				});
 			}else if(this.state.filterField && this.state.filterValues){
 				var filterField = this.state.filterField,
