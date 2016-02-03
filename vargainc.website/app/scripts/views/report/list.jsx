@@ -96,11 +96,10 @@ define([
 							</colgroup>
 							<tbody>
 							{model.get('Tasks').map(function(task){
-								var taskDisplayDate = task && task.Date ? moment(task.Date).format("MMM DD, YYYY") : ''
 								return (
 									<tr key={task.Id}>
 										<td onClick={self.onGotoReport.bind(null, task.Id)}>
-											{taskDisplayDate} - {task.Name}
+											{task.Name}
 										</td>
 										<td>
 											<div className="float-right tool-bar">
