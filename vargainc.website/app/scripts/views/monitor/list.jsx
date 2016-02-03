@@ -10,7 +10,9 @@ define([
 	'models/task',
 	'react.backbone'
 ], function ($, _, moment, Backbone, React, Topic, DismissView, EditView, TaskModel) {
-	var actionHandler = null;
+	var actionHandle = null,
+		searchHandle = null;
+
 	var MonitorRow = React.createBackboneClass({
 		menuKey: 'monitor-menu-ddl-',
 		getDefaultProps: function(){
@@ -200,7 +202,8 @@ define([
 			Topic.subscribe('monitor/refresh', function(){
 				self.getCollection().fetchForTask();
 			});
-			Topic.subscribe('search', function(words){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			searchHandle = Topic.subscribe('search', function(words){
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -210,6 +213,10 @@ define([
 			});
 
 			$("#monitor-filter-ddl-ClientName, #monitor-filter-ddl-ClientCode, #monitor-filter-ddl-Date, #monitor-filter-ddl-AreaDescription").foundation();
+		},
+		componentWillUnmount: function(){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			actionHandle && Topic.unsubscribe(actionHandle);
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();

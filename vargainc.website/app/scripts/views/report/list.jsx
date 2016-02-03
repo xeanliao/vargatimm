@@ -7,7 +7,9 @@ define([
 	'models/task',
 	'react.backbone'
 ], function (_, moment, Backbone, React, Topic, TaskModel) {
-	var actionHandler = null;
+	var actionHandle = null,
+		searchHandle = null;
+
 	var ReportRow = React.createBackboneClass({
 		menuKey: 'report-menu-ddl-',
 		getDefaultProps: function(){
@@ -142,7 +144,8 @@ define([
 			Topic.subscribe('report/refresh', function(){
 				self.getCollection().fetchForReport();
 			});
-			Topic.subscribe('search', function(words){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			searchHandle = Topic.subscribe('search', function(words){
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -152,6 +155,10 @@ define([
 			});
 
 			$("#report-filter-ddl-ClientName, #report-filter-ddl-ClientCode, #report-filter-ddl-Date, #report-filter-ddl-AreaDescription").foundation();
+		},
+		componentWillUnmount: function(){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			actionHandle && Topic.unsubscribe(actionHandle);
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();

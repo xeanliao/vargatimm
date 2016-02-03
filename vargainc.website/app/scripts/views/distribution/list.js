@@ -1,5 +1,6 @@
 define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/distribution/publish', 'views/distribution/dismiss', 'react.backbone'], function (_, moment, Backbone, React, Topic, PublishView, DismissView) {
-	var actionHandler = null;
+	var actionHandler = null,
+	    searchHandle = null;
 	var DistributionRow = React.createBackboneClass({
 		getDefaultProps: function () {
 			return {
@@ -127,7 +128,8 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/distributi
 			Topic.subscribe('distribution/refresh', function () {
 				self.getCollection().fetchForDistribution();
 			});
-			Topic.subscribe('search', function (words) {
+			searchHandle && Topic.unsubscribe(searchHandle);
+			searchHandle = Topic.subscribe('search', function (words) {
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -137,6 +139,10 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/distributi
 			});
 
 			$("#distribution-filter-ddl-ClientName, #distribution-filter-ddl-ClientCode, #distribution-filter-ddl-Date, #distribution-filter-ddl-AreaDescription").foundation();
+		},
+		componentWillUnmount: function () {
+			searchHandle && Topic.unsubscribe(searchHandle);
+			actionHandler && Topic.unsubscribe(actionHandler);
 		},
 		onOrderBy: function (field, reactObj, reactId, e) {
 			e.preventDefault();

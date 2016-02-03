@@ -1,5 +1,6 @@
 define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/edit', 'views/campaign/publish', 'models/campaign', 'react.backbone'], function (_, moment, Backbone, React, Topic, EditView, PublishView, Model) {
-	var campaignPubHandle = null;
+	var actionHandle = null,
+	    searchHandle = null;
 	var CampaignRow = React.createBackboneClass({
 		menuKey: 'campaign-menu-ddl-',
 		getDefaultProps: function () {
@@ -48,8 +49,8 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 			e.stopPropagation();
 			var model = this.getModel();
 			Topic.publish('showDialog', PublishView, null, null);
-			campaignPubHandle && Topic.unsubscribe(campaignPubHandle);
-			campaignPubHandle = Topic.subscribe('campaign/publish', function (user) {
+			actionHandle && Topic.unsubscribe(actionHandle);
+			actionHandle = Topic.subscribe('campaign/publish', function (user) {
 				model.publishToDMap(user, {
 					success: function (result) {
 						Topic.publish('showDialog', null, null, null);
@@ -206,7 +207,8 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 			Topic.subscribe('camapign/refresh', function () {
 				self.getCollection().fetch();
 			});
-			Topic.subscribe('search', function (words) {
+			searchHandle && Topic.unsubscribe(searchHandle);
+			searchHandle = Topic.subscribe('search', function (words) {
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -216,6 +218,10 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 			});
 
 			$("#campaign-filter-ddl-ClientName, #campaign-filter-ddl-ClientCode, #campaign-filter-ddl-Date, #campaign-filter-ddl-AreaDescription").foundation();
+		},
+		componentWillUnmount: function () {
+			searchHandle && Topic.unsubscribe(searchHandle);
+			actionHandle && Topic.unsubscribe(actionHandle);
 		},
 		onNew: function () {
 			Topic.publish('showDialog', EditView, null, new Model());
