@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Vargainc.Timm.REST</RootNamespace>
     <AssemblyName>Vargainc.Timm.REST</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -189,6 +189,7 @@
     <Compile Include="ViewModel\ControlCenter\TaskViewModel.cs" />
     <Compile Include="ViewModel\ImportCampaign.cs" />
     <Compile Include="ViewModel\Location.cs" />
+    <Compile Include="ViewModel\MapOptions.cs" />
     <Compile Include="ViewModel\Record.cs" />
     <Compile Include="ViewModel\LoginUser.cs" />
   </ItemGroup>
