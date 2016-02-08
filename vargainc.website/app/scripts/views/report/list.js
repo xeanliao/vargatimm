@@ -1,4 +1,4 @@
-define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'models/task', 'react.backbone'], function (_, moment, Backbone, React, Topic, TaskModel) {
+define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task', 'react.backbone'], function (_, moment, Backbone, React, BaseView, TaskModel) {
 	var actionHandler = null;
 	var ReportRow = React.createBackboneClass({
 		menuKey: 'report-menu-ddl-',

@@ -33,6 +33,7 @@ define(function (require, exports, module) {
 			'monitor': 'monitorAction',
 			'report': 'reportAction',
 			'admin': 'adminAction',
+			'print': 'printAction',
 			'frame/:page': 'frameAction',
 			'frame/*page?*queryString': 'frameAction',
 			'*actions': 'defaultAction'
@@ -104,6 +105,13 @@ define(function (require, exports, module) {
 				'views/admin/dashboard'
 			], function (View) {
 				Topic.publish('loadView', View);
+			});
+		},
+		printAction: function(){
+			require([
+				'views/print/distribution'
+			], function (View) {
+				Topic.publish('loadView', View, null, null);
 			});
 		}
 	});

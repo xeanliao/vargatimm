@@ -3,10 +3,10 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'models/task',
 	'react.backbone'
-], function (_, moment, Backbone, React, Topic, TaskModel) {
+], function (_, moment, Backbone, React, BaseView, TaskModel) {
 	var actionHandler = null;
 	var ReportRow = React.createBackboneClass({
 		menuKey: 'report-menu-ddl-',

@@ -139,6 +139,15 @@ module.exports = function (grunt) {
 	            	src: ['<%= app %>/scripts/views/report/list.jsx'],
 	            	dest: '<%= app %>/scripts/views/report/list.js'
 	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/distributionMap.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/distributionMap.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/mapZoom.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/mapZoom.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/distribution.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/distribution.js'
+	            },{
 	            	src: ['<%= app %>/scripts/views/frame.jsx'],
 	            	dest: '<%= app %>/scripts/views/frame.js'
 	            },{

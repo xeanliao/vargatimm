@@ -95,6 +95,7 @@ require.config({
         'react-select': 'vendor/react-select',
         'pubsub': 'vendor/pubsub',
         'classnames': 'vendor/dedupe',
+        'numeral': 'vendor/numeral',
         'foundation.core': 'vendor/foundation.core',
         'foundation.util.box': 'vendor/foundation.util.box',
         'foundation.util.keyboard': 'vendor/foundation.util.keyboard',
