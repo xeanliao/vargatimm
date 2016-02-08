@@ -170,7 +170,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'models/task', 'r
 											{ className: 'float-right tool-bar' },
 											React.createElement(
 												'a',
-												{ className: 'button row-button', href: "#frame/EditGTU.aspx?tid=" + task.Id },
+												{ className: 'button row-button', href: "#frame/EditGTU.aspx?id=" + task.Id },
 												React.createElement('i', { className: 'fa fa-magic' }),
 												React.createElement(
 													'small',
