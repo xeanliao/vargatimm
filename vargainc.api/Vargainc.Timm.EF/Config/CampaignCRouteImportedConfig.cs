@@ -15,7 +15,6 @@ namespace Vargainc.Timm.EF.Config
 
             Property(i => i._IsPartModified).HasColumnName("IsPartModified");
             Ignore(i => i.IsPartModified);
-
         }
     }
 }

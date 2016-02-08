@@ -16,7 +16,7 @@ namespace Vargainc.Timm.Models
             }
             set
             {
-                if(value.HasValue && value.Value)
+                if (value.HasValue && value.Value)
                 {
                     _IsPartModified = 1;
                 }
