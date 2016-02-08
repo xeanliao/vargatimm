@@ -3,11 +3,13 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'views/base',
+	'pubsub',
 	'models/task',
 	'react.backbone'
-], function (_, moment, Backbone, React, BaseView, TaskModel) {
-	var actionHandler = null;
+], function (_, moment, Backbone, React, Topic, TaskModel) {
+	var actionHandle = null,
+		searchHandle = null;
+
 	var ReportRow = React.createBackboneClass({
 		menuKey: 'report-menu-ddl-',
 		getDefaultProps: function(){
@@ -50,9 +52,9 @@ define([
 					<button className="button cirle" data-toggle={id}>
 						<i className="fa fa-ellipsis-h"></i>
 					</button>
-					<div id={id} className="dropdown-pane bottom" 
+					<div id={id} className="dropdown-pane bottom"
 						data-dropdown
-						data-close-on-click="true" 
+						data-close-on-click="true"
 						data-auto-focus="false"
 						onClick={this.onCloseMoreMenu.bind(null, key)}>
 						<ul className="vertical menu">
@@ -96,20 +98,22 @@ define([
 							</colgroup>
 							<tbody>
 							{model.get('Tasks').map(function(task){
-								var taskDisplayDate = task && task.Date ? moment(task.Date).format("MMM DD, YYYY") : ''
+								if(task.visiable === false){
+									return null;
+								}
 								return (
 									<tr key={task.Id}>
 										<td onClick={self.onGotoReport.bind(null, task.Id)}>
-											{taskDisplayDate} - {task.Name}
+											{task.Name}
 										</td>
 										<td>
 											<div className="float-right tool-bar">
-												<a className="button row-button" href={"#frame/EditGTU.aspx?tid=" + task.Id}>
+												<a className="button row-button" href={"#frame/EditGTU.aspx?id=" + task.Id}>
 													<i className="fa fa-magic"></i><small>Review</small>
 												</a>
-												<button onClick={self.onReOpenTask.bind(null, task.Id)} 
-													className="button has-tip top" title="dismiss" 
-													data-tooltip aria-haspopup="true" 
+												<button onClick={self.onReOpenTask.bind(null, task.Id)}
+													className="button has-tip top" title="dismiss"
+													data-tooltip aria-haspopup="true"
 													data-disable-hover='false' tabIndex="1">
 													<i className="fa fa-reply"></i>
 												</button>
@@ -140,7 +144,8 @@ define([
 			Topic.subscribe('report/refresh', function(){
 				self.getCollection().fetchForReport();
 			});
-			Topic.subscribe('search', function(words){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			searchHandle = Topic.subscribe('search', function(words){
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -150,6 +155,10 @@ define([
 			});
 
 			$("#report-filter-ddl-ClientName, #report-filter-ddl-ClientCode, #report-filter-ddl-Date, #report-filter-ddl-AreaDescription").foundation();
+		},
+		componentWillUnmount: function(){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			actionHandle && Topic.unsubscribe(actionHandle);
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();
@@ -225,11 +234,11 @@ define([
 				});
 				var menuItems = _.uniq(fieldValues).sort();
 				filterMenu = (
-					<div id={"report-filter-ddl-" + field} 
-						className="dropdown-pane bottom" 
+					<div id={"report-filter-ddl-" + field}
+						className="dropdown-pane bottom"
 						style={{width: 'auto'}}
-						data-dropdown 
-						data-close-on-click="true" 
+						data-dropdown
+						data-close-on-click="true"
 						data-auto-focus="false">
 						<form onSubmit={this.onFilter.bind(this, field)}>
 							<ul className="vertical menu">
@@ -245,7 +254,7 @@ define([
 					</div>
 				);
 			}
-			
+
 			return(
 				<div>
 					<a data-toggle={"report-filter-ddl-" + field}>
@@ -265,16 +274,30 @@ define([
 			}
 			if(this.state.search){
 				var keyword = this.state.search.toLowerCase(),
-					values = null;
+					campaignValues = null,
+					campaignSearch = null,
+					taskValues = null,
+					taskSearch = null;
 				dataSource = _.filter(dataSource, function(i) {
-					values  = _.values(i.attributes);
-					return _.some(values, function(i){
+					campaignValues  = _.values(i.attributes);
+					campaignSearch = _.some(campaignValues, function(i){
 						var dateCheck = moment(i, moment.ISO_8601);
 						if(dateCheck.isValid()){
 							return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;
 						}
 						return _.toString(i).toLowerCase().indexOf(keyword) > -1;
 					});
+					/**
+					 * update task visiable logical.
+					 * if campaign in search keyward. show all task
+					 * otherwise only show task name in search word.
+					 * if there is no task need show hide this campaign.
+					 */
+					taskValues = _.values(i.attributes.Tasks);
+					_.forEach(taskValues, function(i){
+						i.visiable = campaignSearch || i.Name.toLowerCase().indexOf(keyword) > -1;
+					});
+					return campaignSearch || _.some(taskValues, {visiable:true});
 				});
 			}else if(this.state.filterField && this.state.filterValues){
 				var filterField = this.state.filterField,
@@ -292,7 +315,7 @@ define([
 		},
 		render: function () {
 			var list = this.getDataSource();
-			return ( 
+			return (
 				<div className="section row">
 					<div className="small-12 columns">
 						<div className="section-header">

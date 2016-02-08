@@ -1,5 +1,7 @@
-define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task', 'react.backbone'], function (_, moment, Backbone, React, BaseView, TaskModel) {
-	var actionHandler = null;
+define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'models/task', 'react.backbone'], function (_, moment, Backbone, React, Topic, TaskModel) {
+	var actionHandle = null,
+	    searchHandle = null;
+
 	var ReportRow = React.createBackboneClass({
 		menuKey: 'report-menu-ddl-',
 		getDefaultProps: function () {
@@ -149,15 +151,15 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task'
 							'tbody',
 							null,
 							model.get('Tasks').map(function (task) {
-								var taskDisplayDate = task && task.Date ? moment(task.Date).format("MMM DD, YYYY") : '';
+								if (task.visiable === false) {
+									return null;
+								}
 								return React.createElement(
 									'tr',
 									{ key: task.Id },
 									React.createElement(
 										'td',
 										{ onClick: self.onGotoReport.bind(null, task.Id) },
-										taskDisplayDate,
-										' - ',
 										task.Name
 									),
 									React.createElement(
@@ -168,7 +170,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task'
 											{ className: 'float-right tool-bar' },
 											React.createElement(
 												'a',
-												{ className: 'button row-button', href: "#frame/EditGTU.aspx?tid=" + task.Id },
+												{ className: 'button row-button', href: "#frame/EditGTU.aspx?id=" + task.Id },
 												React.createElement('i', { className: 'fa fa-magic' }),
 												React.createElement(
 													'small',
@@ -209,7 +211,8 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task'
 			Topic.subscribe('report/refresh', function () {
 				self.getCollection().fetchForReport();
 			});
-			Topic.subscribe('search', function (words) {
+			searchHandle && Topic.unsubscribe(searchHandle);
+			searchHandle = Topic.subscribe('search', function (words) {
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -219,6 +222,10 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task'
 			});
 
 			$("#report-filter-ddl-ClientName, #report-filter-ddl-ClientCode, #report-filter-ddl-Date, #report-filter-ddl-AreaDescription").foundation();
+		},
+		componentWillUnmount: function () {
+			searchHandle && Topic.unsubscribe(searchHandle);
+			actionHandle && Topic.unsubscribe(actionHandle);
 		},
 		onOrderBy: function (field, reactObj, reactId, e) {
 			e.preventDefault();
@@ -361,16 +368,30 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task'
 			}
 			if (this.state.search) {
 				var keyword = this.state.search.toLowerCase(),
-				    values = null;
+				    campaignValues = null,
+				    campaignSearch = null,
+				    taskValues = null,
+				    taskSearch = null;
 				dataSource = _.filter(dataSource, function (i) {
-					values = _.values(i.attributes);
-					return _.some(values, function (i) {
+					campaignValues = _.values(i.attributes);
+					campaignSearch = _.some(campaignValues, function (i) {
 						var dateCheck = moment(i, moment.ISO_8601);
 						if (dateCheck.isValid()) {
 							return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;
 						}
 						return _.toString(i).toLowerCase().indexOf(keyword) > -1;
 					});
+					/**
+      * update task visiable logical.
+      * if campaign in search keyward. show all task
+      * otherwise only show task name in search word.
+      * if there is no task need show hide this campaign.
+      */
+					taskValues = _.values(i.attributes.Tasks);
+					_.forEach(taskValues, function (i) {
+						i.visiable = campaignSearch || i.Name.toLowerCase().indexOf(keyword) > -1;
+					});
+					return campaignSearch || _.some(taskValues, { visiable: true });
 				});
 			} else if (this.state.filterField && this.state.filterValues) {
 				var filterField = this.state.filterField,

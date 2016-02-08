@@ -10,7 +10,9 @@ define([
 	'models/task',
 	'react.backbone'
 ], function ($, _, moment, Backbone, React, Topic, DismissView, EditView, TaskModel) {
-	var actionHandler = null;
+	var actionHandle = null,
+		searchHandle = null;
+
 	var MonitorRow = React.createBackboneClass({
 		menuKey: 'monitor-menu-ddl-',
 		getDefaultProps: function(){
@@ -159,11 +161,13 @@ define([
 							</colgroup>
 							<tbody>
 							{model.get('Tasks').map(function(task){
-								var taskDisplayDate = task && task.Date ? moment(task.Date).format("MMM DD, YYYY") : ''
+								if (task.visiable === false) {
+									return null;
+								}
 								return (
 									<tr key={task.Id}>
 										<td onClick={self.onGotoMonitor.bind(null, task.Id)}>
-											{taskDisplayDate} - {task.Name}
+											{task.Name}
 										</td>
 										<td>
 											<div className="float-right tool-bar">
@@ -198,7 +202,8 @@ define([
 			Topic.subscribe('monitor/refresh', function(){
 				self.getCollection().fetchForTask();
 			});
-			Topic.subscribe('search', function(words){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			searchHandle = Topic.subscribe('search', function(words){
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -208,6 +213,10 @@ define([
 			});
 
 			$("#monitor-filter-ddl-ClientName, #monitor-filter-ddl-ClientCode, #monitor-filter-ddl-Date, #monitor-filter-ddl-AreaDescription").foundation();
+		},
+		componentWillUnmount: function(){
+			searchHandle && Topic.unsubscribe(searchHandle);
+			actionHandle && Topic.unsubscribe(actionHandle);
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();
@@ -323,16 +332,30 @@ define([
 			}
 			if(this.state.search){
 				var keyword = this.state.search.toLowerCase(),
-					values = null;
+					campaignValues = null,
+					campaignSearch = null,
+					taskValues = null,
+					taskSearch = null;
 				dataSource = _.filter(dataSource, function(i) {
-					values  = _.values(i.attributes);
-					return _.some(values, function(i){
+					campaignValues  = _.values(i.attributes);
+					campaignSearch = _.some(campaignValues, function(i){
 						var dateCheck = moment(i, moment.ISO_8601);
 						if(dateCheck.isValid()){
 							return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;
 						}
 						return _.toString(i).toLowerCase().indexOf(keyword) > -1;
 					});
+					/**
+					 * update task visiable logical.
+					 * if campaign in search keyward. show all task
+					 * otherwise only show task name in search word.
+					 * if there is no task need show hide this campaign.
+					 */
+					taskValues = _.values(i.attributes.Tasks);
+					_.forEach(taskValues, function(i){
+						i.visiable = campaignSearch || i.Name.toLowerCase().indexOf(keyword) > -1;
+					});
+					return campaignSearch || _.some(taskValues, {visiable:true});
 				});
 			}else if(this.state.filterField && this.state.filterValues){
 				var filterField = this.state.filterField,

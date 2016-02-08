@@ -23,7 +23,7 @@ namespace Vargainc.Timm.REST.Controllers
     [RoutePrefix("map")]
     public class MapController : ApiController
     {
-        const string MapImageServer = ConfigurationManager.AppSettings["MapImageServer"];
+        static string MapImageServer = ConfigurationManager.AppSettings["MapImageServer"];
 
         private TimmContext db = new TimmContext();
 
