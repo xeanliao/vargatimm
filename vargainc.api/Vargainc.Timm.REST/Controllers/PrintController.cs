@@ -466,91 +466,10 @@ namespace Vargainc.Timm.REST.Controllers
                                 {
                                     Id = combo.AreaId,
                                     Name = combo.Name,
-                                    APT = r.IsPartModified == true ? r.PartPercentage * combo.APT_COUNT : combo.APT_COUNT,
-                                    Home = r.IsPartModified == true ? r.PartPercentage * combo.HOME_COUNT : combo.HOME_COUNT,
+                                    APT = r._IsPartModified == 1 ? r.PartPercentage * combo.APT_COUNT : combo.APT_COUNT,
+                                    Home = r._IsPartModified == 1 ? r.PartPercentage * combo.HOME_COUNT : combo.HOME_COUNT,
                                     TotalHouseHold = 0,
-                                    TargetHouseHold = r.IsPartModified == true ? r.PartPercentage * r.Penetration : r.Penetration
-                                };
-                    }
-                    break;
-                case 1: //FiveZips
-                    {
-                        query = from submapRecord in db.SubMapRecords
-                                join area in db.FiveZipAreas on submapRecord.AreaId equals area.Id
-                                where submapRecord.SubMapId == submapId && submapRecord.Value == true
-                                select new
-                                {
-                                    AreaId = area.Id,
-                                    Name = area.Name,
-                                    area.APT_COUNT,
-                                    area.HOME_COUNT
-                                }
-                                into combo
-                                join imported in db.CampaignFiveZipImporteds.Where(i => i.CampaignId == campaign.Id) 
-                                on combo.AreaId equals imported.FiveZipAreaId into left
-                                from r in left.DefaultIfEmpty()
-                                where r.CampaignId == campaign.Id
-                                orderby combo.AreaId
-                                select new ViewModel.Record
-                                {
-                                    Id = combo.AreaId,
-                                    Name = combo.Name,
-                                    APT = r.IsPartModified == true ? r.PartPercentage * combo.APT_COUNT : combo.APT_COUNT,
-                                    Home = r.IsPartModified == true ? r.PartPercentage * combo.HOME_COUNT : combo.HOME_COUNT,
-                                    TotalHouseHold = 0,
-                                    TargetHouseHold = r.IsPartModified == true ? r.PartPercentage * r.Penetration : r.Penetration
-                                };
-                    }
-                    break;
-                case 2: //Tracts
-                    {
-                        query = from submapRecord in db.SubMapRecords
-                                join area in db.Tracts on submapRecord.AreaId equals area.Id
-                                where submapRecord.SubMapId == submapId && submapRecord.Value == true
-                                select new
-                                {
-                                    AreaId = area.Id,
-                                    Name = area.Name,
-                                    Total = area.OTotal
-                                }
-                                into combo
-                                join imported in db.CampaignTractImporteds.Where(i => i.CampaignId == campaign.Id) 
-                                on combo.AreaId equals imported.TractId into left
-                                from r in left.DefaultIfEmpty()
-                                where r.CampaignId == campaign.Id
-                                orderby combo.AreaId
-                                select new ViewModel.Record
-                                {
-                                    Id = combo.AreaId,
-                                    Name = combo.Name,
-                                    TotalHouseHold = r.Total.HasValue ? r.Total : combo.Total,
-                                    TargetHouseHold = r.Penetration
-                                };
-                    }
-                    break;
-                case 3: //BlockGroups
-                    {
-                        query = from submapRecord in db.SubMapRecords
-                                join area in db.BlockGroups on submapRecord.AreaId equals area.Id
-                                where submapRecord.SubMapId == submapId && submapRecord.Value == true
-                                select new
-                                {
-                                    AreaId = area.Id,
-                                    Name = area.Name,
-                                    Total = area.OTotal
-                                }
-                                into combo
-                                join imported in db.CampaignBlockGroupImporteds.Where(i => i.CampaignId == campaign.Id) 
-                                on combo.AreaId equals imported.BlockGroupId into left
-                                from r in left.DefaultIfEmpty()
-                                where r.CampaignId == campaign.Id
-                                orderby combo.AreaId
-                                select new ViewModel.Record
-                                {
-                                    Id = combo.AreaId,
-                                    Name = combo.Name,
-                                    TotalHouseHold = r.Total.HasValue ? r.Total : combo.Total,
-                                    TargetHouseHold = r.Penetration
+                                    TargetHouseHold = r._IsPartModified == 1 ? r.PartPercentage * r.Penetration : r.Penetration
                                 };
                     }
                     break;
@@ -569,7 +488,7 @@ namespace Vargainc.Timm.REST.Controllers
             var debug = query.ToString();
             foreach (var item in query)
             {
-                if (record.Classification == 15 || record.Classification == 1)
+                if (record.Classification == 15)
                 {
                     switch (areaDesc)
                     {
