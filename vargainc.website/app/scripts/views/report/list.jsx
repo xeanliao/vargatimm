@@ -52,9 +52,9 @@ define([
 					<button className="button cirle" data-toggle={id}>
 						<i className="fa fa-ellipsis-h"></i>
 					</button>
-					<div id={id} className="dropdown-pane bottom" 
+					<div id={id} className="dropdown-pane bottom"
 						data-dropdown
-						data-close-on-click="true" 
+						data-close-on-click="true"
 						data-auto-focus="false"
 						onClick={this.onCloseMoreMenu.bind(null, key)}>
 						<ul className="vertical menu">
@@ -108,12 +108,12 @@ define([
 										</td>
 										<td>
 											<div className="float-right tool-bar">
-												<a className="button row-button" href={"#frame/EditGTU.aspx?tid=" + task.Id}>
+												<a className="button row-button" href={"#frame/EditGTU.aspx?id=" + task.Id}>
 													<i className="fa fa-magic"></i><small>Review</small>
 												</a>
-												<button onClick={self.onReOpenTask.bind(null, task.Id)} 
-													className="button has-tip top" title="dismiss" 
-													data-tooltip aria-haspopup="true" 
+												<button onClick={self.onReOpenTask.bind(null, task.Id)}
+													className="button has-tip top" title="dismiss"
+													data-tooltip aria-haspopup="true"
 													data-disable-hover='false' tabIndex="1">
 													<i className="fa fa-reply"></i>
 												</button>
@@ -234,11 +234,11 @@ define([
 				});
 				var menuItems = _.uniq(fieldValues).sort();
 				filterMenu = (
-					<div id={"report-filter-ddl-" + field} 
-						className="dropdown-pane bottom" 
+					<div id={"report-filter-ddl-" + field}
+						className="dropdown-pane bottom"
 						style={{width: 'auto'}}
-						data-dropdown 
-						data-close-on-click="true" 
+						data-dropdown
+						data-close-on-click="true"
 						data-auto-focus="false">
 						<form onSubmit={this.onFilter.bind(this, field)}>
 							<ul className="vertical menu">
@@ -254,7 +254,7 @@ define([
 					</div>
 				);
 			}
-			
+
 			return(
 				<div>
 					<a data-toggle={"report-filter-ddl-" + field}>
@@ -315,7 +315,7 @@ define([
 		},
 		render: function () {
 			var list = this.getDataSource();
-			return ( 
+			return (
 				<div className="section row">
 					<div className="small-12 columns">
 						<div className="section-header">
