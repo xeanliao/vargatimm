@@ -21,7 +21,6 @@ namespace Vargainc.Timm.EF
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
-            
             modelBuilder.Configurations.Add(new FiveZipAreaConfig());
             modelBuilder.Configurations.Add(new FiveZipCoordinateConfig());
             modelBuilder.Configurations.Add(new BlockGroupConfig());

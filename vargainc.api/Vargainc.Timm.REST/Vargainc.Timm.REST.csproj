@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Vargainc.Timm.REST</RootNamespace>
     <AssemblyName>Vargainc.Timm.REST</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -173,7 +173,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CampaignController.cs" />
-    <Compile Include="Controllers\MapController.cs" />
     <Compile Include="Controllers\PDFController.cs" />
     <Compile Include="Controllers\PhantomController.cs" />
     <Compile Include="Controllers\PrintController.cs" />
