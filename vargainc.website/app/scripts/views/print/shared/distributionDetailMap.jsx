@@ -9,84 +9,34 @@ define([
 	'views/print/shared/mapZoom',
 	'react.backbone'
 ], function ($, _, moment, Backbone, React, Numeral, BaseView, MapZoomView) {
+	var mapZoomHandler = null;
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function(){
-			return {ImageLoaded: false};
-		},
-		componentDidMount: function(){
-			var id = this.getModel().get('DMapId');
-			this.publish('print.map.imageloaded');
+			return {
+				ImageLoaded: false
+			};
 		},
 		loadImage: function(){
 			var model = this.getModel(),
 				self = this;
-			model.fetchMapImage(this.props.options).always(function(){
-				console.log('always');
-				self.setState({ImageLoaded: true});
+			model.fetchMapImage(this.props.options).always(function () {
+				self.setState({
+					ImageLoaded: true
+				});
 				self.publish('print.map.imageloaded');
 			});
 		},
-		onCreateDetailMap: function(rectBounds){
-			var model = this.getModel(),
-				detailModel = model.clone(),
-				topRight = rectBounds.getNorthEast(),
-				bottomLeft = rectBounds.getSouthWest(),
-				modelIndex = model.collection.indexOf(model);
-			detailModel.set({
-				'key': model.get('key') + '-' + topRight.lat() + '-' + topRight.lng() + '-' + bottomLeft.lat() + '-' + bottomLeft.lng(),
-				'type': 'DistributionDetail',
-				'TopRight': {
-					lat: topRight.lat(),
-					lng: topRight.lng()
-				},
-				'BottomLeft': {
-					lat: bottomLeft.lat(),
-					lng: bottomLeft.lng()
-				},
-				'Boundary': null,
-				'ImageStatus': 'waiting',
-				'MapImage': null,
-				'PolygonImage': null
-			});
-			model.collection.add(detailModel, {
-				at: modelIndex + 1
-			});
-			this.publish('showDialog', null);
-			this.publish('print.map.imageloaded');
-		},
-		onShowEditDialog: function(){
-			var model = this.getModel(),
-				self = this,
-				def = $.Deferred();
-			if(!this.state.ImageLoaded || !model.get('MapImage') || !model.get('PolygonImage')){
-				return;
-			}
-			if(model.get('Boundary')){
-				def.resolve();
-			}else{
-				def = model.fetchBoundary();
-			}
-			def.done(function(){
-				var mapZoomView = React.createFactory(MapZoomView),
-					color = model.get('Color'),
-					key = 'distribution-' + model.get('DMapId'),
-					view = mapZoomView({
-						sourceKey: key,
-						boundary: model.get('Boundary'),
-						color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
-					});
-				self.unsubscribe('print.mapzoom@' + key);
-				self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
-				self.publish('showDialog', view, null, null, 'full');
-			});
+		onRemove: function(){
+			var model = this.getModel();
+			model.collection.remove(model);
 		},
 		getExportParamters: function(){
 			var model = this.getModel();
 			return {
 				'type': 'dmap',
 				'options': [{
-					'title': 'DM MAP ' + model.get('DMapId') + '(' + model.get('Name') + ')'
+					'title': 'DM MAP ' + model.get('DMapId') + '(' + model.get('Name') + ') -- detail map'
 				}, {
 					'list': [{
 						'key': 'DM MAP #',
@@ -101,13 +51,12 @@ define([
 				}, {
 					'title': model.get('DisplayName') + ' - ' + model.get('Name')
 				}, {
-					'map': model.get('PolygonImage'),
-					'bg': model.get('MapImage')
+					'map': model.get('MapImage'),
+					'bg': model.get('PolygonImage')
 				}]
 			};
 		},
 		render: function(){
-			console.log('render');
 			var model = this.getModel();
 			var total = Numeral(model.get('Total')).format('0,0');
 			var mapImage = model.get('MapImage');
@@ -130,11 +79,15 @@ define([
 			}else{
 				var mapImage = React.createElement('div', { className: 'loading' }, null);
 			}
+
 			return (
 				<div className="page">
 					<div className="row">
 	  					<div className="small-12 columns text-center title">
-	  						DM MAP {model.get('DMapId')}({model.get('Name')})
+	  						DM MAP {model.get('DMapId')}({model.get('Name')}) -- detail map
+	  						<button className="button float-right" onClick={this.onRemove}>
+								<i className="fa fa-delete"></i>Remove
+	  						</button>
   						</div>
 					</div>
 					<div className="row list" role="list">
@@ -152,7 +105,7 @@ define([
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
-							<div className="map-container dmapPrint" onClick={this.onShowEditDialog}>
+							<div className="map-container dmapPrint" onClick={this.onEdit}>
 								{mapImage}
 							</div>
 						</div>

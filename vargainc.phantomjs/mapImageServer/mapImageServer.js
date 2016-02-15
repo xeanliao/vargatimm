@@ -1,6 +1,8 @@
 (function () {
 	'use strict';
-
+	var LocalDebug = true;
+	var LocalMapImage = '08F3FBD5-8D7F-4B1B-B466-4AC1F04B1E21.jpg';
+	var LocalPolygonImage = '1B7C8334-C500-42F8-A7FF-83CB3F72EBD6.png';
 	var DEBUG = true;
 
 	var system = require('system'),
@@ -42,12 +44,13 @@
 	};
 
 	var render = function (params, exitCallback) {
+		console.log(params.type);
 		var exit = function (result) {
 			page.close();
 			exitCallback(result);
 		};
 
-		console.log(JSON.stringify(params));
+		console.log('params', JSON.stringify(params));
 		var page = require('webpage').create();
 		page.viewportSize = {
 			width: 800,
@@ -177,25 +180,30 @@
 	};
 
 	var parseUrl = function (url) {
-		var params = url.replace('/', '').replace('?', '').split('&');
 		var map = {};
-		for (var i = 0; i < params.length; i++) {
-			var index = params[i].indexOf('=');
-			var key = decodeURIComponent(params[i].substr(0, index));
-			var value = decodeURIComponent(params[i].substring(index + 1));
+		if(url.substr(0, 1) != '{'){
+			var params = url.replace('/', '').replace('?', '').split('&');
+			for (var i = 0; i < params.length; i++) {
+				var index = params[i].indexOf('=');
+				var key = decodeURIComponent(params[i].substr(0, index));
+				var value = decodeURIComponent(params[i].substring(index + 1));
 
-			if(['true', 'false'].indexOf(value) > -1){
-				map[key] = value == 'true';
-			}else if(key.indexOf('[]') > -1){
-				key = key.replace('[]', '');
-				if(typeof map[key] === 'undefined'){
-					map[key] = [];
+				if(['true', 'false'].indexOf(value) > -1){
+					map[key] = value == 'true';
+				}else if(key.indexOf('[]') > -1){
+					key = key.replace('[]', '');
+					if(typeof map[key] === 'undefined'){
+						map[key] = [];
+					}
+					map[key].push(value);
+				}else{
+					map[key] = value;
 				}
-				map[key].push(value);
-			}else{
-				map[key] = value;
 			}
+		}else{
+			map = JSON.parse(url);
 		}
+		console.log('parse url', url, JSON.stringify(map));
 		return map;
 	};
 
@@ -216,7 +224,7 @@
 						};
 						response.write('');
 						response.close();
-					} else if (false) {
+					} else if (LocalDebug) {
 						var jsonStr = request.postRaw || request.post;
 						var params = parseUrl(jsonStr);
 						response.statusCode = 200;
@@ -224,9 +232,9 @@
 						response.setHeader('access-control-allow-origin', '*');
 						var msg = '';
 						var result = {
-							"tiles": "93F38CAD-7216-42B1-B3FC-BB54B43816C5.jpg",
-							"geometry": "A1F4CBFE-358D-4175-A98F-70038D745A16.png",
-							"success": false
+							"tiles": LocalMapImage,
+							"geometry": LocalPolygonImage,
+							"success": true
 						};
 						result.campaignId = params.campaignId,
 						result.submapId = params.submapId,

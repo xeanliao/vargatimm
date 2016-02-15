@@ -18,9 +18,9 @@ define([
 		$(document).foundation();
 		var options = {
 			//Local dev
-			// baseUrl: "http://dev.timm.vargainc.com/",
-			// mapUrl: "http://local.timm.vargainc.com/map/",
-			// imgUrl: 'http://local.timm.vargainc.com/mapimg/',
+			baseUrl: "http://local.timm.vargainc.com/api/",
+			mapUrl: "http://local.timm.vargainc.com/map/",
+			imgUrl: 'http://local.timm.vargainc.com/mapimg/',
 
 			// baseUrl: "http://98.189.6.210:9000/timm201507/api/",
 			// mapUrl: "http://54.67.112.52/map/",
@@ -28,8 +28,8 @@ define([
 
 			//Timm dev
 			// baseUrl: "http://98.189.6.210:9000/timm201507/api/",
-			mapUrl: "http://local.timm.vargainc.com/map/",
-			imgUrl: 'http://local.timm.vargainc.com/mapimg/',
+			// mapUrl: "http://local.timm.vargainc.com/map/",
+			// imgUrl: 'http://local.timm.vargainc.com/mapimg/',
 
 			// Timm Ubuntu
 			// baseUrl: "http://98.189.6.210:9000/timm201507/api/",
@@ -37,7 +37,7 @@ define([
 			// imgUrl: 'http://98.189.6.213/mapimg/',
 
 			// EC2
-			baseUrl: "http://52.8.230.211/201601/api/",
+			// baseUrl: "http://52.8.230.211/201601/api/",
 			// mapUrl: "http://54.67.112.52/map/",
 			// imgUrl: 'http://ec2-54-67-112-52.us-west-1.compute.amazonaws.com/mapimg/'
 		};

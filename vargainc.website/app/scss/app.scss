@@ -1,5 +1,7 @@
 @import "framework";
 @import url(https://fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic);
+@import "util/_unit";
+
 html, body {
 	font-family: 'Ubuntu', verdana, arial, sans-serif;
 	color: #8a8a8a;
@@ -65,26 +67,6 @@ html, body {
 			top: 2px;
 		}
 	}
-}
-
-.off-canvas-wrapper-inner {
-	position: fixed;
-	min-height: 100%;
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-.off-canvas-wrapper-inner.is-off-canvas-open{
-	overflow-y: visible;
-	overflow-x: visible;
-}
-.is-off-canvas-open .sidebar {
-	width: 250px !important;
-	left: -250px !important;
-	max-height: none !important;
-	span, .submenu{display: inline !important;}
-}
-.is-off-canvas-open .main {
-	left: 0px !important;
 }
 .title-bar-center{
 	position: absolute;
@@ -207,6 +189,284 @@ html, body {
 	}
 }
 
+$LetterPageWidth: 8.5in;
+$LetterPageHeight: 11in;
+$LetterTopBottomMargin: 0.5in;
+$LetterLeftRightMargin: 0.25in;
+$A4PageWidth: 8.27in;
+$A4PageHeight: 11.69in;
+$A4TopBottomMargin: 0.5in;
+$A4LeftRightMargin: 0.25in;
+$A3PageWidth: 11.69in;
+$A3PageHeight: 16.53in;
+$A3TopBottomMargin: 1.25in;
+$A3LeftRightMargin: 0.5in;
+
+.page-container {
+	&.Letter {
+		.page {		
+			width: $LetterPageWidth;
+			min-height: $LetterPageHeight;
+			padding: $LetterTopBottomMargin $LetterLeftRightMargin auto $LetterLeftRightMargin;
+
+			.footer {
+				left: $LetterLeftRightMargin;
+				right: $LetterLeftRightMargin;
+				bottom: $LetterLeftRightMargin;
+			}
+		}
+	}
+	&.A4 {
+		.page {		
+			width: $A4PageWidth;
+			min-height: $A4PageHeight;
+			padding: $A4TopBottomMargin $A4LeftRightMargin auto $A4LeftRightMargin;
+
+			.footer {
+				left: $A4LeftRightMargin;
+				right: $A4LeftRightMargin;
+				bottom: $A4LeftRightMargin;
+			}
+		}
+	}
+	&.A3 {
+		.page {		
+			width: $A3PageWidth;
+			min-height: $A3PageHeight;
+			padding: $A3TopBottomMargin $A3LeftRightMargin auto $A3LeftRightMargin;
+
+			.footer {
+				left: $A3LeftRightMargin;
+				right: $A3LeftRightMargin;
+				bottom: $A3LeftRightMargin;
+			}
+		}
+	}
+	&.dmapPrint{
+		.page {		
+			width: 12in;
+			min-height: 12in;
+			padding: 0;
+			&.dmap .map-container{
+				min-height: rem-calc(725);
+			}
+		}
+		.row{ max-width: 12in; margin: 0;}
+		.footer{
+			margin-bottom: 10px;
+			padding-left: 10px;
+			padding-right: 10px;
+			width: 100%;
+		}
+	}
+}
+.page {
+	width: $A4PageWidth;
+	min-height: $A4PageHeight;
+	padding: $A4TopBottomMargin $A4LeftRightMargin;
+	padding-bottom: rem-calc(85);
+	margin: rem-calc(15) auto;
+	background: #FFF none repeat scroll 0% 0%;
+	box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.4);
+	position: relative;
+
+	&:first-child {
+		margin-top: rem-calc(15);
+	}
+	.title {
+		background: #94b43d;
+		color: #222;
+		text-align: center;
+		font-weight: 800;
+		line-height: 25pt;
+		height: 25pt;
+		font-size: 14pt;
+		span{
+			font-size: 14pt;
+		}
+	}
+	.list{
+		span{
+			font-size: 11pt;
+		}
+	}
+	$map-width: "100%";
+
+	.map-container {
+		cursor: point;
+		overflow: hidden;
+
+		img {
+			width: 100%;
+			height: 100%;
+		}
+	}
+	&.campaign {
+		.map-container {
+			width: $map-width;
+			min-height: rem-calc(690);
+		}
+	}
+	&.submap {
+		.map-container {
+			width: $map-width;
+			min-height: rem-calc(710);
+		}
+	}
+	&.dmap {
+		.map-container {
+			width: $map-width;
+			min-height: rem-calc(790);
+		}
+	}
+	.color-legend{
+		float: left;
+		.tips{
+			margin-top: 10px;
+		}
+		i, label{
+			display: inline-block;
+			font-size: 9pt;
+		}
+		i{
+			position: relative;
+			top: 2px;
+			width: 18px;
+			height: 12px;
+			border: solid 1px black;
+			margin-left: 3pt !important;
+			&:first-child{margin-left: 0 !important;}
+			&.blue{ background-color: rgb(0, 0, 255);}
+			&.green{ background-color: rgb(0, 255, 0);}
+			&.yellow{ background-color: rgb(255, 255, 0);}
+			&.orange{ background-color: rgb(255, 150, 0);}
+			&.red{ background-color: rgb(187, 0, 0);}
+		}
+		label{
+			margin-left: 2pt !important;
+		}
+		
+	}
+	.direction-legend {
+		background: url(../images/direction-legend.jpg) center center;
+		width: rem-calc(64);
+		height: rem-calc(64);
+		background-size: 100% 100%;
+		float: right;
+	}
+	table {
+		width: 100%;
+	}
+	.footer {
+		position: absolute;
+		bottom: 0;
+		border-top: solid rem-calc(2) black;
+		padding-top: rem-calc(5);
+		
+		background: #fff;
+		z-index: 99;
+		.left{
+			position: relative;
+			width: 90pt;
+			float: left;
+			img{
+				margin-top: 5px;
+			}
+		}
+		.center{
+			position: absolute;
+			left: 98pt;
+			right: 125pt;
+		}
+		.right{
+			position: relative;
+			width: 120pt;
+			float: right;
+			img{
+				float: right;
+				margin-top: 6px;
+			}
+		}
+		ul{
+			margin: 0 !important;
+		}
+		li {
+			height: 10pt;
+			line-height: 10pt;
+			position: relative;
+			span{
+				font-size: 7pt;
+				display: block;
+				height: 10pt;
+				line-height: 10pt;
+				&:last-child{
+					position: absolute;
+					right: 0;
+					top: 0;
+				}
+			}
+		}
+	}
+	&.cover {
+		.row{
+			margin-bottom: 20pt;
+		}
+		.client-logo {
+			height: 80pt;
+			margin-top: 40pt;
+			margin-bottom: 40pt;
+		}
+		.vargainc-log {
+			height: 40pt;
+			margin-top: 10pt;
+			margin-bottom: 10pt;
+		}
+		label {
+			font-weight: 800;
+			font-size: 12pt;
+			line-height: 1;
+		}
+		span {
+			font-size: 12pt;
+			line-height: 1;
+		}
+	}
+}
+.google_map_container{
+	width: 100%;
+	height: 100%;
+	z-index: 1007;
+	background: transparent;
+	.pop-tool-bar{
+		pointer-events: none;
+	}
+	*{
+		pointer-events: all;
+	}
+}
+.google-map{
+	position: fixed;
+	z-index: 1005;
+	top: 0;
+	left: 0;
+	width: 1920px;
+	height: 1200px;
+	&.hide{
+		top: -2000px;
+		left: -2000px;
+		width: 1920px;
+		height: 1200px;
+	}
+	.panel{
+        max-height: rem-calc(400);
+        overflow-y: auto;
+        padding: rem-calc(10) !important;
+	}
+}
+.google-map-pop{
+	background: transparent;;
+	pointer-events: none;
+}
 iframe{
 	border: none;
 	position: absolute;

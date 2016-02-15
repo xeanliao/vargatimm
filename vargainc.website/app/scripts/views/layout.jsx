@@ -67,9 +67,21 @@ define([
 			Topic.subscribe("loadView", function(view, collection, model){
 				self.setState({mainView: view, mainCollection: collection, mainModel: model});
 			});
-			Topic.subscribe("showDialog", function(view, collection, model){
+			/**
+			 * show a dialog
+			 * @param  {React} view
+			 * @param  {Backbone.Collection} collection
+			 * @param  {Backbone.Model} model
+			 * @param  {String} size Foundation Reveal Size Value: tiny, small, large, full
+			 */
+			Topic.subscribe("showDialog", function(view, collection, model, size){
 				if(view){
-					self.setState({dialogView: view, dialogCollection: collection, dialogModel: model});
+					self.setState({
+						dialogView: view, 
+						dialogCollection: collection, 
+						dialogSize: size || '',
+						dialogModel: model
+					});
 				}else{
 					$('.reveal').foundation('close');
 					self.setState({dialogView: null, dialogCollection: null, dialogModel: null});
@@ -88,6 +100,9 @@ define([
 			if(this.state.dialogView && Foundation){
 				$('.reveal').foundation();
 				$('.reveal').foundation('open');
+			}else{
+				$('.reveal').foundation();
+				$('.reveal').foundation('close');
 			}
 			$('iframe').height($(window).height());
 		},
@@ -123,6 +138,11 @@ define([
 				name: 'Reports'
 			}];
 			return {menu: menu};
+		},
+		getInitialState: function(){
+			return {
+				dialogSize: 'small'
+			}
 		},
 		fullTextSearch: function(e){
 			Topic.publish('search', e.currentTarget.value);
@@ -205,7 +225,7 @@ define([
 						</div>
 					</div>
 					
-					<div className="reveal" data-reveal>
+					<div className={'reveal ' + this.state.dialogSize} data-reveal>
 						{dialogView}
 					</div>
 				</div>
