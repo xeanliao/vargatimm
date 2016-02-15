@@ -64,7 +64,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/distributi
 			var displayDate = date ? moment(date).format("MMM DD, YYYY") : '';
 			return React.createElement(
 				'div',
-				{ className: 'row scroll-list-item', onClick: this.onGotoDMap.bind(null, model.get('Id')) },
+				{ className: 'row scroll-list-item', onDoubleClick: this.onGotoDMap.bind(null, model.get('Id')) },
 				React.createElement(
 					'div',
 					{ className: 'hide-for-small-only medium-2 columns' },

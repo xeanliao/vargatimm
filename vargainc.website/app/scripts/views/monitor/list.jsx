@@ -166,7 +166,7 @@ define([
 								}
 								return (
 									<tr key={task.Id}>
-										<td onClick={self.onGotoMonitor.bind(null, task.Id)}>
+										<td onDoubleClick={self.onGotoMonitor.bind(null, task.Id)}>
 											{task.Name}
 										</td>
 										<td>

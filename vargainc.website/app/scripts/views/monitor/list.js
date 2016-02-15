@@ -219,7 +219,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 									{ key: task.Id },
 									React.createElement(
 										'td',
-										{ onClick: self.onGotoMonitor.bind(null, task.Id) },
+										{ onDoubleClick: self.onGotoMonitor.bind(null, task.Id) },
 										task.Name
 									),
 									React.createElement(
