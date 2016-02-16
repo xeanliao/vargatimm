@@ -1,4 +1,36 @@
 @import url(https://fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic);
+.off-canvas-wrapper-inner {
+  position: fixed;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.off-canvas-wrapper-inner.is-off-canvas-open {
+  overflow-y: visible;
+  overflow-x: visible;
+}
+
+.is-off-canvas-open .sidebar {
+  width: 250px !important;
+  left: -250px !important;
+  max-height: none !important;
+}
+.is-off-canvas-open .sidebar span, .is-off-canvas-open .sidebar .submenu {
+  display: inline !important;
+}
+
+.is-off-canvas-open .main {
+  left: 0px !important;
+}
+
+.panel input[type='checkbox'] {
+  margin-bottom: 0 !important;
+}
+.panel li {
+  padding-bottom: 0 !important;
+}
+
 .callout.alert {
   background: #bd5151;
   color: #fff;
@@ -52,6 +84,71 @@ a:hover i, a:active i, i.active {
 .has-tip {
   border: none !important;
   cursor: pointer !important;
+}
+
+.pop-tool-bar.text-center .button {
+  float: unset;
+}
+.pop-tool-bar .button {
+  animation: bounceInDown 900ms 200ms ease-in-out both;
+  text-decoration: none;
+  outline-width: 0px;
+  z-index: 990;
+  color: #a675b3;
+  text-align: center;
+  display: inline-block;
+}
+.pop-tool-bar .button:not(.active) {
+  box-shadow: inset 0 1px 1px rgba(111, 55, 125, 0.8), inset 0 -1px 0px rgba(63, 59, 113, 0.2), 0 9px 16px 0 rgba(0, 0, 0, 0.3), 0 4px 3px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px #150a1e;
+  background-image: linear-gradient(#3b2751, #271739);
+  text-shadow: 0 0 21px rgba(223, 206, 228, 0.5), 0 -1px 0 #311d47;
+}
+.pop-tool-bar .button:not(.active):hover, .pop-tool-bar .button:not(.active):focus {
+  transition: color 200ms linear;
+  transition: text-shadow 500ms linear;
+  color: #caadd2;
+  text-shadow: 0 0 21px rgba(223, 206, 228, 0.5), 0 0 10px rgba(223, 206, 228, 0.4), 0 0 2px #2a153c;
+}
+.pop-tool-bar .button:not(.active):active {
+  color: #e4e3ce !important;
+}
+.pop-tool-bar .button.active, .pop-tool-bar .button:active {
+  box-shadow: 0 9px 16px 0 rgba(0, 0, 0, 0.1), 0 0 0 1px #170c22, 0 2px 1px 0 rgba(121, 65, 135, 0.5), inset 0 0 4px 3px rgba(15, 8, 22, 0.2);
+  background-image: linear-gradient(#1f132e, #311d47);
+  text-shadow: 0 0 21px rgba(223, 206, 228, 0.5), 0 0 10px rgba(223, 206, 228, 0.4), 0 0 2px #2a153c;
+  color: #e4e3ce;
+}
+.pop-tool-bar .button.active:before, .pop-tool-bar .button:active:before {
+  position: absolute;
+  display: block;
+  content: "";
+  width: 1px;
+  top: 1px;
+  left: -2px;
+  background-image: linear-gradient(rgba(91, 35, 105, 0), #5b2369 41%, #5b2369 59%, rgba(91, 35, 105, 0));
+  box-shadow: -2px 0 6px 0 #5b2369;
+}
+.pop-tool-bar .button.active:after, .pop-tool-bar .button:active:after {
+  position: absolute;
+  display: block;
+  content: "";
+  width: 1px;
+  top: 1px;
+  right: -2px;
+  background-image: linear-gradient(rgba(91, 35, 105, 0), #5b2369 41%, #5b2369 59%, rgba(91, 35, 105, 0));
+  box-shadow: 2px 0 6px 0 #5b2369;
+}
+.pop-tool-bar .button.active {
+  z-index: 1000;
+}
+.pop-tool-bar .button:active {
+  z-index: 999;
+}
+.pop-tool-bar .button:last-of-type {
+  border-radius: 0 7px 7px 0;
+}
+.pop-tool-bar .button:first-of-type {
+  border-radius: 7px 0 0 7px;
 }
 
 html, body {
@@ -122,31 +219,6 @@ html, body {
   font-size: 18px;
   position: relative;
   top: 2px;
-}
-
-.off-canvas-wrapper-inner {
-  position: fixed;
-  min-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.off-canvas-wrapper-inner.is-off-canvas-open {
-  overflow-y: visible;
-  overflow-x: visible;
-}
-
-.is-off-canvas-open .sidebar {
-  width: 250px !important;
-  left: -250px !important;
-  max-height: none !important;
-}
-.is-off-canvas-open .sidebar span, .is-off-canvas-open .sidebar .submenu {
-  display: inline !important;
-}
-
-.is-off-canvas-open .main {
-  left: 0px !important;
 }
 
 .title-bar-center {
@@ -283,6 +355,262 @@ html, body {
   position: absolute;
   right: 0;
   top: 0;
+}
+
+.page-container.Letter .page {
+  width: 8.5in;
+  min-height: 11in;
+  padding: 0.5in 0.25in auto 0.25in;
+}
+.page-container.Letter .page .footer {
+  left: 0.25in;
+  right: 0.25in;
+  bottom: 0.25in;
+}
+.page-container.A4 .page {
+  width: 8.27in;
+  min-height: 11.69in;
+  padding: 0.5in 0.25in auto 0.25in;
+}
+.page-container.A4 .page .footer {
+  left: 0.25in;
+  right: 0.25in;
+  bottom: 0.25in;
+}
+.page-container.A3 .page {
+  width: 11.69in;
+  min-height: 16.53in;
+  padding: 1.25in 0.5in auto 0.5in;
+}
+.page-container.A3 .page .footer {
+  left: 0.5in;
+  right: 0.5in;
+  bottom: 0.5in;
+}
+.page-container.dmapPrint .page {
+  width: 12in;
+  min-height: 12in;
+  padding: 0;
+}
+.page-container.dmapPrint .page.dmap .map-container {
+  min-height: 45.3125rem;
+}
+.page-container.dmapPrint .row {
+  max-width: 12in;
+  margin: 0;
+}
+.page-container.dmapPrint .footer {
+  margin-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
+}
+
+.page {
+  width: 8.27in;
+  min-height: 11.69in;
+  padding: 0.5in 0.25in;
+  padding-bottom: 5.3125rem;
+  margin: 0.9375rem auto;
+  background: #FFF none repeat scroll 0% 0%;
+  box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+.page:first-child {
+  margin-top: 0.9375rem;
+}
+.page .title {
+  background: #94b43d;
+  color: #222;
+  text-align: center;
+  font-weight: 800;
+  line-height: 25pt;
+  height: 25pt;
+  font-size: 14pt;
+}
+.page .title span {
+  font-size: 14pt;
+}
+.page .list span {
+  font-size: 11pt;
+}
+.page .map-container {
+  cursor: point;
+  overflow: hidden;
+}
+.page .map-container img {
+  width: 100%;
+  height: 100%;
+}
+.page.campaign .map-container {
+  width: "100%";
+  min-height: 43.125rem;
+}
+.page.submap .map-container {
+  width: "100%";
+  min-height: 44.375rem;
+}
+.page.dmap .map-container {
+  width: "100%";
+  min-height: 49.375rem;
+}
+.page .color-legend {
+  float: left;
+}
+.page .color-legend .tips {
+  margin-top: 10px;
+}
+.page .color-legend i, .page .color-legend label {
+  display: inline-block;
+  font-size: 9pt;
+}
+.page .color-legend i {
+  position: relative;
+  top: 2px;
+  width: 18px;
+  height: 12px;
+  border: solid 1px black;
+  margin-left: 3pt !important;
+}
+.page .color-legend i:first-child {
+  margin-left: 0 !important;
+}
+.page .color-legend i.blue {
+  background-color: blue;
+}
+.page .color-legend i.green {
+  background-color: lime;
+}
+.page .color-legend i.yellow {
+  background-color: yellow;
+}
+.page .color-legend i.orange {
+  background-color: #ff9600;
+}
+.page .color-legend i.red {
+  background-color: #bb0000;
+}
+.page .color-legend label {
+  margin-left: 2pt !important;
+}
+.page .direction-legend {
+  background: url(../images/direction-legend.jpg) center center;
+  width: 4rem;
+  height: 4rem;
+  background-size: 100% 100%;
+  float: right;
+}
+.page table {
+  width: 100%;
+}
+.page .footer {
+  position: absolute;
+  bottom: 0;
+  border-top: solid 0.125rem black;
+  padding-top: 0.3125rem;
+  background: #fff;
+  z-index: 99;
+}
+.page .footer .left {
+  position: relative;
+  width: 90pt;
+  float: left;
+}
+.page .footer .left img {
+  margin-top: 5px;
+}
+.page .footer .center {
+  position: absolute;
+  left: 98pt;
+  right: 125pt;
+}
+.page .footer .right {
+  position: relative;
+  width: 120pt;
+  float: right;
+}
+.page .footer .right img {
+  float: right;
+  margin-top: 6px;
+}
+.page .footer ul {
+  margin: 0 !important;
+}
+.page .footer li {
+  height: 10pt;
+  line-height: 10pt;
+  position: relative;
+}
+.page .footer li span {
+  font-size: 7pt;
+  display: block;
+  height: 10pt;
+  line-height: 10pt;
+}
+.page .footer li span:last-child {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.page.cover .row {
+  margin-bottom: 20pt;
+}
+.page.cover .client-logo {
+  height: 80pt;
+  margin-top: 40pt;
+  margin-bottom: 40pt;
+}
+.page.cover .vargainc-log {
+  height: 40pt;
+  margin-top: 10pt;
+  margin-bottom: 10pt;
+}
+.page.cover label {
+  font-weight: 800;
+  font-size: 12pt;
+  line-height: 1;
+}
+.page.cover span {
+  font-size: 12pt;
+  line-height: 1;
+}
+
+.google_map_container {
+  width: 100%;
+  height: 100%;
+  z-index: 1007;
+  background: transparent;
+}
+.google_map_container .pop-tool-bar {
+  pointer-events: none;
+}
+.google_map_container * {
+  pointer-events: all;
+}
+
+.google-map {
+  position: fixed;
+  z-index: 1005;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1200px;
+}
+.google-map.hide {
+  top: -2000px;
+  left: -2000px;
+  width: 1920px;
+  height: 1200px;
+}
+.google-map .panel {
+  max-height: 25rem;
+  overflow-y: auto;
+  padding: 0.625rem !important;
+}
+
+.google-map-pop {
+  background: transparent;
+  pointer-events: none;
 }
 
 iframe {

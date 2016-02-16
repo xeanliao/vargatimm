@@ -81,6 +81,7 @@ require.config({
         }
     },
     paths: {
+        'async': 'vendor/async',
         'jquery': 'vendor/jquery',
         'underscore': 'vendor/lodash',
         'backbone': 'vendor/backbone',

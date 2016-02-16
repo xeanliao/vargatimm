@@ -46,6 +46,9 @@ module.exports = function (grunt) {
 						},
 						'classnames':{
 							'files': ['dedupe.js']
+						},
+						'requirejs-plugins':{
+							'files': ['src/async.js']
 						}
 					}
 				}
@@ -142,8 +145,20 @@ module.exports = function (grunt) {
 	            	src: ['<%= app %>/scripts/views/print/shared/distributionMap.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/shared/distributionMap.js'
 	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/distributionDetailMap.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/distributionDetailMap.js'
+	            },{
 	            	src: ['<%= app %>/scripts/views/print/shared/mapZoom.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/shared/mapZoom.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/options.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/options.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/optionsDMapSelector.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/optionsDMapSelector.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/distributionOptions.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/distributionOptions.js'
 	            },{
 	            	src: ['<%= app %>/scripts/views/print/distribution.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/distribution.js'

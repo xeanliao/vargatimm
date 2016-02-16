@@ -1,22 +1,31 @@
 define([
 	'underscore',
 	'pubsub'
-], function(_, Topic){
-	return{
-		registerTopic: [],
-		subscribe: function(name, callback){
-			console.log('register topic');
-			var signal = Topic.subscribe(name, callback);
-			this.registerTopic.push(signal);
+], function (_, Topic) {
+	return {
+		getDefaultProps: function(){
+			return {
+				registerTopic: {}
+			}
 		},
-		publish: function(){
+		subscribe: function (name, callback) {
+			var signal = Topic.subscribe(name, callback);
+			this.props.registerTopic[name] = signal;
+			return signal;
+		},
+		publish: function () {
 			Topic.publish.apply(this, arguments);
 		},
-		componentWillUnmount: function(){
-			console.log('componentDidUpdate', this.registerTopic.length);
-			_.forEach(this.registerTopic, function(i){
+		unsubscribe: function (name) {
+			var signal = this.props.registerTopic[name];
+			_.unset(this.props.registerTopic, name);
+			signal && Topic.unsubscribe(signal);
+		},
+		componentWillUnmount: function () {
+			_.forEach(this.props.registerTopic, function (i) {
 				Topic.unsubscribe(i);
 			});
-		}
+		},
 	};
+
 });

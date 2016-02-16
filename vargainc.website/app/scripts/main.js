@@ -17,7 +17,7 @@ define(function (require, exports, module) {
 			options.url = model.urlRoot;
 		}
 		options.url = '../api/' + options.url;
-		console.log(options.url);
+
 		return backboneSync(method, model, options);
 	}
 
@@ -33,7 +33,7 @@ define(function (require, exports, module) {
 			'monitor': 'monitorAction',
 			'report': 'reportAction',
 			'admin': 'adminAction',
-			'print': 'printAction',
+			'print/:campaignId/:printType': 'printAction',
 			'frame/:page': 'frameAction',
 			'frame/*page?*queryString': 'frameAction',
 			'*actions': 'defaultAction'
@@ -107,11 +107,15 @@ define(function (require, exports, module) {
 				Topic.publish('loadView', View);
 			});
 		},
-		printAction: function(){
+		printAction: function(campaignId, printType){
 			require([
-				'views/print/distribution'
-			], function (View) {
-				Topic.publish('loadView', View, null, null);
+				'views/print/distribution',
+				'collections/print'
+			], function (View, Collection) {
+				var print = new Collection();
+				print.fetchForDistributionMap(campaignId).then(function(){
+					Topic.publish('loadView', View, print, null);
+				});
 			});
 		}
 	});

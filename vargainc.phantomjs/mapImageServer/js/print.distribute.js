@@ -75,20 +75,15 @@ function drawMap(params, result) {
     console.log('begin find map best view');
     if (result && result.boundary) {
         var mapBounds = new google.maps.LatLngBounds();
-        $.each(result.boundary, function () {
-            var point = new google.maps.LatLng(this.lat, this.lng);
-            mapBounds.extend(point);
-        });
-        var zoom = parseInt(params.zoom),
-            haveCustomZoom = false;
-
-        if(isNaN(zoom) || zoom == 0){
-            zoom = 15;
+        if(params.topRightLat && params.topRightLat && params.bottomLeftLat && params.bottomLeftLng){
+            mapBounds = new google.maps.LatLngBounds(new google.maps.LatLng(params.bottomLeftLat, params.bottomLeftLng), new google.maps.LatLng(params.topRightLat, params.topRightLng));
         }else{
-            haveCustomZoom = true;
+            $.each(result.boundary, function () {
+                var point = new google.maps.LatLng(this.lat, this.lng);
+                mapBounds.extend(point);
+            });
         }
-
-
+        
 
         /**
          * change map type and montor tilesloaded event to make sure all map have loaded
@@ -96,21 +91,11 @@ function drawMap(params, result) {
         google.maps.event.addListenerOnce(map, 'tilesloaded', function () {
             console.log("tilesloaded");
             clearTimeout(window.timeout);
-            resize(params, result, mapBounds, haveCustomZoom);
+            checkMapType(params, result);
         });
 
-        map.setZoom(zoom);
-        map.setCenter(mapBounds.getCenter());
-
+        map.fitBounds(mapBounds);
         console.log("end find best view");
-
-        /**
-         * timeout for google map render all polygon
-         */
-        // window.timeout = setTimeout(function () {
-        //     map.fitBounds(mapBounds);
-        //     checkMapType(params, result);
-        // }, 1 * 60 * 1000);
     } else {
         callback('data error');
     }
