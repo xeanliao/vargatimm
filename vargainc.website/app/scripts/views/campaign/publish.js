@@ -8,6 +8,10 @@ define(['moment', 'backbone', 'react', 'pubsub', 'views/user/adminList', 'react.
 		onUserSelected: function (user) {
 			this.setState({ selectedUser: user });
 		},
+		onDbUserSelected: function (user) {
+			this.setState({ selectedUser: user });
+			Topic.publish('campaign/publish', user);
+		},
 		onClose: function () {
 			Topic.publish("showDialog", null);
 		},
@@ -32,7 +36,7 @@ define(['moment', 'backbone', 'react', 'pubsub', 'views/user/adminList', 'react.
 					null,
 					'Assign to'
 				),
-				React.createElement(AdminUserList, { onSelect: this.onUserSelected, group: 'distribution' }),
+				React.createElement(AdminUserList, { onSelect: this.onUserSelected, onDbSelect: this.onDbUserSelected, group: 'distribution' }),
 				React.createElement(
 					'div',
 					{ className: 'float-right' },

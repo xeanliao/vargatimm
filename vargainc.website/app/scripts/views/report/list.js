@@ -33,6 +33,9 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'models/task', 'r
 		onGotoReport: function (taskId) {
 			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
 		},
+		onGotoReview: function (taskId) {
+			window.location.hash = 'frame/EditGTU.aspx?id=' + taskId;
+		},
 		onCloseMoreMenu: function (key) {
 			$("#" + this.menuKey + key).foundation('close');
 		},
@@ -159,7 +162,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'models/task', 'r
 									{ key: task.Id },
 									React.createElement(
 										'td',
-										{ onClick: self.onGotoReport.bind(null, task.Id) },
+										{ onDoubleClick: self.onGotoReview.bind(null, task.Id) },
 										task.Name
 									),
 									React.createElement(
@@ -170,12 +173,12 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'models/task', 'r
 											{ className: 'float-right tool-bar' },
 											React.createElement(
 												'a',
-												{ className: 'button row-button', href: "#frame/EditGTU.aspx?id=" + task.Id },
-												React.createElement('i', { className: 'fa fa-magic' }),
+												{ className: 'button row-button', onClick: self.onGotoReport.bind(null, task.Id) },
+												React.createElement('i', { className: 'fa fa-file-text-o' }),
 												React.createElement(
 													'small',
 													null,
-													'Review'
+													'Report'
 												)
 											),
 											React.createElement(

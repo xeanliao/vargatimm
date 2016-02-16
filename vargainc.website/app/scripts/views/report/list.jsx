@@ -42,6 +42,9 @@ define([
 		onGotoReport: function(taskId){
 			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
 		},
+		onGotoReview: function(taskId){
+			window.location.hash = 'frame/EditGTU.aspx?id=' + taskId;
+		},
 		onCloseMoreMenu: function(key){
 			$("#" + this.menuKey + key).foundation('close');
 		},
@@ -103,13 +106,13 @@ define([
 								}
 								return (
 									<tr key={task.Id}>
-										<td onClick={self.onGotoReport.bind(null, task.Id)}>
+										<td onDoubleClick={self.onGotoReview.bind(null, task.Id)}>
 											{task.Name}
 										</td>
 										<td>
 											<div className="float-right tool-bar">
-												<a className="button row-button" href={"#frame/EditGTU.aspx?id=" + task.Id}>
-													<i className="fa fa-magic"></i><small>Review</small>
+												<a className="button row-button" onClick={self.onGotoReport.bind(null, task.Id)}>
+													<i className="fa fa-file-text-o"></i><small>Report</small>
 												</a>
 												<button onClick={self.onReOpenTask.bind(null, task.Id)}
 													className="button has-tip top" title="dismiss"

@@ -12,6 +12,10 @@ define([
 		onUserSelected: function(user){
 			this.setState({selectedUser: user});
 		},
+		onDbUserSelected: function(user){
+			this.setState({selectedUser: user});
+			Topic.publish('monitor/dismiss', user);
+		},
 		onClose: function(){
 			Topic.publish("showDialog", null);
 		},
@@ -22,12 +26,11 @@ define([
 			}
 		},
 		render: function(){
-			
 			return (
 				<div>
-					<h5>Campaign Publish</h5>
+					<h5>Dismiss back to Distribution Map</h5>
 					<span>Assign to</span>
-					<AdminUserList onSelect={this.onUserSelected} group="distribution" />
+					<AdminUserList onSelect={this.onUserSelected} onDbSelect={this.onDbUserSelected} group="distribution" />
 					<div className="float-right">
 						<button className="success button" onClick={this.onProcess}>Okay</button>
 						<a href="javascript:;" className="button" onClick={this.onClose}>Cancel</a>

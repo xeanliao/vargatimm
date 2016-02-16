@@ -37,8 +37,8 @@ define([
 			var confirmResult = confirm('Are you sure you want to delete all selected Tasks?');
 			if(confirmResult){
 				Topic.publish('showDialog', DismissView, null, null);
-				actionHandler && Topic.unsubscribe(actionHandler);
-				actionHandler = Topic.subscribe('monitor/dismiss', function(user){
+				actionHandle && Topic.unsubscribe(actionHandle);
+				actionHandle = Topic.subscribe('monitor/dismiss', function(user){
 					model.dismissToDMap(user, {
 						success: function(result){
 							Topic.publish('showDialog', null, null, null);
@@ -72,6 +72,7 @@ define([
 		},
 		onImport: function(taskId, e){
 			e.bubbles = false;
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var uploadFile = e.currentTarget.files[0];
 			if(uploadFile.size == 0){
 				alert('please select an not empty file!');
@@ -93,6 +94,7 @@ define([
 		onEdit: function(taskId, e){
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var model = new TaskModel({Id:taskId});
 			model.fetch().then(function(){
 				Topic.publish('showDialog', EditView, null, model);
@@ -166,7 +168,7 @@ define([
 								}
 								return (
 									<tr key={task.Id}>
-										<td onClick={self.onGotoMonitor.bind(null, task.Id)}>
+										<td onDoubleClick={self.onGotoMonitor.bind(null, task.Id)}>
 											{task.Name}
 										</td>
 										<td>
