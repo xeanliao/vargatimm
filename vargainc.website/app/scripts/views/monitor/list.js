@@ -25,8 +25,8 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			var confirmResult = confirm('Are you sure you want to delete all selected Tasks?');
 			if (confirmResult) {
 				Topic.publish('showDialog', DismissView, null, null);
-				actionHandler && Topic.unsubscribe(actionHandler);
-				actionHandler = Topic.subscribe('monitor/dismiss', function (user) {
+				actionHandle && Topic.unsubscribe(actionHandle);
+				actionHandle = Topic.subscribe('monitor/dismiss', function (user) {
 					model.dismissToDMap(user, {
 						success: function (result) {
 							Topic.publish('showDialog', null, null, null);
@@ -60,6 +60,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 		},
 		onImport: function (taskId, e) {
 			e.bubbles = false;
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var uploadFile = e.currentTarget.files[0];
 			if (uploadFile.size == 0) {
 				alert('please select an not empty file!');
@@ -81,6 +82,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 		onEdit: function (taskId, e) {
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var model = new TaskModel({ Id: taskId });
 			model.fetch().then(function () {
 				Topic.publish('showDialog', EditView, null, model);
@@ -219,7 +221,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 									{ key: task.Id },
 									React.createElement(
 										'td',
-										{ onClick: self.onGotoMonitor.bind(null, task.Id) },
+										{ onDoubleClick: self.onGotoMonitor.bind(null, task.Id) },
 										task.Name
 									),
 									React.createElement(

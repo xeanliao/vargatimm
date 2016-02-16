@@ -20,9 +20,13 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'collections/user
 			}
 		},
 		onSelected: function (userId) {
-			console.log('user selection on selected');
 			var user = this.getCollection().get(userId);
 			this.props.onSelect && this.props.onSelect(user);
+			this.setState({ selected: user });
+		},
+		onDbSelected: function (userId) {
+			var user = this.getCollection().get(userId);
+			this.props.onDbSelect && this.props.onDbSelect(user);
 			this.setState({ selected: user });
 		},
 		render: function () {
@@ -41,7 +45,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'collections/user
 
 					return React.createElement(
 						'li',
-						{ className: activeClass, key: id, onClick: self.onSelected.bind(self, id) },
+						{ className: activeClass, key: id, onClick: self.onSelected.bind(self, id), onDoubleClick: self.onDbSelected.bind(self, id) },
 						model.get('UserName')
 					);
 				})

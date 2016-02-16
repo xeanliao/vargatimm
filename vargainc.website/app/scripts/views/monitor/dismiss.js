@@ -4,6 +4,10 @@ define(['moment', 'backbone', 'react', 'pubsub', 'views/user/adminList', 'react.
 		onUserSelected: function (user) {
 			this.setState({ selectedUser: user });
 		},
+		onDbUserSelected: function (user) {
+			this.setState({ selectedUser: user });
+			Topic.publish('monitor/dismiss', user);
+		},
 		onClose: function () {
 			Topic.publish("showDialog", null);
 		},
@@ -14,21 +18,20 @@ define(['moment', 'backbone', 'react', 'pubsub', 'views/user/adminList', 'react.
 			}
 		},
 		render: function () {
-
 			return React.createElement(
 				'div',
 				null,
 				React.createElement(
 					'h5',
 					null,
-					'Campaign Publish'
+					'Dismiss back to Distribution Map'
 				),
 				React.createElement(
 					'span',
 					null,
 					'Assign to'
 				),
-				React.createElement(AdminUserList, { onSelect: this.onUserSelected, group: 'distribution' }),
+				React.createElement(AdminUserList, { onSelect: this.onUserSelected, onDbSelect: this.onDbUserSelected, group: 'distribution' }),
 				React.createElement(
 					'div',
 					{ className: 'float-right' },

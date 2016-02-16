@@ -17,6 +17,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 		onCopy: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var model = this.getModel(),
 			    self = this;
 			model.copy({
@@ -32,6 +33,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 		onEdit: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var debug = this.getModel();
 			var model = this.getModel().clone();
 			Topic.publish('showDialog', EditView, null, model);
@@ -39,6 +41,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 		onDelete: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var model = this.getModel();
 			model.destroy({ wait: true, success: function () {
 					Topic.publish('camapign/refresh');
@@ -148,7 +151,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 			var displayDate = date ? moment(date).format("MMM DD, YYYY") : '';
 			return React.createElement(
 				'div',
-				{ className: 'row scroll-list-item', onClick: this.onGotoCMap.bind(null, model.get('Id')) },
+				{ className: 'row scroll-list-item', onDoubleClick: this.onGotoCMap.bind(null, model.get('Id')) },
 				React.createElement(
 					'div',
 					{ className: 'hide-for-small-only medium-2 columns' },
