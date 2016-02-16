@@ -169,8 +169,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CampaignController.cs" />
+    <Compile Include="Controllers\MapImageController.cs" />
     <Compile Include="Controllers\PDFController.cs" />
-    <Compile Include="Controllers\PhantomController.cs" />
     <Compile Include="Controllers\PrintController.cs" />
     <Compile Include="Controllers\StatusController.cs" />
     <Compile Include="Controllers\SubMapController.cs" />
@@ -184,6 +184,9 @@
     <Compile Include="ViewModel\ControlCenter\TaskViewModel.cs" />
     <Compile Include="ViewModel\ImportCampaign.cs" />
     <Compile Include="ViewModel\Location.cs" />
+    <Compile Include="ViewModel\MapImage\MapImageOptions.cs" />
+    <Compile Include="ViewModel\MapImage\MapTypeEnum.cs" />
+    <Compile Include="ViewModel\MapImage\ServerResult.cs" />
     <Compile Include="ViewModel\MapOptions.cs" />
     <Compile Include="ViewModel\Record.cs" />
     <Compile Include="ViewModel\LoginUser.cs" />
