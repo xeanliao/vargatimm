@@ -28,6 +28,7 @@ define([
 		onCopy: function(e){
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var model = this.getModel(),
 				self = this;
 			model.copy({
@@ -45,6 +46,7 @@ define([
 		onEdit: function(e){
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var debug = this.getModel();
 			var model = this.getModel().clone();
 			Topic.publish('showDialog', EditView, null, model);
@@ -52,6 +54,7 @@ define([
 		onDelete: function(e){
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var model = this.getModel();
 			model.destroy({wait: true, success: function(){
 				Topic.publish('camapign/refresh');

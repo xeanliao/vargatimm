@@ -28,9 +28,13 @@ define([
 			}
 		},
 		onSelected: function(userId){
-			console.log('user selection on selected');
 			var user = this.getCollection().get(userId);
 			this.props.onSelect && this.props.onSelect(user);
+			this.setState({selected: user});
+		},
+		onDbSelected: function(userId){
+			var user = this.getCollection().get(userId);
+			this.props.onDbSelect && this.props.onDbSelect(user);
 			this.setState({selected: user});
 		},
 		render: function(){
@@ -47,7 +51,7 @@ define([
 							activeClass = selected ? 'list-group-item active' : 'list-group-item';
 
 			          	return (
-			          		<li className={activeClass} key={id} onClick={self.onSelected.bind(self, id)}>
+			          		<li className={activeClass} key={id} onClick={self.onSelected.bind(self, id)} onDoubleClick={self.onDbSelected.bind(self, id)}>
 			          			{model.get('UserName')}
 		          			</li>
 		          		);
