@@ -181,10 +181,10 @@ namespace Vargainc.Timm.REST.Controllers
         }
 
         [HttpGet]
-        [Route("campaign/{campaignId:int}/submap/{submapId:int}/bundary")]
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/boundary")]
         public IHttpActionResult GetBundaryForSubMap(int campaignId, int submapId)
         {
-            var result = GetSubMapBundary(campaignId, submapId);
+            var result = GetSubMapBoundary(campaignId, submapId);
             var color = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId);
             return Json(new
@@ -195,7 +195,7 @@ namespace Vargainc.Timm.REST.Controllers
                     g = color.ColorG,
                     b = color.ColorB
                 },
-                bundary = result
+                boundary = result
             });
         }
 
@@ -283,7 +283,7 @@ namespace Vargainc.Timm.REST.Controllers
             }
             
             var polygon = FormatLocationGroup(query);
-            var boundary = GetSubMapBundary(campaignId, submapId);
+            var boundary = GetSubMapBoundary(campaignId, submapId);
             return Json(new {
                 color = new {
                     r = submap.ColorR,
@@ -329,10 +329,10 @@ namespace Vargainc.Timm.REST.Controllers
 
         #region DMap
         [HttpGet]
-        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/bundary")]
-        public IHttpActionResult GetBundaryForSubMap(int campaignId, int submapId, int dmapId)
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/boundary")]
+        public IHttpActionResult GetBoundaryForDMap(int campaignId, int submapId, int dmapId)
         {
-            var result = GetDMapBundary(campaignId, submapId, dmapId);
+            var result = GetDMapBoundary(campaignId, submapId, dmapId);
             var color = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
                 .DistributionMaps.FirstOrDefault(i => i.Id == dmapId);
@@ -345,7 +345,7 @@ namespace Vargainc.Timm.REST.Controllers
                     g = color.ColorG,
                     b = color.ColorB
                 },
-                bundary = result
+                boundary = result
             });
         }
 
@@ -368,7 +368,7 @@ namespace Vargainc.Timm.REST.Controllers
                 return Json(result);
             }
             
-            var boundary = GetDMapBundary(campaignId, submapId, dmapId);
+            var boundary = GetDMapBoundary(campaignId, submapId, dmapId);
             return Json(new
             {
                 color = new
@@ -405,7 +405,7 @@ namespace Vargainc.Timm.REST.Controllers
                             Longitude = gtu.dwLongitude
                         };
 
-                var dmapPolygon = GetDMapBundary(campaignId, submapId, dmapId);
+                var dmapPolygon = GetDMapBoundary(campaignId, submapId, dmapId);
 
             
 
@@ -511,7 +511,7 @@ namespace Vargainc.Timm.REST.Controllers
             return result;
         }
 
-        private List<ViewModel.Location> GetSubMapBundary(int campaignId, int submapId)
+        private List<ViewModel.Location> GetSubMapBoundary(int campaignId, int submapId)
         {
             var coordinates = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
@@ -534,7 +534,7 @@ namespace Vargainc.Timm.REST.Controllers
                 Longitude = i.X
             }).ToList();
         }
-        private List<ViewModel.Location> GetDMapBundary(int campaignId, int submapId, int dmapId)
+        private List<ViewModel.Location> GetDMapBoundary(int campaignId, int submapId, int dmapId)
         {
             var coordinates = db.Campaigns
                 .FirstOrDefault(i => i.Id == campaignId)

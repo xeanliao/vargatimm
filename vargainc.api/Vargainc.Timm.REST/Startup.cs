@@ -25,9 +25,13 @@ namespace Vargainc.Timm.REST
             json.DateFormatHandling = DateFormatHandling.IsoDateFormat;
             json.ContractResolver = new CamelCasePropertyNamesContractResolver();
             json.DateFormatString = "MM-dd-yyyy";
+            // enum to string
+            json.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+
             json.NullValueHandling = NullValueHandling.Ignore;
             json.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
             json.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+           
 
             // Web API Cros for Dev or local test
             var allowWebsite = ConfigurationManager.AppSettings["CorsSite"];
