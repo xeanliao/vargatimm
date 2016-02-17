@@ -1,7 +1,8 @@
-define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/edit', 'views/campaign/publish', 'models/campaign', 'react.backbone'], function (_, moment, Backbone, React, Topic, EditView, PublishView, Model) {
+define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'views/campaign/edit', 'views/campaign/publish', 'models/campaign', 'react.backbone'], function (_, moment, Backbone, React, BaseView, EditView, PublishView, Model) {
 	var actionHandle = null,
 	    searchHandle = null;
 	var CampaignRow = React.createBackboneClass({
+		mixins: [BaseView],
 		menuKey: 'campaign-menu-ddl-',
 		getDefaultProps: function () {
 			return {
@@ -36,32 +37,33 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var debug = this.getModel();
 			var model = this.getModel().clone();
-			Topic.publish('showDialog', EditView, null, model);
+			this.publish('showDialog', EditView, null, model);
 		},
 		onDelete: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
+			var self = this;
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var model = this.getModel();
 			model.destroy({ wait: true, success: function () {
-					Topic.publish('camapign/refresh');
+					self.publish('camapign/refresh');
 				} });
 		},
 		onPublishToDMap: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
 			var model = this.getModel();
-			Topic.publish('showDialog', PublishView, null, null);
-			actionHandle && Topic.unsubscribe(actionHandle);
-			actionHandle = Topic.subscribe('campaign/publish', function (user) {
+			this.publish('showDialog', PublishView, null, null);
+			actionHandle && this.unsubscribe(actionHandle);
+			actionHandle = this.subscribe('campaign/publish', function (user) {
 				model.publishToDMap(user, {
 					success: function (result) {
-						Topic.publish('showDialog', null, null, null);
+						this.publish('showDialog', null, null, null);
 						if (result && result.success) {
-							Topic.publish('camapign/refresh');
+							this.publish('camapign/refresh');
 						} else {
 							alert(result.error);
-							//Topic.publish('showDialog', result.error, null, null);
+							//this.publish('showDialog', result.error, null, null);
 						}
 					}
 				});
@@ -195,7 +197,8 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 		}
 	});
 
-	var CampaignList = React.createBackboneClass({
+	return React.createBackboneClass({
+		mixins: [BaseView],
 		getInitialState: function () {
 			return {
 				orderByFiled: null,
@@ -207,11 +210,11 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 		},
 		componentDidMount: function () {
 			var self = this;
-			Topic.subscribe('camapign/refresh', function () {
+			this.subscribe('camapign/refresh', function () {
 				self.getCollection().fetch();
 			});
-			searchHandle && Topic.unsubscribe(searchHandle);
-			searchHandle = Topic.subscribe('search', function (words) {
+			searchHandle && this.unsubscribe(searchHandle);
+			searchHandle = this.subscribe('search', function (words) {
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -223,11 +226,11 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 			$("#campaign-filter-ddl-ClientName, #campaign-filter-ddl-ClientCode, #campaign-filter-ddl-Date, #campaign-filter-ddl-AreaDescription").foundation();
 		},
 		componentWillUnmount: function () {
-			searchHandle && Topic.unsubscribe(searchHandle);
-			actionHandle && Topic.unsubscribe(actionHandle);
+			searchHandle && this.unsubscribe(searchHandle);
+			actionHandle && this.unsubscribe(actionHandle);
 		},
 		onNew: function () {
-			Topic.publish('showDialog', EditView, null, new Model());
+			this.publish('showDialog', EditView, null, new Model());
 		},
 		onOrderBy: function (field, reactObj, reactId, e) {
 			e.preventDefault();
@@ -473,5 +476,4 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/campaign/e
 			);
 		}
 	});
-	return CampaignList;
 });

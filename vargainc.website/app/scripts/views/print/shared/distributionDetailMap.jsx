@@ -51,8 +51,8 @@ define([
 				}, {
 					'title': model.get('DisplayName') + ' - ' + model.get('Name')
 				}, {
-					'map': model.get('MapImage'),
-					'bg': model.get('PolygonImage')
+					'map': model.get('PolygonImage'),
+					'bg': model.get('MapImage')
 				}]
 			};
 		},

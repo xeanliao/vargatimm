@@ -2,13 +2,14 @@ define([
 	'jquery',
 	'react',
 	'react-dom',
-	'pubsub',
+	'views/base',
 	'models/user',
 
 	'react.backbone',
 	'foundation'
-], function($, React, ReactDOM, Topic, UserModel){
+], function($, React, ReactDOM, BaseView, UserModel){
 	var MenuItem = React.createClass({
+		mixins: [BaseView],
 		getInitialState: function(){
 			return {
 				active: false
@@ -29,6 +30,7 @@ define([
 	});
 
 	var User = React.createBackboneClass({
+		mixins: [BaseView],
 		getDefaultProps: function(){
 			return {
 				model: new UserModel()
@@ -36,7 +38,7 @@ define([
 		},
 		componentDidMount: function(){
 			this.getModel().fetchCurrentUser();
-			Topic.subscribe("NOT_LOGIN", function(){
+			this.subscribe("NOT_LOGIN", function(){
 				window.location = "../login.html";
 			});
 
@@ -61,10 +63,11 @@ define([
 	});
 
 	return React.createClass({
+		mixins: [BaseView],
 		displayName: 'Layout',
 		componentDidMount: function(){
 			var self = this;
-			Topic.subscribe("loadView", function(view, collection, model){
+			this.subscribe("loadView", function(view, collection, model){
 				self.setState({mainView: view, mainCollection: collection, mainModel: model});
 			});
 			/**
@@ -74,7 +77,7 @@ define([
 			 * @param  {Backbone.Model} model
 			 * @param  {String} size Foundation Reveal Size Value: tiny, small, large, full
 			 */
-			Topic.subscribe("showDialog", function(view, collection, model, size){
+			this.subscribe("showDialog", function(view, collection, model, size){
 				if(view){
 					self.setState({
 						dialogView: view, 
@@ -86,6 +89,31 @@ define([
 					$('.reveal').foundation('close');
 					self.setState({dialogView: null, dialogCollection: null, dialogModel: null});
 				}
+			});
+
+			/**
+			 * loading control
+			 */
+			var loadingCount = 0,
+				loadingDelay = 500,
+				loadingTimeout = null;
+			this.subscribe('showLoading', function(){
+				loadingCount++;
+				window.clearTimeout(loadingTimeout);
+				loadingTimeout = window.setTimeout(function(){
+					self.setState({loading: true});
+				}, loadingDelay);
+				
+			});
+			this.subscribe('hideLoading', function(){
+				loadingCount--;
+				window.setTimeout(function(){
+					if(loadingCount <= 0){
+						window.clearTimeout(loadingTimeout);
+						self.setState({loading: false});
+						loadingCount = 0;
+					}
+				}, 300);
 			});
 			/**
 			 * fix main view size
@@ -141,11 +169,12 @@ define([
 		},
 		getInitialState: function(){
 			return {
-				dialogSize: 'small'
+				dialogSize: 'small',
+				loading: false
 			}
 		},
 		fullTextSearch: function(e){
-			Topic.publish('search', e.currentTarget.value);
+			this.publish('search', e.currentTarget.value);
 		},
 		render: function() {
 			/**
@@ -163,7 +192,7 @@ define([
 		            }
 	        	}
 	        }else{
-	        	var mainView = React.createElement('h1', null, 'loading');
+	        	var mainView = null;
 	        }
 	        /**
 	         * build dialog view
@@ -228,6 +257,28 @@ define([
 					<div className={'reveal ' + this.state.dialogSize} data-reveal>
 						{dialogView}
 					</div>
+
+					<div className="overlayer" style={{'display': this.state.loading ? 'block' : 'none'}}>
+				        <div className="loading">
+							<div className="gear one">
+								<svg id="blue" viewBox="0 0 100 100" fill="#94DDFF">
+								  <path d="M97.6,55.7V44.3l-13.6-2.9c-0.8-3.3-2.1-6.4-3.9-9.3l7.6-11.7l-8-8L67.9,20c-2.9-1.7-6-3.1-9.3-3.9L55.7,2.4H44.3l-2.9,13.6      c-3.3,0.8-6.4,2.1-9.3,3.9l-11.7-7.6l-8,8L20,32.1c-1.7,2.9-3.1,6-3.9,9.3L2.4,44.3v11.4l13.6,2.9c0.8,3.3,2.1,6.4,3.9,9.3      l-7.6,11.7l8,8L32.1,80c2.9,1.7,6,3.1,9.3,3.9l2.9,13.6h11.4l2.9-13.6c3.3-0.8,6.4-2.1,9.3-3.9l11.7,7.6l8-8L80,67.9      c1.7-2.9,3.1-6,3.9-9.3L97.6,55.7z M50,65.6c-8.7,0-15.6-7-15.6-15.6s7-15.6,15.6-15.6s15.6,7,15.6,15.6S58.7,65.6,50,65.6z"></path>
+								</svg>
+							</div>
+							<div className="gear two">
+								<svg id="pink" viewBox="0 0 100 100" fill="#FB8BB9">
+								  <path d="M97.6,55.7V44.3l-13.6-2.9c-0.8-3.3-2.1-6.4-3.9-9.3l7.6-11.7l-8-8L67.9,20c-2.9-1.7-6-3.1-9.3-3.9L55.7,2.4H44.3l-2.9,13.6      c-3.3,0.8-6.4,2.1-9.3,3.9l-11.7-7.6l-8,8L20,32.1c-1.7,2.9-3.1,6-3.9,9.3L2.4,44.3v11.4l13.6,2.9c0.8,3.3,2.1,6.4,3.9,9.3      l-7.6,11.7l8,8L32.1,80c2.9,1.7,6,3.1,9.3,3.9l2.9,13.6h11.4l2.9-13.6c3.3-0.8,6.4-2.1,9.3-3.9l11.7,7.6l8-8L80,67.9      c1.7-2.9,3.1-6,3.9-9.3L97.6,55.7z M50,65.6c-8.7,0-15.6-7-15.6-15.6s7-15.6,15.6-15.6s15.6,7,15.6,15.6S58.7,65.6,50,65.6z"></path>
+								</svg>
+							</div>
+							<div className="gear three">
+								<svg id="yellow" viewBox="0 0 100 100" fill="#FFCD5C">
+								  <path d="M97.6,55.7V44.3l-13.6-2.9c-0.8-3.3-2.1-6.4-3.9-9.3l7.6-11.7l-8-8L67.9,20c-2.9-1.7-6-3.1-9.3-3.9L55.7,2.4H44.3l-2.9,13.6      c-3.3,0.8-6.4,2.1-9.3,3.9l-11.7-7.6l-8,8L20,32.1c-1.7,2.9-3.1,6-3.9,9.3L2.4,44.3v11.4l13.6,2.9c0.8,3.3,2.1,6.4,3.9,9.3      l-7.6,11.7l8,8L32.1,80c2.9,1.7,6,3.1,9.3,3.9l2.9,13.6h11.4l2.9-13.6c3.3-0.8,6.4-2.1,9.3-3.9l11.7,7.6l8-8L80,67.9      c1.7-2.9,3.1-6,3.9-9.3L97.6,55.7z M50,65.6c-8.7,0-15.6-7-15.6-15.6s7-15.6,15.6-15.6s15.6,7,15.6,15.6S58.7,65.6,50,65.6z"></path>
+								</svg>
+							</div>
+							<div className="lil-circle"></div>
+							<div className="text">LOADING</div>
+				        </div>
+				    </div>
 				</div>
 	        );
 	    }

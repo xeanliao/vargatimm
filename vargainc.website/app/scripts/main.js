@@ -6,6 +6,20 @@ define(function (require, exports, module) {
 		Topic = require('pubsub');
 
 	/**
+	 * register loading event except ajax request is quite
+	 */
+	$(document).ajaxSend(function (event, xhr, settings) {
+		if (settings.quite !== true) {
+			Topic.publish('showLoading');
+		}
+	});
+	$(document).ajaxComplete(function (event, xhr, settings) {
+		if (settings.quite !== true) {
+			Topic.publish('hideLoading');
+		}
+	});
+
+	/**
 	 * override base url
 	 */
 	var backboneSync = Backbone.sync;
@@ -24,6 +38,7 @@ define(function (require, exports, module) {
 	var LayoutView = require('views/layout');
 	var layoutViewInstance = React.createFactory(LayoutView)();
 	var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
+
 
 
 	var AppRouter = Backbone.Router.extend({
@@ -45,8 +60,9 @@ define(function (require, exports, module) {
 				'views/campaign/list'
 			], function (Model, Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetch();
+				campaignlist.fetch().done(function(){
+					Topic.publish('loadView', View, campaignlist, null);
+				});
 			});
 		},
 		frameAction: function (page, query) {
@@ -74,8 +90,9 @@ define(function (require, exports, module) {
 				'views/distribution/list'
 			], function (Model, Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetchForDistribution();
+				campaignlist.fetchForDistribution().done(function(){
+					Topic.publish('loadView', View, campaignlist, null);
+				});
 			});
 		},
 		monitorAction: function () {
@@ -85,8 +102,9 @@ define(function (require, exports, module) {
 				'views/monitor/list'
 			], function (Model, Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetchForTask();
+				campaignlist.fetchForTask().done(function(){
+					Topic.publish('loadView', View, campaignlist, null);
+				});
 			});
 		},
 		reportAction: function () {
@@ -96,8 +114,9 @@ define(function (require, exports, module) {
 				'views/report/list'
 			], function (Model, Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetchForReport();
+				campaignlist.fetchForReport().done(function(){
+					Topic.publish('loadView', View, campaignlist, null);
+				});
 			});
 		},
 		adminAction: function () {
@@ -107,13 +126,13 @@ define(function (require, exports, module) {
 				Topic.publish('loadView', View);
 			});
 		},
-		printAction: function(campaignId, printType){
+		printAction: function (campaignId, printType) {
 			require([
 				'views/print/distribution',
 				'collections/print'
 			], function (View, Collection) {
 				var print = new Collection();
-				print.fetchForDistributionMap(campaignId).then(function(){
+				print.fetchForDistributionMap(campaignId).done(function () {
 					Topic.publish('loadView', View, print, null);
 				});
 			});
