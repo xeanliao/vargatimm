@@ -35,7 +35,7 @@ define(function (require, exports, module) {
 		return backboneSync(method, model, options);
 	}
 
-	var LayoutView = require('views/layout');
+	var LayoutView = require('views/layout/main');
 	var layoutViewInstance = React.createFactory(LayoutView)();
 	var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
 

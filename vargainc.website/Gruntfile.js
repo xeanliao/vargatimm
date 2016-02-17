@@ -106,8 +106,14 @@ module.exports = function (grunt) {
 	        },
 	        dist: {
 	            files: [{
-	            	src: ['<%= app %>/scripts/views/layout.jsx'],
-	            	dest: '<%= app %>/scripts/views/layout.js'
+	            	src: ['<%= app %>/scripts/views/layout/main.jsx'],
+	            	dest: '<%= app %>/scripts/views/layout/main.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/layout/frame.jsx'],
+	            	dest: '<%= app %>/scripts/views/layout/frame.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/layout/menu.jsx'],
+	            	dest: '<%= app %>/scripts/views/layout/menu.js'
 	            },{
 	            	src: ['<%= app %>/scripts/views/campaign/list.jsx'],
 	            	dest: '<%= app %>/scripts/views/campaign/list.js'
@@ -162,9 +168,6 @@ module.exports = function (grunt) {
 	            },{
 	            	src: ['<%= app %>/scripts/views/print/distribution.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/distribution.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/frame.jsx'],
-	            	dest: '<%= app %>/scripts/views/frame.js'
 	            },{
 	            	src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
 	            	dest: '<%= app %>/scripts/views/admin/dashboard.js'

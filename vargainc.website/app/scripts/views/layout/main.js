@@ -1,36 +1,4 @@
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'react.backbone', 'foundation'], function ($, React, ReactDOM, BaseView, UserModel) {
-	var MenuItem = React.createClass({
-		displayName: 'MenuItem',
-
-		mixins: [BaseView],
-		getInitialState: function () {
-			return {
-				active: false
-			};
-		},
-		getDefaultProps: function () {
-			return {
-				address: null,
-				icon: null,
-				name: null
-			};
-		},
-		render: function () {
-			return React.createElement(
-				'li',
-				null,
-				React.createElement(
-					'a',
-					{ className: this.state.active ? 'active' : '', href: "#" + this.props.address },
-					React.createElement('i', { className: this.props.icon }),
-					'  ',
-					this.props.name
-				)
-			);
-		}
-	});
+define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layout/menu', 'react.backbone', 'foundation'], function ($, React, ReactDOM, BaseView, UserModel, MenuView) {
 
 	var User = React.createBackboneClass({
 		mixins: [BaseView],
@@ -146,39 +114,6 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'react.back
 			}
 			$('iframe').height($(window).height());
 		},
-		menuSwitch: function () {
-			console.log('menu switch', this.state.isSideMenuOpen);
-			var isSideMenuOpen = !this.state.isSideMenuOpen;
-			this.setState({ isSideMenuOpen: isSideMenuOpen });
-		},
-		closeMenu: function () {
-			this.setState({ isSideMenuOpen: false });
-		},
-		getDefaultProps: function () {
-			var menu = [{
-				//key: 'campaign', icon: 'fa fa-paper-plane-o', address: 'campaign', name: 'Campaign'
-				key: 'campaign',
-				icon: 'fa fa-trophy',
-				address: 'campaign',
-				name: 'Campaign'
-			}, {
-				key: 'distribution',
-				icon: 'fa fa-map',
-				address: 'distribution',
-				name: 'Distribution Maps'
-			}, {
-				key: 'monitor',
-				icon: 'fa fa-truck',
-				address: 'monitor',
-				name: 'GPS Monitor'
-			}, {
-				key: 'report',
-				icon: 'fa fa-file-pdf-o',
-				address: 'report',
-				name: 'Reports'
-			}];
-			return { menu: menu };
-		},
 		getInitialState: function () {
 			return {
 				dialogSize: 'small',
@@ -187,6 +122,9 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'react.back
 		},
 		fullTextSearch: function (e) {
 			this.publish('search', e.currentTarget.value);
+		},
+		menuSwitch: function () {
+			this.refs.sideMenu.switch();
 		},
 		render: function () {
 			/**
@@ -222,7 +160,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'react.back
 				var dialogView = null;
 			}
 
-			var offCanvasClassName = this.state && this.state.isSideMenuOpen ? 'off-canvas-wrapper-inner is-off-canvas-open is-open-left' : 'off-canvas-wrapper-inner';
+			var offCanvasClassName = this.state && this.state.isSideMenuOpen ? 'off-canvas-wrapper-inner ' : 'off-canvas-wrapper-inner';
 			return React.createElement(
 				'div',
 				null,
@@ -231,123 +169,8 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'react.back
 					{ className: 'off-canvas-wrapper' },
 					React.createElement(
 						'div',
-						{ className: offCanvasClassName, 'data-off-canvas-wrapper': true },
-						React.createElement(
-							'div',
-							{ className: 'sidebar off-canvas position-left', 'data-off-canvas': true, 'data-position': 'left' },
-							React.createElement(
-								'ul',
-								{ className: 'menu vertical', onClick: this.closeMenu },
-								this.props.menu.map(function (item) {
-									return React.createElement(MenuItem, _extends({ key: item.key }, item));
-								}),
-								React.createElement(
-									'li',
-									null,
-									React.createElement(
-										'a',
-										{ href: '#admin' },
-										React.createElement('i', { className: 'fa fa-gear' }),
-										'  Administration'
-									),
-									React.createElement(
-										'ul',
-										{ className: 'submenu menu vertical' },
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#frame/Users.aspx' },
-												React.createElement(
-													'span',
-													null,
-													'User Management'
-												)
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#frame/NonDeliverables.aspx' },
-												React.createElement(
-													'span',
-													null,
-													'Non-Deliverables'
-												)
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#frame/GtuAdmin.aspx?AssignNameToGTUFlag=true' },
-												React.createElement(
-													'span',
-													null,
-													'GTU Management'
-												)
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#frame/AvailableGTUList.aspx' },
-												React.createElement(
-													'span',
-													null,
-													'GTU Available List'
-												)
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#frame/AdminGtuToBag.aspx' },
-												React.createElement(
-													'span',
-													null,
-													'GTU bag Management '
-												)
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#frame/AdminGtuBagToAuditor.aspx' },
-												React.createElement(
-													'span',
-													null,
-													'Assign GTU-Bags to Auditors'
-												)
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#frame/AdminDistributorCompany.aspx' },
-												React.createElement(
-													'span',
-													null,
-													'Distributor Management'
-												)
-											)
-										)
-									)
-								)
-							)
-						),
+						{ className: 'off-canvas-wrapper-inner', 'data-off-canvas-wrapper': true },
+						React.createElement(MenuView, { ref: 'sideMenu' }),
 						React.createElement(
 							'div',
 							{ className: 'main off-canvas-content', 'data-off-canvas-content': true },
