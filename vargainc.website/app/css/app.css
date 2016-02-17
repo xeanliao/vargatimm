@@ -287,18 +287,23 @@ html, body {
 }
 
 .main {
-  left: 50px;
   position: relative;
-  margin-right: 50px;
   padding-bottom: 0;
   margin-bottom: 0;
   background: #f8f8f8 !important;
   box-shadow: none !important;
 }
+.main .title-bar {
+  box-shadow: 0px 0px 5px 0px rgba(165, 165, 165, 0.3);
+}
 .main .title-bar .title-text {
   font-size: 18px;
   position: relative;
   top: 2px;
+}
+.main.left-menu {
+  left: 50px;
+  margin-right: 50px;
 }
 
 .title-bar-center {

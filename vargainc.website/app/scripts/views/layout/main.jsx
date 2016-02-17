@@ -119,7 +119,8 @@ define([
 		getInitialState: function(){
 			return {
 				dialogSize: 'small',
-				loading: false
+				loading: false,
+				showMenu: true
 			}
 		},
 		fullTextSearch: function(e){
@@ -162,13 +163,20 @@ define([
 	        	var dialogView = null;
 	        }
 
-	        var offCanvasClassName = this.state && this.state.isSideMenuOpen ? 'off-canvas-wrapper-inner ' : 'off-canvas-wrapper-inner';
+	        if(this.state.showMenu){
+	        	var mainMenuClassName = 'left-menu';
+	        	var menu = <MenuView ref="sideMenu" />;
+	        }else{
+	        	var mainMenuClassName = '';
+	        	var menu = null;
+	        }
+
 	        return (
 	        	<div>
 					<div className="off-canvas-wrapper">
 		        		<div className='off-canvas-wrapper-inner' data-off-canvas-wrapper>
-			        		<MenuView ref="sideMenu" />
-							<div className="main off-canvas-content" data-off-canvas-content>
+			        		{menu}
+							<div className={"main off-canvas-content " + mainMenuClassName} data-off-canvas-content>
 								<div className="title-bar">
 									<div className="title-bar-left">
 										<button aria-expanded="true" className="menu-icon" type="button" onClick={this.menuSwitch}></button>

@@ -117,7 +117,8 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 		getInitialState: function () {
 			return {
 				dialogSize: 'small',
-				loading: false
+				loading: false,
+				showMenu: true
 			};
 		},
 		fullTextSearch: function (e) {
@@ -160,7 +161,14 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 				var dialogView = null;
 			}
 
-			var offCanvasClassName = this.state && this.state.isSideMenuOpen ? 'off-canvas-wrapper-inner ' : 'off-canvas-wrapper-inner';
+			if (this.state.showMenu) {
+				var mainMenuClassName = 'left-menu';
+				var menu = React.createElement(MenuView, { ref: 'sideMenu' });
+			} else {
+				var mainMenuClassName = '';
+				var menu = null;
+			}
+
 			return React.createElement(
 				'div',
 				null,
@@ -170,10 +178,10 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 					React.createElement(
 						'div',
 						{ className: 'off-canvas-wrapper-inner', 'data-off-canvas-wrapper': true },
-						React.createElement(MenuView, { ref: 'sideMenu' }),
+						menu,
 						React.createElement(
 							'div',
-							{ className: 'main off-canvas-content', 'data-off-canvas-content': true },
+							{ className: "main off-canvas-content " + mainMenuClassName, 'data-off-canvas-content': true },
 							React.createElement(
 								'div',
 								{ className: 'title-bar' },
