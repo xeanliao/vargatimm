@@ -25,7 +25,10 @@ define([
 		loadImage: function () {
 			var model = this.getModel(),
 				self = this;
-
+			console.log($(self.refs.mapContainer).offset().top);
+			$('.off-canvas-wrapper-inner').stop().animate({
+			  	scrollTop: $(self.refs.mapContainer).offset().top
+			}, 500);
 			this.setState({
 				imageLoaded: false
 			});
@@ -174,7 +177,7 @@ define([
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
-							<div className="map-container" onClick={this.onShowEditDialog}>
+							<div className="map-container" ref="mapContainer" onClick={this.onShowEditDialog}>
 								{mapImage}
 							</div>
 						</div>

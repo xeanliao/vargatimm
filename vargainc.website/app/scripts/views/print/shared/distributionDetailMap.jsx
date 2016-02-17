@@ -20,6 +20,10 @@ define([
 			var model = this.getModel(),
 				self = this;
 			this.setState({imageLoaded: false});
+			console.log($(self.refs.mapContainer).offset().top);
+			$('.off-canvas-wrapper-inner').stop().animate({
+			  	scrollTop: $(self.refs.mapContainer).offset().top
+			}, 500);
 			model.fetchMapImage(this.props.options).always(function () {
 				self.setState({
 					imageLoaded: true
@@ -117,7 +121,7 @@ define([
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
-							<div className="map-container">
+							<div className="map-container" ref="mapContainer">
 								{mapImage}
 							</div>
 						</div>

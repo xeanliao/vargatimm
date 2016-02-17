@@ -10,6 +10,10 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			var model = this.getModel(),
 			    self = this;
 			this.setState({ imageLoaded: false });
+			console.log($(self.refs.mapContainer).offset().top);
+			$('.off-canvas-wrapper-inner').stop().animate({
+				scrollTop: $(self.refs.mapContainer).offset().top
+			}, 500);
 			model.fetchMapImage(this.props.options).always(function () {
 				self.setState({
 					imageLoaded: true
@@ -159,7 +163,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						{ className: 'small-12 columns' },
 						React.createElement(
 							'div',
-							{ className: 'map-container' },
+							{ className: 'map-container', ref: 'mapContainer' },
 							mapImage
 						)
 					)
