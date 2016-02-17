@@ -138,7 +138,7 @@ define([
 			this.publish('search', e.currentTarget.value);
 		},
 		menuSwitch: function(){
-			this.refs.sideMenu.switch();
+			this.refs.sideMenu && this.refs.sideMenu.switch();
 		},
 		/**
 		 * build main view

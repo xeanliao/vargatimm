@@ -136,7 +136,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 			this.publish('search', e.currentTarget.value);
 		},
 		menuSwitch: function () {
-			this.refs.sideMenu.switch();
+			this.refs.sideMenu && this.refs.sideMenu.switch();
 		},
 		/**
    * build main view
