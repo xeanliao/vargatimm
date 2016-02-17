@@ -1,21 +1,27 @@
 define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views/base', 'views/print/shared/mapZoom', 'react.backbone'], function ($, _, moment, Backbone, React, Numeral, BaseView, MapZoomView) {
-	var mapZoomHandler = null;
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function () {
 			return {
-				ImageLoaded: false
+				imageLoaded: false
 			};
 		},
 		loadImage: function () {
 			var model = this.getModel(),
 			    self = this;
+			this.setState({ imageLoaded: false });
 			model.fetchMapImage(this.props.options).always(function () {
 				self.setState({
-					ImageLoaded: true
+					imageLoaded: true
 				});
 				self.publish('print.map.imageloaded');
 			});
+		},
+		onReloadImage: function () {
+			this.setState({
+				imageLoaded: null
+			});
+			this.publish('print.map.imageloaded');
 		},
 		onRemove: function () {
 			var model = this.getModel();
@@ -47,11 +53,12 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			};
 		},
 		render: function () {
-			var model = this.getModel();
-			var total = Numeral(model.get('Total')).format('0,0');
-			var mapImage = model.get('MapImage');
-			var polygonImage = model.get('PolygonImage');
-			if (this.state.ImageLoaded) {
+			var model = this.getModel(),
+			    total = Numeral(model.get('Total')).format('0,0'),
+			    mapImage = model.get('MapImage'),
+			    polygonImage = model.get('PolygonImage');
+
+			if (this.state.imageLoaded) {
 				if (mapImage && polygonImage) {
 					var mapImage = React.createElement(
 						'div',
@@ -64,10 +71,14 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						React.createElement('img', { src: polygonImage })
 					);
 				} else {
-					var mapImage = React.createElement('div', { className: 'retry' }, null);
+					var mapImage = React.createElement(
+						'button',
+						{ className: 'button reload', onClick: this.onReloadImage },
+						React.createElement('i', { className: 'fa fa-2x fa-refresh' })
+					);
 				}
 			} else {
-				var mapImage = React.createElement('div', { className: 'loading' }, null);
+				var mapImage = React.createElement(LoadingView, { text: this.state.imageLoaded === null ? 'WAITING' : 'LOADING' });
 			}
 
 			return React.createElement(
@@ -148,7 +159,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						{ className: 'small-12 columns' },
 						React.createElement(
 							'div',
-							{ className: 'map-container dmapPrint', onClick: this.onEdit },
+							{ className: 'map-container' },
 							mapImage
 						)
 					)

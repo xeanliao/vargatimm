@@ -36,8 +36,8 @@ define([
 			var self = this;
 			this.subscribe('print.map.imageloaded', function(){
 				_.some(self.refs, function(page){
-					page.state.ImageLoaded == false && page.loadImage();
-					return !page.state.ImageLoaded;
+					!page.state.imageLoaded && page.loadImage();
+					return !page.state.imageLoaded;
 				});
 			});
 			this.subscribe('print.map.options.changed', this.onApplyOptions);
@@ -59,7 +59,7 @@ define([
 				newOptions = _.pick(options.attributes, compareProperty);
 			if(!_.eq(oldOptions, newOptions)){
 				_.forEach(this.refs, function(page){
-					page.setState({ImageLoaded: false});
+					page.setState({imageLoaded: null});
 				});
 			}
 			this.setState({options: options});

@@ -159,6 +159,7 @@ a:hover i, a:active i, i.active {
   top: 50%;
   margin-left: -50px;
   margin-top: -50px;
+  z-index: 1;
 }
 .loading .gear {
   position: absolute;
@@ -195,7 +196,7 @@ a:hover i, a:active i, i.active {
   box-shadow: inset 0 0 10px 2px gray, 0 0 50px white;
   width: 100px;
   height: 100px;
-  opacity: .65;
+  opacity: .1;
 }
 .loading .blur-circle {
   position: absolute;
@@ -500,6 +501,7 @@ html, body {
   background: #FFF none repeat scroll 0% 0%;
   box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.4);
   position: relative;
+  color: #000;
 }
 .page:first-child {
   margin-top: 0.9375rem;
@@ -526,6 +528,38 @@ html, body {
 .page .map-container img {
   width: 100%;
   height: 100%;
+}
+.page .map-container .button.reload {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -35px;
+  margin-top: -35px;
+  height: 70px;
+  width: 70px;
+  background-image: -webkit-linear-gradient(top, #f4f1ee, #fff);
+  background-image: linear-gradient(top, #f4f1ee, #fff);
+  border-radius: 50%;
+  box-shadow: 0px 8px 10px 0px rgba(0, 0, 0, 0.3), inset 0px 4px 1px 1px white, inset 0px -3px 1px 1px rgba(204, 198, 197, 0.5);
+  transition: all .1s linear;
+}
+.page .map-container .button.reload:hover, .page .map-container .button.reload:focus {
+  background-color: transparent !important;
+  background-image: -webkit-linear-gradient(top, #fff, #f4f1ee);
+  background-image: linear-gradient(top, #fff, #f4f1ee);
+}
+.page .map-container .button.reload:active {
+  background-image: -webkit-linear-gradient(top, #efedec, #f7f4f4);
+  background-image: linear-gradient(top, #efedec, #f7f4f4);
+  box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.4), inset 0px -3px 1px 1px rgba(204, 198, 197, 0.5);
+}
+.page .map-container .button.reload:hover, .page .map-container .button.reload:focus, .page .map-container .button.reload:active {
+  color: #eb2f2f;
+  text-shadow: 0px 0px 6px #eb2f2f;
+}
+.page .map-container .button.reload:hover i, .page .map-container .button.reload:focus i, .page .map-container .button.reload:active i {
+  color: #eb2f2f;
+  text-shadow: 0px 0px 6px #eb2f2f;
 }
 .page.campaign .map-container {
   width: "100%";

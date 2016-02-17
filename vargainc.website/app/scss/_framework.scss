@@ -156,6 +156,7 @@ a:hover i, a:active i, i.active {
     top: 50%;
     margin-left: -50px;
     margin-top: -50px;
+    z-index: 1;
 
     .gear {
         position: absolute;
@@ -197,7 +198,7 @@ a:hover i, a:active i, i.active {
         box-shadow: inset 0 0 10px 2px gray, 0 0 50px white;
         width: 100px;
         height: 100px;
-        opacity: .65;
+        opacity: .1;
     }
 
     .blur-circle {

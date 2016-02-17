@@ -9,23 +9,29 @@ define([
 	'views/print/shared/mapZoom',
 	'react.backbone'
 ], function ($, _, moment, Backbone, React, Numeral, BaseView, MapZoomView) {
-	var mapZoomHandler = null;
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function(){
 			return {
-				ImageLoaded: false
+				imageLoaded: false
 			};
 		},
 		loadImage: function(){
 			var model = this.getModel(),
 				self = this;
+			this.setState({imageLoaded: false});
 			model.fetchMapImage(this.props.options).always(function () {
 				self.setState({
-					ImageLoaded: true
+					imageLoaded: true
 				});
 				self.publish('print.map.imageloaded');
 			});
+		},
+		onReloadImage: function(){
+			this.setState({
+				imageLoaded: null
+			});
+			this.publish('print.map.imageloaded');
 		},
 		onRemove: function(){
 			var model = this.getModel();
@@ -57,27 +63,33 @@ define([
 			};
 		},
 		render: function(){
-			var model = this.getModel();
-			var total = Numeral(model.get('Total')).format('0,0');
-			var mapImage = model.get('MapImage');
-			var polygonImage = model.get('PolygonImage');
-			if(this.state.ImageLoaded){
-				if(mapImage && polygonImage){
-					var mapImage = (
-						<div style={{
-							'backgroundImage': 'url(' + mapImage + ')', 
-							'backgroundRepeat': 'no-repeat',
-							'backgroundSize': '100% auto',
-							'backgroundPosition': '0 0'
-						}}>
-							<img src={polygonImage} />
+			var model = this.getModel(),
+				total = Numeral(model.get('Total')).format('0,0'),
+				mapImage = model.get('MapImage'),
+				polygonImage = model.get('PolygonImage');
+
+			if (this.state.imageLoaded) {
+				if (mapImage && polygonImage) {
+					var mapImage = ( 
+						<div style = {
+							{
+								'backgroundImage': 'url(' + mapImage + ')',
+								'backgroundRepeat': 'no-repeat',
+								'backgroundSize': '100% auto',
+								'backgroundPosition': '0 0'
+							}
+						}><img src = {polygonImage} />
 						</div>
 					);
-				}else{
-					var mapImage = React.createElement('div', { className: 'retry' }, null);
+				} else {
+					var mapImage = (
+						<button className="button reload" onClick={this.onReloadImage}>
+							<i className="fa fa-2x fa-refresh"></i>
+						</button>
+					);
 				}
-			}else{
-				var mapImage = React.createElement('div', { className: 'loading' }, null);
+			} else {
+				var mapImage = <LoadingView text={this.state.imageLoaded === null ? 'WAITING' : 'LOADING'} / >;
 			}
 
 			return (
@@ -105,7 +117,7 @@ define([
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
-							<div className="map-container dmapPrint" onClick={this.onEdit}>
+							<div className="map-container">
 								{mapImage}
 							</div>
 						</div>

@@ -1,8 +1,10 @@
-define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views/base', 'views/print/shared/mapZoom', 'react.backbone'], function ($, _, moment, Backbone, React, Numeral, BaseView, MapZoomView) {
+define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views/base', 'views/layout/loading', 'views/print/shared/mapZoom', 'react.backbone'], function ($, _, moment, Backbone, React, Numeral, BaseView, LoadingView, MapZoomView) {
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function () {
-			return { ImageLoaded: false };
+			return {
+				imageLoaded: null
+			};
 		},
 		componentDidMount: function () {
 			var id = this.getModel().get('DMapId');
@@ -11,11 +13,22 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 		loadImage: function () {
 			var model = this.getModel(),
 			    self = this;
+
+			this.setState({
+				imageLoaded: false
+			});
 			model.fetchMapImage(this.props.options).always(function () {
-				console.log('always');
-				self.setState({ ImageLoaded: true });
+				self.setState({
+					imageLoaded: true
+				});
 				self.publish('print.map.imageloaded');
 			});
+		},
+		onReloadImage: function () {
+			this.setState({
+				imageLoaded: null
+			});
+			this.publish('print.map.imageloaded');
 		},
 		onCreateDetailMap: function (rectBounds) {
 			var model = this.getModel(),
@@ -49,7 +62,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			var model = this.getModel(),
 			    self = this,
 			    def = $.Deferred();
-			if (!this.state.ImageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
+			if (!this.state.imageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
 				return;
 			}
 			if (model.get('Boundary')) {
@@ -99,12 +112,12 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			};
 		},
 		render: function () {
-			console.log('render');
-			var model = this.getModel();
-			var total = Numeral(model.get('Total')).format('0,0');
-			var mapImage = model.get('MapImage');
-			var polygonImage = model.get('PolygonImage');
-			if (this.state.ImageLoaded) {
+			var model = this.getModel(),
+			    total = Numeral(model.get('Total')).format('0,0'),
+			    mapImage = model.get('MapImage'),
+			    polygonImage = model.get('PolygonImage');
+
+			if (this.state.imageLoaded) {
 				if (mapImage && polygonImage) {
 					var mapImage = React.createElement(
 						'div',
@@ -117,10 +130,14 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						React.createElement('img', { src: polygonImage })
 					);
 				} else {
-					var mapImage = React.createElement('div', { className: 'retry' }, null);
+					var mapImage = React.createElement(
+						'button',
+						{ className: 'button reload', onClick: this.onReloadImage },
+						React.createElement('i', { className: 'fa fa-2x fa-refresh' })
+					);
 				}
 			} else {
-				var mapImage = React.createElement('div', { className: 'loading' }, null);
+				var mapImage = React.createElement(LoadingView, { text: this.state.imageLoaded === null ? 'WAITING' : 'LOADING' });
 			}
 			return React.createElement(
 				'div',
@@ -194,7 +211,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						{ className: 'small-12 columns' },
 						React.createElement(
 							'div',
-							{ className: 'map-container dmapPrint', onClick: this.onShowEditDialog },
+							{ className: 'map-container', onClick: this.onShowEditDialog },
 							mapImage
 						)
 					)

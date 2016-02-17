@@ -115,6 +115,9 @@ module.exports = function (grunt) {
 	            	src: ['<%= app %>/scripts/views/layout/menu.jsx'],
 	            	dest: '<%= app %>/scripts/views/layout/menu.js'
 	            },{
+	            	src: ['<%= app %>/scripts/views/layout/loading.jsx'],
+	            	dest: '<%= app %>/scripts/views/layout/loading.js'
+	            },{
 	            	src: ['<%= app %>/scripts/views/campaign/list.jsx'],
 	            	dest: '<%= app %>/scripts/views/campaign/list.js'
 	            },{

@@ -6,28 +6,43 @@ define([
 	'react',
 	'numeral',
 	'views/base',
+	'views/layout/loading',
 	'views/print/shared/mapZoom',
+
 	'react.backbone'
-], function ($, _, moment, Backbone, React, Numeral, BaseView, MapZoomView) {
+], function ($, _, moment, Backbone, React, Numeral, BaseView, LoadingView, MapZoomView) {
 	return React.createBackboneClass({
 		mixins: [BaseView],
-		getInitialState: function(){
-			return {ImageLoaded: false};
+		getInitialState: function () {
+			return {
+				imageLoaded: null
+			};
 		},
-		componentDidMount: function(){
+		componentDidMount: function () {
 			var id = this.getModel().get('DMapId');
 			this.publish('print.map.imageloaded');
 		},
-		loadImage: function(){
+		loadImage: function () {
 			var model = this.getModel(),
 				self = this;
-			model.fetchMapImage(this.props.options).always(function(){
-				console.log('always');
-				self.setState({ImageLoaded: true});
+
+			this.setState({
+				imageLoaded: false
+			});
+			model.fetchMapImage(this.props.options).always(function () {
+				self.setState({
+					imageLoaded: true
+				});
 				self.publish('print.map.imageloaded');
 			});
 		},
-		onCreateDetailMap: function(rectBounds){
+		onReloadImage: function(){
+			this.setState({
+				imageLoaded: null
+			});
+			this.publish('print.map.imageloaded');
+		},
+		onCreateDetailMap: function (rectBounds) {
 			var model = this.getModel(),
 				detailModel = model.clone(),
 				topRight = rectBounds.getNorthEast(),
@@ -55,19 +70,19 @@ define([
 			this.publish('showDialog');
 			this.publish('print.map.imageloaded');
 		},
-		onShowEditDialog: function(){
+		onShowEditDialog: function () {
 			var model = this.getModel(),
 				self = this,
 				def = $.Deferred();
-			if(!this.state.ImageLoaded || !model.get('MapImage') || !model.get('PolygonImage')){
+			if (!this.state.imageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
 				return;
 			}
-			if(model.get('Boundary')){
+			if (model.get('Boundary')) {
 				def.resolve();
-			}else{
+			} else {
 				def = model.fetchBoundary();
 			}
-			def.done(function(){
+			def.done(function () {
 				var mapZoomView = React.createFactory(MapZoomView),
 					color = model.get('Color'),
 					key = 'distribution-' + model.get('DMapId'),
@@ -83,7 +98,7 @@ define([
 				});
 			});
 		},
-		getExportParamters: function(){
+		getExportParamters: function () {
 			var model = this.getModel();
 			return {
 				'type': 'dmap',
@@ -109,28 +124,33 @@ define([
 			};
 		},
 		render: function(){
-			console.log('render');
-			var model = this.getModel();
-			var total = Numeral(model.get('Total')).format('0,0');
-			var mapImage = model.get('MapImage');
-			var polygonImage = model.get('PolygonImage');
-			if(this.state.ImageLoaded){
-				if(mapImage && polygonImage){
-					var mapImage = (
-						<div style={{
-							'backgroundImage': 'url(' + mapImage + ')', 
-							'backgroundRepeat': 'no-repeat',
-							'backgroundSize': '100% auto',
-							'backgroundPosition': '0 0'
-						}}>
-							<img src={polygonImage} />
+			var model = this.getModel(),
+				total = Numeral(model.get('Total')).format('0,0'),
+				mapImage = model.get('MapImage'),
+				polygonImage = model.get('PolygonImage');
+
+			if (this.state.imageLoaded) {
+				if (mapImage && polygonImage) {
+					var mapImage = ( 
+						<div style = {
+							{
+								'backgroundImage': 'url(' + mapImage + ')',
+								'backgroundRepeat': 'no-repeat',
+								'backgroundSize': '100% auto',
+								'backgroundPosition': '0 0'
+							}
+						}><img src = {polygonImage} />
 						</div>
 					);
-				}else{
-					var mapImage = React.createElement('div', { className: 'retry' }, null);
+				} else {
+					var mapImage = (
+						<button className="button reload" onClick={this.onReloadImage}>
+							<i className="fa fa-2x fa-refresh"></i>
+						</button>
+					);
 				}
-			}else{
-				var mapImage = React.createElement('div', { className: 'loading' }, null);
+			} else {
+				var mapImage = <LoadingView text={this.state.imageLoaded === null ? 'WAITING' : 'LOADING'} / >;
 			}
 			return (
 				<div className="page">
@@ -154,7 +174,7 @@ define([
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
-							<div className="map-container dmapPrint" onClick={this.onShowEditDialog}>
+							<div className="map-container" onClick={this.onShowEditDialog}>
 								{mapImage}
 							</div>
 						</div>
