@@ -132,7 +132,7 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			this.publish('print.mapzoom@' + this.props.sourceKey, bounds);
 		},
 		onClose: function () {
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 		},
 		render: function () {
 			return React.createElement(

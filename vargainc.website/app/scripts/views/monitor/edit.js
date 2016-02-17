@@ -31,7 +31,7 @@ define(['moment', 'backbone', 'react', 'pubsub', 'react.backbone'], function (mo
 		},
 		onClose: function () {
 			$('.fdatepicker').off('changeDate').fdatepicker('remove');
-			Topic.publish("showDialog", null);
+			Topic.publish("showDialog");
 		},
 		onChange: function (e) {
 			console.log(e.currentTarget.name);

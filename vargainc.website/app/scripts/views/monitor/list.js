@@ -22,14 +22,14 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			e.preventDefault();
 			e.stopPropagation();
 			var model = this.getModel();
-			var confirmResult = confirm('Are you sure you want to delete all selected Tasks?');
-			if (confirmResult) {
-				Topic.publish('showDialog', DismissView, null, null);
+			var result = confirm('Are you sure you want to delete all selected Tasks?');
+			if (result) {
+				Topic.publish('showDialog', DismissView);
 				actionHandle && Topic.unsubscribe(actionHandle);
 				actionHandle = Topic.subscribe('monitor/dismiss', function (user) {
 					model.dismissToDMap(user, {
 						success: function (result) {
-							Topic.publish('showDialog', null, null, null);
+							Topic.publish('showDialog');
 							if (result && result.success) {
 								Topic.publish('monitor/refresh');
 							} else {
@@ -83,9 +83,13 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			e.preventDefault();
 			e.stopPropagation();
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
-			var model = new TaskModel({ Id: taskId });
+			var model = new TaskModel({
+				Id: taskId
+			});
 			model.fetch().then(function () {
-				Topic.publish('showDialog', EditView, null, model);
+				Topic.publish('showDialog', EditView, {
+					mdoel: model
+				});
 			});
 		},
 		onGotoMonitor: function (taskId, e) {

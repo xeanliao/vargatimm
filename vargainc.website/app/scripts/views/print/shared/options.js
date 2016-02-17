@@ -1,7 +1,7 @@
 define(['underscore', 'views/base'], function (_, BaseView) {
 	return _.extend({}, BaseView, {
 		onClose: function () {
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 			if (this.props.needTrigger) {
 				this.publish('print.map.options.changed', this.getModel());
 			}

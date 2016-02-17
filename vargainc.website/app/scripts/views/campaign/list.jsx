@@ -44,39 +44,44 @@ define([
 				}
 			});
 		},
-		onEdit: function(e){
+		onEdit: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
-			var debug = this.getModel();
-			var model = this.getModel().clone();
-			this.publish('showDialog', EditView, null, model);
+			this.publish('showDialog', EditView, {
+				model: this.getModel().clone()
+			});
 		},
-		onDelete: function(e){
+		onDelete: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
+			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
 			var self = this;
-			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
-			var model = this.getModel();
-			model.destroy({wait: true, success: function(){
-				self.publish('camapign/refresh');
-			}});
+			var result = confirm('are you sure want delete this campaign?');
+			if (result) {
+				var model = self.getModel();
+				model.destroy({
+					wait: true,
+					success: function () {
+						self.publish('camapign/refresh');
+					}
+				});
+			}
 		},
-		onPublishToDMap: function(e){
+		onPublishToDMap: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
 			var model = this.getModel();
-			this.publish('showDialog', PublishView, null, null);
+			this.publish('showDialog', PublishView);
 			actionHandle && this.unsubscribe(actionHandle);
-			actionHandle = this.subscribe('campaign/publish', function(user){
+			actionHandle = this.subscribe('campaign/publish', function (user) {
 				model.publishToDMap(user, {
-					success: function(result){
-						this.publish('showDialog', null, null, null);
-						if(result && result.success){
-							this.publish('camapign/refresh');	
-						}else{
+					success: function (result) {
+						this.publish('showDialog');
+						if (result && result.success) {
+							this.publish('camapign/refresh');
+						} else {
 							alert(result.error);
-							//this.publish('showDialog', result.error, null, null);
 						}
 					}
 				});
@@ -176,8 +181,10 @@ define([
 			searchHandle && this.unsubscribe(searchHandle);
 			actionHandle && this.unsubscribe(actionHandle);
 		},
-		onNew: function(){
-			this.publish('showDialog', EditView, null, new Model());
+		onNew: function () {
+			this.publish('showDialog', EditView, {
+				model: new Model()
+			});
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();

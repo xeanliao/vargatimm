@@ -46,13 +46,11 @@ define([
 		onOpenOptions: function(opts){
 			var options = this.state.options;
 			if(!options.get('DMaps')){
-				console.log('dmaps')
 				options.attributes['DMaps'] = this.getCollection().getDMaps();
 			}
 			var model = _.cloneDeep(options);
-			var view = React.createFactory(OptionsView);
-			var viewInstance = new view(_.extend(opts, {model: model}));
-			this.publish('showDialog', viewInstance, null, null, 'large');
+			var params = _.extend(opts, {model: model});
+			this.publish('showDialog', OptionsView, params, {size: 'large'});
 		},
 		onApplyOptions: function(options){
 			//check need reload images
@@ -65,7 +63,7 @@ define([
 				});
 			}
 			this.setState({options: options});
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 			this.publish('print.map.imageloaded');
 		},
 		onPrint: function(){

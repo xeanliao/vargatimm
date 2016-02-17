@@ -21,7 +21,7 @@ define([
 			Topic.publish('campaign/publish', user);
 		},
 		onClose: function(){
-			Topic.publish("showDialog", null);
+			Topic.publish("showDialog");
 		},
 		onProcess: function(){
 			console.log('campaign publish topic');

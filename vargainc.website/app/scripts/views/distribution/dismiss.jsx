@@ -17,7 +17,7 @@ define([
 			Topic.publish('distribution/dismiss', user);
 		},
 		onClose: function(){
-			Topic.publish("showDialog", null);
+			Topic.publish("showDialog");
 		},
 		onProcess: function(){
 			console.log('dmap publish topic');

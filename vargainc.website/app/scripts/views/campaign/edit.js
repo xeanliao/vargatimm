@@ -37,7 +37,7 @@ define(['moment', 'backbone', 'react', 'pubsub', 'react.backbone'], function (mo
 		},
 		onClose: function () {
 			$('.fdatepicker').off('changeDate').fdatepicker('remove');
-			Topic.publish("showDialog", null);
+			Topic.publish("showDialog");
 		},
 		onChange: function (e) {
 			console.log(e.currentTarget.name);
@@ -137,7 +137,7 @@ define(['moment', 'backbone', 'react', 'pubsub', 'react.backbone'], function (mo
 					),
 					React.createElement(
 						'div',
-						{ className: 'small-4 columns end' },
+						{ className: 'small-12 medium-12 large-4 columns end' },
 						React.createElement(
 							'label',
 							null,

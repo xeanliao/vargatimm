@@ -37,7 +37,7 @@ define([
 		},
 		onClose: function(){
 			$('.fdatepicker').off('changeDate').fdatepicker('remove');
-			Topic.publish("showDialog", null);
+			Topic.publish("showDialog");
 		},
 		onChange: function(e){
 			console.log(e.currentTarget.name);

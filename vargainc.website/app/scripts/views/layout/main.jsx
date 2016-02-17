@@ -46,31 +46,49 @@ define([
 
 	return React.createClass({
 		mixins: [BaseView],
-		displayName: 'Layout',
+		getInitialState: function(){
+			return {
+				mainView: null,
+				mainParams: null,
+				dialogView: null,
+				dialogParams: null,
+				dialogSize: 'small',
+				loading: false,
+				showMenu: true
+			}
+		},
 		componentDidMount: function(){
 			var self = this;
-			this.subscribe("loadView", function(view, collection, model){
-				self.setState({mainView: view, mainCollection: collection, mainModel: model});
+			/**
+			 * set main view
+			 * @param  {React} view
+			 * @param  {Backbone.Collection} or Backbone.Model} params
+			 * @param  {showMenu: {boolean}
+			 */
+			this.subscribe("loadView", function(view, params, options){
+				self.setState({
+					mainView: view,
+					mainParams: params
+				});
+				self.setState({
+					showMenu: _.has(options, 'showMenu') ? options.showMenu : true
+				});
 			});
 			/**
 			 * show a dialog
 			 * @param  {React} view
-			 * @param  {Backbone.Collection} collection
-			 * @param  {Backbone.Model} model
-			 * @param  {String} size Foundation Reveal Size Value: tiny, small, large, full
+			 * @param  {Backbone.Collection} or Backbone.Model} params
+			 * @param  {size: {String} size Foundation Reveal Size Value: tiny, small, large, full} options
 			 */
-			this.subscribe("showDialog", function(view, collection, model, size){
-				if(view){
-					self.setState({
-						dialogView: view, 
-						dialogCollection: collection, 
-						dialogSize: size || '',
-						dialogModel: model
-					});
-				}else{
-					$('.reveal').foundation('close');
-					self.setState({dialogView: null, dialogCollection: null, dialogModel: null});
-				}
+			this.subscribe("showDialog", function (view, params, options) {
+				self.setState({
+					dialogView: view,
+					dialogParams: params,
+				});
+
+				self.setState({
+					dialogSize: _.has(options, 'size') ? options.size : 'small'
+				});
 			});
 
 			/**
@@ -116,52 +134,48 @@ define([
 			}
 			$('iframe').height($(window).height());
 		},
-		getInitialState: function(){
-			return {
-				dialogSize: 'small',
-				loading: false,
-				showMenu: true
-			}
-		},
 		fullTextSearch: function(e){
 			this.publish('search', e.currentTarget.value);
 		},
 		menuSwitch: function(){
 			this.refs.sideMenu.switch();
 		},
-		render: function() {
-			/**
-			 * build main view
-			 */
-	        if(this.state && this.state.mainView) {
-	        	if(React.isValidElement(this.state.mainView)){
-	        		var mainView = this.state.mainView;
-	        	}else{
-	        		var MainView = React.createFactory(this.state.mainView);
-	        		if(this.state.mainCollection || this.state.mainModel){
-		            	var mainView = MainView({collection: this.state.mainCollection, model: this.state.mainModel});
-		            }else{
-		            	var mainView = MainView();
-		            }
-	        	}
-	        }else{
-	        	var mainView = null;
-	        }
-	        /**
-	         * build dialog view
-	         */
-	        if(this.state && this.state.dialogView) {
-	        	if(typeof this.state.dialogView === 'string'){
-	        		var dialogView = React.createElement('h5', null, this.state.dialogView);
-	        	}else if(React.isValidElement(this.state.dialogView)){
+		/**
+		 * build main view
+		 */
+		getMainView: function(){
+			if (this.state.mainView) {
+				if (React.isValidElement(this.state.mainView)) {
+					return this.state.mainView;
+				} else {
+					var MainView = React.createFactory(this.state.mainView);
+					return MainView(this.state.mainParams);
+				}
+			}
+			return null;
+		},
+		/**
+         * build dialog view
+         */
+		getDialogView: function(){
+			if (this.state.dialogView) {
+				if (_.isString(this.state.dialogView)) {
+					var dialogView = React.createElement('h5', null, this.state.dialogView);
+				} else if (React.isValidElement(this.state.dialogView)) {
 					var dialogView = this.state.dialogView;
-	        	}else{
-	        		var DialogView = React.createFactory(this.state.dialogView);
-	            	var dialogView = DialogView({collection: this.state.dialogCollection, model: this.state.dialogModel, ref: "DialogView"});	
-	        	}
-	        }else{
-	        	var dialogView = null;
-	        }
+				} else {
+					var DialogView = React.createFactory(this.state.dialogView),
+						params = _.extend(this.state.dialogParams, {
+							ref: "DialogView"
+						});
+					return DialogView(params);
+				}
+			}
+			return null;
+		},
+		render: function() {
+			var mainView = this.getMainView(),
+				dialogView = this.getDialogView();
 
 	        if(this.state.showMenu){
 	        	var mainMenuClassName = 'left-menu';

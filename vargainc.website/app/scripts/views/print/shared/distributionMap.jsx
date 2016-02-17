@@ -52,7 +52,7 @@ define([
 			model.collection.add(detailModel, {
 				at: modelIndex + 1
 			});
-			this.publish('showDialog', null);
+			this.publish('showDialog');
 			this.publish('print.map.imageloaded');
 		},
 		onShowEditDialog: function(){
@@ -78,7 +78,9 @@ define([
 					});
 				self.unsubscribe('print.mapzoom@' + key);
 				self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
-				self.publish('showDialog', view, null, null, 'full');
+				self.publish('showDialog', view, null, {
+					size: 'full'
+				});
 			});
 		},
 		getExportParamters: function(){

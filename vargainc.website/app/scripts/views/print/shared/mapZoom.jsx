@@ -140,7 +140,7 @@ define([
 			this.publish('print.mapzoom@' + this.props.sourceKey, bounds);
 		},
 		onClose: function(){
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 		},
 		render: function(){
 			return (

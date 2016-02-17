@@ -43,7 +43,7 @@ define([
 		},
 		onClose: function(){
 			$('.fdatepicker').off('changeDate').fdatepicker('remove');
-			Topic.publish("showDialog", null);
+			Topic.publish("showDialog");
 		},
 		onChange: function(e){
 			console.log(e.currentTarget.name);
@@ -86,7 +86,7 @@ define([
 							<input type="radio" onChange={this.onChange} name="AreaDescription" checked={"APT ONLY" == AreaDescription} value="APT ONLY" id="aptonly" /><label htmlFor="aptonly">APT ONLY</label>
 							<input type="radio" onChange={this.onChange} name="AreaDescription" checked={"HOME ONLY" == AreaDescription} value="HOME ONLY" id="homeonly" /><label htmlFor="homeonly">HOME ONLY</label>
 						</fieldset>
-						<div className="small-4 columns end">
+						<div className="small-12 medium-12 large-4 columns end">
 							<label>Date
 								<input className="fdatepicker" onChange={this.onChange} name="Date" type="date" readOnly value={displayDate} required />
 							</label>

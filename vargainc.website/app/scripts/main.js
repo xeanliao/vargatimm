@@ -55,13 +55,14 @@ define(function (require, exports, module) {
 		},
 		defaultAction: function () {
 			require([
-				'models/campaign',
 				'collections/campaign',
 				'views/campaign/list'
-			], function (Model, Collection, View) {
+			], function (Collection, View) {
 				var campaignlist = new Collection();
-				campaignlist.fetch().done(function(){
-					Topic.publish('loadView', View, campaignlist, null);
+				campaignlist.fetch().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
 				});
 			});
 		},
@@ -85,25 +86,27 @@ define(function (require, exports, module) {
 		},
 		distributionAction: function () {
 			require([
-				'models/campaign',
 				'collections/campaign',
 				'views/distribution/list'
-			], function (Model, Collection, View) {
+			], function (Collection, View) {
 				var campaignlist = new Collection();
-				campaignlist.fetchForDistribution().done(function(){
-					Topic.publish('loadView', View, campaignlist, null);
+				campaignlist.fetchForDistribution().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
 				});
 			});
 		},
 		monitorAction: function () {
 			require([
-				'models/campaign',
 				'collections/campaign',
 				'views/monitor/list'
-			], function (Model, Collection, View) {
+			], function (Collection, View) {
 				var campaignlist = new Collection();
-				campaignlist.fetchForTask().done(function(){
-					Topic.publish('loadView', View, campaignlist, null);
+				campaignlist.fetchForTask().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
 				});
 			});
 		},
@@ -114,8 +117,10 @@ define(function (require, exports, module) {
 				'views/report/list'
 			], function (Model, Collection, View) {
 				var campaignlist = new Collection();
-				campaignlist.fetchForReport().done(function(){
-					Topic.publish('loadView', View, campaignlist, null);
+				campaignlist.fetchForReport().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
 				});
 			});
 		},
@@ -133,7 +138,11 @@ define(function (require, exports, module) {
 			], function (View, Collection) {
 				var print = new Collection();
 				print.fetchForDistributionMap(campaignId).done(function () {
-					Topic.publish('loadView', View, print, null);
+					Topic.publish('loadView', View, {
+						collection: print
+					}, {
+						showMenu: false
+					});
 				});
 			});
 		}

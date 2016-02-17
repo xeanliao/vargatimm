@@ -9,7 +9,7 @@ define(['moment', 'backbone', 'react', 'pubsub', 'views/user/adminList', 'react.
 			Topic.publish('monitor/dismiss', user);
 		},
 		onClose: function () {
-			Topic.publish("showDialog", null);
+			Topic.publish("showDialog");
 		},
 		onProcess: function () {
 			console.log('dmap publish topic');

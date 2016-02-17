@@ -19,12 +19,12 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/distributi
 			var model = this.getModel();
 			var confirmResult = confirm('Are you sure you would like to move \r\n' + model.getDisplayName() + '\r\nto Campaigns? Any changes that were made will be lost.');
 			if (confirmResult) {
-				Topic.publish('showDialog', DismissView, null, null);
+				Topic.publish('showDialog', DismissView);
 				actionHandler && Topic.unsubscribe(actionHandler);
 				actionHandler = Topic.subscribe('distribution/dismiss', function (user) {
 					model.dismissToCampaign(user, {
 						success: function (result) {
-							Topic.publish('showDialog', null, null, null);
+							Topic.publish('showDialog');
 							if (result && result.success) {
 								Topic.publish('distribution/refresh');
 							} else {
@@ -39,17 +39,16 @@ define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/distributi
 			e.preventDefault();
 			e.stopPropagation();
 			var model = this.getModel();
-			Topic.publish('showDialog', PublishView, null, null);
+			Topic.publish('showDialog', PublishView);
 			actionHandler && Topic.unsubscribe(actionHandler);
 			actionHandler = Topic.subscribe('distribution/publish', function (user) {
 				model.publishToMonitor(user, {
 					success: function (result) {
-						Topic.publish('showDialog', null, null, null);
+						Topic.publish('showDialog');
 						if (result && result.success) {
 							Topic.publish('distribution/refresh');
 						} else {
 							alert(result.error);
-							//Topic.publish('showDialog', result.error, null, null);
 						}
 					}
 				});
