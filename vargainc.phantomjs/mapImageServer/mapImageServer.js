@@ -1,6 +1,6 @@
 (function () {
 	'use strict';
-	var LocalDebug = true;
+	var LocalDebug = false;
 	var LocalMapImage = '08F3FBD5-8D7F-4B1B-B466-4AC1F04B1E21.jpg';
 	var LocalPolygonImage = '1B7C8334-C500-42F8-A7FF-83CB3F72EBD6.png';
 	var DEBUG = true;
