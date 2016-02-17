@@ -9,8 +9,6 @@ define([
 	'models/campaign',
 	'react.backbone'
 ], function (_, moment, Backbone, React, BaseView, EditView, PublishView, Model) {
-	var actionHandle = null,
-		searchHandle = null;
 	var CampaignRow = React.createBackboneClass({
 		mixins: [BaseView],
 		menuKey: 'campaign-menu-ddl-',
@@ -71,15 +69,17 @@ define([
 		onPublishToDMap: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-			var model = this.getModel();
+			var model = this.getModel(),
+				self = this;
 			this.publish('showDialog', PublishView);
-			actionHandle && this.unsubscribe(actionHandle);
-			actionHandle = this.subscribe('campaign/publish', function (user) {
+
+			this.unsubscribe('campaign/publish');
+			this.subscribe('campaign/publish', function (user) {
 				model.publishToDMap(user, {
 					success: function (result) {
-						this.publish('showDialog');
+						self.publish('showDialog');
 						if (result && result.success) {
-							this.publish('camapign/refresh');
+							self.publish('camapign/refresh');
 						} else {
 							alert(result.error);
 						}
@@ -165,8 +165,7 @@ define([
 			this.subscribe('camapign/refresh', function(){
 				self.getCollection().fetch();
 			});
-			searchHandle && this.unsubscribe(searchHandle);
-			searchHandle = this.subscribe('search', function(words){
+			this.subscribe('search', function(words){
 				console.log('on search');
 				self.setState({
 					search: words,
@@ -176,10 +175,6 @@ define([
 			});
 
 			$("#campaign-filter-ddl-ClientName, #campaign-filter-ddl-ClientCode, #campaign-filter-ddl-Date, #campaign-filter-ddl-AreaDescription").foundation();
-		},
-		componentWillUnmount: function(){
-			searchHandle && this.unsubscribe(searchHandle);
-			actionHandle && this.unsubscribe(actionHandle);
 		},
 		onNew: function () {
 			this.publish('showDialog', EditView, {

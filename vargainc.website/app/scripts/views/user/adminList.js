@@ -1,7 +1,8 @@
-define(['underscore', 'moment', 'backbone', 'react', 'pubsub', 'collections/user', 'react.backbone'], function (_, moment, Backbone, React, Topic, Collection) {
+define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'collections/user', 'react.backbone'], function (_, moment, Backbone, React, BaseView, Collection) {
 	var adminCollection = new Collection();
 
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		getDefaultProps: function () {
 			return {
 				collection: adminCollection,

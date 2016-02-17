@@ -1,5 +1,6 @@
-define(['moment', 'backbone', 'react', 'pubsub', 'react.backbone'], function (moment, Backbone, React, Topic) {
+define(['moment', 'backbone', 'react', 'views/base', 'react.backbone'], function (moment, Backbone, React, BaseView) {
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		componentDidMount: function () {
 			var self = this,
 			    model = this.getModel();
@@ -31,10 +32,9 @@ define(['moment', 'backbone', 'react', 'pubsub', 'react.backbone'], function (mo
 		},
 		onClose: function () {
 			$('.fdatepicker').off('changeDate').fdatepicker('remove');
-			Topic.publish("showDialog");
+			this.publish("showDialog");
 		},
 		onChange: function (e) {
-			console.log(e.currentTarget.name);
 			this.getModel().set(e.currentTarget.name, e.currentTarget.value);
 		},
 		render: function () {

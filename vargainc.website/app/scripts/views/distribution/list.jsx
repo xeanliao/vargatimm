@@ -3,14 +3,13 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'views/distribution/publish',
 	'views/distribution/dismiss',
 	'react.backbone'
-], function (_, moment, Backbone, React, Topic, PublishView, DismissView) {
-	var actionHandler = null,
-		searchHandle = null;
+], function (_, moment, Backbone, React, BaseView, PublishView, DismissView) {
 	var DistributionRow = React.createBackboneClass({
+		mixins: [BaseView],
 		getDefaultProps: function(){
 			return {
 				address: null,
@@ -26,17 +25,19 @@ define([
 		onDismiss: function(e){
 			e.preventDefault();
 			e.stopPropagation();
-			var model = this.getModel();
-			var confirmResult = confirm('Are you sure you would like to move \r\n' + model.getDisplayName() + '\r\nto Campaigns? Any changes that were made will be lost.');
+			var model = this.getModel(),
+			confirmResult = confirm('Are you sure you would like to move \r\n' + model.getDisplayName() + '\r\nto Campaigns? Any changes that were made will be lost.'),
+			self = this;
+
 			if(confirmResult){
-				Topic.publish('showDialog', DismissView);
-				actionHandler && Topic.unsubscribe(actionHandler);
-				actionHandler = Topic.subscribe('distribution/dismiss', function(user){
+				this.publish('showDialog', DismissView);
+				this.unsubscribe('distribution/dismiss');
+				this.subscribe('distribution/dismiss', function(user){
 					model.dismissToCampaign(user, {
 						success: function(result){
-							Topic.publish('showDialog');
+							self.publish('showDialog');
 							if(result && result.success){
-								Topic.publish('distribution/refresh');
+								self.publish('distribution/refresh');
 							}else{
 								alert("something wrong");
 							}
@@ -48,15 +49,16 @@ define([
 		onPublishToMonitors: function(e){
 			e.preventDefault();
 			e.stopPropagation();
-			var model = this.getModel();
-			Topic.publish('showDialog', PublishView);
-			actionHandler && Topic.unsubscribe(actionHandler);
-			actionHandler = Topic.subscribe('distribution/publish', function(user){
+			var model = this.getModel(),
+				self = this;
+			this.publish('showDialog', PublishView);
+			this.unsubscribe('distribution/publish');
+			this.subscribe('distribution/publish', function(user){
 				model.publishToMonitor(user, {
 					success: function(result){
-						Topic.publish('showDialog');
+						self.publish('showDialog');
 						if(result && result.success){
-							Topic.publish('distribution/refresh');	
+							self.publish('distribution/refresh');	
 						}else{
 							alert(result.error);
 						}
@@ -99,7 +101,8 @@ define([
 			);
 		}
 	});
-	var DistributionList = React.createBackboneClass({
+	return React.createBackboneClass({
+		mixins: [BaseView],
 		getInitialState: function(){
 			return {
 				orderByFiled: null,
@@ -111,12 +114,10 @@ define([
 		},
 		componentDidMount: function(){
 			var self = this;
-			Topic.subscribe('distribution/refresh', function(){
+			this.subscribe('distribution/refresh', function(){
 				self.getCollection().fetchForDistribution();
 			});
-			searchHandle && Topic.unsubscribe(searchHandle);
-			searchHandle = Topic.subscribe('search', function(words){
-				console.log('on search');
+			this.subscribe('search', function(words){
 				self.setState({
 					search: words,
 					filterField: null,
@@ -125,10 +126,6 @@ define([
 			});
 
 			$("#distribution-filter-ddl-ClientName, #distribution-filter-ddl-ClientCode, #distribution-filter-ddl-Date, #distribution-filter-ddl-AreaDescription").foundation();
-		},
-		componentWillUnmount: function(){
-			searchHandle && Topic.unsubscribe(searchHandle);
-			actionHandler && Topic.unsubscribe(actionHandler);
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();
@@ -307,5 +304,4 @@ define([
 			);
 		}
 	});
-	return DistributionList;
 });

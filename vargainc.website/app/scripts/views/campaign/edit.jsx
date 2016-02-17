@@ -2,10 +2,11 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'react.backbone'
-], function (moment, Backbone, React, Topic) {
+], function (moment, Backbone, React, BaseView) {
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		componentDidMount: function(){
 			var self = this,
 				model = this.getModel();
@@ -18,17 +19,18 @@ define([
 			$('.fdatepicker').fdatepicker({
 				format: 'yyyy-mm-dd'
 			}).on('changeDate', function(e){
-				console.log(e.date);
 				self.getModel().set('Date', e.date);
 			});
 			$('form').foundation();
 		},
 		onSave: function(e){
+			e.preventDefault();
+			e.stopPropagation();
 			var self = this;
 			this.getModel().save(null, {
 				success: function(model, response){
 					if(response && response.success){
-						Topic.publish('camapign/refresh');
+						self.publish('camapign/refresh');
 						self.onClose();
 					}else{
 						self.setState({error: "opps! something wrong. please contact us!"});
@@ -38,15 +40,12 @@ define([
 					self.setState({error: "opps! something wrong. please contact us!"});
 				}
 			});
-			e.preventDefault();
-			e.stopPropagation();
 		},
 		onClose: function(){
 			$('.fdatepicker').off('changeDate').fdatepicker('remove');
-			Topic.publish("showDialog");
+			this.publish("showDialog");
 		},
 		onChange: function(e){
-			console.log(e.currentTarget.name);
 			this.getModel().set(e.currentTarget.name, e.currentTarget.value);
 		},
 		render: function(){

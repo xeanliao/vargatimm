@@ -3,13 +3,14 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'collections/user',
 	'react.backbone'
-], function (_, moment, Backbone, React, Topic, Collection) {
+], function (_, moment, Backbone, React, BaseView, Collection) {
 	var adminCollection = new Collection();
 
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		getDefaultProps: function(){
 			return {
 				collection: adminCollection,

@@ -1,20 +1,21 @@
-define(['moment', 'backbone', 'react', 'pubsub', 'views/user/adminList', 'react.backbone'], function (moment, Backbone, React, Topic, AdminUserList) {
+define(['moment', 'backbone', 'react', 'views/base', 'views/user/adminList', 'react.backbone'], function (moment, Backbone, React, BaseView, AdminUserList) {
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		componentWillMount: function () {},
 		onUserSelected: function (user) {
 			this.setState({ selectedUser: user });
 		},
 		onDbUserSelected: function (user) {
 			this.setState({ selectedUser: user });
-			Topic.publish('monitor/dismiss', user);
+			this.publish('monitor/dismiss', user);
 		},
 		onClose: function () {
-			Topic.publish("showDialog");
+			this.publish("showDialog");
 		},
 		onProcess: function () {
 			console.log('dmap publish topic');
 			if (this.state && this.state.selectedUser) {
-				Topic.publish('monitor/dismiss', this.state.selectedUser);
+				this.publish('monitor/dismiss', this.state.selectedUser);
 			}
 		},
 		render: function () {
