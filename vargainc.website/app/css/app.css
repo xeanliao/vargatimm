@@ -730,6 +730,8 @@ html, body {
 .google-map-pop {
   background: transparent;
   pointer-events: none;
+  margin-top: 0px !important;
+  top: 0px !important;
 }
 
 iframe {

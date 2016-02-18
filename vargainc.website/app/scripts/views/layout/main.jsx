@@ -10,8 +10,6 @@ define([
 	'react.backbone',
 	'foundation'
 ], function($, React, ReactDOM, BaseView, UserModel, MenuView, LoadingView){
-	
-
 	var User = React.createBackboneClass({
 		mixins: [BaseView],
 		getDefaultProps: function(){
@@ -54,6 +52,7 @@ define([
 				dialogView: null,
 				dialogParams: null,
 				dialogSize: 'small',
+				dialogCustomClass: '',
 				loading: false,
 				showMenu: true
 			}
@@ -88,7 +87,8 @@ define([
 				});
 
 				self.setState({
-					dialogSize: _.has(options, 'size') ? options.size : 'small'
+					dialogSize: _.has(options, 'size') ? options.size : 'small',
+					dialogCustomClass: _.has(options, 'customClass') ? options.customClass : ''
 				});
 			});
 
@@ -184,7 +184,7 @@ define([
 	        	var mainMenuClassName = '';
 	        	var menu = null;
 	        }
-
+			
 	        return (
 	        	<div>
 					<div className="off-canvas-wrapper">
@@ -208,7 +208,7 @@ define([
 						</div>
 					</div>
 					
-					<div className={'reveal ' + this.state.dialogSize} data-reveal>
+					<div className={'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass} data-reveal data-options="{closeOnClick: false}">
 						{dialogView}
 					</div>
 

@@ -28,7 +28,6 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 		},
 		componentWillUnmount: function () {
 			try {
-				$('.reveal').removeClass('google-map-pop');
 				_.forEach(googleItems, function (item) {
 					item.setMap(null);
 				});
@@ -51,8 +50,6 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				'top': '0px',
 				'left': '0px'
 			});
-
-			$('.reveal').addClass('google-map-pop');
 
 			if (!googleMap) {
 				googleMap = new google.maps.Map($('#google-map')[0], {
@@ -115,6 +112,8 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			});
 
 			googleMap.fitBounds(mapBounds);
+
+			this.publish('hideLoading');
 		},
 		onExistMapDraw: function () {
 			this.setState({ 'activeButton': 'ExistMapDraw' });

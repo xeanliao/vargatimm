@@ -95,7 +95,8 @@ define([
 					boundary: model.get('Boundary'),
 					color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
 				}, {
-					size: 'full'
+					size: 'full',
+					customClass: 'google-map-pop'
 				});
 			});
 		},

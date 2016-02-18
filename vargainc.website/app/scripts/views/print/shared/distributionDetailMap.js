@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views/base', 'views/print/shared/mapZoom', 'react.backbone'], function ($, _, moment, Backbone, React, Numeral, BaseView, MapZoomView) {
+define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views/base', 'views/layout/loading', 'views/print/shared/mapZoom', 'react.backbone'], function ($, _, moment, Backbone, React, Numeral, BaseView, LoadingView, MapZoomView) {
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function () {
