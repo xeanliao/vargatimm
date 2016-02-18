@@ -54,7 +54,7 @@ define(['backbone', 'react', 'views/print/shared/options', 'views/print/shared/o
 						React.createElement(
 							'button',
 							{ className: 'success button', onClick: this.onApply },
-							'Save'
+							'Apply'
 						),
 						React.createElement(
 							'button',
