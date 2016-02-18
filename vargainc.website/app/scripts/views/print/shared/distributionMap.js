@@ -12,10 +12,11 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 		},
 		loadImage: function () {
 			var model = this.getModel(),
+			    key = model.get('key'),
 			    self = this;
 
 			$('.off-canvas-wrapper-inner').stop().animate({
-				scrollTop: $(self.refs.mapContainer).offset().top
+				scrollTop: $(self.refs['mapContainer-' + key]).offset().top
 			}, 500);
 			this.setState({
 				imageLoaded: false
@@ -224,7 +225,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						{ className: 'small-12 columns' },
 						React.createElement(
 							'div',
-							{ className: 'map-container', ref: 'mapContainer', onClick: this.onShowEditDialog },
+							{ className: 'map-container', ref: 'mapContainer-' + model.get('key'), onClick: this.onShowEditDialog },
 							mapImage
 						)
 					)
