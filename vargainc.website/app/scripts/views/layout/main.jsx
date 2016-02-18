@@ -208,7 +208,7 @@ define([
 						</div>
 					</div>
 					
-					<div className={'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass} data-reveal data-options="{closeOnClick: false}">
+					<div className={'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass} data-reveal data-options="closeOnClick: false; closeOnEsc: false">
 						{dialogView}
 					</div>
 

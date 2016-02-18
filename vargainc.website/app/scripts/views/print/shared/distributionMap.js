@@ -35,10 +35,20 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 		},
 		onCreateDetailMap: function (rectBounds) {
 			var model = this.getModel(),
+			    collection = model.collection,
 			    detailModel = model.clone(),
+			    dmapId = detailModel.get('DMapId'),
 			    topRight = rectBounds.getNorthEast(),
 			    bottomLeft = rectBounds.getSouthWest(),
-			    modelIndex = model.collection.indexOf(model);
+			    modelIndex = 0,
+			    serial = 0;
+			_.forEach(collection.models, function (item, index) {
+				var currentDMapId = item.get('DMapId');
+				if (currentDMapId == dmapId) {
+					serial++;
+					modelIndex = index;
+				}
+			});
 			detailModel.set({
 				'key': model.get('key') + '-' + topRight.lat() + '-' + topRight.lng() + '-' + bottomLeft.lat() + '-' + bottomLeft.lng(),
 				'type': 'DistributionDetail',
@@ -53,9 +63,10 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 				'Boundary': null,
 				'ImageStatus': 'waiting',
 				'MapImage': null,
-				'PolygonImage': null
+				'PolygonImage': null,
+				'Serial': serial
 			});
-			model.collection.add(detailModel, {
+			collection.add(detailModel, {
 				at: modelIndex + 1
 			});
 			this.publish('showDialog');

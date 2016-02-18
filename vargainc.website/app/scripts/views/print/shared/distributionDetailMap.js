@@ -27,15 +27,23 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			this.publish('print.map.imageloaded');
 		},
 		onRemove: function () {
-			var model = this.getModel();
-			model.collection.remove(model);
+			var model = this.getModel(),
+			    dmapId = model.get('DMapId'),
+			    serial = model.get('Serial'),
+			    collection = model.collection;
+			collection.remove(model);
+			_.forEach(collection.models, function (item) {
+				var currentDmapId = item.get('DMapId'),
+				    currentSerial = item.get('Serial');
+				currentDmapId == dmapId && currentSerial > serial && item.set('Serial', currentSerial - 1);
+			});
 		},
 		getExportParamters: function () {
 			var model = this.getModel();
 			return {
 				'type': 'dmap',
 				'options': [{
-					'title': 'DM MAP ' + model.get('DMapId') + '(' + model.get('Name') + ') -- detail map'
+					'title': 'DM MAP ' + model.get('DMapId') + '(' + model.get('Name') + ') -- ' + model.get('Serial')
 				}, {
 					'list': [{
 						'key': 'DM MAP #',
@@ -97,7 +105,8 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						model.get('DMapId'),
 						'(',
 						model.get('Name'),
-						') -- detail map',
+						') -- ',
+						model.get('Serial'),
 						React.createElement(
 							'button',
 							{ className: 'button float-right', onClick: this.onRemove },

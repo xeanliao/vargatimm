@@ -226,7 +226,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 				),
 				React.createElement(
 					'div',
-					{ className: 'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass, 'data-reveal': true, 'data-options': '{closeOnClick: false}' },
+					{ className: 'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass, 'data-reveal': true, 'data-options': 'closeOnClick: false; closeOnEsc: false' },
 					dialogView
 				),
 				React.createElement(
