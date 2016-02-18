@@ -166,7 +166,6 @@ define([
 				self.getCollection().fetch();
 			});
 			this.subscribe('search', function(words){
-				console.log('on search');
 				self.setState({
 					search: words,
 					filterField: null,

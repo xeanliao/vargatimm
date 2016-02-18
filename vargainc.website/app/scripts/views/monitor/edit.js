@@ -8,7 +8,6 @@ define(['moment', 'backbone', 'react', 'views/base', 'react.backbone'], function
 			$('.fdatepicker').fdatepicker({
 				format: 'yyyy-mm-dd'
 			}).on('changeDate', function (e) {
-				console.log(e.date);
 				self.getModel().set('Date', e.date);
 			});
 			$('form').foundation();

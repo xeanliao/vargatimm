@@ -219,7 +219,6 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'views/campai
 				self.getCollection().fetch();
 			});
 			this.subscribe('search', function (words) {
-				console.log('on search');
 				self.setState({
 					search: words,
 					filterField: null,

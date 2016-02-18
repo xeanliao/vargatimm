@@ -38,7 +38,7 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				rectangle = null;
 				drawingManager = null;
 			} catch (ex) {
-				console.log(ex);
+				console.log('mapZoom componentWillUnmount error', ex);
 			}
 			$('#google-map').addClass('hide');
 		},
@@ -153,20 +153,17 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 					React.createElement(
 						'button',
 						{ className: this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button', onClick: this.onEnterMapDraw },
-						React.createElement('i', { className: 'fa fa-crop' }),
-						' Begin Draw'
+						React.createElement('i', { className: 'fa fa-crop' })
 					),
 					React.createElement(
 						'button',
 						{ className: this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button', onClick: this.onExistMapDraw },
-						React.createElement('i', { className: 'fa fa-arrows' }),
-						' End Draw'
+						React.createElement('i', { className: 'fa fa-arrows' })
 					),
 					React.createElement(
 						'button',
 						{ className: 'button', onClick: this.onFinish },
-						React.createElement('i', { className: 'fa fa-image' }),
-						' Create Capture'
+						React.createElement('i', { className: 'fa fa-image' })
 					)
 				)
 			);

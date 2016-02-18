@@ -44,7 +44,7 @@ define([
 				rectangle = null;
 				drawingManager = null;
 			} catch (ex) {
-				console.log(ex);
+				console.log('mapZoom componentWillUnmount error', ex);
 			}
 			$('#google-map').addClass('hide');
 		},
@@ -149,9 +149,9 @@ define([
 				    	<span aria-hidden="true">&times;</span>
 				  	</button>
 					<div className="pop-tool-bar button-group text-center">
-						<button className={this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button'} onClick={this.onEnterMapDraw}><i className="fa fa-crop"></i>&nbsp;Begin Draw</button>
-						<button className={this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button'}  onClick={this.onExistMapDraw}><i className="fa fa-arrows"></i>&nbsp;End Draw</button>
-						<button className='button'  onClick={this.onFinish}><i className="fa fa-image"></i>&nbsp;Create Capture</button>
+						<button className={this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button'} onClick={this.onEnterMapDraw}><i className="fa fa-crop"></i></button>
+						<button className={this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button'}  onClick={this.onExistMapDraw}><i className="fa fa-arrows"></i></button>
+						<button className='button'  onClick={this.onFinish}><i className="fa fa-image"></i></button>
 					</div>
 				</div>
 			);

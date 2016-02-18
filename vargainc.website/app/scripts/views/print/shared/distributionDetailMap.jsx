@@ -20,7 +20,6 @@ define([
 			var model = this.getModel(),
 				self = this;
 			this.setState({imageLoaded: false});
-			console.log($(self.refs.mapContainer).offset().top);
 			$('.off-canvas-wrapper-inner').stop().animate({
 			  	scrollTop: $(self.refs.mapContainer).offset().top
 			}, 500);

@@ -21,7 +21,6 @@ define([
 			this.publish("showDialog");
 		},
 		onProcess: function(){
-			console.log('dmap publish topic');
 			if(this.state && this.state.selectedUser){
 				this.publish('monitor/dismiss', this.state.selectedUser);
 			}

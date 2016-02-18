@@ -117,7 +117,6 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
     * fix main view size
     */
 			$(window).on('resize', function () {
-				console.log('resize', $(window).height());
 				$(".off-canvas-wrapper-inner").height($(window).height());
 			});
 			$(window).trigger('resize');

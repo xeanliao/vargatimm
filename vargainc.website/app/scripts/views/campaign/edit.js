@@ -6,7 +6,6 @@ define(['moment', 'backbone', 'react', 'views/base', 'react.backbone'], function
 			    model = this.getModel();
 
 			if (!model.get('Date')) {
-				console.log('no init date in campaign');
 				model.set('Date', new Date());
 			}
 

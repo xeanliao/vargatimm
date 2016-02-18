@@ -24,6 +24,7 @@ define([
                     dmapId: model.get('DMapId')
                 }),
                 options = {
+                    quite: true,
                     url: model.urlRoot + '/distribution/',
                     method: 'POST',
                     processData: true,
@@ -42,13 +43,11 @@ define([
                                 }
 
                             var mapImage = $(new Image()).one('load', function () {
-                                console.log('mapImageLoaded');
                                 mapImageLoaded = true;
                                 polygonImageLoaded && imageLoaded();
                             }).attr('src', mapImageAddress);
 
                             var polygonImage = $(new Image()).one('load', function () {
-                                console.log('polygonImageLoaded');
                                 polygonImageLoaded = true;
                                 mapImageLoaded && imageLoaded();
                             }).attr('src', polygonImageAddress);

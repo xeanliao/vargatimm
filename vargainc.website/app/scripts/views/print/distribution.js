@@ -61,12 +61,15 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 				campaignId: campaignId,
 				size: "Distribute",
 				needFooter: false,
-				options: _.map(this.refs, function (page) {
-					console.log(page, page.getExportParamters);
-					return page.getExportParamters();
-				})
-			};
-			console.log(postData);
+				options: []
+			},
+			    self = this;
+			_.forEach(collecton, function (page) {
+				if (self.refs[page.get('key')]) {
+					postData.options.push(self.refs[page.get('key')].getExportParamters());
+				}
+			});
+
 			collecton.exportPdf(postData).then(function (response) {
 				var downloadUrl = '../api/pdf/download/' + campaignId + '/' + response.sourceFile;
 				$('<form action="' + downloadUrl + '" method="GET"></form>').appendTo('body').get(0).submit();

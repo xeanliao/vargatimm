@@ -25,7 +25,7 @@ define([
 		loadImage: function () {
 			var model = this.getModel(),
 				self = this;
-			console.log($(self.refs.mapContainer).offset().top);
+
 			$('.off-canvas-wrapper-inner').stop().animate({
 			  	scrollTop: $(self.refs.mapContainer).offset().top
 			}, 500);
@@ -83,20 +83,18 @@ define([
 			if (model.get('Boundary')) {
 				def.resolve();
 			} else {
-				def = model.fetchBoundary();
+				def = model.fetchBoundary({quite: true});
 			}
 			def.done(function () {
-				var mapZoomView = React.createFactory(MapZoomView),
-					color = model.get('Color'),
-					key = 'distribution-' + model.get('DMapId'),
-					view = mapZoomView({
-						sourceKey: key,
-						boundary: model.get('Boundary'),
-						color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
-					});
+				var color = model.get('Color'),
+					key = 'distribution-' + model.get('DMapId');
 				self.unsubscribe('print.mapzoom@' + key);
 				self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
-				self.publish('showDialog', view, null, {
+				self.publish('showDialog', MapZoomView, {
+					sourceKey: key,
+					boundary: model.get('Boundary'),
+					color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
+				}, {
 					size: 'full'
 				});
 			});
