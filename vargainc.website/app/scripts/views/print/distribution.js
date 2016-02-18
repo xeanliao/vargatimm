@@ -64,7 +64,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 				options: []
 			},
 			    self = this;
-			_.forEach(collecton, function (page) {
+			_.forEach(collecton.models, function (page) {
 				if (self.refs[page.get('key')]) {
 					postData.options.push(self.refs[page.get('key')].getExportParamters());
 				}
