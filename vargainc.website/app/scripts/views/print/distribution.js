@@ -24,7 +24,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 			var self = this;
 			this.subscribe('print.map.imageloaded', function () {
 				_.some(self.refs, function (page) {
-					!page.state.imageLoaded && page.loadImage();
+					!page.state.imageLoaded && page.state.imageLoading == false && page.loadImage();
 					return !page.state.imageLoaded;
 				});
 			});

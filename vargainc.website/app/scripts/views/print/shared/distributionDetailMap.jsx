@@ -14,7 +14,8 @@ define([
 		mixins: [BaseView],
 		getInitialState: function(){
 			return {
-				imageLoaded: false
+				imageLoaded: null,
+				imageLoading: false
 			};
 		},
 		preloadImage: function (imageAddress) {
@@ -24,32 +25,40 @@ define([
 			}).attr('src', imageAddress);
 			return def;
 		},
+		scrollToPage: function () {
+			var model = this.getModel(),
+				index = model.collection.indexOf(model),
+				height = $('.page').eq(index).position().top;
+			$('.off-canvas-wrapper-inner').stop().animate({
+				scrollTop: height
+			}, 600);
+		},
 		loadImage: function () {
 			var model = this.getModel(),
 				key = model.get('key'),
+				domNode = this.refs['mapContainer-' + key],
 				self = this;
 
-			$('.off-canvas-wrapper-inner').stop().animate({
-				scrollTop: $(self.refs['mapContainer-' + key]).offset().top
-			}, 500);
+			this.setState({imageLoaded: null, imageLoading: true});
+			this.scrollToPage();
 
 			model.fetchMapImage(this.props.options).then(function () {
 				var def = $.Deferred(),
 					mapImage = model.get('MapImage'),
 					ploygonImage = model.get('PolygonImage');
-				$.when(self.preloadImage(mapImage), self.preloadImage(ploygonImage)).done(function () {
-					def.resolve();
-				});
+				if (_.isEmpty(mapImage) || _.isEmpty(ploygonImage)) {
+					def.reject();
+				} else {
+					$.when(self.preloadImage(mapImage), self.preloadImage(ploygonImage)).done(function () {
+						def.resolve();
+					});
+				}
 				return def;
-			}).done(function () {
-				self.setState({
-					imageLoaded: true
-				});
-			}).fail(function () {
-				self.setState({
-					imageLoaded: false
-				});
 			}).always(function () {
+				self.setState({
+					imageLoaded: true,
+					imageLoading: false
+				});
 				self.publish('print.map.imageloaded');
 			});
 		},
@@ -123,7 +132,7 @@ define([
 					);
 				}
 			} else {
-				var mapImage = <LoadingView text={this.state.imageLoaded === null ? 'WAITING' : 'LOADING'} / >;
+				var mapImage = <LoadingView text={this.state.imageLoading ? 'LOADING' : 'WAITING'} / >;
 			}
 
 			return (

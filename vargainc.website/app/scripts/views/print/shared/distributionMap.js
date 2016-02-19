@@ -3,12 +3,21 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 		mixins: [BaseView],
 		getInitialState: function () {
 			return {
-				imageLoaded: null
+				imageLoaded: null,
+				imageLoading: false
 			};
 		},
 		componentDidMount: function () {
 			var id = this.getModel().get('DMapId');
 			this.publish('print.map.imageloaded');
+		},
+		scrollToPage: function () {
+			var model = this.getModel(),
+			    index = model.collection.indexOf(model),
+			    height = $('.page').eq(index).position().top;
+			$('.off-canvas-wrapper-inner').stop().animate({
+				scrollTop: height
+			}, 600);
 		},
 		preloadImage: function (imageAddress) {
 			var def = $.Deferred();
@@ -21,28 +30,25 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			var model = this.getModel(),
 			    key = model.get('key'),
 			    self = this;
-
-			$('.off-canvas-wrapper-inner').stop().animate({
-				scrollTop: $(self.refs['mapContainer-' + key]).offset().top
-			}, 500);
-
+			this.setState({ imageLoaded: null, imageLoading: true });
+			this.scrollToPage();
 			model.fetchMapImage(this.props.options).then(function () {
 				var def = $.Deferred(),
 				    mapImage = model.get('MapImage'),
 				    ploygonImage = model.get('PolygonImage');
-				$.when(self.preloadImage(mapImage), self.preloadImage(ploygonImage)).done(function () {
-					def.resolve();
-				});
+				if (_.isEmpty(mapImage) || _.isEmpty(ploygonImage)) {
+					def.reject();
+				} else {
+					$.when(self.preloadImage(mapImage), self.preloadImage(ploygonImage)).done(function () {
+						def.resolve();
+					});
+				}
 				return def;
-			}).done(function () {
-				self.setState({
-					imageLoaded: true
-				});
-			}).fail(function () {
-				self.setState({
-					imageLoaded: false
-				});
 			}).always(function () {
+				self.setState({
+					imageLoaded: true,
+					imageLoading: false
+				});
 				self.publish('print.map.imageloaded');
 			});
 		},
@@ -60,7 +66,9 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			    topRight = rectBounds.getNorthEast(),
 			    bottomLeft = rectBounds.getSouthWest(),
 			    modelIndex = 0,
-			    serial = 0;
+			    serial = 0,
+			    key = model.get('key') + '-' + topRight.lat() + '-' + topRight.lng() + '-' + bottomLeft.lat() + '-' + bottomLeft.lng();
+
 			_.forEach(collection.models, function (item, index) {
 				var currentDMapId = item.get('DMapId');
 				if (currentDMapId == dmapId) {
@@ -69,7 +77,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 				}
 			});
 			detailModel.set({
-				'key': model.get('key') + '-' + topRight.lat() + '-' + topRight.lng() + '-' + bottomLeft.lat() + '-' + bottomLeft.lng(),
+				'key': key,
 				'type': 'DistributionDetail',
 				'TopRight': {
 					lat: topRight.lat(),
@@ -169,7 +177,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 					);
 				}
 			} else {
-				var mapImage = React.createElement(LoadingView, { text: this.state.imageLoaded === null ? 'WAITING' : 'LOADING' });
+				var mapImage = React.createElement(LoadingView, { text: this.state.imageLoading ? 'LOADING' : 'WAITING' });
 			}
 			return React.createElement(
 				'div',
