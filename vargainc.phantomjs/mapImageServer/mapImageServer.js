@@ -1,8 +1,8 @@
 (function () {
 	'use strict';
 	var LocalDebug = false;
-	var LocalMapImage = '08F3FBD5-8D7F-4B1B-B466-4AC1F04B1E21.jpg';
-	var LocalPolygonImage = '1B7C8334-C500-42F8-A7FF-83CB3F72EBD6.png';
+	var LocalMapImage = 'FAAE5AAB-1EA9-4AAA-9A48-2B61CF3B5933.jpg';
+	var LocalPolygonImage = 'FB7D4E48-FA06-423A-9801-A29B72DE50F7.png';
 	var DEBUG = true;
 
 	var system = require('system'),
@@ -101,8 +101,8 @@
 			break;
 		case 'Distribute':
 			page.viewportSize = {
-				width: 2298,
-				height: 2177
+				width: 3600,
+				height: 3410
 			};
 			url = 'print.distribute.html';
 			break;
