@@ -10,6 +10,13 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			var id = this.getModel().get('DMapId');
 			this.publish('print.map.imageloaded');
 		},
+		preloadImage: function (imageAddress) {
+			var def = $.Deferred();
+			$(new Image()).one('load', function () {
+				def.resolve();
+			}).attr('src', imageAddress);
+			return def;
+		},
 		loadImage: function () {
 			var model = this.getModel(),
 			    key = model.get('key'),
@@ -18,13 +25,24 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			$('.off-canvas-wrapper-inner').stop().animate({
 				scrollTop: $(self.refs['mapContainer-' + key]).offset().top
 			}, 500);
-			this.setState({
-				imageLoaded: false
-			});
-			model.fetchMapImage(this.props.options).always(function () {
+
+			model.fetchMapImage(this.props.options).then(function () {
+				var def = $.Deferred(),
+				    mapImage = model.get('MapImage'),
+				    ploygonImage = model.get('PolygonImage');
+				$.when(self.preloadImage(mapImage), self.preloadImage(ploygonImage)).done(function () {
+					def.resolve();
+				});
+				return def;
+			}).done(function () {
 				self.setState({
 					imageLoaded: true
 				});
+			}).fail(function () {
+				self.setState({
+					imageLoaded: false
+				});
+			}).always(function () {
 				self.publish('print.map.imageloaded');
 			});
 		},
