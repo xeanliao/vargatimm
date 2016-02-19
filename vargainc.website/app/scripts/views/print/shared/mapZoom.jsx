@@ -25,7 +25,7 @@ define([
 		},
 		componentWillMount: function(){
 			if($('#google-map').size() == 0){
-				$('<div id="google-map" class="hide google-map"></div>').appendTo('body');
+				$('<div id="google-map" class="google-map"></div>').appendTo('body');
 			}
 		},
 		componentDidMount: function(){
@@ -45,16 +45,15 @@ define([
 			} catch (ex) {
 				console.log('mapZoom componentWillUnmount error', ex);
 			}
-			$('#google-map').addClass('hide');
+			$('#google-map').css({
+				'visibility': 'hidden',
+			});
 		},
 		initGoogleMap: function(){
 			console.log('init google map');
 			var container = $(window);
-			$('#google-map').removeClass('hide').css({
-				'width': container.width() + 'px',
-				'height': container.height() + 'px',
-				'top': '0px',
-				'left': '0px'
+			$('#google-map').css({
+				'visibility': 'visible'
 			});
 			
 			if(!googleMap){
