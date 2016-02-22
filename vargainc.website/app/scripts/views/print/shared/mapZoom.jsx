@@ -13,14 +13,16 @@ define([
 		mixins: [BaseView],
 		getInitialState: function(){
 			return {
-				activeButton: 'EnterMapDraw'
+				activeButton: 'EnterMapDraw',
+				activeMap: 'ROADMAP'
 			};
 		},
 		getDefaultProps: function(){
 			return {
 				boundary: [],
 				color: '#000',
-				sourceKey: null
+				sourceKey: null,
+				mapType: 'ROADMAP'
 			};
 		},
 		componentWillMount: function(){
@@ -59,8 +61,12 @@ define([
 				googleMap = new google.maps.Map($('#google-map')[0], {
 			        center: new google.maps.LatLng(40.744556, -73.987378),
 			        zoom: 18,
+			        disableDefaultUI: true,
 			        mapTypeId: google.maps.MapTypeId.ROADMAP
 			    });
+			}else{
+				googleMap.setMapTypeId(google.maps.MapTypeId[this.props.mapType]);
+				this.setState({'activeMap': this.props.mapType});
 			}
 
 			google.maps.event.trigger(googleMap, "resize");
@@ -155,12 +161,18 @@ define([
 			this.setState({'activeButton': 'EnterMapDraw'});
 			drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
 		},
+		onSwitchMapType: function(mapTypeName){
+			if(googleMap && google.maps.MapTypeId && google.maps.MapTypeId[mapTypeName]){
+				googleMap.setMapTypeId(google.maps.MapTypeId[mapTypeName]);
+			}
+			this.setState({'activeMap': mapTypeName});
+		},
 		onFinish: function(){
 			if(!rectangle){
 				return;
 			}
 			var bounds = rectangle.getBounds();
-			this.publish('print.mapzoom@' + this.props.sourceKey, bounds);
+			this.publish('print.mapzoom@' + this.props.sourceKey, bounds, this.state.activeMap);
 		},
 		onClose: function(){
 			this.publish("showDialog");
@@ -178,15 +190,24 @@ define([
 						<button className={this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button'}  onClick={this.onExistMapDraw}>
 							<i className="fa fa-arrows"></i>
 						</button>
+
+						<button className={this.state.activeMap == 'ROADMAP' ? 'button active' : 'button'}  onClick={this.onSwitchMapType.bind(null, 'ROADMAP')}>
+							<i className="fa fa-map-o"></i>
+						</button>
+						<button className={this.state.activeMap == 'HYBRID' ? 'button active' : 'button'}  onClick={this.onSwitchMapType.bind(null, 'HYBRID')}>
+							<i className="fa fa-map"></i>
+						</button>
+						
+						<button className='button' onClick={this.onZoomIn}>
+							<i className="fa fa-search-plus"></i>
+						</button>
+						<button className='button' onClick={this.onZoomOut}>
+							<i className="fa fa-search-minus"></i>
+						</button>
 						<button className='button' onClick={this.onReset}>
 							<i className="fa fa-refresh"></i>
 						</button>
-						<button className='button' onClick={this.onZoomIn}>
-							<i className="fa fa-plus"></i>
-						</button>
-						<button className='button' onClick={this.onZoomOut}>
-							<i className="fa fa-minus"></i>
-						</button>
+
 						<button className='button' onClick={this.onFinish}>
 							<i className="fa fa-image"></i>
 						</button>

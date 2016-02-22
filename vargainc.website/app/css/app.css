@@ -473,23 +473,27 @@ html, body {
   right: 0.5in;
   bottom: 0.5in;
 }
-.page-container.dmapPrint .page {
+.page-container.distribution-print .page {
   width: 12in;
   min-height: 12in;
   padding: 0;
 }
-.page-container.dmapPrint .page.dmap .map-container {
+.page-container.distribution-print .page.dmap .map-container {
   min-height: 45.3125rem;
 }
-.page-container.dmapPrint .row {
+.page-container.distribution-print .row {
   max-width: 12in;
   margin: 0;
 }
-.page-container.dmapPrint .footer {
+.page-container.distribution-print .footer {
   margin-bottom: 10px;
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
+}
+
+.print-toolbar {
+  margin-top: 1rem;
 }
 
 .page {
@@ -504,7 +508,7 @@ html, body {
   color: #000;
 }
 .page:first-child {
-  margin-top: 0.9375rem;
+  margin-top: 0;
 }
 .page .title {
   background: #94b43d;

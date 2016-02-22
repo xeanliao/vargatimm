@@ -7,14 +7,16 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 		mixins: [BaseView],
 		getInitialState: function () {
 			return {
-				activeButton: 'EnterMapDraw'
+				activeButton: 'EnterMapDraw',
+				activeMap: 'ROADMAP'
 			};
 		},
 		getDefaultProps: function () {
 			return {
 				boundary: [],
 				color: '#000',
-				sourceKey: null
+				sourceKey: null,
+				mapType: 'ROADMAP'
 			};
 		},
 		componentWillMount: function () {
@@ -53,8 +55,12 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				googleMap = new google.maps.Map($('#google-map')[0], {
 					center: new google.maps.LatLng(40.744556, -73.987378),
 					zoom: 18,
+					disableDefaultUI: true,
 					mapTypeId: google.maps.MapTypeId.ROADMAP
 				});
+			} else {
+				googleMap.setMapTypeId(google.maps.MapTypeId[this.props.mapType]);
+				this.setState({ 'activeMap': this.props.mapType });
 			}
 
 			google.maps.event.trigger(googleMap, "resize");
@@ -147,12 +153,18 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			this.setState({ 'activeButton': 'EnterMapDraw' });
 			drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
 		},
+		onSwitchMapType: function (mapTypeName) {
+			if (googleMap && google.maps.MapTypeId && google.maps.MapTypeId[mapTypeName]) {
+				googleMap.setMapTypeId(google.maps.MapTypeId[mapTypeName]);
+			}
+			this.setState({ 'activeMap': mapTypeName });
+		},
 		onFinish: function () {
 			if (!rectangle) {
 				return;
 			}
 			var bounds = rectangle.getBounds();
-			this.publish('print.mapzoom@' + this.props.sourceKey, bounds);
+			this.publish('print.mapzoom@' + this.props.sourceKey, bounds, this.state.activeMap);
 		},
 		onClose: function () {
 			this.publish("showDialog");
@@ -185,18 +197,28 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 					),
 					React.createElement(
 						'button',
-						{ className: 'button', onClick: this.onReset },
-						React.createElement('i', { className: 'fa fa-refresh' })
+						{ className: this.state.activeMap == 'ROADMAP' ? 'button active' : 'button', onClick: this.onSwitchMapType.bind(null, 'ROADMAP') },
+						React.createElement('i', { className: 'fa fa-map-o' })
+					),
+					React.createElement(
+						'button',
+						{ className: this.state.activeMap == 'HYBRID' ? 'button active' : 'button', onClick: this.onSwitchMapType.bind(null, 'HYBRID') },
+						React.createElement('i', { className: 'fa fa-map' })
 					),
 					React.createElement(
 						'button',
 						{ className: 'button', onClick: this.onZoomIn },
-						React.createElement('i', { className: 'fa fa-plus' })
+						React.createElement('i', { className: 'fa fa-search-plus' })
 					),
 					React.createElement(
 						'button',
 						{ className: 'button', onClick: this.onZoomOut },
-						React.createElement('i', { className: 'fa fa-minus' })
+						React.createElement('i', { className: 'fa fa-search-minus' })
+					),
+					React.createElement(
+						'button',
+						{ className: 'button', onClick: this.onReset },
+						React.createElement('i', { className: 'fa fa-refresh' })
 					),
 					React.createElement(
 						'button',

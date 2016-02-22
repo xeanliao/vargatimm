@@ -33,11 +33,13 @@ define([
 			return {options: options};
 		},
 		componentDidMount: function(){
-			var self = this;
+			var collecton = this.getCollection(),
+				self = this;
 			this.subscribe('print.map.imageloaded', function(){
-				_.some(self.refs, function(page){
-					!page.state.imageLoaded && page.state.imageLoading == false && page.loadImage();
-					return !page.state.imageLoaded;
+				_.some(collecton.models, function(page){
+					var currentPage = self.refs[page.get('key')];
+					currentPage && !currentPage.state.imageLoaded && currentPage.state.imageLoading == false && currentPage.loadImage();
+					return !currentPage.state.imageLoaded;
 				});
 			});
 			this.subscribe('print.map.options.changed', this.onApplyOptions);
@@ -102,13 +104,13 @@ define([
 				<div className="section">
 					<div className="row">
 						<div className="small-12 columns text-center">
-							<div className="button-group">
+							<div className="button-group print-toolbar">
 								<button onClick={this.onOpenOptions}><i className="fa fa-cog"></i>Options</button>
 								<button onClick={this.onPrint}><i className="fa fa-print"></i>Print</button>
 							</div>
 						</div>
 					</div>
-					<div className="page-container dmapPrint">
+					<div className="page-container distribution-print">
 						{pages.map(function(page){
 							var dmapId = page.get('DMapId');
 							if (dmapId && _.indexOf(hideDMaps, dmapId) > -1) {

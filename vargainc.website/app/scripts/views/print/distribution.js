@@ -21,11 +21,13 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 			return { options: options };
 		},
 		componentDidMount: function () {
-			var self = this;
+			var collecton = this.getCollection(),
+			    self = this;
 			this.subscribe('print.map.imageloaded', function () {
-				_.some(self.refs, function (page) {
-					!page.state.imageLoaded && page.state.imageLoading == false && page.loadImage();
-					return !page.state.imageLoaded;
+				_.some(collecton.models, function (page) {
+					var currentPage = self.refs[page.get('key')];
+					currentPage && !currentPage.state.imageLoaded && currentPage.state.imageLoading == false && currentPage.loadImage();
+					return !currentPage.state.imageLoaded;
 				});
 			});
 			this.subscribe('print.map.options.changed', this.onApplyOptions);
@@ -97,7 +99,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 						{ className: 'small-12 columns text-center' },
 						React.createElement(
 							'div',
-							{ className: 'button-group' },
+							{ className: 'button-group print-toolbar' },
 							React.createElement(
 								'button',
 								{ onClick: this.onOpenOptions },
@@ -115,7 +117,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 				),
 				React.createElement(
 					'div',
-					{ className: 'page-container dmapPrint' },
+					{ className: 'page-container distribution-print' },
 					pages.map(function (page) {
 						var dmapId = page.get('DMapId');
 						if (dmapId && _.indexOf(hideDMaps, dmapId) > -1) {

@@ -245,7 +245,7 @@ $A3LeftRightMargin: 0.5in;
 			}
 		}
 	}
-	&.dmapPrint{
+	&.distribution-print{
 		.page {		
 			width: 12in;
 			min-height: 12in;
@@ -263,6 +263,9 @@ $A3LeftRightMargin: 0.5in;
 		}
 	}
 }
+.print-toolbar{
+	margin-top: 1rem;
+}
 .page {
 	width: $A4PageWidth;
 	min-height: $A4PageHeight;
@@ -274,8 +277,9 @@ $A3LeftRightMargin: 0.5in;
 	position: relative;
 	color: #000;
 
+
 	&:first-child {
-		margin-top: rem-calc(15);
+		margin-top: 0;
 	}
 	.title {
 		background: #94b43d;
