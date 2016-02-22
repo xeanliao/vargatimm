@@ -101,13 +101,6 @@ define([
 			return (
 				<div className="section">
 					<div className="row">
-						<div className="small-12 columns">
-							<div className="section-header">
-								<div className="row">
-									<div className="small-12 column"><h5>TIMM Print Preview</h5></div>
-								</div>
-							</div>
-						</div>
 						<div className="small-12 columns text-center">
 							<div className="button-group">
 								<button onClick={this.onOpenOptions}><i className="fa fa-cog"></i>Options</button>

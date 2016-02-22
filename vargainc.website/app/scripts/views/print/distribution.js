@@ -94,27 +94,6 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 					{ className: 'row' },
 					React.createElement(
 						'div',
-						{ className: 'small-12 columns' },
-						React.createElement(
-							'div',
-							{ className: 'section-header' },
-							React.createElement(
-								'div',
-								{ className: 'row' },
-								React.createElement(
-									'div',
-									{ className: 'small-12 column' },
-									React.createElement(
-										'h5',
-										null,
-										'TIMM Print Preview'
-									)
-								)
-							)
-						)
-					),
-					React.createElement(
-						'div',
 						{ className: 'small-12 columns text-center' },
 						React.createElement(
 							'div',

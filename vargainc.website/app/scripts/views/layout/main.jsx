@@ -3,46 +3,13 @@ define([
 	'react',
 	'react-dom',
 	'views/base',
-	'models/user',
 	'views/layout/menu',
+	'views/layout/user',
 	'views/layout/loading',
 
 	'react.backbone',
 	'foundation'
-], function($, React, ReactDOM, BaseView, UserModel, MenuView, LoadingView){
-	var User = React.createBackboneClass({
-		mixins: [BaseView],
-		getDefaultProps: function(){
-			return {
-				model: new UserModel()
-			}
-		},
-		componentDidMount: function(){
-			this.getModel().fetchCurrentUser();
-			this.subscribe("NOT_LOGIN", function(){
-				window.location = "../login.html";
-			});
-
-			$("#userMenu").foundation();
-		},
-		onLogout: function(){
-			this.getModel().logout();
-		},
-		render: function(){
-			var model = this.getModel();
-			return (
-				<div className="title-bar-right">
-					<a href="javascript:;" onClick={this.onLogout}>
-						<span className="hide-for-small-only">
-							<small>Welcome,&nbsp;{model.get('FullName')}&nbsp;&nbsp;</small>
-						</span>
-						<i className="fa fa-sign-out" style={{'position':'relative', 'top':'2px'}}></i>
-					</a>
-				</div>
-			);
-		}
-	});
-
+], function($, React, ReactDOM, BaseView, MenuView, UserView, LoadingView){
 	return React.createClass({
 		mixins: [BaseView],
 		getInitialState: function(){
@@ -54,7 +21,10 @@ define([
 				dialogSize: 'small',
 				dialogCustomClass: '',
 				loading: false,
-				showMenu: true
+				pageTitle: 'TIMM System',
+				showMenu: true,
+				showSearch: true,
+				showUser: true
 			}
 		},
 		componentDidMount: function(){
@@ -71,7 +41,10 @@ define([
 					mainParams: params
 				});
 				self.setState({
-					showMenu: _.has(options, 'showMenu') ? options.showMenu : true
+					pageTitle: _.has(options, 'pageTitle') ? options.pageTitle : 'TIMM System',
+					showMenu: _.has(options, 'showMenu') ? options.showMenu : true,
+					showSearch: _.has(options, 'showSearch') ? options.showSearch : true,
+					showUser: _.has(options, 'showUser') ? options.showUser : true
 				});
 			});
 			/**
@@ -184,7 +157,18 @@ define([
 	        	var mainMenuClassName = '';
 	        	var menu = null;
 	        }
-			
+	        if(this.state.showSearch){
+	        	var search = (
+	        		<span className="title-bar-center">
+						<div className="topSearchBar hide-for-small-only">
+							<input type="text" placeholder="Search" onChange={this.fullTextSearch} />
+						</div>
+					</span>
+        		);
+	        }else{
+	        	var search = null;
+	        }
+
 	        return (
 	        	<div>
 					<div className="off-canvas-wrapper">
@@ -194,14 +178,10 @@ define([
 								<div className="title-bar">
 									<div className="title-bar-left">
 										<button aria-expanded="true" className="menu-icon" type="button" onClick={this.menuSwitch}></button>
-										<span className="title-text">TIMM System</span>
+										<span className="title-text">{this.state.pageTitle}</span>
 									</div>
-									<User />
-									<span className="title-bar-center">
-										<div className="topSearchBar hide-for-small-only">
-											<input type="text" placeholder="Search" onChange={this.fullTextSearch} />
-										</div>
-									</span>
+									{this.state.showUser ? UserView : null}
+									{search}
 								</div>
 								{mainView}
 							</div>

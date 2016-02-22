@@ -51,7 +51,6 @@ define([
 		},
 		initGoogleMap: function(){
 			console.log('init google map');
-			var container = $(window);
 			$('#google-map').css({
 				'visibility': 'visible'
 			});
@@ -65,6 +64,25 @@ define([
 			}
 
 			google.maps.event.trigger(googleMap, "resize");
+
+			var boundary = this.props.boundary,
+				fillColor = this.props.color,
+				mapBounds = new google.maps.LatLngBounds();
+				polygon = new google.maps.Polygon({
+		            paths: boundary,
+		            strokeColor: '#000',
+		            strokeOpacity: 1,
+		            strokeWeight: 6,
+		            fillColor: fillColor,
+		            fillOpacity: 0.1,
+		            map: googleMap
+		        });
+		    googleItems.push(polygon);
+		    _.forEach(boundary, function(i){
+		    	var point = new google.maps.LatLng(i.lat, i.lng);
+            	mapBounds.extend(point);
+		    });
+			googleMap.fitBounds(mapBounds);
 
 			drawingManager = new google.maps.drawing.DrawingManager({
 				drawingMode: google.maps.drawing.OverlayType.MARKER,
@@ -100,6 +118,9 @@ define([
 			});
 			googleItems.push(drawingManager);
 
+			this.publish('hideLoading');
+		},
+		onReset: function(){
 			var boundary = this.props.boundary,
 				fillColor = this.props.color,
 				mapBounds = new google.maps.LatLngBounds();
@@ -109,7 +130,7 @@ define([
 		            strokeOpacity: 1,
 		            strokeWeight: 6,
 		            fillColor: fillColor,
-		            fillOpacity: 0.2,
+		            fillOpacity: 0.1,
 		            map: googleMap
 		        });
 		    googleItems.push(polygon);
@@ -117,10 +138,14 @@ define([
 		    	var point = new google.maps.LatLng(i.lat, i.lng);
             	mapBounds.extend(point);
 		    });
-
+			console.log('fitBounds', mapBounds.getCenter().lat(), mapBounds.getCenter().lng(), googleMap.getZoom());
 			googleMap.fitBounds(mapBounds);
-
-			this.publish('hideLoading');
+		},
+		onZoomIn: function(){
+			googleMap.setZoom(googleMap.getZoom() + 1);
+		},
+		onZoomOut: function(){
+			googleMap.setZoom(googleMap.getZoom() - 1);
 		},
 		onExistMapDraw: function(){
 			this.setState({'activeButton': 'ExistMapDraw'});
@@ -147,9 +172,24 @@ define([
 				    	<span aria-hidden="true">&times;</span>
 				  	</button>
 					<div className="pop-tool-bar button-group text-center">
-						<button className={this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button'} onClick={this.onEnterMapDraw}><i className="fa fa-crop"></i></button>
-						<button className={this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button'}  onClick={this.onExistMapDraw}><i className="fa fa-arrows"></i></button>
-						<button className='button'  onClick={this.onFinish}><i className="fa fa-image"></i></button>
+						<button className={this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button'} onClick={this.onEnterMapDraw}>
+							<i className="fa fa-crop"></i>
+						</button>
+						<button className={this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button'}  onClick={this.onExistMapDraw}>
+							<i className="fa fa-arrows"></i>
+						</button>
+						<button className='button' onClick={this.onReset}>
+							<i className="fa fa-refresh"></i>
+						</button>
+						<button className='button' onClick={this.onZoomIn}>
+							<i className="fa fa-plus"></i>
+						</button>
+						<button className='button' onClick={this.onZoomOut}>
+							<i className="fa fa-minus"></i>
+						</button>
+						<button className='button' onClick={this.onFinish}>
+							<i className="fa fa-image"></i>
+						</button>
 					</div>
 				</div>
 			);

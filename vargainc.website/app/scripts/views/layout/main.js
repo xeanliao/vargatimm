@@ -1,47 +1,4 @@
-define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layout/menu', 'views/layout/loading', 'react.backbone', 'foundation'], function ($, React, ReactDOM, BaseView, UserModel, MenuView, LoadingView) {
-	var User = React.createBackboneClass({
-		mixins: [BaseView],
-		getDefaultProps: function () {
-			return {
-				model: new UserModel()
-			};
-		},
-		componentDidMount: function () {
-			this.getModel().fetchCurrentUser();
-			this.subscribe("NOT_LOGIN", function () {
-				window.location = "../login.html";
-			});
-
-			$("#userMenu").foundation();
-		},
-		onLogout: function () {
-			this.getModel().logout();
-		},
-		render: function () {
-			var model = this.getModel();
-			return React.createElement(
-				'div',
-				{ className: 'title-bar-right' },
-				React.createElement(
-					'a',
-					{ href: 'javascript:;', onClick: this.onLogout },
-					React.createElement(
-						'span',
-						{ className: 'hide-for-small-only' },
-						React.createElement(
-							'small',
-							null,
-							'Welcome, ',
-							model.get('FullName'),
-							'  '
-						)
-					),
-					React.createElement('i', { className: 'fa fa-sign-out', style: { 'position': 'relative', 'top': '2px' } })
-				)
-			);
-		}
-	});
-
+define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'views/layout/user', 'views/layout/loading', 'react.backbone', 'foundation'], function ($, React, ReactDOM, BaseView, MenuView, UserView, LoadingView) {
 	return React.createClass({
 		mixins: [BaseView],
 		getInitialState: function () {
@@ -53,7 +10,10 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 				dialogSize: 'small',
 				dialogCustomClass: '',
 				loading: false,
-				showMenu: true
+				pageTitle: 'TIMM System',
+				showMenu: true,
+				showSearch: true,
+				showUser: true
 			};
 		},
 		componentDidMount: function () {
@@ -70,7 +30,10 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 					mainParams: params
 				});
 				self.setState({
-					showMenu: _.has(options, 'showMenu') ? options.showMenu : true
+					pageTitle: _.has(options, 'pageTitle') ? options.pageTitle : 'TIMM System',
+					showMenu: _.has(options, 'showMenu') ? options.showMenu : true,
+					showSearch: _.has(options, 'showSearch') ? options.showSearch : true,
+					showUser: _.has(options, 'showUser') ? options.showUser : true
 				});
 			});
 			/**
@@ -182,6 +145,19 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 				var mainMenuClassName = '';
 				var menu = null;
 			}
+			if (this.state.showSearch) {
+				var search = React.createElement(
+					'span',
+					{ className: 'title-bar-center' },
+					React.createElement(
+						'div',
+						{ className: 'topSearchBar hide-for-small-only' },
+						React.createElement('input', { type: 'text', placeholder: 'Search', onChange: this.fullTextSearch })
+					)
+				);
+			} else {
+				var search = null;
+			}
 
 			return React.createElement(
 				'div',
@@ -206,19 +182,11 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'models/user', 'views/layo
 									React.createElement(
 										'span',
 										{ className: 'title-text' },
-										'TIMM System'
+										this.state.pageTitle
 									)
 								),
-								React.createElement(User, null),
-								React.createElement(
-									'span',
-									{ className: 'title-bar-center' },
-									React.createElement(
-										'div',
-										{ className: 'topSearchBar hide-for-small-only' },
-										React.createElement('input', { type: 'text', placeholder: 'Search', onChange: this.fullTextSearch })
-									)
-								)
+								this.state.showUser ? UserView : null,
+								search
 							),
 							mainView
 						)

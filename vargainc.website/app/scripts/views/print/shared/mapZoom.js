@@ -45,7 +45,6 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 		},
 		initGoogleMap: function () {
 			console.log('init google map');
-			var container = $(window);
 			$('#google-map').css({
 				'visibility': 'visible'
 			});
@@ -59,6 +58,25 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			}
 
 			google.maps.event.trigger(googleMap, "resize");
+
+			var boundary = this.props.boundary,
+			    fillColor = this.props.color,
+			    mapBounds = new google.maps.LatLngBounds();
+			polygon = new google.maps.Polygon({
+				paths: boundary,
+				strokeColor: '#000',
+				strokeOpacity: 1,
+				strokeWeight: 6,
+				fillColor: fillColor,
+				fillOpacity: 0.1,
+				map: googleMap
+			});
+			googleItems.push(polygon);
+			_.forEach(boundary, function (i) {
+				var point = new google.maps.LatLng(i.lat, i.lng);
+				mapBounds.extend(point);
+			});
+			googleMap.fitBounds(mapBounds);
 
 			drawingManager = new google.maps.drawing.DrawingManager({
 				drawingMode: google.maps.drawing.OverlayType.MARKER,
@@ -92,6 +110,9 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			});
 			googleItems.push(drawingManager);
 
+			this.publish('hideLoading');
+		},
+		onReset: function () {
 			var boundary = this.props.boundary,
 			    fillColor = this.props.color,
 			    mapBounds = new google.maps.LatLngBounds();
@@ -101,7 +122,7 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				strokeOpacity: 1,
 				strokeWeight: 6,
 				fillColor: fillColor,
-				fillOpacity: 0.2,
+				fillOpacity: 0.1,
 				map: googleMap
 			});
 			googleItems.push(polygon);
@@ -109,10 +130,14 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				var point = new google.maps.LatLng(i.lat, i.lng);
 				mapBounds.extend(point);
 			});
-
+			console.log('fitBounds', mapBounds.getCenter().lat(), mapBounds.getCenter().lng(), googleMap.getZoom());
 			googleMap.fitBounds(mapBounds);
-
-			this.publish('hideLoading');
+		},
+		onZoomIn: function () {
+			googleMap.setZoom(googleMap.getZoom() + 1);
+		},
+		onZoomOut: function () {
+			googleMap.setZoom(googleMap.getZoom() - 1);
 		},
 		onExistMapDraw: function () {
 			this.setState({ 'activeButton': 'ExistMapDraw' });
@@ -157,6 +182,21 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 						'button',
 						{ className: this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button', onClick: this.onExistMapDraw },
 						React.createElement('i', { className: 'fa fa-arrows' })
+					),
+					React.createElement(
+						'button',
+						{ className: 'button', onClick: this.onReset },
+						React.createElement('i', { className: 'fa fa-refresh' })
+					),
+					React.createElement(
+						'button',
+						{ className: 'button', onClick: this.onZoomIn },
+						React.createElement('i', { className: 'fa fa-plus' })
+					),
+					React.createElement(
+						'button',
+						{ className: 'button', onClick: this.onZoomOut },
+						React.createElement('i', { className: 'fa fa-minus' })
 					),
 					React.createElement(
 						'button',

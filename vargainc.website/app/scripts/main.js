@@ -141,7 +141,10 @@ define(function (require, exports, module) {
 					Topic.publish('loadView', View, {
 						collection: print
 					}, {
-						showMenu: false
+						showMenu: false,
+						showUser: false,
+						showSearch: false,
+						pageTitle : 'Timm Print Preview'
 					});
 				});
 			});

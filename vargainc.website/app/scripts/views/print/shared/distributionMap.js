@@ -100,6 +100,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			this.publish('print.map.imageloaded');
 		},
 		onShowEditDialog: function () {
+			this.publish('showLoading');
 			var model = this.getModel(),
 			    self = this,
 			    def = $.Deferred();
