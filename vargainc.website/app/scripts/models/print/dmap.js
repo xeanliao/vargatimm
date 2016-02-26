@@ -18,7 +18,7 @@ define([
             'ImageStatus': 'waiting'
         },
         fetchMapImage: function (mapOption) {
-            console.log('fetch distribution map image');
+            console.log('fetch d map image');
             var model = this,
                 params = $.extend({mapType: 'HYBRID'}, mapOption, {
                     campaignId: model.get('CampaignId'),
@@ -27,7 +27,7 @@ define([
                 }),
                 options = {
                     quite: true,
-                    url: model.urlRoot + '/distribution/',
+                    url: model.urlRoot + '/dmap/',
                     method: 'POST',
                     processData: true,
                     data: $.param(params),

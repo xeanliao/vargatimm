@@ -4,6 +4,7 @@ define([
     'models/print/base'
 ], function (_, Backbone, BaseModel) {
 	return BaseModel.extend({
+        idAttribute: 'key',
 		defaults: {
 			'Id': null,
             'ClientName': null,

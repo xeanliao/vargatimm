@@ -154,6 +154,30 @@ module.exports = function (grunt) {
 	            	src: ['<%= app %>/scripts/views/report/list.jsx'],
 	            	dest: '<%= app %>/scripts/views/report/list.js'
 	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/cover.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/cover.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/footer.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/footer.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/campaign.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/campaign.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/campaignSummary.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/campaignSummary.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/submap.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/submap.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/submapDetail.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/submapDetail.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/dmap.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/dmap.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/dmapDetailMap.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/dmapDetailMap.js'
+	            },{
 	            	src: ['<%= app %>/scripts/views/print/shared/distributionMap.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/shared/distributionMap.js'
 	            },{
@@ -166,14 +190,29 @@ module.exports = function (grunt) {
 	            	src: ['<%= app %>/scripts/views/print/shared/options.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/shared/options.js'
 	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/penetrationColor.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/penetrationColor.js'
+	            },{
 	            	src: ['<%= app %>/scripts/views/print/shared/optionsDMapSelector.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/shared/optionsDMapSelector.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/campaignOptions.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/campaignOptions.js'
 	            },{
 	            	src: ['<%= app %>/scripts/views/print/shared/distributionOptions.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/shared/distributionOptions.js'
 	            },{
+	            	src: ['<%= app %>/scripts/views/print/shared/reportOptions.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/shared/reportOptions.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/campaign.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/campaign.js'
+	            },{
 	            	src: ['<%= app %>/scripts/views/print/distribution.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/distribution.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/print/report.jsx'],
+	            	dest: '<%= app %>/scripts/views/print/report.js'
 	            },{
 	            	src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
 	            	dest: '<%= app %>/scripts/views/admin/dashboard.js'

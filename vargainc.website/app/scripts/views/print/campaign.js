@@ -1,20 +1,22 @@
-define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'models/print/options', 'views/print/shared/distributionOptions', 'views/print/shared/distributionMap', 'views/print/shared/distributionDetailMap', 'react.backbone'], function ($, _, moment, Backbone, React, BaseView, OptionsModel, OptionsView, DistributionMapView, DistributionDetailMapView) {
+define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'models/print/options', 'views/print/shared/campaignOptions', 'views/print/shared/cover', 'views/print/shared/campaign', 'views/print/shared/campaignSummary', 'views/print/shared/submap', 'views/print/shared/submapDetail', 'react.backbone'], function ($, _, moment, Backbone, React, BaseView, OptionsModel, OptionsView, CoverView, CampaignView, CampaignSummaryView, SubMapView, SubMapDetailView) {
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function () {
 			var options = new OptionsModel({
-				suppressCover: true,
-				suppressCampaign: true,
-				suppressCampaignSummary: true,
-				suppressNDAInCampaign: true,
-				suppressSubMap: true,
-				suppressSubMapCountDetail: true,
-				suppressNDAInSubMap: true,
+				suppressCover: false,
+				suppressCampaign: false,
+				suppressCampaignSummary: false,
+				suppressNDAInCampaign: false,
+				suppressSubMap: false,
+				suppressSubMapCountDetail: false,
+				suppressNDAInSubMap: false,
 				suppressDMap: false,
-				suppressGTU: true,
+				suppressGTU: false,
 				suppressNDAInDMap: true,
-				suppressLocations: true,
-				suppressRadii: true
+				showPenetrationColors: true,
+				penetrationColors: [20, 40, 60, 80],
+				suppressLocations: false,
+				suppressRadii: false
 			});
 			return { options: options };
 		},
@@ -24,7 +26,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 			this.subscribe('print.map.imageloaded', function () {
 				_.some(collecton.models, function (page) {
 					var currentPage = self.refs[page.get('key')];
-					currentPage && currentPage.state && !currentPage.state.imageLoaded && currentPage.state.imageLoading == false && currentPage.loadImage();
+					currentPage && currentPage.state && !currentPage.state.imageLoaded && currentPage.state.imageLoading === false && currentPage.loadImage && currentPage.loadImage();
 					return currentPage && currentPage.loadImage ? !currentPage.state.imageLoaded : false;
 				});
 			});
@@ -42,15 +44,20 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 		},
 		onApplyOptions: function (options) {
 			//check need reload images
-			var compareProperty = ['suppressDMap', 'suppressNDAInDMap'],
+			var compareProperty = ['suppressNDAInCampaign', 'suppressNDAInSubMap', 'suppressNDAInDMap', 'showPenetrationColors', 'penetrationColors', 'suppressLocations', 'suppressRadii'],
 			    oldOptions = _.pick(this.state.options.attributes, compareProperty),
 			    newOptions = _.pick(options.attributes, compareProperty);
 			if (!_.eq(oldOptions, newOptions)) {
 				_.forEach(this.refs, function (page) {
-					page.setState({ imageLoaded: null });
+					page.setState({
+						imageLoaded: null,
+						imageLoading: false
+					});
 				});
 			}
-			this.setState({ options: options });
+			this.setState({
+				options: options
+			});
 			this.publish("showDialog");
 			this.publish('print.map.imageloaded');
 		},
@@ -59,8 +66,8 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 			    campaignId = collecton.getCampaignId(),
 			    postData = {
 				campaignId: campaignId,
-				size: 'Distribute',
-				needFooter: 'false',
+				size: 'A4',
+				needFooter: 'true',
 				options: []
 			},
 			    self = this;
@@ -119,17 +126,28 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'mo
 				),
 				React.createElement(
 					'div',
-					{ className: 'page-container distribution-print' },
+					{ className: 'page-container A4' },
 					pages.map(function (page) {
 						var dmapId = page.get('DMapId');
 						if (dmapId && _.indexOf(hideDMaps, dmapId) > -1) {
 							return null;
 						}
 						switch (page.get('type')) {
-							case 'DistributionDetail':
-								return React.createElement(DistributionDetailMapView, { ref: page.get('key'), key: page.get('key'), model: page, options: options });
+							case 'Cover':
+								return options.suppressCover ? null : React.createElement(CoverView, { ref: page.get('key'), key: page.get('key'), model: page, options: options });
+							case 'Campaign':
+								return options.suppressCampaign ? null : React.createElement(CampaignView, { ref: page.get('key'), key: page.get('key'), model: page, options: options });
+							case 'CampaignSummary':
+								return options.suppressCampaign || options.suppressCampaignSummary ? null : React.createElement(CampaignSummaryView, { ref: page.get('key'), key: page.get('key'), model: page, options: options });
+							case 'SubMap':
+								return options.suppressSubMap ? null : React.createElement(SubMapView, { ref: page.get('key'), key: page.get('key'), model: page, options: options });
+								break;
+							case 'SubMapDetail':
+								return options.suppressSubMap || options.suppressSubMapCountDetail ? null : React.createElement(SubMapDetailView, { ref: page.get('key'), key: page.get('key'), model: page, options: options });
+								break;
 							default:
-								return React.createElement(DistributionMapView, { ref: page.get('key'), key: page.get('key'), model: page, options: options });
+								return null;
+								break;
 						}
 					})
 				)

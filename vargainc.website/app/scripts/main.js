@@ -132,22 +132,66 @@ define(function (require, exports, module) {
 			});
 		},
 		printAction: function (campaignId, printType) {
-			require([
-				'views/print/distribution',
-				'collections/print'
-			], function (View, Collection) {
-				var print = new Collection();
-				print.fetchForDistributionMap(campaignId).done(function () {
-					Topic.publish('loadView', View, {
-						collection: print
-					}, {
-						showMenu: false,
-						showUser: false,
-						showSearch: false,
-						pageTitle : 'Timm Print Preview'
+			switch (printType) {
+				case 'campaign':
+				require([
+					'views/print/campaign',
+					'collections/print'
+				], function (View, Collection) {
+					var print = new Collection();
+					print.fetchForCampaignMap(campaignId).done(function () {
+						Topic.publish('loadView', View, {
+							collection: print
+						}, {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						});
 					});
 				});
-			});
+				break;
+			case 'distribution':
+				require([
+					'views/print/distribution',
+					'collections/print'
+				], function (View, Collection) {
+					var print = new Collection();
+					print.fetchForDistributionMap(campaignId).done(function () {
+						Topic.publish('loadView', View, {
+							collection: print
+						}, {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						});
+					});
+				});
+				break;
+			case 'report':
+				require([
+					'views/print/report',
+					'collections/print'
+				], function (View, Collection) {
+					var print = new Collection();
+					print.fetchForReportMap(campaignId).done(function () {
+						Topic.publish('loadView', View, {
+							collection: print
+						}, {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						});
+					});
+				});
+				break;
+			default:
+
+				break;
+			}
+
 		}
 	});
 

@@ -83,6 +83,7 @@ require.config({
     paths: {
         'async': 'vendor/async',
         'jquery': 'vendor/jquery',
+        'jquery-ui': 'vendor/jquery-ui',
         'underscore': 'vendor/lodash',
         'backbone': 'vendor/backbone',
         'backbone.route.control': 'vendor/backbone-route-control',

@@ -27,8 +27,7 @@ define([
 		},
 		scrollToPage: function () {
 			var model = this.getModel(),
-				index = model.collection.indexOf(model),
-				height = $('.page').eq(index).position().top;
+				height = $(this.refs.page).position().top;
 			$('.off-canvas-wrapper-inner').stop().animate({
 				scrollTop: height
 			}, 600);
@@ -36,7 +35,6 @@ define([
 		loadImage: function () {
 			var model = this.getModel(),
 				key = model.get('key'),
-				domNode = this.refs['mapContainer-' + key],
 				self = this;
 
 			this.setState({imageLoaded: null, imageLoading: true});
@@ -89,7 +87,7 @@ define([
 				}, {
 					'list': [{
 						'key': 'DM MAP #',
-						'text': model.get('DMapId')
+						'text': model.get('DMapId') + ''
 					}, {
 						'key': 'DISTRIBUTION MAP NAME',
 						'text': model.get('Name')
@@ -136,7 +134,7 @@ define([
 			}
 
 			return (
-				<div className="page">
+				<div className="page" ref="page">
 					<div className="row">
 	  					<div className="small-12 columns text-center title">
 	  						DM MAP {model.get('DMapId')}({model.get('Name')}) -- {model.get('Serial')}
@@ -160,7 +158,7 @@ define([
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
-							<div className="map-container" ref={'mapContainer-' + model.get('key')}>
+							<div className="map-container">
 								{mapImage}
 							</div>
 						</div>

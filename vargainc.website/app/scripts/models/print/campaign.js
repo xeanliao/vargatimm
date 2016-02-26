@@ -18,16 +18,14 @@ define([
             'ImageStatus': 'waiting'
         },
         fetchMapImage: function (mapOption) {
-            console.log('fetch distribution map image');
+            console.log('fetch campaign map image');
             var model = this,
-                params = $.extend({mapType: 'HYBRID'}, mapOption, {
-                    campaignId: model.get('CampaignId'),
-                    submapId: model.get('SubMapId'),
-                    dmapId: model.get('DMapId')
+                params = $.extend({mapType: 'ROADMAP'}, mapOption, {
+                    campaignId: model.get('CampaignId')
                 }),
                 options = {
                     quite: true,
-                    url: model.urlRoot + '/distribution/',
+                    url: model.urlRoot + '/campaign/',
                     method: 'POST',
                     processData: true,
                     data: $.param(params),
@@ -46,29 +44,6 @@ define([
                         });
                     }
                 };
-            if (model.get('TopRight') && model.get('BottomLeft')) {
-                options.data = $.param($.extend(params, {
-                    topRightLat: model.get('TopRight').lat,
-                    topRightLng: model.get('TopRight').lng,
-                    bottomLeftLat: model.get('BottomLeft').lat,
-                    bottomLeftLng: model.get('BottomLeft').lng
-                }));
-            }
-            return (this.sync || Backbone.sync).call(this, 'update', this, options);
-        },
-        fetchBoundary: function (opts) {
-            var model = this,
-                options = {
-                    url: 'print/campaign/' + model.get('CampaignId') + '/submap/' + model.get('SubMapId') + '/dmap/' + model.get('DMapId') + '/boundary/',
-                    method: 'GET',
-                    success: function (result) {
-                        model.set({
-                            'Boundary': result.boundary,
-                            'Color': result.color
-                        });
-                    }
-                };
-            _.extend(options, opts);
             return (this.sync || Backbone.sync).call(this, 'update', this, options);
         }
     });

@@ -16,8 +16,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 		},
 		scrollToPage: function () {
 			var model = this.getModel(),
-			    index = model.collection.indexOf(model),
-			    height = $('.page').eq(index).position().top;
+			    height = $(this.refs.page).position().top;
 			$('.off-canvas-wrapper-inner').stop().animate({
 				scrollTop: height
 			}, 600);
@@ -25,7 +24,6 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 		loadImage: function () {
 			var model = this.getModel(),
 			    key = model.get('key'),
-			    domNode = this.refs['mapContainer-' + key],
 			    self = this;
 
 			this.setState({ imageLoaded: null, imageLoading: true });
@@ -78,7 +76,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 				}, {
 					'list': [{
 						'key': 'DM MAP #',
-						'text': model.get('DMapId')
+						'text': model.get('DMapId') + ''
 					}, {
 						'key': 'DISTRIBUTION MAP NAME',
 						'text': model.get('Name')
@@ -125,7 +123,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 
 			return React.createElement(
 				'div',
-				{ className: 'page' },
+				{ className: 'page', ref: 'page' },
 				React.createElement(
 					'div',
 					{ className: 'row' },
@@ -202,7 +200,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						{ className: 'small-12 columns' },
 						React.createElement(
 							'div',
-							{ className: 'map-container', ref: 'mapContainer-' + model.get('key') },
+							{ className: 'map-container' },
 							mapImage
 						)
 					)

@@ -16,8 +16,9 @@ define([
 		},
 		OnValueChanged: function (e) {
 			var model = this.getModel(),
-				name = e.currentTarget.name,
-				value = e.currentTarget.checked;
+				ele = $(e.currentTarget),
+				name = ele.attr('name'),
+				value = ele.is('input:checkbox') ? ele.prop('checked') : ele.val();
 			model.set(name, value);
 		}
 	});

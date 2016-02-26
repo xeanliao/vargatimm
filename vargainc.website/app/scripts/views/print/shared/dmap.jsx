@@ -1,16 +1,14 @@
 define([
-	'jquery',
-	'underscore',
-	'moment',
+	'numeral',
 	'backbone',
 	'react',
-	'numeral',
 	'views/base',
 	'views/layout/loading',
+	'views/print/shared/footer',
 	'views/print/shared/mapZoom',
 
 	'react.backbone'
-], function ($, _, moment, Backbone, React, Numeral, BaseView, LoadingView, MapZoomView) {
+], function (Numeral, Backbone, React, BaseView, LoadingView, FooterView, MapZoomView) {
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function () {
@@ -40,7 +38,10 @@ define([
 			var model = this.getModel(),
 				key = model.get('key'),
 				self = this;
-			this.setState({imageLoaded: null, imageLoading: true});
+			this.setState({
+				imageLoaded: null,
+				imageLoading: true
+			});
 			this.scrollToPage();
 			model.fetchMapImage(this.props.options).then(function () {
 				var def = $.Deferred(),
@@ -69,6 +70,34 @@ define([
 			});
 			this.publish('print.map.imageloaded');
 		},
+		onShowEditDialog: function () {
+			this.publish('showLoading');
+			var model = this.getModel(),
+				self = this,
+				def = $.Deferred();
+			if (!this.state.imageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
+				return;
+			}
+			if (model.get('Boundary')) {
+				def.resolve();
+			} else {
+				def = model.fetchBoundary({quite: true});
+			}
+			def.done(function () {
+				var color = model.get('Color'),
+					key = 'dmap-' + model.get('DMapId');
+				self.unsubscribe('print.mapzoom@' + key);
+				self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
+				self.publish('showDialog', MapZoomView, {
+					sourceKey: key,
+					boundary: model.get('Boundary'),
+					color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
+				}, {
+					size: 'full',
+					customClass: 'google-map-pop'
+				});
+			});
+		},
 		onCreateDetailMap: function (rectBounds) {
 			var model = this.getModel(),
 				collection = model.collection,
@@ -89,7 +118,7 @@ define([
 			});
 			detailModel.set({
 				'key': key,
-				'type': 'DistributionDetail',
+				'type': 'DMapDetailMap',
 				'TopRight': {
 					lat: topRight.lat(),
 					lng: topRight.lng()
@@ -98,7 +127,6 @@ define([
 					lat: bottomLeft.lat(),
 					lng: bottomLeft.lng()
 				},
-				'Boundary': null,
 				'ImageStatus': 'waiting',
 				'MapImage': null,
 				'PolygonImage': null,
@@ -109,34 +137,6 @@ define([
 			});
 			this.publish('showDialog');
 			this.publish('print.map.imageloaded');
-		},
-		onShowEditDialog: function () {
-			this.publish('showLoading');
-			var model = this.getModel(),
-				self = this,
-				def = $.Deferred();
-			if (!this.state.imageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
-				return;
-			}
-			if (model.get('Boundary')) {
-				def.resolve();
-			} else {
-				def = model.fetchBoundary({quite: true});
-			}
-			def.done(function () {
-				var color = model.get('Color'),
-					key = 'distribution-' + model.get('DMapId');
-				self.unsubscribe('print.mapzoom@' + key);
-				self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
-				self.publish('showDialog', MapZoomView, {
-					sourceKey: key,
-					boundary: model.get('Boundary'),
-					color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
-				}, {
-					size: 'full',
-					customClass: 'google-map-pop'
-				});
-			});
 		},
 		getExportParamters: function () {
 			var model = this.getModel();
@@ -160,12 +160,13 @@ define([
 				}, {
 					'map': model.get('PolygonImage'),
 					'bg': model.get('MapImage'),
+					'legend': true,
 				}]
 			};
 		},
-		render: function(){
+		render: function () {
 			var model = this.getModel(),
-				total = Numeral(model.get('Total')).format('0,0'),
+				displayTotal = Numeral(model.get('Total')).format('0,0'),
 				mapImage = model.get('MapImage'),
 				polygonImage = model.get('PolygonImage');
 
@@ -192,12 +193,11 @@ define([
 			} else {
 				var mapImage = <LoadingView text={this.state.imageLoading ? 'LOADING' : 'WAITING'} / >;
 			}
+
 			return (
 				<div className="page" ref="page">
 					<div className="row">
-	  					<div className="small-12 columns text-center title">
-	  						DM MAP {model.get('DMapId')}({model.get('Name')})
-  						</div>
+	  					<div className="small-12 columns text-center title">DM MAP {model.get('DMapId')}({model.get('Name')})</div>
 					</div>
 					<div className="row list" role="list">
 						<div className="small-4 columns">DM MAP #:</div>
@@ -205,20 +205,23 @@ define([
 						<div className="small-4 columns">DISTRIBUTION MAP NAME:</div>
 						<div className="small-8 columns">&nbsp;{model.get('Name')}</div>
 						<div className="small-4 columns">TOTAL:</div>
-						<div className="small-8 columns">&nbsp;{total}</div>
+						<div className="small-8 columns">&nbsp;{displayTotal}</div>
 					</div>
 					<div className="row">
-						<div className="small-12 columns text-center title mapTitle">
-							{model.get('DisplayName')} - {model.get('Name')}
-						</div>
+						<div className="small-12 columns text-center title">{model.get('DisplayName')} - {model.get('Name')}</div>
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
 							<div className="map-container" onClick={this.onShowEditDialog}>
 								{mapImage}
 							</div>
+							<div className="small-12 columns">
+								<div className="color-legend"></div>
+								<div className="direction-legend"></div>
+							</div>
 						</div>
 					</div>
+					<FooterView model={model.get('Footer')} />
 				</div>
 			);
 		}

@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views/base', 'views/layout/loading', 'views/print/shared/mapZoom', 'react.backbone'], function ($, _, moment, Backbone, React, Numeral, BaseView, LoadingView, MapZoomView) {
+define(['numeral', 'backbone', 'react', 'views/base', 'views/layout/loading', 'views/print/shared/footer', 'views/print/shared/mapZoom', 'react.backbone'], function (Numeral, Backbone, React, BaseView, LoadingView, FooterView, MapZoomView) {
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		getInitialState: function () {
@@ -28,7 +28,10 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			var model = this.getModel(),
 			    key = model.get('key'),
 			    self = this;
-			this.setState({ imageLoaded: null, imageLoading: true });
+			this.setState({
+				imageLoaded: null,
+				imageLoading: true
+			});
 			this.scrollToPage();
 			model.fetchMapImage(this.props.options).then(function () {
 				var def = $.Deferred(),
@@ -57,6 +60,34 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			});
 			this.publish('print.map.imageloaded');
 		},
+		onShowEditDialog: function () {
+			this.publish('showLoading');
+			var model = this.getModel(),
+			    self = this,
+			    def = $.Deferred();
+			if (!this.state.imageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
+				return;
+			}
+			if (model.get('Boundary')) {
+				def.resolve();
+			} else {
+				def = model.fetchBoundary({ quite: true });
+			}
+			def.done(function () {
+				var color = model.get('Color'),
+				    key = 'dmap-' + model.get('DMapId');
+				self.unsubscribe('print.mapzoom@' + key);
+				self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
+				self.publish('showDialog', MapZoomView, {
+					sourceKey: key,
+					boundary: model.get('Boundary'),
+					color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
+				}, {
+					size: 'full',
+					customClass: 'google-map-pop'
+				});
+			});
+		},
 		onCreateDetailMap: function (rectBounds) {
 			var model = this.getModel(),
 			    collection = model.collection,
@@ -77,7 +108,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			});
 			detailModel.set({
 				'key': key,
-				'type': 'DistributionDetail',
+				'type': 'DMapDetailMap',
 				'TopRight': {
 					lat: topRight.lat(),
 					lng: topRight.lng()
@@ -86,7 +117,6 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 					lat: bottomLeft.lat(),
 					lng: bottomLeft.lng()
 				},
-				'Boundary': null,
 				'ImageStatus': 'waiting',
 				'MapImage': null,
 				'PolygonImage': null,
@@ -97,34 +127,6 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			});
 			this.publish('showDialog');
 			this.publish('print.map.imageloaded');
-		},
-		onShowEditDialog: function () {
-			this.publish('showLoading');
-			var model = this.getModel(),
-			    self = this,
-			    def = $.Deferred();
-			if (!this.state.imageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
-				return;
-			}
-			if (model.get('Boundary')) {
-				def.resolve();
-			} else {
-				def = model.fetchBoundary({ quite: true });
-			}
-			def.done(function () {
-				var color = model.get('Color'),
-				    key = 'distribution-' + model.get('DMapId');
-				self.unsubscribe('print.mapzoom@' + key);
-				self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
-				self.publish('showDialog', MapZoomView, {
-					sourceKey: key,
-					boundary: model.get('Boundary'),
-					color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
-				}, {
-					size: 'full',
-					customClass: 'google-map-pop'
-				});
-			});
 		},
 		getExportParamters: function () {
 			var model = this.getModel();
@@ -147,13 +149,14 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 					'title': model.get('DisplayName') + ' - ' + model.get('Name')
 				}, {
 					'map': model.get('PolygonImage'),
-					'bg': model.get('MapImage')
+					'bg': model.get('MapImage'),
+					'legend': true
 				}]
 			};
 		},
 		render: function () {
 			var model = this.getModel(),
-			    total = Numeral(model.get('Total')).format('0,0'),
+			    displayTotal = Numeral(model.get('Total')).format('0,0'),
 			    mapImage = model.get('MapImage'),
 			    polygonImage = model.get('PolygonImage');
 
@@ -179,6 +182,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 			} else {
 				var mapImage = React.createElement(LoadingView, { text: this.state.imageLoading ? 'LOADING' : 'WAITING' });
 			}
+
 			return React.createElement(
 				'div',
 				{ className: 'page', ref: 'page' },
@@ -229,7 +233,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 						'div',
 						{ className: 'small-8 columns' },
 						' ',
-						total
+						displayTotal
 					)
 				),
 				React.createElement(
@@ -237,7 +241,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 					{ className: 'row' },
 					React.createElement(
 						'div',
-						{ className: 'small-12 columns text-center title mapTitle' },
+						{ className: 'small-12 columns text-center title' },
 						model.get('DisplayName'),
 						' - ',
 						model.get('Name')
@@ -253,9 +257,16 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'numeral', 'views
 							'div',
 							{ className: 'map-container', onClick: this.onShowEditDialog },
 							mapImage
+						),
+						React.createElement(
+							'div',
+							{ className: 'small-12 columns' },
+							React.createElement('div', { className: 'color-legend' }),
+							React.createElement('div', { className: 'direction-legend' })
 						)
 					)
-				)
+				),
+				React.createElement(FooterView, { model: model.get('Footer') })
 			);
 		}
 	});
