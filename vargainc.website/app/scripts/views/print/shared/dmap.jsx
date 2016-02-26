@@ -63,7 +63,8 @@ define([
 				self.publish('print.map.imageloaded');
 			});
 		},
-		onReloadImage: function(){
+		onReloadImage: function(e){
+			e.stopPropagation();
 			this.setState({
 				imageLoaded: null,
 				imageLoading: false
@@ -71,13 +72,13 @@ define([
 			this.publish('print.map.imageloaded');
 		},
 		onShowEditDialog: function () {
-			this.publish('showLoading');
 			var model = this.getModel(),
 				self = this,
 				def = $.Deferred();
 			if (!this.state.imageLoaded || !model.get('MapImage') || !model.get('PolygonImage')) {
 				return;
 			}
+			this.publish('showLoading');
 			if (model.get('Boundary')) {
 				def.resolve();
 			} else {

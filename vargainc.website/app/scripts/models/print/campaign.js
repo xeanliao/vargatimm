@@ -18,7 +18,6 @@ define([
             'ImageStatus': 'waiting'
         },
         fetchMapImage: function (mapOption) {
-            console.log('fetch campaign map image');
             var model = this,
                 params = $.extend({mapType: 'ROADMAP'}, mapOption, {
                     campaignId: model.get('CampaignId')

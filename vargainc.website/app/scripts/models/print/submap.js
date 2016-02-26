@@ -18,7 +18,6 @@ define([
             'ImageStatus': 'waiting'
         },
         fetchMapImage: function (mapOption) {
-            console.log('fetch sub map image');
             var model = this,
                 params = $.extend({mapType: 'HYBRID'}, mapOption, {
                     campaignId: model.get('CampaignId'),
