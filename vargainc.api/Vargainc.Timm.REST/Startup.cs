@@ -44,7 +44,6 @@ namespace Vargainc.Timm.REST
             // Web API routes
             config.MapHttpAttributeRoutes();
             
-
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
             config.Routes.MapHttpRoute(

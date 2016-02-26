@@ -101,7 +101,7 @@ namespace Vargainc.Timm.REST.Controllers
                 campaign.ContactName,
                 campaign.CreatorName,
                 campaign.CustemerName,
-                Date = campaign.Date.Value.ToString("MMM dd, yyyy"),
+                Date = campaign.Date.Value,
                 campaign.Description,
                 campaign.Id,
                 campaign.Latitude,
@@ -182,7 +182,7 @@ namespace Vargainc.Timm.REST.Controllers
 
         [HttpGet]
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/boundary")]
-        public IHttpActionResult GetBundaryForSubMap(int campaignId, int submapId)
+        public IHttpActionResult GetBoundaryForSubMap(int campaignId, int submapId)
         {
             var result = GetSubMapBoundary(campaignId, submapId);
             var color = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
