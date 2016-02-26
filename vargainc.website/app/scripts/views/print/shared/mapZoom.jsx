@@ -13,19 +13,21 @@ define([
 		mixins: [BaseView],
 		getInitialState: function(){
 			return {
-				activeButton: 'EnterMapDraw'
+				activeButton: 'EnterMapDraw',
+				activeMap: 'ROADMAP'
 			};
 		},
 		getDefaultProps: function(){
 			return {
 				boundary: [],
 				color: '#000',
-				sourceKey: null
+				sourceKey: null,
+				mapType: 'ROADMAP'
 			};
 		},
 		componentWillMount: function(){
 			if($('#google-map').size() == 0){
-				$('<div id="google-map" class="hide google-map"></div>').appendTo('body');
+				$('<div id="google-map" class="google-map"></div>').appendTo('body');
 			}
 		},
 		componentDidMount: function(){
@@ -34,7 +36,6 @@ define([
 		},
 		componentWillUnmount: function(){
 			try {
-				$('.reveal').removeClass('google-map-pop');
 				_.forEach(googleItems, function (item) {
 					item.setMap(null);
 				});
@@ -44,31 +45,50 @@ define([
 				rectangle = null;
 				drawingManager = null;
 			} catch (ex) {
-				console.log(ex);
+				console.log('mapZoom componentWillUnmount error', ex);
 			}
-			$('#google-map').addClass('hide');
+			$('#google-map').css({
+				'visibility': 'hidden',
+			});
 		},
 		initGoogleMap: function(){
 			console.log('init google map');
-			var container = $(window);
-			$('#google-map').removeClass('hide').css({
-				'width': container.width() + 'px',
-				'height': container.height() + 'px',
-				'top': '0px',
-				'left': '0px'
+			$('#google-map').css({
+				'visibility': 'visible'
 			});
-			
-			$('.reveal').addClass('google-map-pop');
 			
 			if(!googleMap){
 				googleMap = new google.maps.Map($('#google-map')[0], {
 			        center: new google.maps.LatLng(40.744556, -73.987378),
 			        zoom: 18,
+			        disableDefaultUI: true,
 			        mapTypeId: google.maps.MapTypeId.ROADMAP
 			    });
+			}else{
+				googleMap.setMapTypeId(google.maps.MapTypeId[this.props.mapType]);
+				this.setState({'activeMap': this.props.mapType});
 			}
 
 			google.maps.event.trigger(googleMap, "resize");
+
+			var boundary = this.props.boundary,
+				fillColor = this.props.color,
+				mapBounds = new google.maps.LatLngBounds();
+				polygon = new google.maps.Polygon({
+		            paths: boundary,
+		            strokeColor: '#000',
+		            strokeOpacity: 1,
+		            strokeWeight: 6,
+		            fillColor: fillColor,
+		            fillOpacity: 0.1,
+		            map: googleMap
+		        });
+		    googleItems.push(polygon);
+		    _.forEach(boundary, function(i){
+		    	var point = new google.maps.LatLng(i.lat, i.lng);
+            	mapBounds.extend(point);
+		    });
+			googleMap.fitBounds(mapBounds);
 
 			drawingManager = new google.maps.drawing.DrawingManager({
 				drawingMode: google.maps.drawing.OverlayType.MARKER,
@@ -104,6 +124,9 @@ define([
 			});
 			googleItems.push(drawingManager);
 
+			this.publish('hideLoading');
+		},
+		onReset: function(){
 			var boundary = this.props.boundary,
 				fillColor = this.props.color,
 				mapBounds = new google.maps.LatLngBounds();
@@ -113,7 +136,7 @@ define([
 		            strokeOpacity: 1,
 		            strokeWeight: 6,
 		            fillColor: fillColor,
-		            fillOpacity: 0.2,
+		            fillOpacity: 0.1,
 		            map: googleMap
 		        });
 		    googleItems.push(polygon);
@@ -121,8 +144,14 @@ define([
 		    	var point = new google.maps.LatLng(i.lat, i.lng);
             	mapBounds.extend(point);
 		    });
-
+			console.log('fitBounds', mapBounds.getCenter().lat(), mapBounds.getCenter().lng(), googleMap.getZoom());
 			googleMap.fitBounds(mapBounds);
+		},
+		onZoomIn: function(){
+			googleMap.setZoom(googleMap.getZoom() + 1);
+		},
+		onZoomOut: function(){
+			googleMap.setZoom(googleMap.getZoom() - 1);
 		},
 		onExistMapDraw: function(){
 			this.setState({'activeButton': 'ExistMapDraw'});
@@ -132,15 +161,21 @@ define([
 			this.setState({'activeButton': 'EnterMapDraw'});
 			drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
 		},
+		onSwitchMapType: function(mapTypeName){
+			if(googleMap && google.maps.MapTypeId && google.maps.MapTypeId[mapTypeName]){
+				googleMap.setMapTypeId(google.maps.MapTypeId[mapTypeName]);
+			}
+			this.setState({'activeMap': mapTypeName});
+		},
 		onFinish: function(){
 			if(!rectangle){
 				return;
 			}
 			var bounds = rectangle.getBounds();
-			this.publish('print.mapzoom@' + this.props.sourceKey, bounds);
+			this.publish('print.mapzoom@' + this.props.sourceKey, bounds, this.state.activeMap);
 		},
 		onClose: function(){
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 		},
 		render: function(){
 			return (
@@ -149,9 +184,33 @@ define([
 				    	<span aria-hidden="true">&times;</span>
 				  	</button>
 					<div className="pop-tool-bar button-group text-center">
-						<button className={this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button'} onClick={this.onEnterMapDraw}><i className="fa fa-crop"></i>&nbsp;Begin Draw</button>
-						<button className={this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button'}  onClick={this.onExistMapDraw}><i className="fa fa-arrows"></i>&nbsp;End Draw</button>
-						<button className='button'  onClick={this.onFinish}><i className="fa fa-image"></i>&nbsp;Create Capture</button>
+						<button className={this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button'} onClick={this.onEnterMapDraw}>
+							<i className="fa fa-crop"></i>
+						</button>
+						<button className={this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button'}  onClick={this.onExistMapDraw}>
+							<i className="fa fa-arrows"></i>
+						</button>
+
+						<button className={this.state.activeMap == 'ROADMAP' ? 'button active' : 'button'}  onClick={this.onSwitchMapType.bind(null, 'ROADMAP')}>
+							<i className="fa fa-map-o"></i>
+						</button>
+						<button className={this.state.activeMap == 'HYBRID' ? 'button active' : 'button'}  onClick={this.onSwitchMapType.bind(null, 'HYBRID')}>
+							<i className="fa fa-map"></i>
+						</button>
+						
+						<button className='button' onClick={this.onZoomIn}>
+							<i className="fa fa-search-plus"></i>
+						</button>
+						<button className='button' onClick={this.onZoomOut}>
+							<i className="fa fa-search-minus"></i>
+						</button>
+						<button className='button' onClick={this.onReset}>
+							<i className="fa fa-refresh"></i>
+						</button>
+
+						<button className='button' onClick={this.onFinish}>
+							<i className="fa fa-image"></i>
+						</button>
 					</div>
 				</div>
 			);

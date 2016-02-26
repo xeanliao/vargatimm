@@ -4,7 +4,7 @@ define([
 ], function (_, BaseView) {
 	return _.extend({}, BaseView, {
 		onClose: function(){
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 			if(this.props.needTrigger){
 				this.publish('print.map.options.changed', this.getModel());
 			}
@@ -16,8 +16,9 @@ define([
 		},
 		OnValueChanged: function (e) {
 			var model = this.getModel(),
-				name = e.currentTarget.name,
-				value = e.currentTarget.checked;
+				ele = $(e.currentTarget),
+				name = ele.attr('name'),
+				value = ele.is('input:checkbox') ? ele.prop('checked') : ele.val();
 			model.set(name, value);
 		}
 	});

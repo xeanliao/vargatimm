@@ -3,15 +3,14 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'views/campaign/edit',
 	'views/campaign/publish',
 	'models/campaign',
 	'react.backbone'
-], function (_, moment, Backbone, React, Topic, EditView, PublishView, Model) {
-	var actionHandle = null,
-		searchHandle = null;
+], function (_, moment, Backbone, React, BaseView, EditView, PublishView, Model) {
 	var CampaignRow = React.createBackboneClass({
+		mixins: [BaseView],
 		menuKey: 'campaign-menu-ddl-',
 		getDefaultProps: function(){
 			return {
@@ -43,38 +42,46 @@ define([
 				}
 			});
 		},
-		onEdit: function(e){
+		onEdit: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
-			var debug = this.getModel();
-			var model = this.getModel().clone();
-			Topic.publish('showDialog', EditView, null, model);
+			this.publish('showDialog', EditView, {
+				model: this.getModel().clone()
+			});
 		},
-		onDelete: function(e){
+		onDelete: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
-			var model = this.getModel();
-			model.destroy({wait: true, success: function(){
-				Topic.publish('camapign/refresh');
-			}});
+			var self = this;
+			var result = confirm('are you sure want delete this campaign?');
+			if (result) {
+				var model = self.getModel();
+				model.destroy({
+					wait: true,
+					success: function () {
+						self.publish('camapign/refresh');
+					}
+				});
+			}
 		},
-		onPublishToDMap: function(e){
+		onPublishToDMap: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-			var model = this.getModel();
-			Topic.publish('showDialog', PublishView, null, null);
-			actionHandle && Topic.unsubscribe(actionHandle);
-			actionHandle = Topic.subscribe('campaign/publish', function(user){
+			var model = this.getModel(),
+				self = this;
+			this.publish('showDialog', PublishView);
+
+			this.unsubscribe('campaign/publish');
+			this.subscribe('campaign/publish', function (user) {
 				model.publishToDMap(user, {
-					success: function(result){
-						Topic.publish('showDialog', null, null, null);
-						if(result && result.success){
-							Topic.publish('camapign/refresh');	
-						}else{
+					success: function (result) {
+						self.publish('showDialog');
+						if (result && result.success) {
+							self.publish('camapign/refresh');
+						} else {
 							alert(result.error);
-							//Topic.publish('showDialog', result.error, null, null);
 						}
 					}
 				});
@@ -142,7 +149,8 @@ define([
 		}
 	});
 
-	var CampaignList = React.createBackboneClass({
+	return React.createBackboneClass({
+		mixins: [BaseView],
 		getInitialState: function(){
 			return {
 				orderByFiled: null,
@@ -154,12 +162,10 @@ define([
 		},
 		componentDidMount: function(){
 			var self = this;
-			Topic.subscribe('camapign/refresh', function(){
+			this.subscribe('camapign/refresh', function(){
 				self.getCollection().fetch();
 			});
-			searchHandle && Topic.unsubscribe(searchHandle);
-			searchHandle = Topic.subscribe('search', function(words){
-				console.log('on search');
+			this.subscribe('search', function(words){
 				self.setState({
 					search: words,
 					filterField: null,
@@ -169,12 +175,10 @@ define([
 
 			$("#campaign-filter-ddl-ClientName, #campaign-filter-ddl-ClientCode, #campaign-filter-ddl-Date, #campaign-filter-ddl-AreaDescription").foundation();
 		},
-		componentWillUnmount: function(){
-			searchHandle && Topic.unsubscribe(searchHandle);
-			actionHandle && Topic.unsubscribe(actionHandle);
-		},
-		onNew: function(){
-			Topic.publish('showDialog', EditView, null, new Model());
+		onNew: function () {
+			this.publish('showDialog', EditView, {
+				model: new Model()
+			});
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();
@@ -358,5 +362,4 @@ define([
 			);
 		}
 	});
-	return CampaignList;
 });

@@ -53,19 +53,22 @@ html, body {
 	box-shadow: 0 7px 0 rgba(245,159,26,0.8), 0 14px 0 rgba(245,159,26,0.8);
 }
 .main {
-	left: 50px;
 	position: relative;
-	margin-right: 50px;
 	padding-bottom: 0;
 	margin-bottom: 0;
 	background: #f8f8f8 !important;
 	box-shadow: none !important;
 	.title-bar{
+		box-shadow: 0px 0px 5px 0px rgba(165, 165, 165, 0.3);
 		.title-text{
 			font-size: 18px;
 			position: relative;
 			top: 2px;
 		}
+	}
+	&.left-menu{
+		left: 50px;
+		margin-right: 50px;
 	}
 }
 .title-bar-center{
@@ -242,7 +245,7 @@ $A3LeftRightMargin: 0.5in;
 			}
 		}
 	}
-	&.dmapPrint{
+	&.distribution-print{
 		.page {		
 			width: 12in;
 			min-height: 12in;
@@ -260,6 +263,9 @@ $A3LeftRightMargin: 0.5in;
 		}
 	}
 }
+.print-toolbar{
+	margin-top: 1rem;
+}
 .page {
 	width: $A4PageWidth;
 	min-height: $A4PageHeight;
@@ -269,9 +275,11 @@ $A3LeftRightMargin: 0.5in;
 	background: #FFF none repeat scroll 0% 0%;
 	box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.4);
 	position: relative;
+	color: #000;
+
 
 	&:first-child {
-		margin-top: rem-calc(15);
+		margin-top: 0;
 	}
 	.title {
 		background: #94b43d;
@@ -300,6 +308,41 @@ $A3LeftRightMargin: 0.5in;
 			width: 100%;
 			height: 100%;
 		}
+
+		.button.reload{
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-left: -35px;
+			margin-top: -35px;
+			height: 70px;
+			width: 70px;
+			background-image: -webkit-linear-gradient(top, #f4f1ee, #fff);
+			background-image: linear-gradient(top, #f4f1ee, #fff);
+			border-radius: 50%;
+			box-shadow: 0px 8px 10px 0px rgba(0, 0, 0, .3), inset 0px 4px 1px 1px white, inset 0px -3px 1px 1px rgba(204,198,197,.5);
+			transition: all .1s linear;
+
+			&:hover, &:focus{
+				background-color: transparent !important;
+				background-image: -webkit-linear-gradient(top, #fff, #f4f1ee);
+				background-image: linear-gradient(top, #fff, #f4f1ee);
+			}
+			&:active{
+				background-image: -webkit-linear-gradient(top, #efedec, #f7f4f4);
+				background-image: linear-gradient(top, #efedec, #f7f4f4);
+				box-shadow: 0 3px 5px 0 rgba(0,0,0,.4), inset 0px -3px 1px 1px rgba(204,198,197,.5);
+			}
+			&:hover, &:focus, &:active{
+				color:#eb2f2f;
+				text-shadow:0px 0px 6px #eb2f2f;
+				i{
+					color:#eb2f2f;
+					text-shadow:0px 0px 6px #eb2f2f;
+				}
+			}
+		}
+		
 	}
 	&.campaign {
 		.map-container {
@@ -348,7 +391,7 @@ $A3LeftRightMargin: 0.5in;
 		
 	}
 	.direction-legend {
-		background: url(../images/direction-legend.jpg) center center;
+		background: url(../img/direction-legend.jpg) center center;
 		width: rem-calc(64);
 		height: rem-calc(64);
 		background-size: 100% 100%;
@@ -362,14 +405,28 @@ $A3LeftRightMargin: 0.5in;
 		bottom: 0;
 		border-top: solid rem-calc(2) black;
 		padding-top: rem-calc(5);
+		height: rem-calc(56);
 		
 		background: #fff;
 		z-index: 99;
+
+		.vargainc-logo{
+			background: #fff url("../img/vargainc-logo.png") center center no-repeat;
+			background-size: 100% auto;
+			width: rem-calc(120);
+			height: rem-calc(56);
+		}
+		.timm-logo{
+			background: #fff url("../img/timm-logo-print.jpg") center center no-repeat;
+			background-size: 100% auto;
+			width: rem-calc(160);
+			height: rem-calc(56);
+		}
 		.left{
 			position: relative;
 			width: 90pt;
 			float: left;
-			img{
+			.vargainc-log{
 				margin-top: 5px;
 			}
 		}
@@ -417,9 +474,10 @@ $A3LeftRightMargin: 0.5in;
 			margin-bottom: 40pt;
 		}
 		.vargainc-log {
+			margin: 10pt auto;
+			background: #fff url("../img/vargainc-logo.png") center center no-repeat;
+			background-size: auto 100%;
 			height: 40pt;
-			margin-top: 10pt;
-			margin-bottom: 10pt;
 		}
 		label {
 			font-weight: 800;
@@ -449,14 +507,11 @@ $A3LeftRightMargin: 0.5in;
 	z-index: 1005;
 	top: 0;
 	left: 0;
-	width: 1920px;
-	height: 1200px;
-	&.hide{
-		top: -2000px;
-		left: -2000px;
-		width: 1920px;
-		height: 1200px;
-	}
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	visibility: hidden;
 	.panel{
         max-height: rem-calc(400);
         overflow-y: auto;
@@ -466,6 +521,8 @@ $A3LeftRightMargin: 0.5in;
 .google-map-pop{
 	background: transparent;;
 	pointer-events: none;
+	margin-top: 0px !important;
+	top: 0px !important
 }
 iframe{
 	border: none;

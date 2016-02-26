@@ -83,7 +83,7 @@ function drawMap(params, result) {
                 mapBounds.extend(point);
             });
         }
-        
+
 
         /**
          * change map type and montor tilesloaded event to make sure all map have loaded
@@ -242,7 +242,7 @@ function draw(params, result) {
             strokeOpacity: 1,
             strokeWeight: 6,
             fillColor: fillColor,
-            fillOpacity: 0.2,
+            fillOpacity: 0.1,
         });
         boundaryPolyline.setMap(map);
 

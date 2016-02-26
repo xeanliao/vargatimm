@@ -1,8 +1,6 @@
-define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/monitor/dismiss', 'views/monitor/edit', 'models/task', 'react.backbone'], function ($, _, moment, Backbone, React, Topic, DismissView, EditView, TaskModel) {
-	var actionHandle = null,
-	    searchHandle = null;
-
+define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'views/monitor/dismiss', 'views/monitor/edit', 'models/task', 'react.backbone'], function ($, _, moment, Backbone, React, BaseView, DismissView, EditView, TaskModel) {
 	var MonitorRow = React.createBackboneClass({
+		mixins: [BaseView],
 		menuKey: 'monitor-menu-ddl-',
 		getDefaultProps: function () {
 			return {
@@ -21,20 +19,23 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 		onDismiss: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-			var model = this.getModel();
-			var confirmResult = confirm('Are you sure you want to delete all selected Tasks?');
-			if (confirmResult) {
-				Topic.publish('showDialog', DismissView, null, null);
-				actionHandle && Topic.unsubscribe(actionHandle);
-				actionHandle = Topic.subscribe('monitor/dismiss', function (user) {
+			var model = this.getModel(),
+			    self = this,
+			    result = confirm('Are you sure you want to delete all selected Tasks?');
+			if (result) {
+				this.publish('showDialog', DismissView);
+				this.unsubscribe('monitor/dismiss');
+				this.subscribe('monitor/dismiss', function (user) {
 					model.dismissToDMap(user, {
 						success: function (result) {
-							Topic.publish('showDialog', null, null, null);
 							if (result && result.success) {
-								Topic.publish('monitor/refresh');
+								self.publish('monitor/refresh');
 							} else {
 								alert("something wrong");
 							}
+						},
+						complete: function () {
+							self.publish('showDialog');
 						}
 					});
 				});
@@ -44,11 +45,12 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			evt.preventDefault();
 			evt.stopPropagation();
 
-			var model = new TaskModel({ Id: taskId });
+			var model = new TaskModel({ Id: taskId }),
+			    self = this;
 			model.markFinished({
 				success: function (result) {
 					if (result && result.success) {
-						Topic.publish('monitor/refresh');
+						self.publish('monitor/refresh');
 					} else {
 						alert(result.error);
 					}
@@ -59,19 +61,25 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			$("#upload-file-" + taskId).click();
 		},
 		onImport: function (taskId, e) {
-			e.bubbles = false;
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
+			e.bubbles = false;
+
 			var uploadFile = e.currentTarget.files[0];
 			if (uploadFile.size == 0) {
 				alert('please select an not empty file!');
 				return;
 			}
-			var model = new TaskModel({ Id: taskId });
+
+			var model = new TaskModel({
+				Id: taskId
+			}),
+			    self = this;
+
 			model.importGtu(uploadFile, {
 				success: function (result) {
 					$("#upload-file-" + taskId).val('');
 					if (result && result.success) {
-						Topic.publish('monitor/refresh');
+						self.publish('monitor/refresh');
 					}
 					if (result && result.error && result.error.length > 0) {
 						alert(result.error.join('\r\n'));
@@ -83,9 +91,16 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			e.preventDefault();
 			e.stopPropagation();
 			$(e.currentTarget).closest('.dropdown-pane').foundation('close');
-			var model = new TaskModel({ Id: taskId });
+
+			var model = new TaskModel({
+				Id: taskId
+			}),
+			    self = this;
+
 			model.fetch().then(function () {
-				Topic.publish('showDialog', EditView, null, model);
+				self.publish('showDialog', EditView, {
+					model: model
+				});
 			});
 		},
 		onGotoMonitor: function (taskId, e) {
@@ -251,7 +266,8 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			);
 		}
 	});
-	var MonitorList = React.createBackboneClass({
+	return React.createBackboneClass({
+		mixins: [BaseView],
 		getInitialState: function () {
 			return {
 				orderByFiled: null,
@@ -263,12 +279,10 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 		},
 		componentDidMount: function () {
 			var self = this;
-			Topic.subscribe('monitor/refresh', function () {
+			this.subscribe('monitor/refresh', function () {
 				self.getCollection().fetchForTask();
 			});
-			searchHandle && Topic.unsubscribe(searchHandle);
-			searchHandle = Topic.subscribe('search', function (words) {
-				console.log('on search');
+			this.subscribe('search', function (words) {
 				self.setState({
 					search: words,
 					filterField: null,
@@ -278,13 +292,10 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 
 			$("#monitor-filter-ddl-ClientName, #monitor-filter-ddl-ClientCode, #monitor-filter-ddl-Date, #monitor-filter-ddl-AreaDescription").foundation();
 		},
-		componentWillUnmount: function () {
-			searchHandle && Topic.unsubscribe(searchHandle);
-			actionHandle && Topic.unsubscribe(actionHandle);
-		},
 		onOrderBy: function (field, reactObj, reactId, e) {
 			e.preventDefault();
 			e.stopPropagation();
+
 			if (this.state.orderByFiled == field) {
 				this.setState({ orderByAsc: !this.state.orderByAsc });
 			} else {
@@ -297,6 +308,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 		onFilter: function (field, e) {
 			e.preventDefault();
 			e.stopPropagation();
+
 			var els = $(":checked", e.currentTarget),
 			    values = _.map(els, function (item) {
 				return $(item).val();
@@ -312,13 +324,14 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 		onClearFilter: function (field, e) {
 			e.preventDefault();
 			e.stopPropagation();
+			$('#monitor-filter-ddl-' + field).foundation('close');
+			$(e.currentTarget).closest('form').get(0).reset();
+
 			this.setState({
 				filterField: null,
 				filterValues: [],
 				search: null
 			});
-			$('#monitor-filter-ddl-' + field).foundation('close');
-			$(e.currentTarget).closest('form').get(0).reset();
 		},
 		renderHeader: function (field, displayName) {
 			var dataSource = this.getCollection(),
@@ -526,5 +539,4 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'pubsub', 'views/
 			);
 		}
 	});
-	return MonitorList;
 });

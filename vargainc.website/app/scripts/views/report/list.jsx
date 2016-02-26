@@ -3,14 +3,12 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'models/task',
 	'react.backbone'
-], function (_, moment, Backbone, React, Topic, TaskModel) {
-	var actionHandle = null,
-		searchHandle = null;
-
+], function (_, moment, Backbone, React, BaseView, TaskModel) {
 	var ReportRow = React.createBackboneClass({
+		mixins: [BaseView],
 		menuKey: 'report-menu-ddl-',
 		getDefaultProps: function(){
 			return {
@@ -24,15 +22,18 @@ define([
 		},
 		componentDidUpdate: function(){
 		},
-		onReOpenTask: function(taskId){
-			var confirmResult = confirm('Do you really want to move report back to GPS Montor?');
-			if(confirmResult){
-				var model = new TaskModel({Id:taskId});
+		onReOpenTask: function (taskId) {
+			var confirmResult = confirm('Do you really want to move report back to GPS Montor?'),
+				self = this;
+			if (confirmResult) {
+				var model = new TaskModel({
+					Id: taskId
+				});
 				model.reOpen({
-					success: function(result){
-						if(result && result.success){
-							Topic.publish('report/refresh');
-						}else{
+					success: function (result) {
+						if (result && result.success) {
+							self.publish('report/refresh');
+						} else {
 							alert(result.error);
 						}
 					}
@@ -132,7 +133,8 @@ define([
 			);
 		}
 	});
-	var ReportList = React.createBackboneClass({
+	return React.createBackboneClass({
+		mixins: [BaseView],
 		getInitialState: function(){
 			return {
 				orderByFiled: null,
@@ -144,12 +146,10 @@ define([
 		},
 		componentDidMount: function(){
 			var self = this;
-			Topic.subscribe('report/refresh', function(){
+			this.subscribe('report/refresh', function(){
 				self.getCollection().fetchForReport();
 			});
-			searchHandle && Topic.unsubscribe(searchHandle);
-			searchHandle = Topic.subscribe('search', function(words){
-				console.log('on search');
+			this.subscribe('search', function(words){
 				self.setState({
 					search: words,
 					filterField: null,
@@ -158,10 +158,6 @@ define([
 			});
 
 			$("#report-filter-ddl-ClientName, #report-filter-ddl-ClientCode, #report-filter-ddl-Date, #report-filter-ddl-AreaDescription").foundation();
-		},
-		componentWillUnmount: function(){
-			searchHandle && Topic.unsubscribe(searchHandle);
-			actionHandle && Topic.unsubscribe(actionHandle);
 		},
 		onOrderBy: function(field, reactObj, reactId, e){
 			e.preventDefault();
@@ -354,5 +350,4 @@ define([
 			);
 		}
 	});
-	return ReportList;
 });

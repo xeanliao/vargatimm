@@ -151,6 +151,87 @@ a:hover i, a:active i, i.active {
   border-radius: 7px 0 0 7px;
 }
 
+.loading {
+  height: 100px;
+  width: 100px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -50px;
+  margin-top: -50px;
+  z-index: 1;
+}
+.loading .gear {
+  position: absolute;
+  z-index: -10;
+  width: 40px;
+  height: 40px;
+  animation: spin 5s infinite;
+}
+.loading .two {
+  left: 40px;
+  width: 80px;
+  height: 80px;
+  animation: spin-reverse 5s infinite;
+}
+.loading .three {
+  top: 45px;
+  left: -10px;
+  width: 60px;
+  height: 60px;
+}
+@keyframes spin {
+  50% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes spin-reverse {
+  50% {
+    transform: rotate(-360deg);
+  }
+}
+.loading .lil-circle {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow: inset 0 0 10px 2px gray, 0 0 50px white;
+  width: 100px;
+  height: 100px;
+  opacity: .1;
+}
+.loading .blur-circle {
+  position: absolute;
+  top: -19px;
+  left: -19px;
+}
+.loading .text {
+  position: absolute;
+  text-align: center;
+  color: #fff;
+  font-weight: 400;
+  width: 100px;
+  top: 50px;
+  margin-top: -20px;
+  height: 40px;
+  line-height: 40px;
+  text-shadow: 1px 1px 3px black;
+}
+
+.overlayer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(100, 100, 100, 0.75);
+  z-index: 9998;
+  display: none;
+}
+.overlayer .loading {
+  z-index: 9999;
+}
+
 html, body {
   font-family: 'Ubuntu', verdana, arial, sans-serif;
   color: #8a8a8a;
@@ -207,18 +288,23 @@ html, body {
 }
 
 .main {
-  left: 50px;
   position: relative;
-  margin-right: 50px;
   padding-bottom: 0;
   margin-bottom: 0;
   background: #f8f8f8 !important;
   box-shadow: none !important;
 }
+.main .title-bar {
+  box-shadow: 0px 0px 5px 0px rgba(165, 165, 165, 0.3);
+}
 .main .title-bar .title-text {
   font-size: 18px;
   position: relative;
   top: 2px;
+}
+.main.left-menu {
+  left: 50px;
+  margin-right: 50px;
 }
 
 .title-bar-center {
@@ -387,23 +473,27 @@ html, body {
   right: 0.5in;
   bottom: 0.5in;
 }
-.page-container.dmapPrint .page {
+.page-container.distribution-print .page {
   width: 12in;
   min-height: 12in;
   padding: 0;
 }
-.page-container.dmapPrint .page.dmap .map-container {
+.page-container.distribution-print .page.dmap .map-container {
   min-height: 45.3125rem;
 }
-.page-container.dmapPrint .row {
+.page-container.distribution-print .row {
   max-width: 12in;
   margin: 0;
 }
-.page-container.dmapPrint .footer {
+.page-container.distribution-print .footer {
   margin-bottom: 10px;
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
+}
+
+.print-toolbar {
+  margin-top: 1rem;
 }
 
 .page {
@@ -415,9 +505,10 @@ html, body {
   background: #FFF none repeat scroll 0% 0%;
   box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.4);
   position: relative;
+  color: #000;
 }
 .page:first-child {
-  margin-top: 0.9375rem;
+  margin-top: 0;
 }
 .page .title {
   background: #94b43d;
@@ -441,6 +532,38 @@ html, body {
 .page .map-container img {
   width: 100%;
   height: 100%;
+}
+.page .map-container .button.reload {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -35px;
+  margin-top: -35px;
+  height: 70px;
+  width: 70px;
+  background-image: -webkit-linear-gradient(top, #f4f1ee, #fff);
+  background-image: linear-gradient(top, #f4f1ee, #fff);
+  border-radius: 50%;
+  box-shadow: 0px 8px 10px 0px rgba(0, 0, 0, 0.3), inset 0px 4px 1px 1px white, inset 0px -3px 1px 1px rgba(204, 198, 197, 0.5);
+  transition: all .1s linear;
+}
+.page .map-container .button.reload:hover, .page .map-container .button.reload:focus {
+  background-color: transparent !important;
+  background-image: -webkit-linear-gradient(top, #fff, #f4f1ee);
+  background-image: linear-gradient(top, #fff, #f4f1ee);
+}
+.page .map-container .button.reload:active {
+  background-image: -webkit-linear-gradient(top, #efedec, #f7f4f4);
+  background-image: linear-gradient(top, #efedec, #f7f4f4);
+  box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.4), inset 0px -3px 1px 1px rgba(204, 198, 197, 0.5);
+}
+.page .map-container .button.reload:hover, .page .map-container .button.reload:focus, .page .map-container .button.reload:active {
+  color: #eb2f2f;
+  text-shadow: 0px 0px 6px #eb2f2f;
+}
+.page .map-container .button.reload:hover i, .page .map-container .button.reload:focus i, .page .map-container .button.reload:active i {
+  color: #eb2f2f;
+  text-shadow: 0px 0px 6px #eb2f2f;
 }
 .page.campaign .map-container {
   width: "100%";
@@ -494,7 +617,7 @@ html, body {
   margin-left: 2pt !important;
 }
 .page .direction-legend {
-  background: url(../images/direction-legend.jpg) center center;
+  background: url(../img/direction-legend.jpg) center center;
   width: 4rem;
   height: 4rem;
   background-size: 100% 100%;
@@ -508,15 +631,28 @@ html, body {
   bottom: 0;
   border-top: solid 0.125rem black;
   padding-top: 0.3125rem;
+  height: 3.5rem;
   background: #fff;
   z-index: 99;
+}
+.page .footer .vargainc-logo {
+  background: #fff url("../img/vargainc-logo.png") center center no-repeat;
+  background-size: 100% auto;
+  width: 7.5rem;
+  height: 3.5rem;
+}
+.page .footer .timm-logo {
+  background: #fff url("../img/timm-logo-print.jpg") center center no-repeat;
+  background-size: 100% auto;
+  width: 10rem;
+  height: 3.5rem;
 }
 .page .footer .left {
   position: relative;
   width: 90pt;
   float: left;
 }
-.page .footer .left img {
+.page .footer .left .vargainc-log {
   margin-top: 5px;
 }
 .page .footer .center {
@@ -561,9 +697,10 @@ html, body {
   margin-bottom: 40pt;
 }
 .page.cover .vargainc-log {
+  margin: 10pt auto;
+  background: #fff url("../img/vargainc-logo.png") center center no-repeat;
+  background-size: auto 100%;
   height: 40pt;
-  margin-top: 10pt;
-  margin-bottom: 10pt;
 }
 .page.cover label {
   font-weight: 800;
@@ -593,14 +730,11 @@ html, body {
   z-index: 1005;
   top: 0;
   left: 0;
-  width: 1920px;
-  height: 1200px;
-}
-.google-map.hide {
-  top: -2000px;
-  left: -2000px;
-  width: 1920px;
-  height: 1200px;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
 }
 .google-map .panel {
   max-height: 25rem;
@@ -611,6 +745,8 @@ html, body {
 .google-map-pop {
   background: transparent;
   pointer-events: none;
+  margin-top: 0px !important;
+  top: 0px !important;
 }
 
 iframe {

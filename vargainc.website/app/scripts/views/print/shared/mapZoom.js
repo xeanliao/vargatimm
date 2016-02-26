@@ -7,19 +7,21 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 		mixins: [BaseView],
 		getInitialState: function () {
 			return {
-				activeButton: 'EnterMapDraw'
+				activeButton: 'EnterMapDraw',
+				activeMap: 'ROADMAP'
 			};
 		},
 		getDefaultProps: function () {
 			return {
 				boundary: [],
 				color: '#000',
-				sourceKey: null
+				sourceKey: null,
+				mapType: 'ROADMAP'
 			};
 		},
 		componentWillMount: function () {
 			if ($('#google-map').size() == 0) {
-				$('<div id="google-map" class="hide google-map"></div>').appendTo('body');
+				$('<div id="google-map" class="google-map"></div>').appendTo('body');
 			}
 		},
 		componentDidMount: function () {
@@ -28,7 +30,6 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 		},
 		componentWillUnmount: function () {
 			try {
-				$('.reveal').removeClass('google-map-pop');
 				_.forEach(googleItems, function (item) {
 					item.setMap(null);
 				});
@@ -38,31 +39,50 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				rectangle = null;
 				drawingManager = null;
 			} catch (ex) {
-				console.log(ex);
+				console.log('mapZoom componentWillUnmount error', ex);
 			}
-			$('#google-map').addClass('hide');
+			$('#google-map').css({
+				'visibility': 'hidden'
+			});
 		},
 		initGoogleMap: function () {
 			console.log('init google map');
-			var container = $(window);
-			$('#google-map').removeClass('hide').css({
-				'width': container.width() + 'px',
-				'height': container.height() + 'px',
-				'top': '0px',
-				'left': '0px'
+			$('#google-map').css({
+				'visibility': 'visible'
 			});
-
-			$('.reveal').addClass('google-map-pop');
 
 			if (!googleMap) {
 				googleMap = new google.maps.Map($('#google-map')[0], {
 					center: new google.maps.LatLng(40.744556, -73.987378),
 					zoom: 18,
+					disableDefaultUI: true,
 					mapTypeId: google.maps.MapTypeId.ROADMAP
 				});
+			} else {
+				googleMap.setMapTypeId(google.maps.MapTypeId[this.props.mapType]);
+				this.setState({ 'activeMap': this.props.mapType });
 			}
 
 			google.maps.event.trigger(googleMap, "resize");
+
+			var boundary = this.props.boundary,
+			    fillColor = this.props.color,
+			    mapBounds = new google.maps.LatLngBounds();
+			polygon = new google.maps.Polygon({
+				paths: boundary,
+				strokeColor: '#000',
+				strokeOpacity: 1,
+				strokeWeight: 6,
+				fillColor: fillColor,
+				fillOpacity: 0.1,
+				map: googleMap
+			});
+			googleItems.push(polygon);
+			_.forEach(boundary, function (i) {
+				var point = new google.maps.LatLng(i.lat, i.lng);
+				mapBounds.extend(point);
+			});
+			googleMap.fitBounds(mapBounds);
 
 			drawingManager = new google.maps.drawing.DrawingManager({
 				drawingMode: google.maps.drawing.OverlayType.MARKER,
@@ -96,6 +116,9 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			});
 			googleItems.push(drawingManager);
 
+			this.publish('hideLoading');
+		},
+		onReset: function () {
 			var boundary = this.props.boundary,
 			    fillColor = this.props.color,
 			    mapBounds = new google.maps.LatLngBounds();
@@ -105,7 +128,7 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				strokeOpacity: 1,
 				strokeWeight: 6,
 				fillColor: fillColor,
-				fillOpacity: 0.2,
+				fillOpacity: 0.1,
 				map: googleMap
 			});
 			googleItems.push(polygon);
@@ -113,8 +136,14 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				var point = new google.maps.LatLng(i.lat, i.lng);
 				mapBounds.extend(point);
 			});
-
+			console.log('fitBounds', mapBounds.getCenter().lat(), mapBounds.getCenter().lng(), googleMap.getZoom());
 			googleMap.fitBounds(mapBounds);
+		},
+		onZoomIn: function () {
+			googleMap.setZoom(googleMap.getZoom() + 1);
+		},
+		onZoomOut: function () {
+			googleMap.setZoom(googleMap.getZoom() - 1);
 		},
 		onExistMapDraw: function () {
 			this.setState({ 'activeButton': 'ExistMapDraw' });
@@ -124,15 +153,21 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			this.setState({ 'activeButton': 'EnterMapDraw' });
 			drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
 		},
+		onSwitchMapType: function (mapTypeName) {
+			if (googleMap && google.maps.MapTypeId && google.maps.MapTypeId[mapTypeName]) {
+				googleMap.setMapTypeId(google.maps.MapTypeId[mapTypeName]);
+			}
+			this.setState({ 'activeMap': mapTypeName });
+		},
 		onFinish: function () {
 			if (!rectangle) {
 				return;
 			}
 			var bounds = rectangle.getBounds();
-			this.publish('print.mapzoom@' + this.props.sourceKey, bounds);
+			this.publish('print.mapzoom@' + this.props.sourceKey, bounds, this.state.activeMap);
 		},
 		onClose: function () {
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 		},
 		render: function () {
 			return React.createElement(
@@ -153,20 +188,42 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 					React.createElement(
 						'button',
 						{ className: this.state.activeButton == 'EnterMapDraw' ? 'button active' : 'button', onClick: this.onEnterMapDraw },
-						React.createElement('i', { className: 'fa fa-crop' }),
-						' Begin Draw'
+						React.createElement('i', { className: 'fa fa-crop' })
 					),
 					React.createElement(
 						'button',
 						{ className: this.state.activeButton == 'ExistMapDraw' ? 'button active' : 'button', onClick: this.onExistMapDraw },
-						React.createElement('i', { className: 'fa fa-arrows' }),
-						' End Draw'
+						React.createElement('i', { className: 'fa fa-arrows' })
+					),
+					React.createElement(
+						'button',
+						{ className: this.state.activeMap == 'ROADMAP' ? 'button active' : 'button', onClick: this.onSwitchMapType.bind(null, 'ROADMAP') },
+						React.createElement('i', { className: 'fa fa-map-o' })
+					),
+					React.createElement(
+						'button',
+						{ className: this.state.activeMap == 'HYBRID' ? 'button active' : 'button', onClick: this.onSwitchMapType.bind(null, 'HYBRID') },
+						React.createElement('i', { className: 'fa fa-map' })
+					),
+					React.createElement(
+						'button',
+						{ className: 'button', onClick: this.onZoomIn },
+						React.createElement('i', { className: 'fa fa-search-plus' })
+					),
+					React.createElement(
+						'button',
+						{ className: 'button', onClick: this.onZoomOut },
+						React.createElement('i', { className: 'fa fa-search-minus' })
+					),
+					React.createElement(
+						'button',
+						{ className: 'button', onClick: this.onReset },
+						React.createElement('i', { className: 'fa fa-refresh' })
 					),
 					React.createElement(
 						'button',
 						{ className: 'button', onClick: this.onFinish },
-						React.createElement('i', { className: 'fa fa-image' }),
-						' Create Capture'
+						React.createElement('i', { className: 'fa fa-image' })
 					)
 				)
 			);

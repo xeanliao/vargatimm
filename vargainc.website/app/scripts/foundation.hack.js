@@ -12,6 +12,5 @@ define([
     'foundation.tooltip',
     'foundation-datepicker'
 ], function($){
-	console.log($.fn.foundation, window.Foundation);
 	return window.Foundation;
 })

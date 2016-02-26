@@ -83,19 +83,15 @@ require.config({
     paths: {
         'async': 'vendor/async',
         'jquery': 'vendor/jquery',
+        'jquery-ui': 'vendor/jquery-ui',
         'underscore': 'vendor/lodash',
         'backbone': 'vendor/backbone',
         'backbone.route.control': 'vendor/backbone-route-control',
         'react-dom': 'vendor/react-dom',
         'react': 'vendor/react',
         'react.backbone': 'vendor/react.backbone',
-        'react-intl': 'vendor/react-intl-with-locales',
         'moment': 'vendor/moment',
-        'react-day-picker': 'vendor/DayPicker',
-        'react-native-listener': 'vendor/react-native-listener',
-        'react-select': 'vendor/react-select',
         'pubsub': 'vendor/pubsub',
-        'classnames': 'vendor/dedupe',
         'numeral': 'vendor/numeral',
         'foundation.core': 'vendor/foundation.core',
         'foundation.util.box': 'vendor/foundation.util.box',
@@ -109,7 +105,7 @@ require.config({
         'foundation.tooltip': 'vendor/foundation.tooltip',
         'foundation-datepicker': 'vendor/foundation-datepicker',
         'foundation': 'vendor/foundation',
-        'foundation.hack': 'vendor/foundation.hack'
+        'foundation.hack': 'foundation.hack'
     }
 });
 

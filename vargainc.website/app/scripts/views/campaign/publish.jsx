@@ -2,15 +2,12 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'views/user/adminList',
 	'react.backbone'
-], function (moment, Backbone, React, Topic, AdminUserList) {
-	// var userList = new UserCollection();
-	// var SelectionView = React.createFactory(UserSelection);
-	// var selectionView = SelectionView({collection: userList});
-
+], function (moment, Backbone, React, BaseView, AdminUserList) {
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		componentWillMount: function(){
 		},
 		onUserSelected: function(user){
@@ -18,19 +15,17 @@ define([
 		},
 		onDbUserSelected: function(user){
 			this.setState({selectedUser: user});
-			Topic.publish('campaign/publish', user);
+			this.publish('campaign/publish', user);
 		},
 		onClose: function(){
-			Topic.publish("showDialog", null);
+			this.publish("showDialog");
 		},
 		onProcess: function(){
-			console.log('campaign publish topic');
 			if(this.state && this.state.selectedUser){
-				Topic.publish('campaign/publish', this.state.selectedUser);
+				this.publish('campaign/publish', this.state.selectedUser);
 			}
 		},
 		render: function(){
-			
 			return (
 				<div>
 					<h5>Campaign Publish</h5>

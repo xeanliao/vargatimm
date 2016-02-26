@@ -2,11 +2,12 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'views/user/adminList',
 	'react.backbone'
-], function (moment, Backbone, React, Topic, AdminUserList) {
+], function (moment, Backbone, React, BaseView, AdminUserList) {
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		componentWillMount: function(){
 		},
 		onUserSelected: function(user){
@@ -14,19 +15,17 @@ define([
 		},
 		onDbUserSelected: function(user){
 			this.setState({selectedUser: user});
-			Topic.publish('distribution/dismiss', user);
+			this.publish('distribution/dismiss', user);
 		},
 		onClose: function(){
-			Topic.publish("showDialog", null);
+			this.publish("showDialog");
 		},
 		onProcess: function(){
-			console.log('dmap publish topic');
 			if(this.state && this.state.selectedUser){
-				Topic.publish('distribution/dismiss', this.state.selectedUser);
+				this.publish('distribution/dismiss', this.state.selectedUser);
 			}
 		},
 		render: function(){
-			
 			return (
 				<div>
 					<h5>Campaign Publish</h5>

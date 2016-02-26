@@ -2,33 +2,34 @@ define([
 	'moment',
 	'backbone',
 	'react',
-	'pubsub',
+	'views/base',
 	'react.backbone'
-], function (moment, Backbone, React, Topic) {
+], function (moment, Backbone, React, BaseView) {
 	return React.createBackboneClass({
+		mixins: [BaseView],
 		componentDidMount: function(){
 			var self = this,
 				model = this.getModel();
 			
 			if(!model.get('Date')){
-				console.log('no init date in campaign');
 				model.set('Date', new Date());
 			}
 			
 			$('.fdatepicker').fdatepicker({
 				format: 'yyyy-mm-dd'
 			}).on('changeDate', function(e){
-				console.log(e.date);
 				self.getModel().set('Date', e.date);
 			});
 			$('form').foundation();
 		},
 		onSave: function(e){
+			e.preventDefault();
+			e.stopPropagation();
 			var self = this;
 			this.getModel().save(null, {
 				success: function(model, response){
 					if(response && response.success){
-						Topic.publish('camapign/refresh');
+						self.publish('camapign/refresh');
 						self.onClose();
 					}else{
 						self.setState({error: "opps! something wrong. please contact us!"});
@@ -38,15 +39,12 @@ define([
 					self.setState({error: "opps! something wrong. please contact us!"});
 				}
 			});
-			e.preventDefault();
-			e.stopPropagation();
 		},
 		onClose: function(){
 			$('.fdatepicker').off('changeDate').fdatepicker('remove');
-			Topic.publish("showDialog", null);
+			this.publish("showDialog");
 		},
 		onChange: function(e){
-			console.log(e.currentTarget.name);
 			this.getModel().set(e.currentTarget.name, e.currentTarget.value);
 		},
 		render: function(){
@@ -86,7 +84,7 @@ define([
 							<input type="radio" onChange={this.onChange} name="AreaDescription" checked={"APT ONLY" == AreaDescription} value="APT ONLY" id="aptonly" /><label htmlFor="aptonly">APT ONLY</label>
 							<input type="radio" onChange={this.onChange} name="AreaDescription" checked={"HOME ONLY" == AreaDescription} value="HOME ONLY" id="homeonly" /><label htmlFor="homeonly">HOME ONLY</label>
 						</fieldset>
-						<div className="small-4 columns end">
+						<div className="small-12 medium-12 large-4 columns end">
 							<label>Date
 								<input className="fdatepicker" onChange={this.onChange} name="Date" type="date" readOnly value={displayDate} required />
 							</label>

@@ -24,11 +24,7 @@ define([
 
             customSubMapPenetrationColors: false,
             suppressLocations: true,
-            suppressRadii: true,
-            /**
-             * ROADMAP, SATELLITE, HYBRID, TERRAIN
-             */
-            mapType: 'ROADMAP'
+            suppressRadii: true
         }
     });
 });

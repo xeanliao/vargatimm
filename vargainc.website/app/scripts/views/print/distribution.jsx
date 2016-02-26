@@ -25,19 +25,19 @@ define([
 	            suppressDMap: false,
 	            suppressGTU: true,
 	            suppressNDAInDMap: true,
-	            customSubMapPenetrationColors: false,
 	            suppressLocations: true,
-	            suppressRadii: true,
-	            mapType: 'ROADMAP'
+	            suppressRadii: true
 			});
 			return {options: options};
 		},
 		componentDidMount: function(){
-			var self = this;
+			var collecton = this.getCollection(),
+				self = this;
 			this.subscribe('print.map.imageloaded', function(){
-				_.some(self.refs, function(page){
-					page.state.ImageLoaded == false && page.loadImage();
-					return !page.state.ImageLoaded;
+				_.some(collecton.models, function(page){
+					var currentPage = self.refs[page.get('key')];
+					currentPage && currentPage.state && !currentPage.state.imageLoaded && currentPage.state.imageLoading == false && currentPage.loadImage();
+					return currentPage && currentPage.loadImage ? !currentPage.state.imageLoaded : false;
 				});
 			});
 			this.subscribe('print.map.options.changed', this.onApplyOptions);
@@ -46,13 +46,11 @@ define([
 		onOpenOptions: function(opts){
 			var options = this.state.options;
 			if(!options.get('DMaps')){
-				console.log('dmaps')
 				options.attributes['DMaps'] = this.getCollection().getDMaps();
 			}
 			var model = _.cloneDeep(options);
-			var view = React.createFactory(OptionsView);
-			var viewInstance = new view(_.extend(opts, {model: model}));
-			this.publish('showDialog', viewInstance, null, null, 'large');
+			var params = _.extend(opts, {model: model});
+			this.publish('showDialog', OptionsView, params, {size: 'large'});
 		},
 		onApplyOptions: function(options){
 			//check need reload images
@@ -61,29 +59,36 @@ define([
 				newOptions = _.pick(options.attributes, compareProperty);
 			if(!_.eq(oldOptions, newOptions)){
 				_.forEach(this.refs, function(page){
-					page.setState({ImageLoaded: false});
+					page.setState({imageLoaded: null});
 				});
 			}
 			this.setState({options: options});
-			this.publish("showDialog", null);
+			this.publish("showDialog");
 			this.publish('print.map.imageloaded');
 		},
-		onPrint: function(){
+		onPrint: function () {
 			var collecton = this.getCollection(),
 				campaignId = collecton.getCampaignId(),
 				postData = {
 					campaignId: campaignId,
-					size: "Distribute",
-					needFooter: false,
-					options: _.map(this.refs, function (page) {
-						console.log(page, page.getExportParamters);
-						return page.getExportParamters();
-					})
-				};
-			console.log(postData);
-			collecton.exportPdf(postData).then(function(response){
+					size: 'Distribute',
+					needFooter: 'false',
+					options: []
+				},
+				self = this;
+			_.forEach(collecton.models, function (page) {
+				if (self.refs[page.get('key')]) {
+					postData.options.push(self.refs[page.get('key')].getExportParamters());
+				}
+			})
+			
+			collecton.exportPdf(postData).then(function (response) {
 				var downloadUrl = '../api/pdf/download/' + campaignId + '/' + response.sourceFile;
-				$('<form action="' + downloadUrl + '" method="GET"></form>').appendTo('body').get(0).submit();
+				if($('#downloadForm').size() == 0){
+					$('<form id="downloadForm" action="' + downloadUrl + '" method="GET"></form>').appendTo('body').get(0).submit();
+				}else{
+					$('#downloadForm').attr('action', downloadUrl).get(0).submit();
+				}
 			});
 		},
 		render: function () {
@@ -100,21 +105,14 @@ define([
 			return (
 				<div className="section">
 					<div className="row">
-						<div className="small-12 columns">
-							<div className="section-header">
-								<div className="row">
-									<div className="small-12 column"><h5>TIMM Print Preview</h5></div>
-								</div>
-							</div>
-						</div>
 						<div className="small-12 columns text-center">
-							<div className="button-group">
+							<div className="button-group print-toolbar">
 								<button onClick={this.onOpenOptions}><i className="fa fa-cog"></i>Options</button>
 								<button onClick={this.onPrint}><i className="fa fa-print"></i>Print</button>
 							</div>
 						</div>
 					</div>
-					<div className="page-container dmapPrint">
+					<div className="page-container distribution-print">
 						{pages.map(function(page){
 							var dmapId = page.get('DMapId');
 							if (dmapId && _.indexOf(hideDMaps, dmapId) > -1) {
@@ -122,13 +120,9 @@ define([
 							}
 							switch (page.get('type')) {
 								case 'DistributionDetail':
-									return (
-										<DistributionDetailMapView ref={page.get('key')} key={page.get('key')} model={page} options={options} />
-									);
+									return <DistributionDetailMapView ref={page.get('key')} key={page.get('key')} model={page} options={options} />;
 								default :
-									return (
-										<DistributionMapView ref={page.get('key')} key={page.get('key')} model={page} options={options} />
-									);
+									return <DistributionMapView ref={page.get('key')} key={page.get('key')} model={page} options={options} />;
 							}
 						})}
 					</div>

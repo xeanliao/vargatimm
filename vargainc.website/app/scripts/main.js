@@ -6,6 +6,20 @@ define(function (require, exports, module) {
 		Topic = require('pubsub');
 
 	/**
+	 * register loading event except ajax request is quite
+	 */
+	$(document).ajaxSend(function (event, xhr, settings) {
+		if (settings.quite !== true) {
+			Topic.publish('showLoading');
+		}
+	});
+	$(document).ajaxComplete(function (event, xhr, settings) {
+		if (settings.quite !== true) {
+			Topic.publish('hideLoading');
+		}
+	});
+
+	/**
 	 * override base url
 	 */
 	var backboneSync = Backbone.sync;
@@ -21,9 +35,10 @@ define(function (require, exports, module) {
 		return backboneSync(method, model, options);
 	}
 
-	var LayoutView = require('views/layout');
+	var LayoutView = require('views/layout/main');
 	var layoutViewInstance = React.createFactory(LayoutView)();
 	var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
+
 
 
 	var AppRouter = Backbone.Router.extend({
@@ -40,13 +55,15 @@ define(function (require, exports, module) {
 		},
 		defaultAction: function () {
 			require([
-				'models/campaign',
 				'collections/campaign',
 				'views/campaign/list'
-			], function (Model, Collection, View) {
+			], function (Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetch();
+				campaignlist.fetch().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
+				});
 			});
 		},
 		frameAction: function (page, query) {
@@ -69,24 +86,28 @@ define(function (require, exports, module) {
 		},
 		distributionAction: function () {
 			require([
-				'models/campaign',
 				'collections/campaign',
 				'views/distribution/list'
-			], function (Model, Collection, View) {
+			], function (Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetchForDistribution();
+				campaignlist.fetchForDistribution().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
+				});
 			});
 		},
 		monitorAction: function () {
 			require([
-				'models/campaign',
 				'collections/campaign',
 				'views/monitor/list'
-			], function (Model, Collection, View) {
+			], function (Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetchForTask();
+				campaignlist.fetchForTask().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
+				});
 			});
 		},
 		reportAction: function () {
@@ -96,8 +117,11 @@ define(function (require, exports, module) {
 				'views/report/list'
 			], function (Model, Collection, View) {
 				var campaignlist = new Collection();
-				Topic.publish('loadView', View, campaignlist, null);
-				campaignlist.fetchForReport();
+				campaignlist.fetchForReport().done(function () {
+					Topic.publish('loadView', View, {
+						collection: campaignlist
+					});
+				});
 			});
 		},
 		adminAction: function () {
@@ -107,16 +131,67 @@ define(function (require, exports, module) {
 				Topic.publish('loadView', View);
 			});
 		},
-		printAction: function(campaignId, printType){
-			require([
-				'views/print/distribution',
-				'collections/print'
-			], function (View, Collection) {
-				var print = new Collection();
-				print.fetchForDistributionMap(campaignId).then(function(){
-					Topic.publish('loadView', View, print, null);
+		printAction: function (campaignId, printType) {
+			switch (printType) {
+				case 'campaign':
+				require([
+					'views/print/campaign',
+					'collections/print'
+				], function (View, Collection) {
+					var print = new Collection();
+					print.fetchForCampaignMap(campaignId).done(function () {
+						Topic.publish('loadView', View, {
+							collection: print
+						}, {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						});
+					});
 				});
-			});
+				break;
+			case 'distribution':
+				require([
+					'views/print/distribution',
+					'collections/print'
+				], function (View, Collection) {
+					var print = new Collection();
+					print.fetchForDistributionMap(campaignId).done(function () {
+						Topic.publish('loadView', View, {
+							collection: print
+						}, {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						});
+					});
+				});
+				break;
+			case 'report':
+				require([
+					'views/print/report',
+					'collections/print'
+				], function (View, Collection) {
+					var print = new Collection();
+					print.fetchForReportMap(campaignId).done(function () {
+						Topic.publish('loadView', View, {
+							collection: print
+						}, {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						});
+					});
+				});
+				break;
+			default:
+
+				break;
+			}
+
 		}
 	});
 

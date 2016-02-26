@@ -28,7 +28,7 @@ define([
 				   	<OptionsDMapSelector collection={model.get('DMaps')} />
 				    <div className="small-12 columns">
 						<div className="button-group float-right">
-							<button className="success button" onClick={this.onApply}>Save</button>
+							<button className="success button" onClick={this.onApply}>Apply</button>
 							<button className="button" onClick={this.onClose}>Cancel</button>
 						</div>
 					</div>

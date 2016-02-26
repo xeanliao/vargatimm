@@ -7,6 +7,7 @@ define([
 ], function ($, _, Backbone, Topic, BaseModel) {
     return BaseModel.extend({
         urlRoot: 'map',
+        idAttribute: 'key',
         defaults: {
             'Id': null,
             'Name': null,
@@ -17,52 +18,31 @@ define([
             'ImageStatus': 'waiting'
         },
         fetchMapImage: function (mapOption) {
+            console.log('fetch distribution map image');
             var model = this,
-                params = $.extend(mapOption, {
+                params = $.extend({mapType: 'HYBRID'}, mapOption, {
                     campaignId: model.get('CampaignId'),
                     submapId: model.get('SubMapId'),
                     dmapId: model.get('DMapId')
                 }),
                 options = {
+                    quite: true,
                     url: model.urlRoot + '/distribution/',
                     method: 'POST',
                     processData: true,
                     data: $.param(params),
                     success: function (result) {
+                        var mapImage = null,
+                            polygonImage = null;
                         if (result && result.success) {
-                            var mapImageLoaded = false,
-                                mapImageAddress = result.tiles,
-                                polygonImageLoaded = false,
-                                polygonImageAddress = result.geometry,
-                                imageLoaded = function () {
-                                    model.set({
-                                        'MapImage': mapImageAddress,
-                                        'PolygonImage': polygonImageAddress
-                                    });
-                                }
-
-                            var mapImage = $(new Image()).one('load', function () {
-                                console.log('mapImageLoaded');
-                                mapImageLoaded = true;
-                                polygonImageLoaded && imageLoaded();
-                            }).attr('src', mapImageAddress);
-
-                            var polygonImage = $(new Image()).one('load', function () {
-                                console.log('polygonImageLoaded');
-                                polygonImageLoaded = true;
-                                mapImageLoaded && imageLoaded();
-                            }).attr('src', polygonImageAddress);
-                        } else {
-                            model.set({
-                                'MapImage': null,
-                                'PolygonImage': null
-                            });
+                            mapImage = result.tiles;
+                            polygonImage = result.geometry;
                         }
-                    },
-                    error: function () {
-                        model.set({
-                            'MapImage': null,
-                            'PolygonImage': null
+                        model.set('MapImage', mapImage, {
+                            silent: true
+                        });
+                        model.set('PolygonImage', polygonImage, {
+                            silent: true
                         });
                     }
                 };
