@@ -1,8 +1,8 @@
 (function () {
 	'use strict';
 	var LocalDebug = false;
-	var LocalMapImage = 'FAAE5AAB-1EA9-4AAA-9A48-2B61CF3B5933.jpg';
-	var LocalPolygonImage = 'FB7D4E48-FA06-423A-9801-A29B72DE50F7.png';
+	var LocalMapImage = '23C3819F-67A1-49BE-873E-BF9972122A9A.jpg';
+	var LocalPolygonImage = '2092087E-8E06-4723-9681-77F56206C40F.png';
 	var DEBUG = true;
 
 	var system = require('system'),

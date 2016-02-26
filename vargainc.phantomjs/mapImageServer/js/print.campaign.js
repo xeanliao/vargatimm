@@ -44,7 +44,7 @@ function loadMap(params) {
         var query = [];
 
         $.each(campaign.SubMaps, function () {
-            var submapUrl = params.baseUrl + 'print/campaign/' + params.campaignId + '/submap/' + this.Id + '/bundary';
+            var submapUrl = params.baseUrl + 'print/campaign/' + params.campaignId + '/submap/' + this.Id + '/boundary';
             console.log(submapUrl);
             query.push($.getJSON(submapUrl));
         });
@@ -93,7 +93,7 @@ function drawMap(params, result) {
         console.log('wait map tiles!');
         var mapBounds = new google.maps.LatLngBounds();
         $.each(result.subMaps, function () {
-            $.each(this.bundary, function () {
+            $.each(this.boundary, function () {
                 var point = new google.maps.LatLng(this.lat, this.lng);
                 mapBounds.extend(point);
             });
@@ -240,15 +240,15 @@ function draw(params, result) {
             for (var index = 1; index <= result.subMaps.length; index++) {
                 var submap = result.subMaps[index - 1],
                     borderColor = 'rgb(' + submap.color.r + ',' + submap.color.g + ',' + submap.color.b + ')',
-                    fillColor = params.showPenetrationColors ? getColorByPenetration(params.PenetrationColors, submap.Penetration) : borderColor,
+                    fillColor = params.showPenetrationColors ? getColorByPenetration(params.penetrationColors, submap.Penetration) : borderColor,
                     submapBounds = new google.maps.LatLngBounds();
                 //find submap center for render label
-                $.each(submap.bundary, function () {
+                $.each(submap.boundary, function () {
                     submapBounds.extend(new google.maps.LatLng(this.lat, this.lng));
                 });
                 //submap boundary
                 new google.maps.Polygon({
-                    paths: submap.bundary,
+                    paths: submap.boundary,
                     strokeColor: borderColor,
                     strokeOpacity: 1,
                     strokeWeight: 5,

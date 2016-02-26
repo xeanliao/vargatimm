@@ -221,7 +221,7 @@ function draw(params, result) {
     if (result.polygon && result.record && result.polygon.length == result.record.length) {
         for (var index = 1; index <= result.polygon.length; index++) {
             var cRoute = result.polygon[index - 1],
-                fillColor = params.showPenetrationColors ? getColorByPenetration(params.PenetrationColors, result.record[index - 1].Penetration) : borderColor,
+                fillColor = params.showPenetrationColors ? getColorByPenetration(params.penetrationColors, result.record[index - 1].Penetration) : borderColor,
                 bounds = new google.maps.LatLngBounds();
 
             $.each(cRoute, function () {

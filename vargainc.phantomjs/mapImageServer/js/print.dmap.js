@@ -75,10 +75,14 @@ function drawMap(params, result) {
     console.log('begin find map best view');
     if (result && result.boundary) {
         var mapBounds = new google.maps.LatLngBounds();
-        $.each(result.boundary, function () {
-            var point = new google.maps.LatLng(this.lat, this.lng);
-            mapBounds.extend(point);
-        });
+        if(params.topRightLat && params.topRightLat && params.bottomLeftLat && params.bottomLeftLng){
+            mapBounds = new google.maps.LatLngBounds(new google.maps.LatLng(params.bottomLeftLat, params.bottomLeftLng), new google.maps.LatLng(params.topRightLat, params.topRightLng));
+        }else{
+            $.each(result.boundary, function () {
+                var point = new google.maps.LatLng(this.lat, this.lng);
+                mapBounds.extend(point);
+            });
+        }
 
         google.maps.event.addListenerOnce(map, 'tilesloaded', function () {
             console.log("end find best view");
