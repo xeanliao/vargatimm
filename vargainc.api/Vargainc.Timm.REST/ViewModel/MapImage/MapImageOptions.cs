@@ -13,9 +13,14 @@ namespace Vargainc.Timm.REST.ViewModel.MapImage
         public int? campaignId { get; set; }
         public int? submapId { get; set; }
         public int? dmapId { get; set; }
+        public bool suppressNDAInCampaign { get; set; }
         public bool suppressGTU { get; set; }
+        public bool suppressNDAInSubMap { get; set; }
         public bool suppressNDAInDMap { get; set; }
+        public bool suppressLocations { get; set; }
         public bool suppressRadii { get; set; }
+        public bool showPenetrationColors { get; set; }
+        public List<int> penetrationColors { get; set; }
         public int zoom { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public MapTypeEnum? mapType { get;set; }
