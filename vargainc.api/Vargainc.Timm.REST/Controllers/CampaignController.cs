@@ -197,9 +197,10 @@ namespace Vargainc.Timm.REST.Controllers
             dbCampaign.Name = user.UserName;
             dbCampaign.Description = "";
             dbCampaign.CustemerName = "";
-            dbCampaign.Latitude = 0;
-            dbCampaign.Longitude = 0;
-            dbCampaign.ZoomLevel = 1;
+            //for new campaign. set the default center of USA and zoom level to 5.
+            dbCampaign.Latitude = 39.82541310342478;
+            dbCampaign.Longitude = -102.74414062500001;
+            dbCampaign.ZoomLevel = 5;
 
 
             dbCampaign.AreaDescription = campaign.AreaDescription;
