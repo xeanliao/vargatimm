@@ -11,9 +11,9 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 				dialogCustomClass: '',
 				loading: false,
 				pageTitle: 'TIMM System',
-				showMenu: true,
-				showSearch: true,
-				showUser: true
+				showMenu: null,
+				showSearch: null,
+				showUser: null
 			};
 		},
 		componentDidMount: function () {
@@ -139,14 +139,14 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 			    mainView = this.getMainView(),
 			    dialogView = this.getDialogView();
 
-			if (this.state.showMenu) {
+			if (this.state.showMenu === true) {
 				var mainMenuClassName = 'left-menu';
 				var menu = React.createElement(MenuView, { ref: 'sideMenu' });
 			} else {
 				var mainMenuClassName = '';
 				var menu = null;
 			}
-			if (this.state.showSearch) {
+			if (this.state.showSearch === true) {
 				var search = React.createElement(
 					'span',
 					{ className: 'title-bar-center' },
@@ -159,7 +159,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 			} else {
 				var search = null;
 			}
-			if (this.state.showUser) {
+			if (this.state.showUser === true) {
 				var user = React.createElement(UserView, { model: this.props.user });
 			} else {
 				var user = null;

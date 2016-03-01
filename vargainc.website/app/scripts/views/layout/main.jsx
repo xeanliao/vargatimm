@@ -25,9 +25,9 @@ define([
 				dialogCustomClass: '',
 				loading: false,
 				pageTitle: 'TIMM System',
-				showMenu: true,
-				showSearch: true,
-				showUser: true
+				showMenu: null,
+				showSearch: null,
+				showUser: null
 			}
 		},
 		componentDidMount: function(){
@@ -155,14 +155,14 @@ define([
 				dialogView = this.getDialogView();
 
 
-			if (this.state.showMenu) {
+			if (this.state.showMenu === true) {
 	        	var mainMenuClassName = 'left-menu';
 	        	var menu = <MenuView ref="sideMenu" />;
 			} else {				
 				var mainMenuClassName = '';
 				var menu = null;
 			}
-			if (this.state.showSearch) {
+			if (this.state.showSearch === true) {
 	        	var search = (
 	        		<span className="title-bar-center">
 						<div className="topSearchBar hide-for-small-only">
@@ -173,7 +173,7 @@ define([
 			} else {				
 				var search = null;
 			}
-			if (this.state.showUser) {
+			if (this.state.showUser === true) {
 				var user = <UserView model={this.props.user} / >
 			} else {
 				var user = null;
