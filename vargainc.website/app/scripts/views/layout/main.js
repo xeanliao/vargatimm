@@ -1,6 +1,6 @@
 define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'views/layout/user', 'views/layout/loading', 'react.backbone', 'foundation'], function ($, React, ReactDOM, BaseView, MenuView, UserView, LoadingView) {
-	return React.createClass({
-		mixins: [BaseView],
+	return React.createBackboneClass({
+		mixins: [BaseView, React.BackboneMixin("user", "change:FullName")],
 		getInitialState: function () {
 			return {
 				mainView: null,
@@ -135,7 +135,8 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 			return null;
 		},
 		render: function () {
-			var mainView = this.getMainView(),
+			var model = this.getModel(),
+			    mainView = this.getMainView(),
 			    dialogView = this.getDialogView();
 
 			if (this.state.showMenu) {
@@ -157,6 +158,11 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 				);
 			} else {
 				var search = null;
+			}
+			if (this.state.showUser) {
+				var user = React.createElement(UserView, { model: this.props.user });
+			} else {
+				var user = null;
 			}
 
 			return React.createElement(
@@ -185,7 +191,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 										this.state.pageTitle
 									)
 								),
-								this.state.showUser ? UserView : null,
+								user,
 								search
 							),
 							mainView

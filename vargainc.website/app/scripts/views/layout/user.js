@@ -1,21 +1,13 @@
 define(['react', 'backbone', 'views/base', 'models/user', 'react.backbone'], function (React, Backbone, BaseView, UserModel) {
 	return React.createBackboneClass({
 		mixins: [BaseView],
-		getDefaultProps: function () {
-			return {
-				model: new UserModel()
-			};
-		},
 		componentDidMount: function () {
-			this.getModel().fetchCurrentUser();
-			this.subscribe("NOT_LOGIN", function () {
-				window.location = "../login.html";
-			});
-
 			$("#userMenu").foundation();
 		},
 		onLogout: function () {
-			this.getModel().logout();
+			this.getModel().logout().always(function () {
+				window.location.reload(true);
+			});
 		},
 		render: function () {
 			var model = this.getModel();
@@ -32,7 +24,7 @@ define(['react', 'backbone', 'views/base', 'models/user', 'react.backbone'], fun
 							'small',
 							null,
 							'Welcome, ',
-							model.get('FullName'),
+							this.getModel().get('FullName'),
 							'  '
 						)
 					),

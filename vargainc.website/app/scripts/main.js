@@ -35,12 +35,6 @@ define(function (require, exports, module) {
 		return backboneSync(method, model, options);
 	}
 
-	var LayoutView = require('views/layout/main');
-	var layoutViewInstance = React.createFactory(LayoutView)();
-	var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
-
-
-
 	var AppRouter = Backbone.Router.extend({
 		routes: {
 			'campaign': 'defaultAction',
@@ -133,7 +127,7 @@ define(function (require, exports, module) {
 		},
 		printAction: function (campaignId, printType) {
 			switch (printType) {
-				case 'campaign':
+			case 'campaign':
 				require([
 					'views/print/campaign',
 					'collections/print'
@@ -195,7 +189,21 @@ define(function (require, exports, module) {
 		}
 	});
 
-	var appRouter = new AppRouter;
+	var UserModel = require('models/user');
+	var LayoutView = require('views/layout/main');
+	var userModel = new UserModel();
+	userModel.fetchCurrentUser().done(function () {
+		var LayoutViewInstance = React.createFactory(LayoutView);
+		var layoutViewInstance = LayoutViewInstance({
+			user: userModel
+		});
+		var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
 
-	Backbone.history.start();
+		var appRouter = new AppRouter;
+
+		Backbone.history.start();
+	}).fail(function () {
+		window.location = '../login.html';
+	});
+
 });
