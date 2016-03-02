@@ -214,6 +214,9 @@ module.exports = function (grunt) {
 	            	src: ['<%= app %>/scripts/views/print/report.jsx'],
 	            	dest: '<%= app %>/scripts/views/print/report.js'
 	            },{
+	            	src: ['<%= app %>/scripts/views/gtu/monitor.jsx'],
+	            	dest: '<%= app %>/scripts/views/gtu/monitor.js'
+	            },{
 	            	src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
 	            	dest: '<%= app %>/scripts/views/admin/dashboard.js'
 	            }]
