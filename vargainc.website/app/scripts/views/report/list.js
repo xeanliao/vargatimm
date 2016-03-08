@@ -1,4 +1,4 @@
-define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task', 'react.backbone'], function (_, moment, Backbone, React, BaseView, TaskModel) {
+define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'models/task', 'react.backbone'], function (_, moment, helper, Backbone, React, BaseView, TaskModel) {
 	var ReportRow = React.createBackboneClass({
 		mixins: [BaseView],
 		menuKey: 'report-menu-ddl-',
@@ -34,8 +34,9 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task'
 		onGotoReport: function (taskId) {
 			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
 		},
-		onGotoReview: function (taskId) {
-			window.location.hash = 'frame/EditGTU.aspx?id=' + taskId;
+		onGotoReview: function (campaignId, taskName, taskId) {
+			window.location.hash = helper.sprintf('campaign/%d/%s/%d/monitor', campaignId, taskName, taskId);
+			// window.location.hash = 'frame/EditGTU.aspx?id=' + taskId;
 		},
 		onCloseMoreMenu: function (key) {
 			$("#" + this.menuKey + key).foundation('close');
@@ -158,12 +159,14 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'models/task'
 								if (task.visiable === false) {
 									return null;
 								}
+								var campaignId = model.get('Id'),
+								    taskName = task.Name;
 								return React.createElement(
 									'tr',
 									{ key: task.Id },
 									React.createElement(
 										'td',
-										{ onDoubleClick: self.onGotoReview.bind(null, task.Id) },
+										{ onDoubleClick: self.onGotoReview.bind(null, campaignId, taskName, task.Id) },
 										task.Name
 									),
 									React.createElement(

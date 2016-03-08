@@ -22,10 +22,6 @@ require.config({
         'react.backbone': {
             deps: ['backbone', 'react']
         },
-        'react-day-picker': {
-            deps: ['react'],
-            exports: 'DayPicker'
-        },
         'react-select': {
             deps: ['react', 'react-dom', 'classnames'],
             exports: 'ReactSelect'
@@ -93,6 +89,7 @@ require.config({
         'moment': 'vendor/moment',
         'pubsub': 'vendor/pubsub',
         'numeral': 'vendor/numeral',
+        'sprintf': 'vendor/sprintf',
         'foundation.core': 'vendor/foundation.core',
         'foundation.util.box': 'vendor/foundation.util.box',
         'foundation.util.keyboard': 'vendor/foundation.util.keyboard',

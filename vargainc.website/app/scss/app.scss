@@ -117,7 +117,7 @@ html, body {
 				background-color: #1583cc;
 			}
 		}
-		&:hover, &:focus{
+		&:hover, &:focus, &.active, &:active{
 			color: #fff;
 			background-color: #1583cc;
 			i, small, span{color: #fff;}

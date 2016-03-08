@@ -12,9 +12,9 @@
     "font-awesome": "~4.5.0",
     "moment": "~2.11.1",
     "pubsub.js": "~0.1.0",
-    "react-day-picker": "~1.2.0",
     "numeral": "~1.5.3",
-    "requirejs-plugins": "~1.0.3"
+    "requirejs-plugins": "~1.0.3",
+    "sprintf": "~1.0.3"
   },
   "description": "",
   "main": "",

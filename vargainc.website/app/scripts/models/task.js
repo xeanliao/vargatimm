@@ -1,8 +1,9 @@
 define([
+    'jquery',
     'underscore',
     'backbone',
     'pubsub'
-], function (_, Backbone, Topic) {
+], function ($, _, Backbone, Topic) {
     return Backbone.Model.extend({
         urlRoot: 'task',
         idAttribute: 'Id',
@@ -16,7 +17,7 @@ define([
             DistributionMapId: null,
             AuditorId: null,
             AuditorName: null,
-            DistributionMapId : null
+            DistributionMapId: null
         },
         markFinished: function (opts) {
             var model = this,
@@ -58,6 +59,30 @@ define([
             };
             fd.append('gtuFile', file);
             xhr.send(fd);
+        },
+        addGtuDots: function (dots, opts) {
+            var def = $.Deferred(),
+                model = this,
+                options = {
+                    url: model.urlRoot + '/' + model.get('Id') + '/dots/',
+                    method: 'POST',
+                    data: $.param({
+                        '': dots
+                    }),
+                    success: function (result) {
+                        if (result && result.success) {
+                            return def.resolve();
+                        }
+                        return def.reject();
+                    },
+                    fail: function () {
+                        def.reject();
+                    }
+                };
+            options = _.extend(opts, options);
+
+            (this.sync || Backbone.sync).call(this, '', this, options);
+            return def;
         }
     });
 });

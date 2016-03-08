@@ -184,6 +184,11 @@ define([
 									{search}
 								</div>
 								{mainView}
+								<div className="row">
+									<div className="small-12 columns">
+										<div id="google-map" className="google-map"></div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
