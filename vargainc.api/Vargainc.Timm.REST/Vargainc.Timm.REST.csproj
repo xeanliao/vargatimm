@@ -182,6 +182,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModel\ControlCenter\CampaignViewModel.cs" />
     <Compile Include="ViewModel\ControlCenter\TaskViewModel.cs" />
+    <Compile Include="ViewModel\CustomGTUPoint.cs" />
     <Compile Include="ViewModel\ImportCampaign.cs" />
     <Compile Include="ViewModel\Location.cs" />
     <Compile Include="ViewModel\MapImage\MapImageOptions.cs" />

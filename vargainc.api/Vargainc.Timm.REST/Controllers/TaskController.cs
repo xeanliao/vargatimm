@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Data.Entity;
+using System.Text;
 using Vargainc.Timm.EF;
 using Vargainc.Timm.REST.ViewModel.ControlCenter;
+using System.Net.Http;
+using System.IO;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -26,7 +29,13 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 return NotFound();
             }
+            var dbDMap = await db.DistributionMaps.FindAsync(dbTask.DistributionMapId);
+            var dbSubMap = await db.SubMaps.FindAsync(dbDMap.SubMapId);
+
             return Json(new {
+                CampaignId = dbSubMap.CampaignId,
+                SubMapId = dbSubMap.Id,
+                DMapId = dbDMap.Id,
                 dbTask.Id,
                 dbTask.Name,
                 dbTask.Date,
@@ -225,6 +234,63 @@ namespace Vargainc.Timm.REST.Controllers
             //            return gtuInfoList.Count;
             //        }
             //    }
+        }
+
+        [Route("{taskId:int}/gtu")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetGtuListByTaskId(int taskId)
+        {
+            var result = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new
+            {
+                i.GTU.Id,
+                i.GTU.ShortUniqueID,
+                i.UserColor
+            }).ToListAsync();
+            return Json(result);
+        }
+
+        [Route("{taskId:int}/dots")]
+        [HttpPost]
+        public async Task<IHttpActionResult> AddGtuDotsToTask(int taskId, [FromBody] List<ViewModel.CustomGTUPoint> dots)
+        {
+            var taskDic = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new
+            {
+                i.GTUId,
+                TaskgtuinfoId = i.Id,
+
+            }).ToDictionaryAsync(i => i.GTUId);
+
+            List<Models.GtuInfo> newDots = new List<Models.GtuInfo>();
+            foreach (var item in dots)
+            {
+                newDots.Add(new Models.GtuInfo {
+                    dtReceivedTime = item.Date,
+                    dtSendTime = item.Date,
+                    //0-original ,1-added ,2-removed
+                    nCellID = 1,
+                    dwLatitude = item.Location.Latitude,
+                    dwLongitude = item.Location.Longitude,
+                    TaskgtuinfoId = taskDic[item.GtuId].TaskgtuinfoId,
+                    dwSpeed = 0,
+                    nHeading = 0,
+                    sIPAddress = string.Empty,
+                    nAreaCode = 0,
+                    nNetworkCode = 0,
+                    nGPSFix = 0,
+                    nAccuracy = 0,
+                    nCount = 0,
+                    nLocationID = 0,
+                    sVersion = string.Empty,
+                    dwAltitude = 0,
+                    PowerInfo = 0,
+                    Code = string.Empty,
+                    Status = 0,
+                    Distance = 0
+                });
+            }
+            db.GtuInfos.AddRange(newDots);
+            await db.SaveChangesAsync();
+            return Json(new { success = true });
         }
 
         protected override void Dispose(bool disposing)

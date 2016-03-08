@@ -383,7 +383,7 @@ namespace Vargainc.Timm.REST.Controllers
 
         [HttpGet]
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu")]
-        public IHttpActionResult GetDmapGTU(int campaignId, int submapId, int dmapId, bool showAllPoint = false)
+        public IHttpActionResult GetDmapGTU(int campaignId, int submapId, int dmapId)
         {
             var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
@@ -431,6 +431,64 @@ namespace Vargainc.Timm.REST.Controllers
                 points = locations,
                 pointsColors = colors.ToList(),
                 
+            });
+        }
+
+        [HttpGet]
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/inside")]
+        public IHttpActionResult GetGtuInsideDmap(int campaignId, int submapId, int dmapId)
+        {
+            return LoadGtu(campaignId, submapId, dmapId, true);
+        }
+
+        [HttpGet]
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/all")]
+        public IHttpActionResult GetGtuAll(int campaignId, int submapId, int dmapId)
+        {
+            return LoadGtu(campaignId, submapId, dmapId, false);
+        }
+
+        private IHttpActionResult LoadGtu(int campaignId, int submapId, int dmapId, bool filterOutside)
+        {
+            var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
+                .SubMaps.FirstOrDefault(i => i.Id == submapId)
+                .DistributionMaps.FirstOrDefault(i => i.Id == dmapId);
+            if (dmap == null)
+            {
+                return NotFound();
+            }
+
+            var query = from task in db.Tasks
+                        join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
+                        join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
+                        where task.DistributionMapId == dmapId && task.Status == 1
+                        orderby task.Id, mapping.GTUId, gtu.Id
+                        select new ViewModel.Location
+                        {
+                            Id = mapping.GTUId,
+                            Latitude = gtu.dwLatitude,
+                            Longitude = gtu.dwLongitude
+                        };
+
+            var dmapPolygon = GetDMapBoundary(campaignId, submapId, dmapId);
+            
+            List<long?> validGtuId;
+            var locations = FormatLocationGroup(query, dmapPolygon, out validGtuId, filterOutside);
+            var colors = new List<string>();
+            if (validGtuId.Count > 0)
+            {
+                var colorQuery = from task in db.Tasks
+                                 join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
+                                 where task.DistributionMapId == dmapId && task.Status == 1 && validGtuId.Contains(mapping.GTUId)
+                                 orderby task.Id, mapping.GTUId
+                                 select mapping.UserColor;
+                colors = colorQuery.ToList();
+            }
+            return Json(new
+            {
+                points = locations,
+                pointsColors = colors.ToList(),
+
             });
         }
         #endregion
@@ -566,27 +624,8 @@ namespace Vargainc.Timm.REST.Controllers
         /// <returns></returns>
         private List<ViewModel.Location[]> FormatLocationGroup(IQueryable<ViewModel.Location> coordinates)
         {
-            List<ViewModel.Location[]> result = new List<ViewModel.Location[]>();
-            long? lastId = null;
-            List<ViewModel.Location> area = new List<ViewModel.Location>();
-            foreach (var item in coordinates)
-            {
-                if (!lastId.HasValue || lastId.Value == item.Id)
-                {
-                    area.Add(item);
-                }
-                else
-                {
-                    result.Add(area.ToArray());
-                    area.Clear();
-                    area.Add(item);
-                }
-                lastId = item.Id;
-            }
-
-            result.Add(area.ToArray());
-
-            return result;
+            List<long?> groupKey;
+            return FormatLocationGroup(coordinates, null, out groupKey);
         }
 
         /// <summary>
@@ -594,18 +633,31 @@ namespace Vargainc.Timm.REST.Controllers
         /// </summary>
         /// <param name="coordinates"></param>
         /// <returns></returns>
-        private List<ViewModel.Location[]> FormatLocationGroup(IQueryable<ViewModel.Location> coordinates, List<ViewModel.Location> filerPolygon, out List<long?> groupKeys)
+        private List<ViewModel.Location[]> FormatLocationGroup(IQueryable<ViewModel.Location> coordinates, List<ViewModel.Location> filterPolygon, out List<long?> groupKeys, bool filterOuterSide = true)
         {
             groupKeys = new List<long?>();
 
-            var polygon = BuildPolygon(filerPolygon);
+            var polygon = filterPolygon != null ? BuildPolygon(filterPolygon) : null;
             List<ViewModel.Location[]> result = new List<ViewModel.Location[]>();
             long? lastId = null;
             List<ViewModel.Location> area = new List<ViewModel.Location>();
+            HashSet<string> ducplicateLocation = new HashSet<string>();
             foreach (var item in coordinates)
             {
-                var point = new Point(item.Longitude ?? 0, item.Latitude ?? 0);
-                if (polygon == null || !polygon.Contains(point))
+                float lat = (int)(item.Latitude * 100000) / 100000f;
+                float lng = (int)(item.Longitude * 100000) / 100000f;
+                var key = string.Format("{0}:{1}", lat, lng);
+                if (ducplicateLocation.Contains(key))
+                {
+                    continue;
+                }
+                else
+                {
+                    ducplicateLocation.Add(key);
+                }
+
+                var point = new Point(lng, lat);
+                if (filterOuterSide && (polygon == null || !polygon.Contains(point)))
                 {
                     continue;
                 }
@@ -619,6 +671,7 @@ namespace Vargainc.Timm.REST.Controllers
                     result.Add(area.ToArray());                    
                     area.Clear();
                     area.Add(item);
+                    ducplicateLocation.Clear();
                 }
                 lastId = item.Id;
             }
@@ -631,7 +684,6 @@ namespace Vargainc.Timm.REST.Controllers
                 result.Add(area.ToArray());
             }
             
-
             return result;
         }
 

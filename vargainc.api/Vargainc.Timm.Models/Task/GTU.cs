@@ -12,6 +12,7 @@ namespace Vargainc.Timm.Models
         public bool IsEnabled { get; set; }
         public string Model { get; set; }
         public string UniqueID { get; set; }
+        public string ShortUniqueID { get; set; }
         public int? UserId { get; set; }
     }
 }
