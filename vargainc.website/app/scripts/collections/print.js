@@ -59,6 +59,9 @@ define([
                             ContactName: result.ContactName,
                             DisplayName: result.DisplayName,
                             CreatorName: result.CreatorName,
+                            TotalHouseHold: result.TotalHouseHold,
+                            TargetHouseHold: result.TargetHouseHold,
+                            Penetration: result.Penetration,
                             Date: result.Date,
                             Logo: result.Logo,
                             Footer: footerModel
@@ -177,6 +180,9 @@ define([
                             ContactName: result.ContactName,
                             DisplayName: result.DisplayName,
                             CreatorName: result.CreatorName,
+                            TotalHouseHold: result.TotalHouseHold,
+                            TargetHouseHold: result.TargetHouseHold,
+                            Penetration: result.Penetration,
                             Date: result.Date,
                             Logo: result.Logo,
                             Footer: footerModel

@@ -10,8 +10,11 @@ define([
 	'react.backbone',
 	'foundation'
 ], function($, React, ReactDOM, BaseView, MenuView, UserView, LoadingView){
-	return React.createClass({
-		mixins: [BaseView],
+	return React.createBackboneClass({
+		mixins: [
+			BaseView,
+			React.BackboneMixin("user", "change:FullName"),
+		],
 		getInitialState: function(){
 			return {
 				mainView: null,
@@ -22,9 +25,9 @@ define([
 				dialogCustomClass: '',
 				loading: false,
 				pageTitle: 'TIMM System',
-				showMenu: true,
-				showSearch: true,
-				showUser: true
+				showMenu: null,
+				showSearch: null,
+				showUser: null
 			}
 		},
 		componentDidMount: function(){
@@ -147,17 +150,19 @@ define([
 			return null;
 		},
 		render: function() {
-			var mainView = this.getMainView(),
+			var model = this.getModel(),
+				mainView = this.getMainView(),
 				dialogView = this.getDialogView();
 
-	        if(this.state.showMenu){
+
+			if (this.state.showMenu === true) {
 	        	var mainMenuClassName = 'left-menu';
 	        	var menu = <MenuView ref="sideMenu" />;
-	        }else{
-	        	var mainMenuClassName = '';
-	        	var menu = null;
-	        }
-	        if(this.state.showSearch){
+			} else {				
+				var mainMenuClassName = '';
+				var menu = null;
+			}
+			if (this.state.showSearch === true) {
 	        	var search = (
 	        		<span className="title-bar-center">
 						<div className="topSearchBar hide-for-small-only">
@@ -165,9 +170,14 @@ define([
 						</div>
 					</span>
         		);
-	        }else{
-	        	var search = null;
-	        }
+			} else {				
+				var search = null;
+			}
+			if (this.state.showUser === true) {
+				var user = <UserView model={this.props.user} / >
+			} else {
+				var user = null;
+			}
 
 	        return (
 	        	<div>
@@ -180,7 +190,7 @@ define([
 										<button aria-expanded="true" className="menu-icon" type="button" onClick={this.menuSwitch}></button>
 										<span className="title-text">{this.state.pageTitle}</span>
 									</div>
-									{this.state.showUser ? UserView : null}
+									{user}
 									{search}
 								</div>
 								{mainView}

@@ -1,8 +1,8 @@
 define([
+    'jquery',
     'underscore',
-    'backbone',
-    'pubsub'
-], function (_, Backbone, Topic) {
+    'backbone'
+], function ($, _, Backbone) {
     return Backbone.Model.extend({
         urlRoot: 'user',
         idAttribute: 'Id',
@@ -15,7 +15,8 @@ define([
             Token: null
         },
         fetchCurrentUser: function (opts) {
-            var model = this,
+            var def = $.Deferred(),
+                model = this,
                 url = model.urlRoot + '/info',
                 options = {
                     url: url,
@@ -23,30 +24,26 @@ define([
                     success: function (result) {
                         if (result && result.success) {
                             model.set(result.data);
+                            def.resolve();
                         } else {
-                            Topic.publish("NOT_LOGIN");
+                            def.reject();
                         }
                     },
-                    error: function () {
-                        Topic.publish("NOT_LOGIN");
+                    fail: function () {
+                        def.reject();
                     }
                 };
             _.extend(options, opts);
 
-            return (this.sync || Backbone.sync).call(this, 'read', this, options);
+            (this.sync || Backbone.sync).call(this, 'read', this, options);
+            return def;
         },
         logout: function (opts) {
             var model = this,
                 url = model.urlRoot + '/logout',
                 options = {
                     url: url,
-                    type: 'POST',
-                    success: function (result) {
-                        Topic.publish("NOT_LOGIN");
-                    },
-                    error: function () {
-                        Topic.publish("NOT_LOGIN");
-                    }
+                    type: 'POST'
                 };
             _.extend(options, opts);
 

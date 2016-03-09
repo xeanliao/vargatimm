@@ -1,6 +1,6 @@
 define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'views/layout/user', 'views/layout/loading', 'react.backbone', 'foundation'], function ($, React, ReactDOM, BaseView, MenuView, UserView, LoadingView) {
-	return React.createClass({
-		mixins: [BaseView],
+	return React.createBackboneClass({
+		mixins: [BaseView, React.BackboneMixin("user", "change:FullName")],
 		getInitialState: function () {
 			return {
 				mainView: null,
@@ -11,9 +11,9 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 				dialogCustomClass: '',
 				loading: false,
 				pageTitle: 'TIMM System',
-				showMenu: true,
-				showSearch: true,
-				showUser: true
+				showMenu: null,
+				showSearch: null,
+				showUser: null
 			};
 		},
 		componentDidMount: function () {
@@ -135,17 +135,18 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 			return null;
 		},
 		render: function () {
-			var mainView = this.getMainView(),
+			var model = this.getModel(),
+			    mainView = this.getMainView(),
 			    dialogView = this.getDialogView();
 
-			if (this.state.showMenu) {
+			if (this.state.showMenu === true) {
 				var mainMenuClassName = 'left-menu';
 				var menu = React.createElement(MenuView, { ref: 'sideMenu' });
 			} else {
 				var mainMenuClassName = '';
 				var menu = null;
 			}
-			if (this.state.showSearch) {
+			if (this.state.showSearch === true) {
 				var search = React.createElement(
 					'span',
 					{ className: 'title-bar-center' },
@@ -157,6 +158,11 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 				);
 			} else {
 				var search = null;
+			}
+			if (this.state.showUser === true) {
+				var user = React.createElement(UserView, { model: this.props.user });
+			} else {
+				var user = null;
 			}
 
 			return React.createElement(
@@ -185,7 +191,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 										this.state.pageTitle
 									)
 								),
-								this.state.showUser ? UserView : null,
+								user,
 								search
 							),
 							mainView,
