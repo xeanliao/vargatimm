@@ -353,11 +353,11 @@ html, body {
 .section button.cirle:hover, .section button.cirle:focus, .section .button.row-button.cirle:hover, .section .button.row-button.cirle:focus {
   background-color: #1583cc;
 }
-.section button:hover, .section button:focus, .section .button.row-button:hover, .section .button.row-button:focus {
+.section button:hover, .section button:focus, .section button.active, .section button:active, .section .button.row-button:hover, .section .button.row-button:focus, .section .button.row-button.active, .section .button.row-button:active {
   color: #fff;
   background-color: #1583cc;
 }
-.section button:hover i, .section button:hover small, .section button:hover span, .section button:focus i, .section button:focus small, .section button:focus span, .section .button.row-button:hover i, .section .button.row-button:hover small, .section .button.row-button:hover span, .section .button.row-button:focus i, .section .button.row-button:focus small, .section .button.row-button:focus span {
+.section button:hover i, .section button:hover small, .section button:hover span, .section button:focus i, .section button:focus small, .section button:focus span, .section button.active i, .section button.active small, .section button.active span, .section button:active i, .section button:active small, .section button:active span, .section .button.row-button:hover i, .section .button.row-button:hover small, .section .button.row-button:hover span, .section .button.row-button:focus i, .section .button.row-button:focus small, .section .button.row-button:focus span, .section .button.row-button.active i, .section .button.row-button.active small, .section .button.row-button.active span, .section .button.row-button:active i, .section .button.row-button:active small, .section .button.row-button:active span {
   color: #fff;
 }
 .section button i, .section .button.row-button i {

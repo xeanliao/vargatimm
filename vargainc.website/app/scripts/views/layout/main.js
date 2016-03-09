@@ -188,7 +188,16 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 								this.state.showUser ? UserView : null,
 								search
 							),
-							mainView
+							mainView,
+							React.createElement(
+								'div',
+								{ className: 'row' },
+								React.createElement(
+									'div',
+									{ className: 'small-12 columns' },
+									React.createElement('div', { id: 'google-map', className: 'google-map' })
+								)
+							)
 						)
 					)
 				),

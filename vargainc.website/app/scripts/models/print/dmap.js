@@ -69,7 +69,28 @@ define([
                     }
                 };
             _.extend(options, opts);
-            return (this.sync || Backbone.sync).call(this, 'update', this, options);
+            return (this.sync || Backbone.sync).call(this, 'read', this, options);
+        },
+        fetchAllGtu: function(opts){
+            var model = this,
+                options = {
+                    url: 'print/campaign/' + model.get('CampaignId') + '/submap/' + model.get('SubMapId') + '/dmap/' + model.get('DMapId') + '/gtu/inside/',
+                    method: 'GET',
+                    success: function (result) {
+                        var gtus = [];
+                        for(var i = 0; i < result.pointsColors.length; i++){
+                            gtus.push({
+                                color: result.pointsColors[i],
+                                points: result.points[i]
+                            });
+                        }
+                        model.set({
+                            'Gtu': gtus
+                        });
+                    }
+                };
+            _.extend(options, opts);
+            return (this.sync || Backbone.sync).call(this, 'read', this, options);
         }
     });
 });

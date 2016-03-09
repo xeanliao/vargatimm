@@ -10,7 +10,7 @@ define([
 			'report': 'reportAction',
 			'admin': 'adminAction',
 			'print/:campaignId/:printType': 'printAction',
-			'gtu/:taskId/monitor': 'gtuMonitorAction',
+			'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
 			'frame/:page': 'frameAction',
 			'frame/*page?*queryString': 'frameAction',
 			'*actions': 'defaultAction'
@@ -154,24 +154,33 @@ define([
 				break;
 			}
 		},
-		gtuMonitorAction: function (taskId) {
+		gtuMonitorAction: function (campaignId, taskName, taskId) {
 			require([
-				'models/print/distribution',
+				'models/task',
+				'models/print/dmap',
 				'collections/gtu',
 				'views/gtu/monitor'
-			], function (DMap, Gtu, View) {
-				var dmap = new DMap({
-						CampaignId: 7,
-						SubMapId: 89,
-						DMapId: 22
-					}),
-					gtu = new Gtu();
-				$.when(dmap.fetchBoundary(), gtu.fetchByTask(taskId)).done(function () {
-					Topic.publish('loadView', View, {
-						dmap: dmap,
-						gtu: gtu
+			], function (Task, DMap, Gtu, View) {
+				var gtu = new Gtu(),
+					task = new Task({
+						Id: taskId
+					});
+				task.fetch().then(function () {
+					var dmap = new DMap({
+						CampaignId: task.get('CampaignId'),
+						SubMapId: task.get('SubMapId'),
+						DMapId: task.get('DMapId')
+					});
+
+					$.when(dmap.fetchBoundary(), dmap.fetchAllGtu(), gtu.fetchByTask(taskId)).done(function () {
+						Topic.publish('loadView', View, {
+							dmap: dmap,
+							gtu: gtu,
+							task: task
+						});
 					});
 				});
+
 			});
 		}
 	});
