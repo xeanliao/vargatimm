@@ -35,14 +35,24 @@ define(function (require, exports, module) {
 		return backboneSync(method, model, options);
 	}
 
-	var LayoutView = require('views/layout/main');
-	var layoutViewInstance = React.createFactory(LayoutView)();
-	var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
-
-
-
 	var AppRouter = require('route');
 	var appRouter = new AppRouter;
+		var UserModel = require('models/user');
+	var LayoutView = require('views/layout/main');
+	var userModel = new UserModel();
+	userModel.fetchCurrentUser().done(function () {
+		var LayoutViewInstance = React.createFactory(LayoutView);
+		var layoutViewInstance = LayoutViewInstance({
+			user: userModel
+		});
+		var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
+
+		var appRouter = new AppRouter;
+
+		Backbone.history.start();
+	}).fail(function () {
+		window.location = '../login.html';
+	});
 
 	Backbone.history.start();
 });
