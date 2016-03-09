@@ -415,7 +415,7 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'views/campai
 							{ className: 'row', 'data-equalizer': true },
 							React.createElement(
 								'div',
-								{ className: 'small-4 column' },
+								{ className: 'small-12 column' },
 								React.createElement(
 									'h5',
 									null,
@@ -425,6 +425,37 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'views/campai
 							React.createElement(
 								'div',
 								{ className: 'small-8 column' },
+								React.createElement(
+									'nav',
+									{ 'aria-label': 'You are here:', role: 'navigation' },
+									React.createElement(
+										'ul',
+										{ className: 'breadcrumbs' },
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'a',
+												{ href: '#' },
+												'Control Center'
+											)
+										),
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'span',
+												{ className: 'show-for-sr' },
+												'Current: '
+											),
+											' Campaign'
+										)
+									)
+								)
+							),
+							React.createElement(
+								'div',
+								{ className: 'small-4 column' },
 								React.createElement(
 									'button',
 									{ onClick: this.onNew, className: 'float-right section-button' },

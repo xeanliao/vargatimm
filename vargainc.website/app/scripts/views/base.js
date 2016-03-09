@@ -3,7 +3,7 @@ define([
 	'pubsub'
 ], function (_, Topic) {
 	return {
-		getDefaultProps: function(){
+		getDefaultProps: function () {
 			return {
 				registerTopic: {}
 			}
@@ -26,6 +26,11 @@ define([
 				Topic.unsubscribe(i);
 			});
 		},
+		scrollTop: function (ele) {
+			$('.off-canvas-wrapper-inner').stop().animate({
+				scrollTop: $(ele).offset().top
+			}, 600);
+		}
 	};
 
 });

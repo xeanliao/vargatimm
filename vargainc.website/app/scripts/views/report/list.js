@@ -1,4 +1,4 @@
-define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'models/task', 'react.backbone'], function (_, moment, helper, Backbone, React, BaseView, TaskModel) {
+define(['jquery', 'underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'models/task', 'react.backbone'], function ($, _, moment, helper, Backbone, React, BaseView, TaskModel) {
 	var ReportRow = React.createBackboneClass({
 		mixins: [BaseView],
 		menuKey: 'report-menu-ddl-',
@@ -6,13 +6,18 @@ define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'm
 			return {
 				address: null,
 				icon: null,
-				name: null
+				name: null,
+				scrollToTaskId: null
 			};
 		},
 		componentDidMount: function () {
 			$('.has-tip').foundation();
+			var scrollToTaskId = this.props.scrollToTaskId;
+			if (scrollToTaskId && this.refs[scrollToTaskId]) {
+				this.scrollTop(this.refs[scrollToTaskId]);
+				this.props.scrollToTaskId = null;
+			}
 		},
-		componentDidUpdate: function () {},
 		onReOpenTask: function (taskId) {
 			var confirmResult = confirm('Do you really want to move report back to GPS Montor?'),
 			    self = this;
@@ -35,8 +40,8 @@ define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'm
 			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
 		},
 		onGotoReview: function (campaignId, taskName, taskId) {
+			Backbone.history.navigate('report/' + taskId, { trigger: false });
 			window.location.hash = helper.sprintf('campaign/%d/%s/%d/monitor', campaignId, taskName, taskId);
-			// window.location.hash = 'frame/EditGTU.aspx?id=' + taskId;
 		},
 		onCloseMoreMenu: function (key) {
 			$("#" + this.menuKey + key).foundation('close');
@@ -163,7 +168,7 @@ define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'm
 								    taskName = task.Name;
 								return React.createElement(
 									'tr',
-									{ key: task.Id },
+									{ key: task.Id, ref: task.Id },
 									React.createElement(
 										'td',
 										{ onDoubleClick: self.onGotoReview.bind(null, campaignId, taskName, task.Id) },
@@ -216,6 +221,7 @@ define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'm
 		},
 		componentDidMount: function () {
 			var self = this;
+
 			this.subscribe('report/refresh', function () {
 				self.getCollection().fetchForReport();
 			});
@@ -410,7 +416,8 @@ define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'm
 			return dataSource;
 		},
 		render: function () {
-			var list = this.getDataSource();
+			var list = this.getDataSource(),
+			    scrollToTaskId = this.props.taskId;
 			return React.createElement(
 				'div',
 				{ className: 'section row' },
@@ -430,6 +437,37 @@ define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'm
 									'h5',
 									null,
 									'Reports'
+								)
+							),
+							React.createElement(
+								'div',
+								{ className: 'small-12 column' },
+								React.createElement(
+									'nav',
+									{ 'aria-label': 'You are here:', role: 'navigation' },
+									React.createElement(
+										'ul',
+										{ className: 'breadcrumbs' },
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'a',
+												{ href: '#' },
+												'Control Center'
+											)
+										),
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'span',
+												{ className: 'show-for-sr' },
+												'Current: '
+											),
+											' Reports'
+										)
+									)
 								)
 							)
 						)
@@ -466,7 +504,7 @@ define(['underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'm
 							)
 						),
 						list.map(function (item) {
-							return React.createElement(ReportRow, { key: item.get('Id'), model: item });
+							return React.createElement(ReportRow, { key: item.get('Id'), model: item, scrollToTaskId: scrollToTaskId });
 						})
 					)
 				)

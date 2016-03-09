@@ -326,17 +326,47 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'vie
 								React.createElement(
 									'h5',
 									null,
-									'GTU Monitor'
-								),
+									'Edit GTU for Task ',
+									this.props.task.get('Name')
+								)
+							),
+							React.createElement(
+								'div',
+								{ className: 'small-12 column' },
 								React.createElement(
-									'h5',
-									null,
-									'Max Display ',
-									React.createElement('input', { ref: 'txtMaxCount', style: { width: '120px' }, defaultValue: this.state.maxDisplayCount }),
+									'nav',
+									{ 'aria-label': 'You are here:', role: 'navigation' },
 									React.createElement(
-										'button',
-										{ onClick: this.onSetMaxDisplayDots },
-										'Applay'
+										'ul',
+										{ className: 'breadcrumbs' },
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'a',
+												{ href: '#' },
+												'Control Center'
+											)
+										),
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'a',
+												{ href: '#report/' + this.props.task.get('Id') },
+												'Report'
+											)
+										),
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'span',
+												{ className: 'show-for-sr' },
+												'Current: '
+											),
+											' Edit GTU'
+										)
 									)
 								)
 							)

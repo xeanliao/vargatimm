@@ -8,6 +8,7 @@ define([
 			'distribution': 'distributionAction',
 			'monitor': 'monitorAction',
 			'report': 'reportAction',
+			'report/:taskId': 'reportAction',
 			'admin': 'adminAction',
 			'print/:campaignId/:printType': 'printAction',
 			'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
@@ -72,7 +73,7 @@ define([
 				});
 			});
 		},
-		reportAction: function () {
+		reportAction: function (taskId) {
 			require([
 				'models/campaign',
 				'collections/campaign',
@@ -81,7 +82,8 @@ define([
 				var campaignlist = new Collection();
 				campaignlist.fetchForReport().done(function () {
 					Topic.publish('loadView', View, {
-						collection: campaignlist
+						collection: campaignlist,
+						taskId: taskId
 					});
 				});
 			});

@@ -46,13 +46,9 @@ define(function (require, exports, module) {
 			user: userModel
 		});
 		var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
-
 		var appRouter = new AppRouter;
-
 		Backbone.history.start();
 	}).fail(function () {
 		window.location = '../login.html';
 	});
-
-	Backbone.history.start();
 });

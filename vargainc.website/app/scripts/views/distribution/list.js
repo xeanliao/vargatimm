@@ -328,6 +328,37 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'views/distri
 									null,
 									'Distribution Maps'
 								)
+							),
+							React.createElement(
+								'div',
+								{ className: 'small-12 column' },
+								React.createElement(
+									'nav',
+									{ 'aria-label': 'You are here:', role: 'navigation' },
+									React.createElement(
+										'ul',
+										{ className: 'breadcrumbs' },
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'a',
+												{ href: '#' },
+												'Control Center'
+											)
+										),
+										React.createElement(
+											'li',
+											null,
+											React.createElement(
+												'span',
+												{ className: 'show-for-sr' },
+												'Current: '
+											),
+											' Distribution Maps'
+										)
+									)
+								)
 							)
 						)
 					),

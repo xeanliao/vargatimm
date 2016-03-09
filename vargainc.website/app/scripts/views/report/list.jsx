@@ -1,4 +1,5 @@
 define([
+	'jquery',
 	'underscore',
 	'moment',
 	'sprintf',
@@ -7,21 +8,25 @@ define([
 	'views/base',
 	'models/task',
 	'react.backbone'
-], function (_, moment, helper, Backbone, React, BaseView, TaskModel) {
+], function ($, _, moment, helper, Backbone, React, BaseView, TaskModel) {
 	var ReportRow = React.createBackboneClass({
 		mixins: [BaseView],
 		menuKey: 'report-menu-ddl-',
-		getDefaultProps: function(){
+		getDefaultProps: function () {
 			return {
 				address: null,
 				icon: null,
-				name: null
+				name: null,
+				scrollToTaskId: null
 			};
 		},
-		componentDidMount: function(){
+		componentDidMount: function () {
 			$('.has-tip').foundation();
-		},
-		componentDidUpdate: function(){
+			var scrollToTaskId = this.props.scrollToTaskId;
+			if (scrollToTaskId && this.refs[scrollToTaskId]) {
+				this.scrollTop(this.refs[scrollToTaskId]);
+				this.props.scrollToTaskId = null;
+			}
 		},
 		onReOpenTask: function (taskId) {
 			var confirmResult = confirm('Do you really want to move report back to GPS Montor?'),
@@ -45,13 +50,13 @@ define([
 			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
 		},
 		onGotoReview: function (campaignId, taskName, taskId) {
+			Backbone.history.navigate('report/' + taskId, { trigger: false });
 			window.location.hash = helper.sprintf('campaign/%d/%s/%d/monitor', campaignId, taskName, taskId);
-			// window.location.hash = 'frame/EditGTU.aspx?id=' + taskId;
 		},
 		onCloseMoreMenu: function (key) {
 			$("#" + this.menuKey + key).foundation('close');
 		},
-		renderMoreMenu: function(key){
+		renderMoreMenu: function (key) {
 			var id = this.menuKey + key;
 			return (
 				<span>
@@ -72,7 +77,7 @@ define([
 				</span>
 			);
 		},
-		render: function(){
+		render: function () {
 			var model = this.getModel(),
 				date = model.get('Date'),
 				displayDate = date ? moment(date).format("MMM DD, YYYY") : '',
@@ -110,7 +115,7 @@ define([
 								var campaignId = model.get('Id'),
 									taskName = task.Name;
 								return (
-									<tr key={task.Id}>
+									<tr key={task.Id} ref={task.Id}>
 										<td onDoubleClick={self.onGotoReview.bind(null, campaignId, taskName, task.Id)}>
 											{task.Name}
 										</td>
@@ -150,6 +155,7 @@ define([
 		},
 		componentDidMount: function(){
 			var self = this;
+
 			this.subscribe('report/refresh', function(){
 				self.getCollection().fetchForReport();
 			});
@@ -317,13 +323,24 @@ define([
 			return dataSource;
 		},
 		render: function () {
-			var list = this.getDataSource();
+			var list = this.getDataSource(),
+				scrollToTaskId = this.props.taskId;
 			return (
 				<div className="section row">
 					<div className="small-12 columns">
 						<div className="section-header">
 							<div className="row">
 								<div className="small-12 column"><h5>Reports</h5></div>
+								<div className="small-12 column">
+									<nav aria-label="You are here:" role="navigation">
+										<ul className="breadcrumbs">
+											<li><a href="#">Control Center</a></li>
+											<li>
+												<span className="show-for-sr">Current: </span> Reports
+											</li>
+										</ul>
+									</nav>
+								</div>
 							</div>
 						</div>
 						<div className="scroll-list-section-body">
@@ -345,7 +362,7 @@ define([
 							</div>
 							{list.map(function(item) {
 					          	return (
-					          		<ReportRow key={item.get('Id')} model={item} />
+					          		<ReportRow key={item.get('Id')} model={item} scrollToTaskId={scrollToTaskId} />
 				          		);
 					        })}
 				        </div>

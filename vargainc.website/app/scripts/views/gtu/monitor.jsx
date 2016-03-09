@@ -307,8 +307,18 @@ define([
 						<div className="section-header">
 							<div className="row">
 								<div className="small-12 column">
-									<h5>GTU Monitor</h5>
-									<h5>Max Display <input ref="txtMaxCount" style={{width: '120px'}} defaultValue={this.state.maxDisplayCount} /><button onClick={this.onSetMaxDisplayDots}>Applay</button></h5>
+									<h5>Edit GTU for Task {this.props.task.get('Name')}</h5>
+								</div>
+								<div className="small-12 column">
+									<nav aria-label="You are here:" role="navigation">
+										<ul className="breadcrumbs">
+											<li><a href="#">Control Center</a></li>
+											<li><a href={'#report/' + this.props.task.get('Id')}>Report</a></li>
+											<li>
+												<span className="show-for-sr">Current: </span> Edit GTU
+											</li>
+										</ul>
+									</nav>
 								</div>
 							</div>
 						</div>
