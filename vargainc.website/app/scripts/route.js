@@ -11,6 +11,7 @@ define([
 			'report/:taskId': 'reportAction',
 			'admin': 'adminAction',
 			'print/:campaignId/:printType': 'printAction',
+			'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
 			'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
 			'frame/:page': 'frameAction',
 			'frame/*page?*queryString': 'frameAction',
@@ -155,6 +156,35 @@ define([
 
 				break;
 			}
+		},
+		gtuEditAction: function (campaignId, taskName, taskId) {
+			require([
+				'models/task',
+				'models/print/dmap',
+				'collections/gtu',
+				'views/gtu/edit'
+			], function (Task, DMap, Gtu, View) {
+				var gtu = new Gtu(),
+					task = new Task({
+						Id: taskId
+					});
+				task.fetch().then(function () {
+					var dmap = new DMap({
+						CampaignId: task.get('CampaignId'),
+						SubMapId: task.get('SubMapId'),
+						DMapId: task.get('DMapId')
+					});
+
+					$.when(dmap.fetchBoundary(), dmap.fetchAllGtu(), gtu.fetchByTask(taskId)).done(function () {
+						Topic.publish('loadView', View, {
+							dmap: dmap,
+							gtu: gtu,
+							task: task
+						});
+					});
+				});
+
+			});
 		},
 		gtuMonitorAction: function (campaignId, taskName, taskId) {
 			require([

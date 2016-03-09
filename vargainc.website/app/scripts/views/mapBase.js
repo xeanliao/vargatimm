@@ -43,6 +43,10 @@ define([
 					center: new google.maps.LatLng(40.744556, -73.987378),
 					zoom: 18,
 					disableDefaultUI: disableDefaultUI,
+					streetViewControl: false,
+					zoomControlOptions: {
+						position: google.maps.ControlPosition.RIGHT_TOP
+					},
 					scrollwheel: scrollwheel,
 					disableDoubleClickZoom: disableDoubleClickZoom,
 					mapTypeId: mapType
@@ -51,8 +55,12 @@ define([
 				googleMap.setMapTypeId(mapType);
 				googleMap.setOptions({
 					disableDefaultUI: disableDefaultUI,
+					streetViewControl: false,
 					scrollwheel: scrollwheel,
-					disableDoubleClickZoom: disableDoubleClickZoom
+					disableDoubleClickZoom: disableDoubleClickZoom,
+					zoomControlOptions: {
+						position: google.maps.ControlPosition.RIGHT_TOP
+					}
 				});
 			}
 			google.maps.event.trigger(googleMap, "resize");

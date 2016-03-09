@@ -51,7 +51,7 @@ define([
 		},
 		onGotoReview: function (campaignId, taskName, taskId) {
 			Backbone.history.navigate('report/' + taskId, { trigger: false });
-			window.location.hash = helper.sprintf('campaign/%d/%s/%d/monitor', campaignId, taskName, taskId);
+			window.location.hash = helper.sprintf('campaign/%d/%s/%d/edit', campaignId, taskName, taskId);
 		},
 		onCloseMoreMenu: function (key) {
 			$("#" + this.menuKey + key).foundation('close');
