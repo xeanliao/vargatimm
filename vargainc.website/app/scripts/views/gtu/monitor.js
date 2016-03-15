@@ -240,6 +240,21 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			});
 		},
 		renderGtu: function (gtu) {
+			console.log(gtu.get('Role'));
+			switch (gtu.get('Role')) {
+				case 'Auditor':
+					gtuIcon = 'fa fa-group';
+					break;
+				case 'Driver':
+					gtuIcon = 'fa fa-truck';
+					break;
+				case 'Walker':
+					gtuIcon = 'fa fa-street-view';
+					break;
+				default:
+					gtuIcon = 'fa fa-stop';
+					break;
+			}
 			if (gtu.get('IsOnline')) {
 				return React.createElement(
 					'div',
@@ -247,7 +262,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 					React.createElement(
 						'button',
 						{ className: 'button text-left' },
-						React.createElement('i', { className: 'fa fa-stop', style: { color: gtu.get('UserColor') } }),
+						React.createElement('i', { className: gtuIcon, style: { color: gtu.get('UserColor') } }),
 						'  ',
 						gtu.get('ShortUniqueID')
 					)
@@ -259,7 +274,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 					React.createElement(
 						'button',
 						{ className: 'button text-left', disabled: true },
-						React.createElement('i', { className: 'fa fa-stop', style: { color: gtu.get('UserColor') } }),
+						React.createElement('i', { className: gtuIcon, style: { color: gtu.get('UserColor') } }),
 						'  ',
 						gtu.get('ShortUniqueID')
 					)

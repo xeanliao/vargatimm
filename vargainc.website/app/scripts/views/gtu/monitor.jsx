@@ -254,21 +254,36 @@ define([
 				});
 			});
 		},
-		renderGtu: function(gtu){
-			if(gtu.get('IsOnline')){
+		renderGtu: function (gtu) {
+			console.log(gtu.get('Role'));
+			switch (gtu.get('Role')) {
+			case 'Auditor':
+				gtuIcon = 'fa fa-group';
+				break;
+			case 'Driver':
+				gtuIcon = 'fa fa-truck';
+				break;
+			case 'Walker':
+				gtuIcon = 'fa fa-street-view';
+				break;
+			default:
+				gtuIcon = 'fa fa-stop';
+				break;
+			}
+			if (gtu.get('IsOnline')) {
 				return (
 					<div className="columns" key={gtu.get('Id')}>
 						<button className="button text-left">
-							<i className="fa fa-stop" style={{color: gtu.get('UserColor')}}></i>&nbsp;&nbsp;
+							<i className={gtuIcon} style={{color: gtu.get('UserColor')}}></i>&nbsp;&nbsp;
 							{gtu.get('ShortUniqueID')}
 						</button>
 					</div>
 				);
-			}else{
+			} else {
 				return (
 					<div className="columns" key={gtu.get('Id')}>
 						<button className="button text-left" disabled>
-							<i className="fa fa-stop" style={{color: gtu.get('UserColor')}}></i>&nbsp;&nbsp;
+							<i className={gtuIcon} style={{color: gtu.get('UserColor')}}></i>&nbsp;&nbsp;
 							{gtu.get('ShortUniqueID')}
 						</button>
 					</div>
