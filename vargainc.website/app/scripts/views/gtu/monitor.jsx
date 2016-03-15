@@ -14,8 +14,7 @@ define([
 	var dmapPolygon = null,
 		dmapBounds = null,
 		gtuData = null,
-		gtuPoints = [],
-		savedCustomPoints = [];
+		gtuPoints = [];
 	return React.createBackboneClass({
 		mixins: [
 			BaseView,
@@ -58,6 +57,20 @@ define([
 				googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
 				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
 				self.publish('hideLoading');
+			});
+		},
+		componentWillUnmount: function () {
+			try {
+				_.forEach(gtuPoints, function (item) {
+					item.setMap(null);
+				});
+				dmapPolygon.setMap(null);
+				google.maps.event.clearInstanceListeners(googleMap);
+			} catch (ex) {
+				console.log('google map clear error', ex);
+			}
+			$('#google-map').css({
+				'visibility': 'hidden',
 			});
 		},
 		setActiveGtu: function(gtuId){
