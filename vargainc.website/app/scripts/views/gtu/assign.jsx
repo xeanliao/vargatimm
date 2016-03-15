@@ -75,7 +75,7 @@ define([
 			return (
 				<tr key={gtu.get('Id')}>
 					<td>{gtu.get('ShortUniqueID')}</td>
-					<td><input ref="userColor" type="color" defaultValue={'#'+Math.floor(Math.random()*16777215).toString(16)} /></td>
+					<td><input ref="userColor" type="color" autocomplete defaultValue={'#'+Math.floor(Math.random()*16777215).toString(16)} /></td>
 					<td colSpan="2">
 						<select ref={'userSelector-' + gtu.get('Id')}>
 							{_.map(user, function(v, k){
@@ -110,18 +110,17 @@ define([
 				  	</div>
 					<table>
 						<colgroup>
-							<col style={{"width": "120px"}} />
-							<col style={{"width": "80px"}} />
+							<col style={{"width": "160px"}} />
+							<col style={{"width": "160px"}} />
 							<col />
-							<col style={{"width": "120px"}} />
-							<col style={{"width": "120px"}} />
+							<col style={{"width": "160px"}} />
+							<col style={{"width": "160px"}} />
 							<col style={{"width": "150px"}} />
 						</colgroup>
 						<thead>
 							<tr>
 								<th>GTU#</th>
 								<th>Color</th>
-								
 								<th>
 									<div className="row">
 										<div className="small-6 column">Company</div>
@@ -138,7 +137,8 @@ define([
 								var isAssign = gtu.get('IsAssign'),
 									gtuId = gtu.get('Id'),
 									assignButton = <button className="button tiny" onClick={self.onAdd.bind(null, gtuId)}><i className="fa fa-plus"></i>&nbsp;Assign</button>,
-									removeButton = <button className="button alert tiny" onClick={self.onRemove.bind(null, gtuId)}><i className="fa fa-remove"></i>&nbsp;Remove</button>;
+									removeButton = <button className="button alert tiny" onClick={self.onRemove.bind(null, gtuId)}><i className="fa fa-remove"></i>&nbsp;Remove</button>,
+									colorInput = gtu.get('UserColor') ? <div className="color-block" style={{background:gtu.get('UserColor')}}></div> : null;
 								var actionButton = isAssign ? removeButton : assignButton;
 								if (gtu.get('Id') == self.state.editId) {
 									return self.renderEditForm(gtu);
@@ -146,7 +146,7 @@ define([
 									return(
 										<tr key={gtu.get('Id')}>
 											<td>{gtu.get('ShortUniqueID')}</td>
-											<td>{gtu.get('UserColor')}</td>
+											<td>{colorInput}</td>
 											<td>
 												<div className="row">
 													<div className="small-6 column">{gtu.get('Company')}</div>

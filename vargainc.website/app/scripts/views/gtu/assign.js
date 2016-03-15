@@ -74,7 +74,7 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 				React.createElement(
 					'td',
 					null,
-					React.createElement('input', { ref: 'userColor', type: 'color', defaultValue: '#' + Math.floor(Math.random() * 16777215).toString(16) })
+					React.createElement('input', { ref: 'userColor', type: 'color', autocomplete: true, defaultValue: '#' + Math.floor(Math.random() * 16777215).toString(16) })
 				),
 				React.createElement(
 					'td',
@@ -150,11 +150,11 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 					React.createElement(
 						'colgroup',
 						null,
-						React.createElement('col', { style: { "width": "120px" } }),
-						React.createElement('col', { style: { "width": "80px" } }),
+						React.createElement('col', { style: { "width": "160px" } }),
+						React.createElement('col', { style: { "width": "160px" } }),
 						React.createElement('col', null),
-						React.createElement('col', { style: { "width": "120px" } }),
-						React.createElement('col', { style: { "width": "120px" } }),
+						React.createElement('col', { style: { "width": "160px" } }),
+						React.createElement('col', { style: { "width": "160px" } }),
 						React.createElement('col', { style: { "width": "150px" } })
 					),
 					React.createElement(
@@ -221,7 +221,8 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 								{ className: 'button alert tiny', onClick: self.onRemove.bind(null, gtuId) },
 								React.createElement('i', { className: 'fa fa-remove' }),
 								' Remove'
-							);
+							),
+							    colorInput = gtu.get('UserColor') ? React.createElement('div', { className: 'color-block', style: { background: gtu.get('UserColor') } }) : null;
 							var actionButton = isAssign ? removeButton : assignButton;
 							if (gtu.get('Id') == self.state.editId) {
 								return self.renderEditForm(gtu);
@@ -237,7 +238,7 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 									React.createElement(
 										'td',
 										null,
-										gtu.get('UserColor')
+										colorInput
 									),
 									React.createElement(
 										'td',

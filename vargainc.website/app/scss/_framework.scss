@@ -50,6 +50,9 @@ table{
         padding: 0.25rem !important;
         height: 25px !important;
     }
+    input[type="color"]{
+        max-width: 50px;
+    }
 }
 .dropdown-pane {
     .button {

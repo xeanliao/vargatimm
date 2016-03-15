@@ -595,6 +595,9 @@ table input {
   padding: 0.25rem !important;
   height: 25px !important;
 }
+table input[type="color"] {
+  max-width: 50px;
+}
 
 .dropdown-pane {
   box-shadow: 0 0.5em 1em 0 rgba(0, 0, 0, 0.1);
@@ -1290,6 +1293,15 @@ html, body {
 }
 .gtu .button.disabled i, .gtu .button[disabled] i {
   opacity: 0.25;
+}
+
+.color-block {
+  border: solid 1px #cacaca;
+  width: 50px;
+  height: 25px;
+  padding: 0.25rem;
+  vertical-align: middle;
+  background-clip: content-box !important;
 }
 
 .google_map_container {

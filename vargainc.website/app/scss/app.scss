@@ -506,6 +506,14 @@ $A3LeftRightMargin: 0.5in;
 		}
 	}
 }
+.color-block{
+	border: solid 1px #cacaca;
+	width: 50px;
+	height: 25px;
+	padding: 0.25rem;
+	vertical-align: middle;
+	background-clip: content-box !important;
+}
 .google_map_container{
 	width: 100%;
 	height: 100%;
