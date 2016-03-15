@@ -4,11 +4,13 @@ define([
 	'sprintf',
 	'moment',
 	'react',
+	'collections/user',
 	'views/base',
 	'views/mapBase',
+	'views/gtu/assign',
 
 	'react.backbone'
-], function ($, _, helper, moment, React, BaseView, MapBaseView) {
+], function ($, _, helper, moment, React, UserCollection, BaseView, MapBaseView, AssignView) {
 	var dmapPolygon = null,
 		dmapBounds = null,
 		gtuData = null,
@@ -47,13 +49,12 @@ define([
 			google.maps.event.trigger(this.getGoogleMap(), "resize");
 
 			this.setState({
-				activeGtu: this.props.gtu.at(0)
+				activeGtu: _.find(this.props.gtu, {IsAssign: true})
 			});
 			
 			var self = this,
 				googleMap = this.getGoogleMap();
 			this.drawDmapBoundary().then(this.filterGtu).then(this.drawGtu).done(function(){
-				dmapPolygon.addListener('click', $.proxy(self.onNewGtu, self));
 				googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
 				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
 				self.publish('hideLoading');
@@ -220,125 +221,93 @@ define([
 			});
 			cutDown();
 		},
-		onNewGtu: function (e) {
-			var googleMap = this.getGoogleMap(),
-				point = new google.maps.Marker({
-					position: e.latLng,
-					icon: {
-						path: this.getCirclePath(5),
-						fillColor: this.state.activeGtu.get('UserColor'),
-						fillOpacity: 1,
-						strokeOpacity: 1,
-						strokeWeight: 2,
-						strokeColor: '#fff'
-					},
-					draggable: true,
-					map: googleMap
-				});
-
-			point.GtuId = this.state.activeGtu.get('Id');
-			point.date = moment().format('YYYY-MM-DD HH:mm:ss');
-			this.state.customPoints.push(point);
-			this.forceUpdate();
-		},
-		onUnderGtu: function(){
-			var customPoints = this.state.customPoints,
-				lastPoint = _.last(customPoints);
-
-			lastPoint.setMap(null);
-			this.setState({customPoints: _.dropRight(customPoints)});
-		},
-		onSaveGtu: function () {
-			var self = this,
-				googleMap = this.getGoogleMap(),
-				savedPoint,
-				postData = _.map(this.state.customPoints, function (item) {
-					return {
-						GtuId: item.GtuId,
-						Date: item.date,
-						Location: {
-							Latitude: item.getPosition().lat(),
-							Longitude: item.getPosition().lng()
-						}
-					}
-				});
-			console.log('save gtu', postData);
-
-			this.props.task.addGtuDots(postData).done(function () {
-				_.forEach(self.state.customPoints, function (point) {
-					var icon = point.getIcon();
-					icon.strokeWeight = 1;
-					icon.strokeColor = '#000';
-					point.setIcon(icon);
-					savedCustomPoints.push(savedPoint);
-				});
-
-				self.setState({
-					customPoints: []
-				});
-			});
-		},
-		onSetMaxDisplayDots: function(){
-			this.setState({
-				maxDisplayCount: this.refs.txtMaxCount.value
-			});
-			setTimeout(this.drawGtu, 500);
-		},
 		onReCenter: function () {
 			var googleMap = this.getGoogleMap();
 			googleMap.setCenter(dmapBounds.getCenter());
 			this.drawGtu();
 		},
+		onAssign: function () {
+			var gtu = this.props.gtu,
+				taskId = this.props.task.get('Id'),
+				user = new UserCollection(),
+				self = this;
+			user.fetchForGtu().done(function(){
+				self.publish('showDialog', AssignView, {
+					collection: gtu,
+					user: user,
+					taskId: taskId
+				}, {
+					size: 'full'
+				});
+			});
+		},
+		renderGtu: function(gtu){
+			if(gtu.get('IsOnline')){
+				return (
+					<div className="columns" key={gtu.get('Id')}>
+						<button className="button text-left">
+							<i className="fa fa-stop" style={{color: gtu.get('UserColor')}}></i>&nbsp;&nbsp;
+							{gtu.get('ShortUniqueID')}
+						</button>
+					</div>
+				);
+			}else{
+				return (
+					<div className="columns" key={gtu.get('Id')}>
+						<button className="button text-left" disabled>
+							<i className="fa fa-stop" style={{color: gtu.get('UserColor')}}></i>&nbsp;&nbsp;
+							{gtu.get('ShortUniqueID')}
+						</button>
+					</div>
+				);
+			}
+		},
 		render: function () {
 			var self = this,
-				gtuList = this.props.gtu.models || [],
-				canUndoSave = this.state.customPoints.length > 0 ? true : false;
-			if (!canUndoSave) {
-				var undoButton = <button className="button float-right" disabled onClick={this.onUnderGtu}><i className="fa fa-undo"></i>Undo</button>;
-				var saveButton = <button className="button float-right" disabled onClick={this.onSaveGtu}><i className="fa fa-save"></i>Save</button>;
-			} else {
-				var undoButton = <button className="button float-right" onClick={this.onUnderGtu}><i className="fa fa-undo"></i>Undo</button>;
-				var saveButton = <button className="button float-right" onClick={this.onSaveGtu}><i className="fa fa-save"></i>Save</button>;
-			}
-			
+				gtuList = this.props.gtu.where({
+					IsAssign: true
+				});
 			return (
-				<div className="section row">
-					<div className="small-12 columns">
-						<div className="section-header">
-							<div className="row">
-								<div className="small-12 column">
-									<h5>Edit GTU - {this.props.task.get('Name')}</h5>
-								</div>
-								<div className="small-12 column">
-									<nav aria-label="You are here:" role="navigation">
-										<ul className="breadcrumbs">
-											<li><a href="#">Control Center</a></li>
-											<li><a href={'#report/' + this.props.task.get('Id')}>Report</a></li>
-											<li>
-												<span className="show-for-sr">Current: </span> Edit GTU
-											</li>
-										</ul>
-									</nav>
+				<div>
+					<div className="section row">
+						<div className="small-12 columns">
+							<div className="section-header">
+								<div className="row">
+									<div className="small-12 column">
+										<h5>GTU Monitor - {this.props.task.get('Name')}</h5>
+									</div>
+									<div className="small-12 column">
+										<nav aria-label="You are here:" role="navigation">
+											<ul className="breadcrumbs">
+												<li><a href="#">Control Center</a></li>
+												<li><a href={'#report/' + this.props.task.get('Id')}>Report</a></li>
+												<li>
+													<span className="show-for-sr">Current: </span> GTU Monitor
+												</li>
+											</ul>
+										</nav>
+									</div>
 								</div>
 							</div>
 						</div>
+						<div className="small-12 medium-7 large-9 columns">
+							<button className="button"><i className="fa fa-play"></i>Start</button>
+							<button className="button"><i className="fa fa-pause"></i>Pause</button>
+							<button className="button"><i className="fa fa-stop"></i>Stop</button>
+						</div>
+						<div className="small-12 medium-5 large-3 columns">
+							<button className="button float-right" onClick={this.onReCenter}><i className="fa fa-refresh"></i>ReCenter</button>
+							<button className="button float-right" onClick={this.onAssign}><i className="fa fa-plus"></i>Assign GTU</button>
+						</div>
 					</div>
-					<div className="small-12 medium-7 large-9 columns">
-						{gtuList.map(function(gtu) {
-							return (
-								<button key={gtu.get('Id')} className={self.state.activeGtu == gtu ? " button" : "button"} onClick={self.setActiveGtu.bind(null, gtu.get('Id'))}>
-									<i className={self.state.activeGtu == gtu ? "fa fa-map-marker" : "fa fa-stop"} style={{color: gtu.get('UserColor')}}></i>
-									{gtu.get('ShortUniqueID')}
-								</button>
-							);
-						})}
+					<div className="row gtu small-up-8">
+					{gtuList.map(function(gtu) {
+						return self.renderGtu(gtu);
+					})}
 					</div>
-					<div className="small-12 medium-5 large-3 columns">
-						{saveButton}
-						{undoButton}
-						<button className="button float-right" onClick={this.onReCenter}><i className="fa fa-refresh"></i>ReCenter</button>
+					<div className="row">
+						<div className="small-12 columns" ref="mapArea"></div>
 					</div>
-					<div className="small-12 columns" ref="mapArea"></div>
 				</div>
 			);
 		}

@@ -42,6 +42,15 @@ i {
 a:hover i, a:active i, i.active {
     color: #8a8a8a;
 }
+table{
+    .button, select, input{
+        margin-bottom: 0 !important;
+    }
+    input{
+        padding: 0.25rem !important;
+        height: 25px !important;
+    }
+}
 .dropdown-pane {
     .button {
         margin-bottom: 0 !important;
@@ -146,6 +155,21 @@ a:hover i, a:active i, i.active {
     }
     .button:first-of-type {
         border-radius: 7px 0 0 7px;
+    }
+}
+.reveal.full{
+    margin-top: 0 !important;
+    top: 0 !important;
+}
+.select2-container{
+    border-radius: 0;
+    border-color: #cacaca;
+    input{
+        margin-bottom: 0;
+    }
+    .select2-selection--single{
+        border-radius: 0;
+        border-color: #cacaca;
     }
 }
 .loading{

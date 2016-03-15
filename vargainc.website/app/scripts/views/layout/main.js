@@ -81,6 +81,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
     * fix main view size
     */
 			$(window).on('resize', function () {
+				console.log('window resize');
 				$(".off-canvas-wrapper-inner").height($(window).height());
 			});
 			$(window).trigger('resize');

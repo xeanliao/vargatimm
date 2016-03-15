@@ -59,6 +59,23 @@ define([
 				self.publish('hideLoading');
 			});
 		},
+		componentWillUnmount: function () {
+			try {
+				_.forEach(gtuPoints, function (item) {
+					item.setMap(null);
+				});
+				_.forEach(savedCustomPoints, function (item) {
+					item.setMap(null);
+				});
+				dmapPolygon.setMap(null);
+				google.maps.event.clearInstanceListeners(googleMap);
+			} catch (ex) {
+				console.log('google map clear error', ex);
+			}
+			$('#google-map').css({
+				'visibility': 'hidden',
+			});
+		},
 		setActiveGtu: function(gtuId){
 			var activeGut = this.props.gtu.get(gtuId);
 			this.setState({activeGtu: activeGut});

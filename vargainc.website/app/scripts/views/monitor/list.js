@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'views/monitor/dismiss', 'views/monitor/edit', 'models/task', 'react.backbone'], function ($, _, moment, Backbone, React, BaseView, DismissView, EditView, TaskModel) {
+define(['jquery', 'underscore', 'moment', 'sprintf', 'backbone', 'react', 'views/base', 'views/monitor/dismiss', 'views/monitor/edit', 'models/task', 'react.backbone'], function ($, _, moment, helper, Backbone, React, BaseView, DismissView, EditView, TaskModel) {
 	var MonitorRow = React.createBackboneClass({
 		mixins: [BaseView],
 		menuKey: 'monitor-menu-ddl-',
@@ -103,8 +103,9 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'vi
 				});
 			});
 		},
-		onGotoMonitor: function (taskId, e) {
-			window.location.hash = 'frame/taskMonitor.aspx?taskid=' + taskId;
+		onGotoMonitor: function (campaignId, taskName, taskId) {
+			//window.location.hash = 'frame/taskMonitor.aspx?taskid=' + taskId;
+			window.location.hash = helper.sprintf('campaign/%d/%s/%d/monitor', campaignId, taskName, taskId);
 		},
 		onOpenMoreMenu: function (e) {
 			e.preventDefault();
@@ -231,12 +232,14 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 'vi
 								if (task.visiable === false) {
 									return null;
 								}
+								var campaignId = model.get('Id'),
+								    taskName = task.Name;
 								return React.createElement(
 									'tr',
 									{ key: task.Id },
 									React.createElement(
 										'td',
-										{ onDoubleClick: self.onGotoMonitor.bind(null, task.Id) },
+										{ onDoubleClick: self.onGotoMonitor.bind(null, campaignId, taskName, task.Id) },
 										task.Name
 									),
 									React.createElement(

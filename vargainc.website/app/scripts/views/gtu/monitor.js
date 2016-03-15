@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'views/mapBase', 'react.backbone'], function ($, _, helper, moment, React, BaseView, MapBaseView) {
+define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user', 'views/base', 'views/mapBase', 'views/gtu/assign', 'react.backbone'], function ($, _, helper, moment, React, UserCollection, BaseView, MapBaseView, AssignView) {
 	var dmapPolygon = null,
 	    dmapBounds = null,
 	    gtuData = null,
@@ -34,13 +34,12 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'vie
 			google.maps.event.trigger(this.getGoogleMap(), "resize");
 
 			this.setState({
-				activeGtu: this.props.gtu.at(0)
+				activeGtu: _.find(this.props.gtu, { IsAssign: true })
 			});
 
 			var self = this,
 			    googleMap = this.getGoogleMap();
 			this.drawDmapBoundary().then(this.filterGtu).then(this.drawGtu).done(function () {
-				dmapPolygon.addListener('click', $.proxy(self.onNewGtu, self));
 				googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
 				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
 				self.publish('hideLoading');
@@ -207,197 +206,177 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'vie
 			});
 			cutDown();
 		},
-		onNewGtu: function (e) {
-			var googleMap = this.getGoogleMap(),
-			    point = new google.maps.Marker({
-				position: e.latLng,
-				icon: {
-					path: this.getCirclePath(5),
-					fillColor: this.state.activeGtu.get('UserColor'),
-					fillOpacity: 1,
-					strokeOpacity: 1,
-					strokeWeight: 2,
-					strokeColor: '#fff'
-				},
-				draggable: true,
-				map: googleMap
-			});
-
-			point.GtuId = this.state.activeGtu.get('Id');
-			point.date = moment().format('YYYY-MM-DD HH:mm:ss');
-			this.state.customPoints.push(point);
-			this.forceUpdate();
-		},
-		onUnderGtu: function () {
-			var customPoints = this.state.customPoints,
-			    lastPoint = _.last(customPoints);
-
-			lastPoint.setMap(null);
-			this.setState({ customPoints: _.dropRight(customPoints) });
-		},
-		onSaveGtu: function () {
-			var self = this,
-			    googleMap = this.getGoogleMap(),
-			    savedPoint,
-			    postData = _.map(this.state.customPoints, function (item) {
-				return {
-					GtuId: item.GtuId,
-					Date: item.date,
-					Location: {
-						Latitude: item.getPosition().lat(),
-						Longitude: item.getPosition().lng()
-					}
-				};
-			});
-			console.log('save gtu', postData);
-
-			this.props.task.addGtuDots(postData).done(function () {
-				_.forEach(self.state.customPoints, function (point) {
-					var icon = point.getIcon();
-					icon.strokeWeight = 1;
-					icon.strokeColor = '#000';
-					point.setIcon(icon);
-					savedCustomPoints.push(savedPoint);
-				});
-
-				self.setState({
-					customPoints: []
-				});
-			});
-		},
-		onSetMaxDisplayDots: function () {
-			this.setState({
-				maxDisplayCount: this.refs.txtMaxCount.value
-			});
-			setTimeout(this.drawGtu, 500);
-		},
 		onReCenter: function () {
 			var googleMap = this.getGoogleMap();
 			googleMap.setCenter(dmapBounds.getCenter());
 			this.drawGtu();
 		},
-		render: function () {
-			var self = this,
-			    gtuList = this.props.gtu.models || [],
-			    canUndoSave = this.state.customPoints.length > 0 ? true : false;
-			if (!canUndoSave) {
-				var undoButton = React.createElement(
-					'button',
-					{ className: 'button float-right', disabled: true, onClick: this.onUnderGtu },
-					React.createElement('i', { className: 'fa fa-undo' }),
-					'Undo'
-				);
-				var saveButton = React.createElement(
-					'button',
-					{ className: 'button float-right', disabled: true, onClick: this.onSaveGtu },
-					React.createElement('i', { className: 'fa fa-save' }),
-					'Save'
+		onAssign: function () {
+			var gtu = this.props.gtu,
+			    taskId = this.props.task.get('Id'),
+			    user = new UserCollection(),
+			    self = this;
+			user.fetchForGtu().done(function () {
+				self.publish('showDialog', AssignView, {
+					collection: gtu,
+					user: user,
+					taskId: taskId
+				}, {
+					size: 'full'
+				});
+			});
+		},
+		renderGtu: function (gtu) {
+			if (gtu.get('IsOnline')) {
+				return React.createElement(
+					'div',
+					{ className: 'columns', key: gtu.get('Id') },
+					React.createElement(
+						'button',
+						{ className: 'button text-left' },
+						React.createElement('i', { className: 'fa fa-stop', style: { color: gtu.get('UserColor') } }),
+						'  ',
+						gtu.get('ShortUniqueID')
+					)
 				);
 			} else {
-				var undoButton = React.createElement(
-					'button',
-					{ className: 'button float-right', onClick: this.onUnderGtu },
-					React.createElement('i', { className: 'fa fa-undo' }),
-					'Undo'
-				);
-				var saveButton = React.createElement(
-					'button',
-					{ className: 'button float-right', onClick: this.onSaveGtu },
-					React.createElement('i', { className: 'fa fa-save' }),
-					'Save'
+				return React.createElement(
+					'div',
+					{ className: 'columns', key: gtu.get('Id') },
+					React.createElement(
+						'button',
+						{ className: 'button text-left', disabled: true },
+						React.createElement('i', { className: 'fa fa-stop', style: { color: gtu.get('UserColor') } }),
+						'  ',
+						gtu.get('ShortUniqueID')
+					)
 				);
 			}
-
+		},
+		render: function () {
+			var self = this,
+			    gtuList = this.props.gtu.where({
+				IsAssign: true
+			});
 			return React.createElement(
 				'div',
-				{ className: 'section row' },
+				null,
 				React.createElement(
 					'div',
-					{ className: 'small-12 columns' },
+					{ className: 'section row' },
 					React.createElement(
 						'div',
-						{ className: 'section-header' },
+						{ className: 'small-12 columns' },
 						React.createElement(
 							'div',
-							{ className: 'row' },
+							{ className: 'section-header' },
 							React.createElement(
 								'div',
-								{ className: 'small-12 column' },
+								{ className: 'row' },
 								React.createElement(
-									'h5',
-									null,
-									'Edit GTU - ',
-									this.props.task.get('Name')
-								)
-							),
-							React.createElement(
-								'div',
-								{ className: 'small-12 column' },
-								React.createElement(
-									'nav',
-									{ 'aria-label': 'You are here:', role: 'navigation' },
+									'div',
+									{ className: 'small-12 column' },
 									React.createElement(
-										'ul',
-										{ className: 'breadcrumbs' },
+										'h5',
+										null,
+										'GTU Monitor - ',
+										this.props.task.get('Name')
+									)
+								),
+								React.createElement(
+									'div',
+									{ className: 'small-12 column' },
+									React.createElement(
+										'nav',
+										{ 'aria-label': 'You are here:', role: 'navigation' },
 										React.createElement(
-											'li',
-											null,
+											'ul',
+											{ className: 'breadcrumbs' },
 											React.createElement(
-												'a',
-												{ href: '#' },
-												'Control Center'
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'a',
-												{ href: '#report/' + this.props.task.get('Id') },
-												'Report'
-											)
-										),
-										React.createElement(
-											'li',
-											null,
-											React.createElement(
-												'span',
-												{ className: 'show-for-sr' },
-												'Current: '
+												'li',
+												null,
+												React.createElement(
+													'a',
+													{ href: '#' },
+													'Control Center'
+												)
 											),
-											' Edit GTU'
+											React.createElement(
+												'li',
+												null,
+												React.createElement(
+													'a',
+													{ href: '#report/' + this.props.task.get('Id') },
+													'Report'
+												)
+											),
+											React.createElement(
+												'li',
+												null,
+												React.createElement(
+													'span',
+													{ className: 'show-for-sr' },
+													'Current: '
+												),
+												' GTU Monitor'
+											)
 										)
 									)
 								)
 							)
 						)
+					),
+					React.createElement(
+						'div',
+						{ className: 'small-12 medium-7 large-9 columns' },
+						React.createElement(
+							'button',
+							{ className: 'button' },
+							React.createElement('i', { className: 'fa fa-play' }),
+							'Start'
+						),
+						React.createElement(
+							'button',
+							{ className: 'button' },
+							React.createElement('i', { className: 'fa fa-pause' }),
+							'Pause'
+						),
+						React.createElement(
+							'button',
+							{ className: 'button' },
+							React.createElement('i', { className: 'fa fa-stop' }),
+							'Stop'
+						)
+					),
+					React.createElement(
+						'div',
+						{ className: 'small-12 medium-5 large-3 columns' },
+						React.createElement(
+							'button',
+							{ className: 'button float-right', onClick: this.onReCenter },
+							React.createElement('i', { className: 'fa fa-refresh' }),
+							'ReCenter'
+						),
+						React.createElement(
+							'button',
+							{ className: 'button float-right', onClick: this.onAssign },
+							React.createElement('i', { className: 'fa fa-plus' }),
+							'Assign GTU'
+						)
 					)
 				),
 				React.createElement(
 					'div',
-					{ className: 'small-12 medium-7 large-9 columns' },
+					{ className: 'row gtu small-up-8' },
 					gtuList.map(function (gtu) {
-						return React.createElement(
-							'button',
-							{ key: gtu.get('Id'), className: self.state.activeGtu == gtu ? " button" : "button", onClick: self.setActiveGtu.bind(null, gtu.get('Id')) },
-							React.createElement('i', { className: self.state.activeGtu == gtu ? "fa fa-map-marker" : "fa fa-stop", style: { color: gtu.get('UserColor') } }),
-							gtu.get('ShortUniqueID')
-						);
+						return self.renderGtu(gtu);
 					})
 				),
 				React.createElement(
 					'div',
-					{ className: 'small-12 medium-5 large-3 columns' },
-					saveButton,
-					undoButton,
-					React.createElement(
-						'button',
-						{ className: 'button float-right', onClick: this.onReCenter },
-						React.createElement('i', { className: 'fa fa-refresh' }),
-						'ReCenter'
-					)
-				),
-				React.createElement('div', { className: 'small-12 columns', ref: 'mapArea' })
+					{ className: 'row' },
+					React.createElement('div', { className: 'small-12 columns', ref: 'mapArea' })
+				)
 			);
 		}
 	});

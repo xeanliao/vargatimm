@@ -204,7 +204,7 @@ define([
 						DMapId: task.get('DMapId')
 					});
 
-					$.when(dmap.fetchBoundary(), dmap.fetchAllGtu(), gtu.fetchByTask(taskId)).done(function () {
+					$.when(dmap.fetchBoundary(), dmap.fetchAllGtu(), gtu.fetchGtuWithStatusByTask(taskId)).done(function () {
 						Topic.publish('loadView', View, {
 							dmap: dmap,
 							gtu: gtu,

@@ -1,3 +1,4 @@
+@import "core";
 @import "framework";
 @import url(https://fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic);
 @import "util/_unit";
@@ -487,6 +488,21 @@ $A3LeftRightMargin: 0.5in;
 		span {
 			font-size: 12pt;
 			line-height: 1;
+		}
+	}
+}
+.gtu{
+	.button{
+		color: #2199e8;
+		background: transparent;
+		padding: 5px 10px;
+		margin-bottom: 10px;
+	}
+	.button.disabled, .button[disabled]{
+		color: gray;
+		opacity: 1;
+		i{
+			opacity: 0.25;
 		}
 	}
 }

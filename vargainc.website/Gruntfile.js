@@ -87,6 +87,7 @@ module.exports = function (grunt) {
 						'bower_components/motion-ui/src',
 						'bower_components/font-awesome/scss',
 						'bower_components/foundation-datepicker/css',
+						'bower_components/select2/src/scss'
 					],
 					compass: true,
 					quiet: true
@@ -219,6 +220,9 @@ module.exports = function (grunt) {
 	            },{
 	            	src: ['<%= app %>/scripts/views/gtu/monitor.jsx'],
 	            	dest: '<%= app %>/scripts/views/gtu/monitor.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/gtu/assign.jsx'],
+	            	dest: '<%= app %>/scripts/views/gtu/assign.js'
 	            },{
 	            	src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
 	            	dest: '<%= app %>/scripts/views/admin/dashboard.js'

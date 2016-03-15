@@ -14,7 +14,9 @@
     "pubsub.js": "~0.1.0",
     "numeral": "~1.5.3",
     "requirejs-plugins": "~1.0.3",
-    "sprintf": "~1.0.3"
+    "sprintf": "~1.0.3",
+    "select2": "~4.0.2",
+    "spectrum": "~1.8.0"
   },
   "description": "",
   "main": "",

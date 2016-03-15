@@ -90,6 +90,8 @@ require.config({
         'pubsub': 'vendor/pubsub',
         'numeral': 'vendor/numeral',
         'sprintf': 'vendor/sprintf',
+        'select2': 'vendor/select2',
+        'spectrum': 'vendor/spectrum',
         'foundation.core': 'vendor/foundation.core',
         'foundation.util.box': 'vendor/foundation.util.box',
         'foundation.util.keyboard': 'vendor/foundation.util.keyboard',
