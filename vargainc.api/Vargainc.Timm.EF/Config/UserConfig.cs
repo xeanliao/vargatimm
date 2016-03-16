@@ -13,6 +13,8 @@ namespace Vargainc.Timm.EF.Config
             HasKey(i => i.Id).ToTable("users");
 
             HasMany(i => i.Status).WithRequired(i => i.User).HasForeignKey(i => i.UserId);
+
+            HasOptional(i => i.Company).WithMany().HasForeignKey(i => i.CompanyId);
         }
     }
 }

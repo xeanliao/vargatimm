@@ -57,19 +57,20 @@ namespace Vargainc.Timm.EF
             modelBuilder.Configurations.Add(new DistributionJobConfig());
 
             modelBuilder.Configurations.Add(new GTUConfig());
+            modelBuilder.Configurations.Add(new GTUBagConfig());
             modelBuilder.Configurations.Add(new TaskGtuInfoMappingConfig());
             modelBuilder.Configurations.Add(new GtuInfoConfig());
             modelBuilder.Configurations.Add(new NdAddressCoordinateConfig());
             modelBuilder.Configurations.Add(new NdAddressConfig());
 
             modelBuilder.Configurations.Add(new TaskConfig());
-            //database datetime type is datetime2(0) have some problem with entity framework
             modelBuilder.Configurations.Add(new TaskTimeConfig());
 
 
 
             modelBuilder.Configurations.Add(new UserConfig());
             modelBuilder.Configurations.Add(new GroupConfig());
+            modelBuilder.Configurations.Add(new CompanyConfig());
         }
 
         public DbSet<FiveZipArea> FiveZipAreas { get; set; }
@@ -107,6 +108,7 @@ namespace Vargainc.Timm.EF
         public DbSet<TaskTime> TaskTimes { get; set; }
 
         public DbSet<GTU> GTUs { get; set; }
+        public DbSet<GTUBag> GTUBags { get; set; }
         public DbSet<TaskGtuInfoMapping> TaskGtuInfoMappings { get; set; }
         public DbSet<GtuInfo> GtuInfos { get; set; }
 
@@ -114,5 +116,6 @@ namespace Vargainc.Timm.EF
         
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<Company> Companies { get; set; }
     }
 }

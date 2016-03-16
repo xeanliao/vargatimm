@@ -14,5 +14,9 @@ namespace Vargainc.Timm.Models
         public string UniqueID { get; set; }
         public string ShortUniqueID { get; set; }
         public int? UserId { get; set; }
+        public int? BagId { get; set; }
+
+        public GTUBag Bag { get; set; }
+        public User User { get; set; }
     }
 }

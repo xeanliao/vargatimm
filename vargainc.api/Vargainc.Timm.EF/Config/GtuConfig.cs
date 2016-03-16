@@ -13,6 +13,9 @@ namespace Vargainc.Timm.EF.Config
         public GTUConfig()
         {
             HasKey(i => i.Id).ToTable("Gtus");
+            Property(i => i.BagId).HasColumnName("GTUBagId");
+            HasOptional(i => i.Bag).WithMany(i => i.GTU).HasForeignKey(i => i.BagId);
+            HasOptional(i => i.User).WithMany().HasForeignKey(i => i.UserId);
         }
     }
 }

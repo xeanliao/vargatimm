@@ -15,6 +15,8 @@ namespace Vargainc.Timm.Models
         public string UserColor { get; set; }
         public virtual Task Task { get; set; }
         public virtual ICollection<GtuInfo> GtuInfos { get; set; }
+        public int? UserId { get; set; }
+        public User Auditor { get; set; }
         
     }
 }

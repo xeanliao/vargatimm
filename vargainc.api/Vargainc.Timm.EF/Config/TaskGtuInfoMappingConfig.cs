@@ -15,6 +15,7 @@ namespace Vargainc.Timm.EF.Config
                 .WillCascadeOnDelete(false);
 
             HasRequired(i => i.GTU).WithMany().HasForeignKey(i => i.GTUId);
+            HasOptional(i => i.Auditor).WithMany().HasForeignKey(i => i.UserId);
         }
     }
 }

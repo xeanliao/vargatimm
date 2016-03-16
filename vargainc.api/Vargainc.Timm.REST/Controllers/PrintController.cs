@@ -12,6 +12,7 @@ using Vargainc.Timm.Models;
 using Wintellect.PowerCollections;
 using Vargainc.Timm.REST.Helper;
 using System.Threading.Tasks;
+using Vargainc.Timm.Extentions;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -438,17 +439,25 @@ namespace Vargainc.Timm.REST.Controllers
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/inside")]
         public IHttpActionResult GetGtuInsideDmap(int campaignId, int submapId, int dmapId)
         {
-            return LoadGtu(campaignId, submapId, dmapId, true);
+            return LoadGtu(campaignId, submapId, dmapId, true, null);
+        }
+
+        [HttpGet]
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/inside/{date}")]
+        public IHttpActionResult GetGtuInsideDmapAfterTime(int campaignId, int submapId, int dmapId, [DateTimeParameter]DateTime? date)
+        {
+            
+            return LoadGtu(campaignId, submapId, dmapId, true, date);
         }
 
         [HttpGet]
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/all")]
         public IHttpActionResult GetGtuAll(int campaignId, int submapId, int dmapId)
         {
-            return LoadGtu(campaignId, submapId, dmapId, false);
+            return LoadGtu(campaignId, submapId, dmapId, false, null);
         }
 
-        private IHttpActionResult LoadGtu(int campaignId, int submapId, int dmapId, bool filterOutside)
+        private IHttpActionResult LoadGtu(int campaignId, int submapId, int dmapId, bool filterOutside, DateTime? lastTime)
         {
             var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
@@ -461,7 +470,7 @@ namespace Vargainc.Timm.REST.Controllers
             var query = from task in db.Tasks
                         join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
                         join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
-                        where task.DistributionMapId == dmapId && task.Status == 1
+                        where task.DistributionMapId == dmapId && task.Status == 1 && (lastTime == null || gtu.dtReceivedTime > lastTime)
                         orderby task.Id, mapping.GTUId, gtu.Id
                         select new ViewModel.Location
                         {
@@ -469,6 +478,8 @@ namespace Vargainc.Timm.REST.Controllers
                             Latitude = gtu.dwLatitude,
                             Longitude = gtu.dwLongitude
                         };
+
+
 
             var dmapPolygon = GetDMapBoundary(campaignId, submapId, dmapId);
             
@@ -594,10 +605,17 @@ namespace Vargainc.Timm.REST.Controllers
         }
         private List<ViewModel.Location> GetDMapBoundary(int campaignId, int submapId, int dmapId)
         {
-            var coordinates = db.Campaigns
-                .FirstOrDefault(i => i.Id == campaignId)
-                .SubMaps.FirstOrDefault(i => i.Id == submapId)
-                .DistributionMaps.FirstOrDefault(i => i.Id == dmapId)
+            var polygon = GetDMapPolygon(dmapId);
+            return polygon.Boundary.Coordinates.Select(i => new ViewModel.Location {
+                Latitude = i.Y,
+                Longitude = i.X
+            }).ToList();
+        }
+
+        internal IGeometry GetDMapPolygon(int dmapId)
+        {
+            var coordinates = db.DistributionMaps
+                .FirstOrDefault(i => i.Id == dmapId)
                 .DistributionMapCoordinates
                 .OrderBy(i => i.Id)
                 .Select(i => new ViewModel.Location
@@ -605,16 +623,8 @@ namespace Vargainc.Timm.REST.Controllers
                     Latitude = i.Latitude,
                     Longitude = i.Longitude
                 }).ToList();
-            
-            var polygon = BuildPolygon(coordinates);
-            if(polygon == null)
-            {
-                return new List<ViewModel.Location>();
-            }
-            return polygon.Boundary.Coordinates.Select(i => new ViewModel.Location {
-                Latitude = i.Y,
-                Longitude = i.X
-            }).ToList();
+
+            return BuildPolygon(coordinates);
         }
 
         /// <summary>

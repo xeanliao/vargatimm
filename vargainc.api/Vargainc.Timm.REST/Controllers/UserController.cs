@@ -1,26 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Collections.Concurrent;
 using Vargainc.Timm.EF;
 using Vargainc.Timm.Models;
 using System.Data.Entity;
-using System.Text;
-using NetTopologySuite.Geometries;
-using GeoAPI.Geometries;
-using NetTopologySuite.IO.KML;
-using Vargainc.Timm.REST.ViewModel.ControlCenter;
-using Vargainc.Timm.REST.Helper;
 using System.Web;
 using Vargainc.Timm.REST.ViewModel;
 using System.Net.Http;
-using System.Security.Claims;
-using System.Net.Http.Headers;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -65,7 +54,6 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = false });
         }
 
-        
         [Route("group/campaign")]
         [HttpGet]
         public async Task<IHttpActionResult> GetUserForCamapign()
@@ -73,7 +61,6 @@ namespace Vargainc.Timm.REST.Controllers
             var queryGroups = new List<int?>() { 46, 47, 53 };
             return await queryUserInGroup(queryGroups);
         }
-
 
         [Route("group/distribution")]
         [HttpGet]
@@ -91,6 +78,32 @@ namespace Vargainc.Timm.REST.Controllers
             return await queryUserInGroup(queryGroups);
         }
 
+        /// <summary>
+        /// return role in auditor walker and driver
+        /// </summary>
+        /// <returns></returns>
+        [Route("gtu")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetUserForGTU()
+        {
+            HashSet<UserRoles> allowedUser = new HashSet<UserRoles>();
+            allowedUser.Add(UserRoles.Auditor);
+            allowedUser.Add(UserRoles.Driver);
+            allowedUser.Add(UserRoles.Walker);
+            var result = await db.Users.Where(i=>i.CompanyId != null && i.Role != null).Select(i => new
+            {
+                i.CompanyId,
+                CompanyName = i.Company.Name,
+                UserId = i.Id,
+                UserName = i.FullName,
+                i.Role
+            }).OrderBy(i => i.CompanyId).ThenBy(i => i.UserId).ToListAsync();
+            return Json(result.Where((i) =>
+            {
+                return i.Role.HasValue && allowedUser.Contains(i.Role.Value);
+            }).ToList());
+        }
+
         private async Task<IHttpActionResult> queryUserInGroup(List<int?> queryGroups)
         {
             var result = await db.Groups.Where(i => queryGroups.Contains(i.Id))
@@ -105,7 +118,7 @@ namespace Vargainc.Timm.REST.Controllers
                    i.Email
                }).ToListAsync();
 
-            return Json(new { success = true, data = result });
+            return Json(result);
         }
 
         [Route("login")]
