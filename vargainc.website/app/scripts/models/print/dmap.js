@@ -91,6 +91,29 @@ define([
                 };
             _.extend(options, opts);
             return (this.sync || Backbone.sync).call(this, 'read', this, options);
+        },
+        updateGtuAfterTime: function(time, opts){
+            var model = this,
+                options = {
+                    url: 'print/campaign/' + model.get('CampaignId') + '/submap/' + model.get('SubMapId') + '/dmap/' + model.get('DMapId') + '/gtu/inside/' + time.format('YYYY-MM-DD-hh-mm-ss'),
+                    method: 'GET',
+                    success: function (result) {
+                        var gtus = model.get('Gtu') || [];
+                        for(var i = 0; i < result.pointsColors.length; i++){
+                            var colorItem = _.find(gtus, {color: result.pointsColors[i]});
+                            if(!colorItem){
+                                gtus.push({
+                                    color: result.pointsColors[i],
+                                    points: result.points[i]
+                                })
+                            }else{
+                                colorItem.points = _.concat(colorItem.points, result.points[i]);
+                            }
+                        }
+                    }
+                };
+            _.extend(options, opts);
+            return (this.sync || Backbone.sync).call(this, 'read', this, options);
         }
     });
 });

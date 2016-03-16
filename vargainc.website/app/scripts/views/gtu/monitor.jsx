@@ -14,7 +14,9 @@ define([
 	var dmapPolygon = null,
 		dmapBounds = null,
 		gtuData = null,
-		gtuPoints = [];
+		gtuPoints = [],
+		gtuLocation = [];
+
 	return React.createBackboneClass({
 		mixins: [
 			BaseView,
@@ -27,7 +29,8 @@ define([
 				disableDoubleClickZoom: true,
 				activeGtu: null,
 				customPoints: [],
-				maxDisplayCount: 2000
+				maxDisplayCount: 2000,
+				gtuQueryTime: moment()
 			};
 		},
 		componentDidMount: function () {
@@ -58,10 +61,14 @@ define([
 				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
 				self.publish('hideLoading');
 			});
+			window.setInterval(this.reload, 1 * 60 * 1000);
 		},
 		componentWillUnmount: function () {
 			try {
 				_.forEach(gtuPoints, function (item) {
+					item.setMap(null);
+				});
+				_.forEach(gtuLocation, function (item) {
 					item.setMap(null);
 				});
 				dmapPolygon.setMap(null);
@@ -234,6 +241,45 @@ define([
 			});
 			cutDown();
 		},
+		drawLastLocation: function () {
+			var googleMap = this.getGoogleMap(),
+				point,
+				gtuList = this.props.gtu.where({
+					IsAssign: true,
+					IsOnline: true
+				});
+			_.forEach(gtuLocation, function (p) {
+				p.setMap(null);
+			});
+			_.forEach(gtuList, function (gtu) {
+				point = new google.maps.Marker({
+					position: {
+						lat: gtu.lat,
+						lng: gtu.lng
+					},
+					draggable: false,
+					map: googleMap
+				});
+				gtuLocation.push(point);
+			});
+		},
+		reload: function () {
+			var dmap = this.props.dmap,
+				gtu = this.props.gtu,
+				taskId = this.props.task.get('Id'),
+				self = this;
+			$.when(dmap.updateGtuAfterTime(this.state.gtuQueryTime), gtu.fetchGtuLocation(taskId)).done(function () {
+				self.setState({
+					gtuQueryTime: moment()
+				});
+				self.prepareGtu();
+				self.drawGtu();
+				self.drawLastLocation();
+			});
+		},
+		drawLastPosition: function(){
+
+		},
 		onReCenter: function () {
 			var googleMap = this.getGoogleMap();
 			googleMap.setCenter(dmapBounds.getCenter());
@@ -254,8 +300,19 @@ define([
 				});
 			});
 		},
+		onStart: function () {
+			var model = this.props.task;
+			model.setStart();
+		},
+		onStop: function () {
+			var model = this.props.task;
+			model.setStop();
+		},
+		onPause: function () {
+			var model = this.props.task;
+			model.setPause();
+		},
 		renderGtu: function (gtu) {
-			console.log(gtu.get('Role'));
 			switch (gtu.get('Role')) {
 			case 'Auditor':
 				gtuIcon = 'fa fa-group';
@@ -290,6 +347,37 @@ define([
 				);
 			}
 		},
+		renderController: function () {
+				var task = this.props.task;
+			switch (task.get('Status')) {
+			case 0: //started
+				return (
+					<div>
+						<button className="button" onClick={this.onPause}><i className="fa fa-pause"></i>Pause</button>
+						<button className="button" onClick={this.onStop}><i className="fa fa-stop"></i>Stop</button>
+					</div>
+				);
+				break;
+			case 1: //stoped
+				return "STOPPED";
+				break;
+			case 2: //peased
+				return (
+					<div>
+						<button className="button" onClick={this.onStart}><i className="fa fa-play"></i>Start</button>
+						<button className="button" onClick={this.onStop}><i className="fa fa-stop"></i>Stop</button>
+					</div>
+				);
+				break;
+			default:
+				return (
+					<div>
+						<button className="button" onClick={this.onStart}><i className="fa fa-play"></i>Start</button>
+					</div>
+				);
+				break;
+			}
+		},
 		render: function () {
 			var self = this,
 				gtuList = this.props.gtu.where({
@@ -319,13 +407,13 @@ define([
 							</div>
 						</div>
 						<div className="small-12 medium-7 large-9 columns">
-							<button className="button"><i className="fa fa-play"></i>Start</button>
-							<button className="button"><i className="fa fa-pause"></i>Pause</button>
-							<button className="button"><i className="fa fa-stop"></i>Stop</button>
+							{this.renderController()}
 						</div>
 						<div className="small-12 medium-5 large-3 columns">
+							<button className="button float-right" onClick={this.reload}><i className="fa fa-update"></i>Update GTU</button>
 							<button className="button float-right" onClick={this.onReCenter}><i className="fa fa-refresh"></i>ReCenter</button>
 							<button className="button float-right" onClick={this.onAssign}><i className="fa fa-plus"></i>Assign GTU</button>
+
 						</div>
 					</div>
 					<div className="row gtu small-up-8">

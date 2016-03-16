@@ -83,6 +83,57 @@ define([
 
             (this.sync || Backbone.sync).call(this, '', this, options);
             return def;
+        },
+        setStart: function(opts){
+            var model = this,
+                options = {
+                    url: model.urlRoot + '/' + model.get('Id') + '/start/',
+                    method: 'PUT',
+                    success: function(result){
+                        if(result && result.success){
+                            model.set({
+                                Status: result.status
+                            });
+                        }
+                    }
+                };
+            options = _.extend(opts, options);
+
+            return (this.sync || Backbone.sync).call(this, 'update', this, options);
+        },
+        setPause: function(opts){
+            var model = this,
+                options = {
+                    url: model.urlRoot + '/' + model.get('Id') + '/pause/',
+                    method: 'PUT',
+                    success: function(result){
+                        if(result && result.success){
+                            model.set({
+                                Status: result.status
+                            });
+                        }
+                    }
+                };
+            options = _.extend(opts, options);
+
+            return (this.sync || Backbone.sync).call(this, 'update', this, options);
+        },
+        setStop: function(opts){
+            var model = this,
+                options = {
+                    url: model.urlRoot + '/' + model.get('Id') + '/stop/',
+                    method: 'PUT',
+                    success: function(result){
+                        if(result && result.success){
+                            model.set({
+                                Status: result.status
+                            });
+                        }
+                    }
+                };
+            options = _.extend(opts, options);
+
+            return (this.sync || Backbone.sync).call(this, 'update', this, options);
         }
     });
 });

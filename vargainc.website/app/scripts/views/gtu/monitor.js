@@ -2,7 +2,9 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 	var dmapPolygon = null,
 	    dmapBounds = null,
 	    gtuData = null,
-	    gtuPoints = [];
+	    gtuPoints = [],
+	    gtuLocation = [];
+
 	return React.createBackboneClass({
 		mixins: [BaseView, MapBaseView],
 		getInitialState: function () {
@@ -12,7 +14,8 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				disableDoubleClickZoom: true,
 				activeGtu: null,
 				customPoints: [],
-				maxDisplayCount: 2000
+				maxDisplayCount: 2000,
+				gtuQueryTime: moment()
 			};
 		},
 		componentDidMount: function () {
@@ -43,10 +46,14 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
 				self.publish('hideLoading');
 			});
+			window.setInterval(this.reload, 1 * 60 * 1000);
 		},
 		componentWillUnmount: function () {
 			try {
 				_.forEach(gtuPoints, function (item) {
+					item.setMap(null);
+				});
+				_.forEach(gtuLocation, function (item) {
 					item.setMap(null);
 				});
 				dmapPolygon.setMap(null);
@@ -219,6 +226,43 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			});
 			cutDown();
 		},
+		drawLastLocation: function () {
+			var googleMap = this.getGoogleMap(),
+			    point,
+			    gtuList = this.props.gtu.where({
+				IsAssign: true,
+				IsOnline: true
+			});
+			_.forEach(gtuLocation, function (p) {
+				p.setMap(null);
+			});
+			_.forEach(gtuList, function (gtu) {
+				point = new google.maps.Marker({
+					position: {
+						lat: gtu.lat,
+						lng: gtu.lng
+					},
+					draggable: false,
+					map: googleMap
+				});
+				gtuLocation.push(point);
+			});
+		},
+		reload: function () {
+			var dmap = this.props.dmap,
+			    gtu = this.props.gtu,
+			    taskId = this.props.task.get('Id'),
+			    self = this;
+			$.when(dmap.updateGtuAfterTime(this.state.gtuQueryTime), gtu.fetchGtuLocation(taskId)).done(function () {
+				self.setState({
+					gtuQueryTime: moment()
+				});
+				self.prepareGtu();
+				self.drawGtu();
+				self.drawLastLocation();
+			});
+		},
+		drawLastPosition: function () {},
 		onReCenter: function () {
 			var googleMap = this.getGoogleMap();
 			googleMap.setCenter(dmapBounds.getCenter());
@@ -239,8 +283,19 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				});
 			});
 		},
+		onStart: function () {
+			var model = this.props.task;
+			model.setStart();
+		},
+		onStop: function () {
+			var model = this.props.task;
+			model.setStop();
+		},
+		onPause: function () {
+			var model = this.props.task;
+			model.setPause();
+		},
 		renderGtu: function (gtu) {
-			console.log(gtu.get('Role'));
 			switch (gtu.get('Role')) {
 				case 'Auditor':
 					gtuIcon = 'fa fa-group';
@@ -279,6 +334,65 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 						gtu.get('ShortUniqueID')
 					)
 				);
+			}
+		},
+		renderController: function () {
+			var task = this.props.task;
+			switch (task.get('Status')) {
+				case 0:
+					//started
+					return React.createElement(
+						'div',
+						null,
+						React.createElement(
+							'button',
+							{ className: 'button', onClick: this.onPause },
+							React.createElement('i', { className: 'fa fa-pause' }),
+							'Pause'
+						),
+						React.createElement(
+							'button',
+							{ className: 'button', onClick: this.onStop },
+							React.createElement('i', { className: 'fa fa-stop' }),
+							'Stop'
+						)
+					);
+					break;
+				case 1:
+					//stoped
+					return "STOPPED";
+					break;
+				case 2:
+					//peased
+					return React.createElement(
+						'div',
+						null,
+						React.createElement(
+							'button',
+							{ className: 'button', onClick: this.onStart },
+							React.createElement('i', { className: 'fa fa-play' }),
+							'Start'
+						),
+						React.createElement(
+							'button',
+							{ className: 'button', onClick: this.onStop },
+							React.createElement('i', { className: 'fa fa-stop' }),
+							'Stop'
+						)
+					);
+					break;
+				default:
+					return React.createElement(
+						'div',
+						null,
+						React.createElement(
+							'button',
+							{ className: 'button', onClick: this.onStart },
+							React.createElement('i', { className: 'fa fa-play' }),
+							'Start'
+						)
+					);
+					break;
 			}
 		},
 		render: function () {
@@ -357,28 +471,17 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 					React.createElement(
 						'div',
 						{ className: 'small-12 medium-7 large-9 columns' },
-						React.createElement(
-							'button',
-							{ className: 'button' },
-							React.createElement('i', { className: 'fa fa-play' }),
-							'Start'
-						),
-						React.createElement(
-							'button',
-							{ className: 'button' },
-							React.createElement('i', { className: 'fa fa-pause' }),
-							'Pause'
-						),
-						React.createElement(
-							'button',
-							{ className: 'button' },
-							React.createElement('i', { className: 'fa fa-stop' }),
-							'Stop'
-						)
+						this.renderController()
 					),
 					React.createElement(
 						'div',
 						{ className: 'small-12 medium-5 large-3 columns' },
+						React.createElement(
+							'button',
+							{ className: 'button float-right', onClick: this.reload },
+							React.createElement('i', { className: 'fa fa-update' }),
+							'Update GTU'
+						),
 						React.createElement(
 							'button',
 							{ className: 'button float-right', onClick: this.onReCenter },
