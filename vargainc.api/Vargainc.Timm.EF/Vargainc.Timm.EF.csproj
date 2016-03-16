@@ -66,6 +66,7 @@
     <Compile Include="Config\CampaignPercentageColorConfig.cs" />
     <Compile Include="Config\CampaignRecordConfig.cs" />
     <Compile Include="Config\CampaignTractImportedConfig.cs" />
+    <Compile Include="Config\CompanyConfig.cs" />
     <Compile Include="Config\DistributionJobConfig.cs" />
     <Compile Include="Config\DistributionMapConfig.cs" />
     <Compile Include="Config\DistributionMapCoordinateConfig.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Config\FiveZipAreaConfig.cs" />
     <Compile Include="Config\FiveZipCoordinateConfig.cs" />
     <Compile Include="Config\GroupConfig.cs" />
+    <Compile Include="Config\GTUBagConfig.cs" />
     <Compile Include="Config\GTUConfig.cs" />
     <Compile Include="Config\GtuInfoConfig.cs" />
     <Compile Include="Config\NdAddressConfig.cs" />

@@ -31,7 +31,7 @@ namespace Vargainc.Timm.REST.Controllers
             }
             var dbDMap = await db.DistributionMaps.FindAsync(dbTask.DistributionMapId);
             var dbSubMap = await db.SubMaps.FindAsync(dbDMap.SubMapId);
-
+            var taskStatus = await db.TaskTimes.Where(i => i.TaskId == taskId).OrderByDescending(i => i.Id).FirstOrDefaultAsync();
             return Json(new {
                 CampaignId = dbSubMap.CampaignId,
                 SubMapId = dbSubMap.Id,
@@ -44,7 +44,8 @@ namespace Vargainc.Timm.REST.Controllers
                 AuditorId = dbTask.Auditor.Id,
                 dbTask.Email,
                 dbTask.Telephone,
-                HaveGtuInfoMapping = dbTask.TaskGtuInfoMappings.Count() > 0 ? true : false
+                HaveGtuInfoMapping = dbTask.TaskGtuInfoMappings.Count() > 0 ? true : false,
+                Status = taskStatus == null ? null : new Nullable<int>(taskStatus.TimeType)
             });
         }
 
@@ -80,9 +81,7 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 return Json(new { success = false, error = "You could not mark finish for this task because you have not stop monitor(s) yet!" });
             }
-            dbTask.Status = 1;
-            await db.SaveChangesAsync();
-            return Json(new { success = true });
+            return await SetTaskStop(taskId);
         }
 
         [Route("{taskId:int}/reopen")]
@@ -291,6 +290,72 @@ namespace Vargainc.Timm.REST.Controllers
             db.GtuInfos.AddRange(newDots);
             await db.SaveChangesAsync();
             return Json(new { success = true });
+        }
+
+        [Route("{taskId:int}/start")]
+        [HttpPut]
+        public async Task<IHttpActionResult> SetTaskStart(int taskId)
+        {
+            var dbTask = await db.Tasks.FindAsync(taskId);
+            if(dbTask == null)
+            {
+                return NotFound();
+            }
+            db.TaskTimes.Add(new Models.TaskTime {
+                Task = dbTask,
+                Time = DateTime.Now,
+                TimeType = 0
+            });
+            await db.SaveChangesAsync();
+            return Json(new { success = true, status = 0 });
+        }
+
+        [Route("{taskId:int}/pause")]
+        [HttpPut]
+        public async Task<IHttpActionResult> SetTaskPause(int taskId)
+        {
+            var dbTask = await db.Tasks.FindAsync(taskId);
+            if (dbTask == null)
+            {
+                return NotFound();
+            }
+            db.TaskTimes.Add(new Models.TaskTime
+            {
+                Task = dbTask,
+                Time = DateTime.Now,
+                TimeType = 2
+            });
+            await db.SaveChangesAsync();
+            return Json(new { success = true, status = 2 });
+        }
+
+        [Route("{taskId:int}/stop")]
+        [HttpPut]
+        public async Task<IHttpActionResult> SetTaskStop(int taskId)
+        {
+            var dbTask = await db.Tasks.FindAsync(taskId);
+            if (dbTask == null)
+            {
+                return NotFound();
+            }
+            db.TaskTimes.Add(new Models.TaskTime
+            {
+                Task = dbTask,
+                Time = DateTime.Now,
+                TimeType = 1
+            });
+
+            var assignedGtuList = await db.TaskGtuInfoMappings
+                .Where(i => i.TaskId == taskId && i.UserId != null)
+                .ToListAsync();
+
+            foreach(var item in assignedGtuList)
+            {
+                item.UserId = null;
+            }
+
+            await db.SaveChangesAsync();
+            return Json(new { success = true, status = 1 });
         }
 
         protected override void Dispose(bool disposing)

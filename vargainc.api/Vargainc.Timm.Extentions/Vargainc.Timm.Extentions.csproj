@@ -54,6 +54,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomDateTimeConverter.cs" />
+    <Compile Include="DateTimeParameterAttribute.cs" />
+    <Compile Include="DateTimeParameterBinding.cs" />
     <Compile Include="FileResult.cs" />
     <Compile Include="ImageResult.cs" />
     <Compile Include="PDFResult.cs" />

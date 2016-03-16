@@ -90,10 +90,12 @@
     <Compile Include="SubMap\SubMapDetailItem.cs" />
     <Compile Include="SubMap\SubMapRecord.cs" />
     <Compile Include="Task\GTU.cs" />
+    <Compile Include="Task\GTUBag.cs" />
     <Compile Include="Task\GtuInfo.cs" />
     <Compile Include="Task\Task.cs" />
     <Compile Include="Task\TaskGtuInfoMapping.cs" />
     <Compile Include="Task\TaskTime.cs" />
+    <Compile Include="User\Company.cs" />
     <Compile Include="User\Group.cs" />
     <Compile Include="User\User.cs" />
     <Compile Include="User\UserRoles.cs" />
