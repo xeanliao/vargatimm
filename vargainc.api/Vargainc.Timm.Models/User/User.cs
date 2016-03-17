@@ -17,6 +17,10 @@ namespace Vargainc.Timm.Models
         public string UserCode { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
+        public string CellPhone { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string Picture { get; set; }
+        public string Notes { get; set; }
 
         public int? CompanyId { get; set; }
 

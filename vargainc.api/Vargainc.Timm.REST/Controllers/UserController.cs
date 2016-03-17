@@ -10,6 +10,9 @@ using System.Data.Entity;
 using System.Web;
 using Vargainc.Timm.REST.ViewModel;
 using System.Net.Http;
+using System.Configuration;
+using System.IO;
+using System.Net;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -102,6 +105,127 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 return i.Role.HasValue && allowedUser.Contains(i.Role.Value);
             }).ToList());
+        }
+
+        /// <summary>
+        /// This will recieved client post picture. not like normal ajax request
+        /// the post data is multipart/form-data. that we need parse the post data by ourself
+        /// see more here http://www.asp.net/web-api/overview/advanced/sending-html-form-data-part-2
+        /// </summary>
+        /// <returns>new create employee</returns>
+        [Route("employee")]
+        [HttpPost]
+        public async Task<IHttpActionResult> AddEmployee()
+        {
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+            string root = ConfigurationManager.AppSettings["TempPath"];
+            if (!Directory.Exists(root))
+            {
+                Directory.CreateDirectory(root);
+            }
+            var provider = new MultipartFormDataStreamProvider(root);
+            
+            await Request.Content.ReadAsMultipartAsync(provider);
+
+            var postCompanyId = provider.FormData["CompanyId"];
+            var postRole = provider.FormData["Role"];
+            var postFullName = provider.FormData["FullName"];
+            var postCellPhone = provider.FormData["CellPhone"];
+            var postDateOfBirth = provider.FormData["DateOfBirth"];
+            var postNotes = provider.FormData["Notes"];
+
+            var dbUser = db.Users.Create();
+            int companyId;
+            if(!int.TryParse(postCompanyId, out companyId))
+            {
+                return NotFound();
+            }
+            else
+            {
+                var dbCompany = await db.Companies.FindAsync(companyId);
+                if(dbCompany == null)
+                {
+                    return NotFound();
+                }
+                dbUser.Company = dbCompany;
+            }
+
+            UserRoles role;
+            if(!Enum.TryParse<UserRoles>(postRole, out role))
+            {
+                return NotFound();
+            }
+            else if(role != UserRoles.Auditor && role != UserRoles.Driver && role != UserRoles.Walker)
+            {
+                return NotFound();
+            }
+            else
+            {
+                dbUser.Role = role;
+            }
+            if (string.IsNullOrWhiteSpace(postFullName))
+            {
+                return NotFound();
+            }
+            else
+            {
+                dbUser.FullName = postFullName;
+            }
+
+
+            dbUser.CellPhone = postCellPhone;
+
+            DateTime birthday;
+            if(DateTime.TryParse(postDateOfBirth, out birthday))
+            {
+                dbUser.DateOfBirth = birthday;
+            }
+
+            dbUser.Notes = postNotes;
+
+            dbUser.UserCode = dbUser.FullName.Replace(" ", ".");
+            dbUser.UserName = Guid.NewGuid().ToString();
+            dbUser.Password = Guid.NewGuid().ToString();
+            dbUser.Enabled = false;  // employee cannot access the software.
+
+            if(provider.FileData.Count > 0)
+            {
+                var fileName = provider.FileData[0].Headers.ContentDisposition.FileName;
+                fileName = fileName.Trim('"');
+                var fileExtension = Path.GetExtension(fileName);
+                var fileGuidName = string.Format("{0}{1}", Guid.NewGuid().ToString(), fileExtension);
+                var fileServerPath = ConfigurationManager.AppSettings["PictureRoot"];
+                if (!Directory.Exists(fileServerPath))
+                {
+                    Directory.CreateDirectory(fileServerPath);
+                }
+                var fileSavePath = Path.Combine(fileServerPath, fileGuidName);
+                File.Move(provider.FileData[0].LocalFileName, fileSavePath);
+                dbUser.Picture = fileGuidName;
+            }
+
+            
+
+            db.Users.Add(dbUser);
+            await db.SaveChangesAsync();
+            return Json(new {
+                CompanyId = dbUser.CompanyId,
+                CompanyName = dbUser.Company.Name,
+                UserId = dbUser.Id,
+                UserName = dbUser.FullName,
+                dbUser.Role
+            });
+        }
+
+        [Route("company")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetCompany()
+        {
+            var result = await db.Companies.Select(i => new { i.Id, i.Name }).ToListAsync();
+            return Json(result);
         }
 
         private async Task<IHttpActionResult> queryUserInGroup(List<int?> queryGroups)
