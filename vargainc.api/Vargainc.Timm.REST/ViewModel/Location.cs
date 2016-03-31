@@ -18,7 +18,6 @@ namespace Vargainc.Timm.REST.ViewModel
             this.Longitude = lng;
         }
 
-        [JsonIgnore]
         public long? Id { get; set; }
 
         [JsonProperty("lat")]
@@ -26,5 +25,9 @@ namespace Vargainc.Timm.REST.ViewModel
 
         [JsonProperty("lng")]
         public double? Longitude { get; set; }
+
+        [JsonProperty("out")]
+        public bool? OutOfBoundary { get; set; }
+        
     }
 }
