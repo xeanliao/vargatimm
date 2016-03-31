@@ -117,7 +117,7 @@ namespace Vargainc.Timm.REST.Controllers
 
         static PDFController()
         {
-            TempFolder = HostingEnvironment.MapPath("~/pdf_temp");
+            TempFolder = ConfigurationManager.AppSettings["TempPath"];
             if (!System.IO.Directory.Exists(TempFolder))
             {
                 System.IO.Directory.CreateDirectory(TempFolder);
