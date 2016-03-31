@@ -491,19 +491,39 @@ $A3LeftRightMargin: 0.5in;
 		}
 	}
 }
+.gtu-monitor{
+	.dropdown-pane{
+		padding: 0;
+		max-width: 260px;
+		z-index: 99999;
+	}
+}
 .gtu{
 	.button{
 		color: #2199e8;
 		background: transparent;
 		padding: 5px 10px;
 		margin-bottom: 10px;
+		min-width: 120px;
+		text-align: left !important;
+		margin-right: 5px;
+		font-weight: 600;
+		&.active{
+			box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25);
+			background: white;
+
+		}
 	}
-	.button.disabled, .button[disabled]{
-		color: gray;
+	.button.offline{
+		color: #a7a7a7;
+		font-weight: 400;
 		opacity: 1;
 		i{
-			opacity: 0.25;
+			opacity: 0.2;
 		}
+	}
+	i.alert{
+		color: #ec5840;
 	}
 }
 .color-block{

@@ -127,9 +127,9 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'vie
 			});
 			gtuData = [gtu3, gtu4, gtu5];
 
-			console.log("precision 1000   gut:", gtu3.length);
-			console.log("precision 10000  gut:", gtu4.length);
-			console.log("precision 100000 gut:", gtu5.length);
+			// console.log("precision 1000   gut:", gtu3.length);
+			// console.log("precision 10000  gut:", gtu4.length);
+			// console.log("precision 100000 gut:", gtu5.length);
 		},
 		drawGtu: function () {
 			var def = $.Deferred(),
@@ -155,7 +155,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'vie
 			    point;
 
 			gtuData || this.prepareGtu();
-			console.log(lastDisplayGtuIndex, lastZoomLevel, zoomLevel);
+			//console.log(lastDisplayGtuIndex, lastZoomLevel, zoomLevel);
 			if (typeof lastDisplayGtuIndex === 'undefined' || lastZoomLevel != zoomLevel) {
 				_.forEach(gtuData, function (points, index) {
 					var visiableGtu = _.filter(points, function (latlng) {
@@ -168,14 +168,14 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'vie
 					} else {
 						return false;
 					}
-					console.log(visiableGtu.length + ' / ' + points.length + ' dots in current zoom level ' + googleMap.getZoom() + ' view area');
+					//console.log(visiableGtu.length + ' / ' + points.length + ' dots in current zoom level ' + googleMap.getZoom() + ' view area');
 				});
 			} else {
-				filterGtus = _.filter(gtuData[lastDisplayGtuIndex], function (latlng) {
-					return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
-				});
-				newDisplayGtuIndex = lastDisplayGtuIndex;
-			}
+					filterGtus = _.filter(gtuData[lastDisplayGtuIndex], function (latlng) {
+						return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
+					});
+					newDisplayGtuIndex = lastDisplayGtuIndex;
+				}
 
 			if (lastDisplayGtuIndex == newDisplayGtuIndex) {
 				var tempPoints = [];
@@ -266,7 +266,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'views/base', 'vie
 					}
 				};
 			});
-			console.log('save gtu', postData);
+			//console.log('save gtu', postData);
 
 			this.props.task.addGtuDots(postData).done(function () {
 				_.forEach(self.state.customPoints, function (point) {

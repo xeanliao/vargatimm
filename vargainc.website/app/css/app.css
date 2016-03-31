@@ -599,6 +599,11 @@ table input[type="color"] {
   max-width: 50px;
 }
 
+.select2-container {
+  width: 100% !important;
+  margin: 0 0 1rem;
+}
+
 .dropdown-pane {
   box-shadow: 0 0.5em 1em 0 rgba(0, 0, 0, 0.1);
   font-size: 1rem !important;
@@ -1281,18 +1286,36 @@ html, body {
   line-height: 1;
 }
 
+.gtu-monitor .dropdown-pane {
+  padding: 0;
+  max-width: 260px;
+  z-index: 99999;
+}
+
 .gtu .button {
   color: #2199e8;
   background: transparent;
   padding: 5px 10px;
   margin-bottom: 10px;
+  min-width: 120px;
+  text-align: left !important;
+  margin-right: 5px;
+  font-weight: 600;
 }
-.gtu .button.disabled, .gtu .button[disabled] {
-  color: gray;
+.gtu .button.active {
+  box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25);
+  background: white;
+}
+.gtu .button.offline {
+  color: #a7a7a7;
+  font-weight: 400;
   opacity: 1;
 }
-.gtu .button.disabled i, .gtu .button[disabled] i {
-  opacity: 0.25;
+.gtu .button.offline i {
+  opacity: 0.2;
+}
+.gtu i.alert {
+  color: #ec5840;
 }
 
 .color-block {

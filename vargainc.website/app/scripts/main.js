@@ -31,7 +31,7 @@ define(function (require, exports, module) {
 			options.url = model.urlRoot;
 		}
 		options.url = '../api/' + options.url;
-
+		//options.url = 'http://timm.vargainc.com/201603-4/api/' + options.url;
 		return backboneSync(method, model, options);
 	}
 

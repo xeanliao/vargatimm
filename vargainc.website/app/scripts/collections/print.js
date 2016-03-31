@@ -268,7 +268,7 @@ define([
                         'options': JSON.stringify(params)
                     }),
                     success: function (result) {
-                        console.log(result, result.campaignId, result.sourceFile);
+                        //console.log(result, result.campaignId, result.sourceFile);
                         return result;
                     }
                 };

@@ -35,6 +35,16 @@ define([
 			_.extend(options, opts);
 
 			return this.fetch(options);
+		},
+		fetchCompany: function(opts){
+			var collection = this,
+				options = {
+					url: collection.url + '/company/',
+					type: 'GET',
+				};
+			_.extend(options, opts);
+
+			return this.fetch(options);
 		}
 	});
 });
