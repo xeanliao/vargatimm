@@ -62,7 +62,6 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 			    loadingTimeout = null;
 			this.subscribe('showLoading', function () {
 				loadingCount++;
-				console.log('add', loadingCount);
 				window.clearTimeout(loadingTimeout);
 				loadingTimeout = window.setTimeout(function () {
 					self.setState({ loading: true });
@@ -70,7 +69,6 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 			});
 			this.subscribe('hideLoading', function () {
 				loadingCount--;
-				console.log('reduce', loadingCount);
 				window.setTimeout(function () {
 					if (loadingCount <= 0) {
 						window.clearTimeout(loadingTimeout);
@@ -83,7 +81,6 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
     * fix main view size
     */
 			$(window).on('resize', function () {
-				console.log('window resize');
 				$(".off-canvas-wrapper-inner").height($(window).height());
 			});
 			$(window).trigger('resize');
@@ -198,15 +195,7 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 								search
 							),
 							mainView,
-							React.createElement(
-								'div',
-								{ className: 'row' },
-								React.createElement(
-									'div',
-									{ className: 'small-12 columns' },
-									React.createElement('div', { id: 'google-map', className: 'google-map' })
-								)
-							)
+							React.createElement('div', { id: 'google-map', className: 'google-map' })
 						)
 					)
 				),

@@ -16,7 +16,8 @@
     "requirejs-plugins": "~1.0.3",
     "sprintf": "~1.0.3",
     "select2": "~4.0.2",
-    "spectrum": "~1.8.0"
+    "spectrum": "~1.8.0",
+    "font-awesome-animation": "~0.0.8"
   },
   "description": "",
   "main": "",

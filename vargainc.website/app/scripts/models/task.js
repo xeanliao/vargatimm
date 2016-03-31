@@ -53,7 +53,7 @@ define([
             xhr.open(options.method, options.url, true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
-                    console.log(xhr.responseText);
+                    //console.log(xhr.responseText);
                     options.success && options.success.call(model, JSON.parse(xhr.responseText));
                 }
             };

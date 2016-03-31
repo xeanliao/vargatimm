@@ -38,6 +38,9 @@ module.exports = function (grunt) {
 						'font-awesome': {
 							'files': ['fonts/**']
 						},
+						'font-awesome-animation': {
+							'files': ['dist/font-awesome-animation.css']
+						},
 						'foundation-datepicker': {
 							'files': ['js/foundation-datepicker.js']
 						},
@@ -133,6 +136,9 @@ module.exports = function (grunt) {
 	            },{
 	            	src: ['<%= app %>/scripts/views/user/adminList.jsx'],
 	            	dest: '<%= app %>/scripts/views/user/adminList.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/user/employee.jsx'],
+	            	dest: '<%= app %>/scripts/views/user/employee.js'
 	            },{
 	            	src: ['<%= app %>/scripts/views/distribution/list.jsx'],
 	            	dest: '<%= app %>/scripts/views/distribution/list.js'

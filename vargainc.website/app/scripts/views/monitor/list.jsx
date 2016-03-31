@@ -118,7 +118,8 @@ define([
 		},
 		onGotoMonitor: function(campaignId, taskName, taskId){
 			//window.location.hash = 'frame/taskMonitor.aspx?taskid=' + taskId;
-			window.location.hash = helper.sprintf('campaign/%d/%s/%d/monitor', campaignId, taskName, taskId);
+			var url = helper.sprintf('./#campaign/%d/%s/%d/monitor', campaignId, taskName, taskId);
+			window.open(url);
 		},
 		onOpenMoreMenu: function(e){
 			e.preventDefault();

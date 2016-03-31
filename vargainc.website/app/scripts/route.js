@@ -209,6 +209,11 @@ define([
 							dmap: dmap,
 							gtu: gtu,
 							task: task
+						}, {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'GTU Monitor - ' + task.get('Name')
 						});
 					});
 				});

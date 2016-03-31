@@ -12,13 +12,13 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 		},
 		componentWillUpdate: function (newProps, newState) {
 			if (this.state.editId != null && newState.editId != this.state.editId && this.refs['userSelector-' + this.state.editId]) {
-				console.log('destory');
+				//console.log('destory');
 				$(this.refs['userSelector-' + this.state.editId]).select2('destroy');
 			}
 		},
 		componentDidUpdate: function (prevProps, prevState) {
 			if (this.state.editId != null && this.state.editId != prevState.editId && this.refs['userSelector-' + this.state.editId]) {
-				console.log('init');
+				//console.log('init');
 				$(this.refs['userSelector-' + this.state.editId]).select2();
 			}
 		},
@@ -182,7 +182,7 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 									React.createElement(
 										'div',
 										{ className: 'small-6 column' },
-										'Company'
+										'Team'
 									),
 									React.createElement(
 										'div',

@@ -76,7 +76,6 @@ define([
 				loadingTimeout = null;
 			this.subscribe('showLoading', function(){
 				loadingCount++;
-				console.log('add', loadingCount);
 				window.clearTimeout(loadingTimeout);
 				loadingTimeout = window.setTimeout(function(){
 					self.setState({loading: true});
@@ -85,7 +84,6 @@ define([
 			});
 			this.subscribe('hideLoading', function(){
 				loadingCount--;
-				console.log('reduce', loadingCount);
 				window.setTimeout(function(){
 					if(loadingCount <= 0){
 						window.clearTimeout(loadingTimeout);
@@ -98,7 +96,6 @@ define([
 			 * fix main view size
 			 */
 			$(window).on('resize', function(){
-				console.log('window resize');
 				$(".off-canvas-wrapper-inner").height($(window).height());
 			});
 			$(window).trigger('resize');
@@ -197,11 +194,7 @@ define([
 									{search}
 								</div>
 								{mainView}
-								<div className="row">
-									<div className="small-12 columns">
-										<div id="google-map" className="google-map"></div>
-									</div>
-								</div>
+								<div id="google-map" className="google-map"></div>
 							</div>
 						</div>
 					</div>

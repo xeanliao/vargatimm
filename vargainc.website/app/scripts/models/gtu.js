@@ -50,6 +50,32 @@ define([
 			options = _.extend(opts, options);
 
 			return (this.sync || Backbone.sync).call(this, 'update', this, options);
+		},
+		getTrack: function (taskId, opts) {
+			var model = this,
+				lastTime = model.get('lastUpdateTime'),
+				url = model.urlRoot + '/task/' + taskId + '/track/' + model.get('Id');
+			if (lastTime) {
+				url += '/' + lastTime;
+			}
+			var options = {
+				url: url,
+				method: 'GET',
+				success: function (result) {
+					if (result) {
+						model.set('lastUpdateTime', result.lastUpdateTime);
+						var existTrack = model.get('track') || [];
+						model.set('track', _.concat(existTrack, _.map(result.data, function (i) {
+							return {
+								lat: parseFloat(i.lat),
+								lng: parseFloat(i.lng)
+							}
+						})));
+					}
+				}
+			};
+			options = _.extend(opts, options);
+			return (this.sync || Backbone.sync).call(this, '', this, options);
 		}
 	});
 });
