@@ -19,15 +19,15 @@ require.config({
             deps: ['react'],
             exports: 'ReactDOM'
         },
+        'react-dom-server': {
+            deps: ['react'],
+            exports: 'ReactDOM'
+        },
         'react.backbone': {
             deps: ['backbone', 'react']
         },
-        'react-select': {
-            deps: ['react', 'react-dom', 'classnames'],
-            exports: 'ReactSelect'
-        },
-        'classnames': {
-            exports: 'classNames'
+        'markerclusterer': {
+            exports: 'MarkerClusterer'
         },
         'foundation': {
             deps: ['jquery'],
@@ -83,8 +83,9 @@ require.config({
         'underscore': 'vendor/lodash',
         'backbone': 'vendor/backbone',
         'backbone.route.control': 'vendor/backbone-route-control',
-        'react-dom': 'vendor/react-dom',
         'react': 'vendor/react',
+        'react-dom': 'vendor/react-dom',
+        'react-dom-server': 'vendor/react-dom-server',
         'react.backbone': 'vendor/react.backbone',
         'moment': 'vendor/moment',
         'pubsub': 'vendor/pubsub',
@@ -92,6 +93,7 @@ require.config({
         'sprintf': 'vendor/sprintf',
         'select2': 'vendor/select2',
         'spectrum': 'vendor/spectrum',
+        'markerclusterer': 'vendor/markerclusterer',
         'foundation.core': 'vendor/foundation.core',
         'foundation.util.box': 'vendor/foundation.util.box',
         'foundation.util.keyboard': 'vendor/foundation.util.keyboard',

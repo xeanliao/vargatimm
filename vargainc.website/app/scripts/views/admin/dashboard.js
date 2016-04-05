@@ -131,7 +131,7 @@ define(['underscore', 'react'], function (_, React) {
 										{ className: 'callout secondary' },
 										React.createElement(
 											'a',
-											{ href: '#frame/AvailableGTUList.aspx' },
+											{ href: '#admin/gtu' },
 											React.createElement(
 												'span',
 												null,

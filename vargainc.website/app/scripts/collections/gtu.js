@@ -52,6 +52,6 @@ define([
                 };
             _.extend(options, opts);
             return (this.sync || Backbone.sync).call(this, '', this, options);
-        },
+        }
     });
 });

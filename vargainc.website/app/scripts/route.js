@@ -10,6 +10,7 @@ define([
 			'report': 'reportAction',
 			'report/:taskId': 'reportAction',
 			'admin': 'adminAction',
+			'admin/gtu': 'availableGTUAction',
 			'print/:campaignId/:printType': 'printAction',
 			'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
 			'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
@@ -218,6 +219,19 @@ define([
 					});
 				});
 
+			});
+		},
+		availableGTUAction: function(){
+			require([
+				'collections/gtu',
+				'views/admin/availableGTU'
+			], function (Collection, View) {
+				var gtuList = new Collection();
+				gtuList.fetch().done(function () {
+					Topic.publish('loadView', View, {
+						collection: gtuList
+					}, {showSearch: false});
+				});
 			});
 		}
 	});

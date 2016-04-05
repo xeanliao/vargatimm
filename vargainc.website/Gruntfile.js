@@ -29,6 +29,9 @@ module.exports = function (grunt) {
 								'js/foundation.dropdown.js', 'js/foundation.abide.js', 'js/foundation.tooltip.js'
 							]
 						},
+						'react': {
+							'files': ['react.js', 'react-dom.js', 'react-dom-server.js']
+						},
 						'motion-ui': {
 							'files': ['dist/motion-ui.js']
 						},
@@ -232,6 +235,9 @@ module.exports = function (grunt) {
 	            },{
 	            	src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
 	            	dest: '<%= app %>/scripts/views/admin/dashboard.js'
+	            },{
+	            	src: ['<%= app %>/scripts/views/admin/availableGTU.jsx'],
+	            	dest: '<%= app %>/scripts/views/admin/availableGTU.js'
 	            }]
 	        }
 	    },

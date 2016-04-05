@@ -130,15 +130,35 @@ define([
 			}
 			return null;
 		},
+		onCloseDialog: function(){
+			this.publish('showDialog');
+		},
 		/**
          * build dialog view
          */
 		getDialogView: function(){
 			if (this.state.dialogView) {
 				if (_.isString(this.state.dialogView)) {
-					var dialogView = React.createElement('h5', null, this.state.dialogView);
+					var content = this.state.dialogView;
+					return (
+						<div className="row">
+							<div className="small-12 columns">
+								<p>&nbsp;</p>
+								<h5>{content}</h5>
+								<p>&nbsp;</p>
+							</div>
+							<div className="small-12 columns">
+								<div className="button-group float-right">
+									<a href="javascript:;" className="button tiny" onClick={this.onCloseDialog}>Okay</a>
+								</div>
+							</div>
+							<button onClick={this.onCloseDialog} className="close-button" data-close aria-label="Close reveal" type="button">
+						    	<span aria-hidden="true">&times;</span>
+						  	</button>
+						</div>
+					);
 				} else if (React.isValidElement(this.state.dialogView)) {
-					var dialogView = this.state.dialogView;
+					return this.state.dialogView;
 				} else {
 					var DialogView = React.createFactory(this.state.dialogView),
 						params = _.extend(this.state.dialogParams, {
