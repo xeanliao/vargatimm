@@ -298,6 +298,99 @@ namespace Vargainc.Timm.REST.Controllers
             });
         }
 
+        [Route("")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetAllGTUWithStatus()
+        {
+            #region SQL
+            const string sql = @"
+                SELECT
+	                [T].[Code],
+                    [T].[dtReceivedTime] AS [ReceivedTime],
+	                [Info].[dwLatitude] AS [Latitude],
+	                [Info].[dwLongitude] AS [Longitude]
+                FROM (
+	                SELECT
+		                Code,
+		                Max([dtReceivedTime]) AS [dtReceivedTime]
+	                FROM
+		                [gtuinfo]
+	                GROUP BY
+		                Code
+                ) [T]
+                INNER JOIN [gtuinfo] [Info] ON [T].Code = [Info].Code
+                AND [T].[dtReceivedTime] = [Info].[dtReceivedTime]
+            ";
+            #endregion
+
+            var checkTime = DateTime.Now.AddMinutes(-5);
+            var gtuLocationList = await db.Database.SqlQuery<ViewGTUInfo>(sql).ToListAsync();
+            var gtuLocation = new Dictionary<string, KeyValuePair<bool, ViewModel.Location>>();
+            foreach(var item in gtuLocationList)
+            {
+                if (!gtuLocation.ContainsKey(item.Code))
+                {
+                    var isOnline = item.ReceivedTime.HasValue && item.ReceivedTime.Value > checkTime;
+                    var latlng = new ViewModel.Location
+                    {
+                        Latitude = item.Latitude,
+                        Longitude = item.Longitude
+                    };
+                    gtuLocation.Add(item.Code, new KeyValuePair<bool, ViewModel.Location>(isOnline, latlng));
+                }
+            }
+            var assignedGTUList = await db.TaskGtuInfoMappings
+                .Where(i => i.UserId > 0)
+                .Select(i => new
+                {
+                    i.GTUId,
+                    i.Task.Name,
+                    Role = i.Auditor.Role,
+                    Company = i.Auditor.Company.Name,
+                    Auditor = i.Auditor.FullName,
+                    TaskName = i.Task.Name
+                }).ToListAsync();
+            var assignedGTU = new Dictionary<int?, ViewGTU>();
+            foreach(var item in assignedGTUList)
+            {
+                if (!assignedGTU.ContainsKey(item.GTUId))
+                {
+                    assignedGTU.Add(item.GTUId, new ViewGTU {
+                        Company = item.Company,
+                        Auditor = item.Auditor,
+                        Role = item.Role,
+                        UserColor = item.TaskName
+                    });
+                }
+            }
+
+            var gtuInfo = await db.GTUs
+                .Select(i => new
+                {
+                    i.Id,
+                    i.UniqueID,
+                    i.ShortUniqueID
+                })
+                .OrderByDescending(i=>i.Id)
+                .ToListAsync();
+            return Json(gtuInfo.Select(i => new
+            {
+                Id = i.Id,
+                Code = i.ShortUniqueID,
+                FullCode = i.UniqueID,
+                IsAssign = assignedGTU.ContainsKey(i.Id),
+                TaskName = assignedGTU.ContainsKey(i.Id) ? assignedGTU[i.Id].UserColor : null,
+                Company = assignedGTU.ContainsKey(i.Id) ? assignedGTU[i.Id].Company : null,
+                Auditor = assignedGTU.ContainsKey(i.Id) ? assignedGTU[i.Id].Auditor : null,
+                Role = assignedGTU.ContainsKey(i.Id) ? assignedGTU[i.Id].Role : null,
+                HaveLocation = gtuLocation.ContainsKey(i.UniqueID),
+                IsOnline = gtuLocation.ContainsKey(i.UniqueID) ? gtuLocation[i.UniqueID].Key : false,
+                Latitude = gtuLocation.ContainsKey(i.UniqueID) ? gtuLocation[i.UniqueID].Value.Latitude : null,
+                Longitude = gtuLocation.ContainsKey(i.UniqueID) ? gtuLocation[i.UniqueID].Value.Longitude : null
+            }).ToList()
+            );
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
