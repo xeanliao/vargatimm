@@ -439,25 +439,31 @@ namespace Vargainc.Timm.REST.Controllers
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/inside")]
         public IHttpActionResult GetGtuInsideDmap(int campaignId, int submapId, int dmapId)
         {
-            return LoadGtu(campaignId, submapId, dmapId, true, null);
+            return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, true, null);
         }
 
         [HttpGet]
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/inside/{date}")]
         public IHttpActionResult GetGtuInsideDmapAfterTime(int campaignId, int submapId, int dmapId, [DateTimeParameter]DateTime? date)
         {
-            
-            return LoadGtu(campaignId, submapId, dmapId, true, date);
+            return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, true, date);
         }
 
         [HttpGet]
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/all")]
         public IHttpActionResult GetGtuAll(int campaignId, int submapId, int dmapId)
         {
-            return LoadGtu(campaignId, submapId, dmapId, false, null);
+            return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, false, null);
         }
 
-        private IHttpActionResult LoadGtu(int campaignId, int submapId, int dmapId, bool filterOutside, DateTime? lastTime)
+        [HttpGet]
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/all/{date}")]
+        public IHttpActionResult GetGtuAllAfterTime(int campaignId, int submapId, int dmapId, [DateTimeParameter]DateTime? date)
+        {
+            return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, false, date);
+        }
+
+        private IHttpActionResult LoadGtuWithoutTaskStatus(int campaignId, int submapId, int dmapId, bool filterOutside, DateTime? lastTime)
         {
             var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
@@ -470,36 +476,54 @@ namespace Vargainc.Timm.REST.Controllers
             var query = from task in db.Tasks
                         join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
                         join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
-                        where task.DistributionMapId == dmapId && task.Status == 1 && (lastTime == null || gtu.dtReceivedTime > lastTime)
+                        where task.DistributionMapId == dmapId && (lastTime == null || gtu.dtReceivedTime > lastTime)
                         orderby task.Id, mapping.GTUId, gtu.Id
-                        select new ViewModel.Location
+                        select new
                         {
-                            Id = mapping.GTUId,
+                            Time = gtu.dtReceivedTime,
+                            GTUId = mapping.GTUId,
                             Latitude = gtu.dwLatitude,
                             Longitude = gtu.dwLongitude
                         };
 
+            var locationQuery = query.Select(i => new ViewModel.Location
+            {
+                Id = i.GTUId,
+                Latitude = i.Latitude,
+                Longitude = i.Longitude
+            });
 
+            var lastReceivedTimeQuery = query.Max(i => i.Time);
 
             var dmapPolygon = GetDMapBoundary(campaignId, submapId, dmapId);
             
             List<long?> validGtuId;
-            var locations = FormatLocationGroup(query, dmapPolygon, out validGtuId, filterOutside);
+            var locations = FormatLocationGroup(locationQuery, dmapPolygon, out validGtuId, filterOutside);
             var colors = new List<string>();
             if (validGtuId.Count > 0)
             {
                 var colorQuery = from task in db.Tasks
                                  join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
-                                 where task.DistributionMapId == dmapId && task.Status == 1 && validGtuId.Contains(mapping.GTUId)
+                                 where task.DistributionMapId == dmapId && validGtuId.Contains(mapping.GTUId)
                                  orderby task.Id, mapping.GTUId
                                  select mapping.UserColor;
                 colors = colorQuery.ToList();
             }
+
+            var lastUpdateTime = DateTime.Now;
+            if (lastReceivedTimeQuery.HasValue)
+            {
+                lastUpdateTime = lastReceivedTimeQuery.Value;
+            }else if (lastTime.HasValue)
+            {
+                lastUpdateTime = lastTime.Value;
+            }
+
             return Json(new
             {
                 points = locations,
                 pointsColors = colors.ToList(),
-
+                lastUpdateTime = lastUpdateTime.ToString("yyyyMMddhhmmss")
             });
         }
         #endregion
@@ -671,6 +695,7 @@ namespace Vargainc.Timm.REST.Controllers
                 {
                     continue;
                 }
+                item.OutOfBoundary = !polygon.Contains(point);
                 if (!lastId.HasValue || lastId.Value == item.Id)
                 {
                     area.Add(item);
@@ -678,7 +703,7 @@ namespace Vargainc.Timm.REST.Controllers
                 else
                 {
                     groupKeys.Add(lastId);
-                    result.Add(area.ToArray());                    
+                    result.Add(area.ToArray());
                     area.Clear();
                     area.Add(item);
                     ducplicateLocation.Clear();

@@ -239,7 +239,7 @@ namespace Vargainc.Timm.REST.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> GetGtuListByTaskId(int taskId)
         {
-            var result = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new
+            var result = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId && i.UserId != null).Select(i => new
             {
                 i.GTU.Id,
                 i.GTU.ShortUniqueID,

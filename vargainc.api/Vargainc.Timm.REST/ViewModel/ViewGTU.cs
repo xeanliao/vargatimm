@@ -15,5 +15,6 @@ namespace Vargainc.Timm.REST.ViewModel
         public int? AuditorId { get; set; }
         public string Auditor { get; set; }
         public Models.UserRoles? Role { get; set; }
+        public bool? HaveData { get; set; }
     }
 }
