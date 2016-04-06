@@ -176,7 +176,7 @@ define([
 						DMapId: task.get('DMapId')
 					});
 
-					$.when(dmap.fetchBoundary(), dmap.fetchAllGtu(), gtu.fetchByTask(taskId)).done(function () {
+					$.when(dmap.fetchBoundary(), dmap.fetchGtu(), gtu.fetchByTask(taskId)).done(function () {
 						Topic.publish('loadView', View, {
 							dmap: dmap,
 							gtu: gtu,
@@ -214,7 +214,7 @@ define([
 							showMenu: false,
 							showUser: false,
 							showSearch: false,
-							pageTitle: 'GTU Monitor - ' + task.get('Name')
+							pageTitle: 'GTU Monitor - ' + task.get('ClientName') + ', ' + task.get('ClientCode') + ': ' + task.get('Name')
 						});
 					});
 				});
