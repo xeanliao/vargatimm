@@ -10,6 +10,7 @@ using Vargainc.Timm.REST.ViewModel;
 using Vargainc.Timm.Models;
 using NetTopologySuite.Geometries;
 using Vargainc.Timm.Extentions;
+using System.Data.Common;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -144,6 +145,7 @@ namespace Vargainc.Timm.REST.Controllers
                 .Where(i => i.TaskId == taskId)
                 .Select(i => new
                 {
+                    MappingId = i.Id,
                     i.GTU.Id,
                     i.GTU.UniqueID,
                     i.GTU.ShortUniqueID
@@ -168,6 +170,54 @@ namespace Vargainc.Timm.REST.Controllers
                     });
                 }
             }
+            #region Query GTU Last Location
+            Dictionary<string, ViewModel.Location> gtuLastLocation = new Dictionary<string, ViewModel.Location>();
+            if (checkList.Length > 0)
+            {
+                #region SQL
+                const string sql = @"
+                SELECT
+	                [T].[Code],
+	                [Info].[dwLatitude] AS [Latitude],
+	                [Info].[dwLongitude] AS [Longitude]
+                FROM (
+	                SELECT
+		                [Code],
+		                Max([dtReceivedTime]) AS [dtReceivedTime]
+	                FROM
+		                [gtuinfo]
+                    WHERE [TaskgtuinfoId] IN ( SELECT [Id] FROM [taskgtuinfomapping] WHERE [TaskId] = @TaskId ) 
+                        AND [Code] IN ({0})
+	                GROUP BY
+		                [Code]
+                ) [T]
+                INNER JOIN [gtuinfo] [Info] ON [T].Code = [Info].Code
+                AND [T].[dtReceivedTime] = [Info].[dtReceivedTime]
+            ";
+                #endregion
+                List<string> param = new List<string>(checkList.Length);
+                List<DbParameter> runParam = new List<DbParameter>(checkList.Length + 1);
+                for(var i = 0; i < checkList.Length; i++)
+                {
+                    var name = "@P" + i;
+                    param.Add(name);
+                    runParam.Add(new System.Data.SqlClient.SqlParameter(name, checkList[i]));
+                }
+                runParam.Add(new System.Data.SqlClient.SqlParameter("@TaskId", taskId));
+                string runSql = string.Format(sql, string.Join(",", param));
+                var gtuLastLocationList = db.Database.SqlQuery<ViewGTUInfo>(runSql, runParam.ToArray());
+                foreach(var item in gtuLastLocationList)
+                {
+                    if (!gtuLastLocation.ContainsKey(item.Code))
+                    {
+                        gtuLastLocation.Add(item.Code, new ViewModel.Location {
+                            Latitude = item.Latitude,
+                            Longitude = item.Longitude
+                        });
+                    }
+                }
+            }
+            #endregion
 
             var dmapPolygon = new PrintController().GetDMapPolygon(task.DistributionMapId);
 
@@ -175,7 +225,7 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 i.Id,
                 IsOnline = onlineGTU.ContainsKey(i.UniqueID),
-                Location = onlineGTU.ContainsKey(i.UniqueID) ? onlineGTU[i.UniqueID] : null,
+                Location = gtuLastLocation.ContainsKey(i.UniqueID) ? gtuLastLocation[i.UniqueID] : null,
                 OutOfBoundary = onlineGTU.ContainsKey(i.UniqueID) ? !dmapPolygon.Contains(new Point(onlineGTU[i.UniqueID].Longitude ?? 0, onlineGTU[i.UniqueID].Latitude ?? 0)) : true
             }).ToList());
 
@@ -287,14 +337,29 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 lastUpdateTime = lastTime.Value;
             }
-            var result = await query.Select(i=>new {
-                lat = i.dwLatitude,
-                lng = i.dwLongitude
-            }).ToListAsync();
+            var result = await query.Select(i => new GeoAPI.Geometries.Coordinate
+            {
+                Y = i.dwLatitude ?? 0,
+                X = i.dwLongitude ?? 0
+            }).ToArrayAsync();
+            GeoAPI.Geometries.Coordinate[] simplify = null;
+            if (result.Length > 3)
+            {
+                simplify = NetTopologySuite.Simplify.DouglasPeuckerLineSimplifier.Simplify(result, 0.0001);
+            }
+            else
+            {
+                simplify = new GeoAPI.Geometries.Coordinate[0];
+
+            }
+            
 
             return Json(new {
                 lastUpdateTime = lastUpdateTime.ToString("yyyyMMddhhmmss"),
-                data = result
+                data = simplify.Select(i=> new {
+                    lat = i.Y,
+                    lng = i.X
+                })
             });
         }
 

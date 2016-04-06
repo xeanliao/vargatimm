@@ -31,9 +31,13 @@ namespace Vargainc.Timm.REST.Controllers
             }
             var dbDMap = await db.DistributionMaps.FindAsync(dbTask.DistributionMapId);
             var dbSubMap = await db.SubMaps.FindAsync(dbDMap.SubMapId);
+            var dbCampaign = await db.Campaigns.FindAsync(dbSubMap.CampaignId);
             var taskStatus = await db.TaskTimes.Where(i => i.TaskId == taskId).OrderByDescending(i => i.Id).FirstOrDefaultAsync();
+            
             return Json(new {
                 CampaignId = dbSubMap.CampaignId,
+                ClientName = dbCampaign.ClientName,
+                ClientCode = dbCampaign.ClientCode,
                 SubMapId = dbSubMap.Id,
                 DMapId = dbDMap.Id,
                 dbTask.Id,
@@ -239,7 +243,7 @@ namespace Vargainc.Timm.REST.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> GetGtuListByTaskId(int taskId)
         {
-            var result = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId && i.UserId != null).Select(i => new
+            var result = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new
             {
                 i.GTU.Id,
                 i.GTU.ShortUniqueID,
