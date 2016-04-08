@@ -115,15 +115,63 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 			}
 			return null;
 		},
+		onCloseDialog: function () {
+			this.publish('showDialog');
+		},
 		/**
          * build dialog view
          */
 		getDialogView: function () {
 			if (this.state.dialogView) {
 				if (_.isString(this.state.dialogView)) {
-					var dialogView = React.createElement('h5', null, this.state.dialogView);
+					var content = this.state.dialogView;
+					return React.createElement(
+						'div',
+						{ className: 'row' },
+						React.createElement(
+							'div',
+							{ className: 'small-12 columns' },
+							React.createElement(
+								'p',
+								null,
+								' '
+							),
+							React.createElement(
+								'h5',
+								null,
+								content
+							),
+							React.createElement(
+								'p',
+								null,
+								' '
+							)
+						),
+						React.createElement(
+							'div',
+							{ className: 'small-12 columns' },
+							React.createElement(
+								'div',
+								{ className: 'button-group float-right' },
+								React.createElement(
+									'a',
+									{ href: 'javascript:;', className: 'button tiny', onClick: this.onCloseDialog },
+									'Okay'
+								)
+							)
+						),
+						React.createElement(
+							'button',
+							{ onClick: this.onCloseDialog, className: 'close-button', 'data-close': true, 'aria-label': 'Close reveal', type: 'button' },
+							React.createElement(
+								'span',
+								{ 'aria-hidden': 'true' },
+								'×'
+							)
+						)
+					);
 				} else if (React.isValidElement(this.state.dialogView)) {
-					var dialogView = this.state.dialogView;
+					return this.state.dialogView;
 				} else {
 					var DialogView = React.createFactory(this.state.dialogView),
 					    params = _.extend(this.state.dialogParams, {

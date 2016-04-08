@@ -25,9 +25,12 @@ module.exports = function (grunt) {
 					packageSpecific: {
 						'foundation-sites': {
 							'files': [
-								'js/foundation.core.js', 'js/foundation.util.*.js', 'js/foundation.reveal.js', 
+								'js/foundation.core.js', 'js/foundation.util.*.js', 'js/foundation.reveal.js',
 								'js/foundation.dropdown.js', 'js/foundation.abide.js', 'js/foundation.tooltip.js'
 							]
+						},
+						'react': {
+							'files': ['react.js', 'react-dom.js', 'react-dom-server.js']
 						},
 						'motion-ui': {
 							'files': ['dist/motion-ui.js']
@@ -44,13 +47,13 @@ module.exports = function (grunt) {
 						'foundation-datepicker': {
 							'files': ['js/foundation-datepicker.js']
 						},
-						'react-select':{
+						'react-select': {
 							'files': ['dist/react-select.js', 'dist/react-select.css']
 						},
-						'classnames':{
+						'classnames': {
 							'files': ['dedupe.js']
 						},
-						'requirejs-plugins':{
+						'requirejs-plugins': {
 							'files': ['src/async.js']
 						}
 					}
@@ -102,139 +105,157 @@ module.exports = function (grunt) {
 			}
 		},
 		babel: {
-	        options: {
-	            sourceMap: false,
-	            presets: ['react'],
-	            plugins: ['react-intl'],
+			options: {
+				sourceMap: false,
+				presets: ['react'],
+				plugins: ['react-intl'],
 
-	        },
-	        dist: {
-	            files: [{
-	            	src: ['<%= app %>/scripts/views/layout/main.jsx'],
-	            	dest: '<%= app %>/scripts/views/layout/main.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/layout/frame.jsx'],
-	            	dest: '<%= app %>/scripts/views/layout/frame.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/layout/menu.jsx'],
-	            	dest: '<%= app %>/scripts/views/layout/menu.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/layout/user.jsx'],
-	            	dest: '<%= app %>/scripts/views/layout/user.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/layout/loading.jsx'],
-	            	dest: '<%= app %>/scripts/views/layout/loading.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/campaign/list.jsx'],
-	            	dest: '<%= app %>/scripts/views/campaign/list.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/campaign/edit.jsx'],
-	            	dest: '<%= app %>/scripts/views/campaign/edit.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/campaign/publish.jsx'],
-	            	dest: '<%= app %>/scripts/views/campaign/publish.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/user/adminList.jsx'],
-	            	dest: '<%= app %>/scripts/views/user/adminList.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/user/employee.jsx'],
-	            	dest: '<%= app %>/scripts/views/user/employee.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/distribution/list.jsx'],
-	            	dest: '<%= app %>/scripts/views/distribution/list.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/distribution/publish.jsx'],
-	            	dest: '<%= app %>/scripts/views/distribution/publish.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/distribution/dismiss.jsx'],
-	            	dest: '<%= app %>/scripts/views/distribution/dismiss.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/monitor/list.jsx'],
-	            	dest: '<%= app %>/scripts/views/monitor/list.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/monitor/edit.jsx'],
-	            	dest: '<%= app %>/scripts/views/monitor/edit.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/monitor/dismiss.jsx'],
-	            	dest: '<%= app %>/scripts/views/monitor/dismiss.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/report/list.jsx'],
-	            	dest: '<%= app %>/scripts/views/report/list.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/cover.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/cover.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/footer.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/footer.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/campaign.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/campaign.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/campaignSummary.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/campaignSummary.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/submap.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/submap.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/submapDetail.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/submapDetail.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/dmap.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/dmap.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/dmapDetailMap.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/dmapDetailMap.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/distributionMap.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/distributionMap.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/distributionDetailMap.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/distributionDetailMap.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/mapZoom.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/mapZoom.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/options.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/options.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/penetrationColor.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/penetrationColor.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/optionsDMapSelector.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/optionsDMapSelector.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/campaignOptions.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/campaignOptions.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/distributionOptions.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/distributionOptions.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/shared/reportOptions.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/shared/reportOptions.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/campaign.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/campaign.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/distribution.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/distribution.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/print/report.jsx'],
-	            	dest: '<%= app %>/scripts/views/print/report.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/gtu/edit.jsx'],
-	            	dest: '<%= app %>/scripts/views/gtu/edit.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/gtu/monitor.jsx'],
-	            	dest: '<%= app %>/scripts/views/gtu/monitor.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/gtu/assign.jsx'],
-	            	dest: '<%= app %>/scripts/views/gtu/assign.js'
-	            },{
-	            	src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
-	            	dest: '<%= app %>/scripts/views/admin/dashboard.js'
-	            }]
-	        }
-	    },
+			},
+			dist: {
+				files: [{
+					src: ['<%= app %>/scripts/views/layout/main.jsx'],
+					dest: '<%= app %>/scripts/views/layout/main.js'
+				}, {
+					src: ['<%= app %>/scripts/views/layout/frame.jsx'],
+					dest: '<%= app %>/scripts/views/layout/frame.js'
+				}, {
+					src: ['<%= app %>/scripts/views/layout/menu.jsx'],
+					dest: '<%= app %>/scripts/views/layout/menu.js'
+				}, {
+					src: ['<%= app %>/scripts/views/layout/user.jsx'],
+					dest: '<%= app %>/scripts/views/layout/user.js'
+				}, {
+					src: ['<%= app %>/scripts/views/layout/loading.jsx'],
+					dest: '<%= app %>/scripts/views/layout/loading.js'
+				}, {
+					src: ['<%= app %>/scripts/views/campaign/list.jsx'],
+					dest: '<%= app %>/scripts/views/campaign/list.js'
+				}, {
+					src: ['<%= app %>/scripts/views/campaign/edit.jsx'],
+					dest: '<%= app %>/scripts/views/campaign/edit.js'
+				}, {
+					src: ['<%= app %>/scripts/views/campaign/publish.jsx'],
+					dest: '<%= app %>/scripts/views/campaign/publish.js'
+				}, {
+					src: ['<%= app %>/scripts/views/user/adminList.jsx'],
+					dest: '<%= app %>/scripts/views/user/adminList.js'
+				}, {
+					src: ['<%= app %>/scripts/views/user/employee.jsx'],
+					dest: '<%= app %>/scripts/views/user/employee.js'
+				}, {
+					src: ['<%= app %>/scripts/views/distribution/list.jsx'],
+					dest: '<%= app %>/scripts/views/distribution/list.js'
+				}, {
+					src: ['<%= app %>/scripts/views/distribution/publish.jsx'],
+					dest: '<%= app %>/scripts/views/distribution/publish.js'
+				}, {
+					src: ['<%= app %>/scripts/views/distribution/dismiss.jsx'],
+					dest: '<%= app %>/scripts/views/distribution/dismiss.js'
+				}, {
+					src: ['<%= app %>/scripts/views/monitor/list.jsx'],
+					dest: '<%= app %>/scripts/views/monitor/list.js'
+				}, {
+					src: ['<%= app %>/scripts/views/monitor/edit.jsx'],
+					dest: '<%= app %>/scripts/views/monitor/edit.js'
+				}, {
+					src: ['<%= app %>/scripts/views/monitor/dismiss.jsx'],
+					dest: '<%= app %>/scripts/views/monitor/dismiss.js'
+				}, {
+					src: ['<%= app %>/scripts/views/report/list.jsx'],
+					dest: '<%= app %>/scripts/views/report/list.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/cover.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/cover.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/footer.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/footer.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/campaign.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/campaign.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/campaignSummary.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/campaignSummary.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/submap.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/submap.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/submapDetail.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/submapDetail.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/dmap.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/dmap.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/dmapDetailMap.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/dmapDetailMap.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/distributionMap.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/distributionMap.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/distributionDetailMap.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/distributionDetailMap.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/mapZoom.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/mapZoom.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/options.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/options.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/penetrationColor.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/penetrationColor.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/optionsDMapSelector.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/optionsDMapSelector.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/campaignOptions.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/campaignOptions.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/distributionOptions.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/distributionOptions.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/shared/reportOptions.jsx'],
+					dest: '<%= app %>/scripts/views/print/shared/reportOptions.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/campaign.jsx'],
+					dest: '<%= app %>/scripts/views/print/campaign.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/distribution.jsx'],
+					dest: '<%= app %>/scripts/views/print/distribution.js'
+				}, {
+					src: ['<%= app %>/scripts/views/print/report.jsx'],
+					dest: '<%= app %>/scripts/views/print/report.js'
+				}, {
+					src: ['<%= app %>/scripts/views/gtu/edit.jsx'],
+					dest: '<%= app %>/scripts/views/gtu/edit.js'
+				}, {
+					src: ['<%= app %>/scripts/views/gtu/monitor.jsx'],
+					dest: '<%= app %>/scripts/views/gtu/monitor.js'
+				}, {
+					src: ['<%= app %>/scripts/views/gtu/assign.jsx'],
+					dest: '<%= app %>/scripts/views/gtu/assign.js'
+				}, {
+					src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
+					dest: '<%= app %>/scripts/views/admin/dashboard.js'
+				}, {
+					src: ['<%= app %>/scripts/views/admin/availableGTU.jsx'],
+					dest: '<%= app %>/scripts/views/admin/availableGTU.js'
+				}]
+			}
+		},
+		requirejs: {
+			compile: {
+				options: {
+					baseUrl: '<%= app %>/scripts/',
+					mainConfigFile: ['<%= app %>/scripts/config.js'],
+					name: "monitor",
+					out: '<%= app %>/scripts/monitor-optimized.js',
+					optimize: 'none',
+					stubModules: ['async'],
+					optimizeAllPluginResources: true,
+					findNestedDependencies: true,
+					wrapShim: true
+				}
+			}
+		},
 		useminPrepare: {
 			html: ['<%= app %>/index.html'],
 			options: {
@@ -282,9 +303,9 @@ module.exports = function (grunt) {
 				tasks: ['sass']
 			},
 			babel: {
-	            files: '<%= app %>/scripts/**/*.jsx',
-	            tasks: ['babel']
-	        },
+				files: '<%= app %>/scripts/**/*.jsx',
+				tasks: ['babel']
+			},
 			livereload: {
 				files: ['<%= app %>/**/*.html', '<%= app %>/scripts/**/*.js', '<%= app %>/css/**/*.css', '<%= app %>/images/**/*.{jpg,gif,svg,jpeg,png}'],
 				options: {

@@ -73,6 +73,31 @@ define([
             _.extend(options, opts);
             return (this.sync || Backbone.sync).call(this, 'read', this, options);
         },
+        fetchGtu: function (opts) {
+            var model = this,
+                options = {
+                    url: 'print/campaign/' + model.get('CampaignId') + '/submap/' + model.get('SubMapId') + '/dmap/' + model.get('DMapId') + '/gtu/',
+                    method: 'GET',
+                    success: function (result) {
+                        var gtus = [];
+                        for (var i = 0; i < result.pointsColors.length; i++) {
+                            if (result.points[i] && result.points[i].length > 0) {
+                                gtus.push({
+                                    gtuId: result.points[i][0].Id,
+                                    color: result.pointsColors[i],
+                                    points: result.points[i]
+                                });
+                            }
+                        }
+                        model.set({
+                            'Gtu': gtus,
+                            lastUpdateTime: result.lastUpdateTime
+                        });
+                    }
+                };
+            _.extend(options, opts);
+            return (this.sync || Backbone.sync).call(this, 'read', this, options);
+        },
         fetchAllGtu: function (opts) {
             var model = this,
                 options = {

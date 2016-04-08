@@ -98,10 +98,13 @@ define([
 			);
 		},
 		render: function(){
-			var collection = this.getCollection(),
+			var collection = this.getCollection().where(function (i) {
+					return i.get('IsAssignedToOther') == false;
+				}),
 				showError = false,
 				errorMessage = '',
 				self = this;
+
 			return (
 				<div>
 					<h3>Assign GTU</h3>
@@ -133,7 +136,7 @@ define([
 							</tr>
 						</thead>
 						<tbody>
-							{collection.models.map(function(gtu){
+							{collection.map(function(gtu){
 								var isAssign = gtu.get('IsAssign'),
 									gtuId = gtu.get('Id'),
 									assignButton = <button className="button tiny" onClick={self.onAdd.bind(null, gtuId)}><i className="fa fa-plus"></i>&nbsp;Assign</button>,
