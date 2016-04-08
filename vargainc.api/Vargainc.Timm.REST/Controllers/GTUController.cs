@@ -15,11 +15,12 @@ using System.Data.Common;
 namespace Vargainc.Timm.REST.Controllers
 {
     [RoutePrefix("gtu")]
+    [Helper.PublicAccessFilter]
     public class GTUController : ApiController
     {
         private TimmContext db = new TimmContext();
 
-        [Route("task/{taskId:int}")]
+        [Route("task/{taskId}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetGtuListByTask(int taskId)
         {
@@ -60,6 +61,20 @@ namespace Vargainc.Timm.REST.Controllers
                 if (!assignedGtu.ContainsKey(item.Id))
                 {
                     assignedGtu.Add(item.Id, item);
+                }
+            }
+
+            var assignedToOtherGtuList = await db.TaskGtuInfoMappings
+                .Where(i => i.TaskId != taskId && i.UserId > 0)
+                .GroupBy(i => i.GTUId)
+                .Select(i => i.Key).ToArrayAsync();
+            
+            HashSet<int?> assignedToOtherGtu = new HashSet<int?>();
+            foreach (var item in assignedToOtherGtuList)
+            {
+                if (!assignedToOtherGtu.Contains(item))
+                {
+                    assignedToOtherGtu.Add(item);
                 }
             }
 
@@ -124,6 +139,7 @@ namespace Vargainc.Timm.REST.Controllers
                 Location = onlineGTU.ContainsKey(i.UniqueID) ? onlineGTU[i.UniqueID] : null,
                 OutOfBoundary = onlineGTU.ContainsKey(i.UniqueID) ? !dmapPolygon.Contains(new Point(onlineGTU[i.UniqueID].Longitude ?? 0, onlineGTU[i.UniqueID].Latitude ?? 0)) : true,
                 IsAssign = assignedGtu.ContainsKey(i.Id),
+                IsAssignedToOther = assignedToOtherGtu.Contains(i.Id),
                 UserColor = gtuColor.ContainsKey(i.Id) ? gtuColor[i.Id] : "",
                 Company = assignedGtu.ContainsKey(i.Id) ? assignedGtu[i.Id].Company : "",
                 Auditor = assignedGtu.ContainsKey(i.Id) ? assignedGtu[i.Id].Auditor : "",
@@ -132,7 +148,7 @@ namespace Vargainc.Timm.REST.Controllers
             }).OrderByDescending(i=>i.IsAssign).ThenByDescending(i=>i.IsOnline).ThenBy(i=>i.ShortUniqueID));
         }
 
-        [Route("task/{taskId:int}/online")]
+        [Route("task/{taskId}/online")]
         [HttpGet]
         public async Task<IHttpActionResult> GetGTULastLocation(int taskId)
         {
@@ -281,7 +297,7 @@ namespace Vargainc.Timm.REST.Controllers
             });
         }
 
-        [Route("task/{taskId:int}/unassign/{gtuId:int}")]
+        [Route("task/{taskId}/unassign/{gtuId:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> UnassignGtu(int taskId, int gtuId)
         {
@@ -296,14 +312,14 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = true });
         }
 
-        [Route("task/{taskId:int}/track/{gtuId:int}")]
+        [Route("task/{taskId}/track/{gtuId:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetGtuTrack(int taskId, int gtuId)
         {
             return await GetGtuTrackWithTime(taskId, gtuId, null);
         }
 
-        [Route("task/{taskId:int}/track/{gtuId:int}/{date}")]
+        [Route("task/{taskId}/track/{gtuId:int}/{date}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetGtuTrackAfterTime(int taskId, int gtuId, [DateTimeParameter]DateTime? date)
         {
