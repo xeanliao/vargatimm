@@ -11,6 +11,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 	    gtuTrack = {},
 	    //{key: 'gtu id', {track: google.map.polyline, startPoint: google.map.marker}
 	animateIndex = 0,
+	    infowindow = null,
 	    startPointIcon = 'M1.8-25.1c-0.3-0.3-0.7-0.5-1.2-0.5c-0.4,0-0.8,0.2-1.2,0.5C-1-24.8-1-24.4-1-23.9c0,0.4,0.1,0.8,0.4,1c0.3,0.3,0.4,0.6,0.4,1v21.4c0,0.1,0,0.2,0.1,0.3C0,0,0.1,0,0.2,0H1c0.1,0,0.2,0,0.3-0.1s0.1-0.2,0.1-0.3v-21.4c0-0.4,0.2-0.7,0.4-1s0.4-0.6,0.4-1C2.3-24.4,2.1-24.8,1.8-25.1z M16.8-23.7c-0.2-0.2-0.4-0.2-0.6-0.2c-0.1,0-0.3,0.1-0.7,0.3c-0.4,0.2-0.6,0.4-1,0.5c-0.1,0,0.8,0.1,0.7,0.1c-0.4,0.1-0.8,0.3-1.3,0.5s-1,0.3-1.5,0.3c-0.4,0-0.8-0.1-1.1-0.2c-1.1-0.5-1-0.9-1.8-1.1c-0.8-0.3-1.7-0.4-2.6-0.4c-1.6,0-1.4,0.5-3.4,1.5c-0.5,0.2-0.8,0.4-1,0.5c-0.3,0.2-0.4,0.4-0.4,0.7v7.4c0,0.2,0.1,0.4,0.2,0.6S2.8-13,3-13c0.1,0,0.3,0,0.4-0.1C5.7-14.3,5.7-15,7.3-15c0.6,0,1.2,0.1,1.8,0.3s1.1,0.4,1.5,0.6c0.4,0.2-0.1,0.4,0.4,0.6c0.5,0.2,1.1,0.3,1.6,0.3c1.3,0,1.9-0.5,3.7-1.5c0.2-0.1,0.4-0.2,0.5-0.4c0.1-0.1,0.2-0.3,0.2-0.5v-7.5C17-23.4,16.9-23.5,16.8-23.7z',
 	    walkerIcon = 'M-9-0.2c0,0.5,0.3,1,0.8,1.4S-7,2-6.1,2.2c0.9,0.3,1.8,0.4,2.8,0.6C-2.3,2.9-1.2,3-0.1,3S2,2.9,3.1,2.8c1-0.1,2-0.3,2.8-0.6c0.9-0.3,1.5-0.6,2-1s0.8-0.9,0.8-1.4c0-0.4-0.1-0.8-0.4-1.1C8-1.6,7.6-1.9,7.2-2.1c-0.5-0.2-1-0.4-1.5-0.6C5.2-2.8,4.7-3,4.1-3.1c-0.2,0-0.4,0-0.6,0.1C3.3-2.9,3.2-2.7,3.2-2.5s0,0.4,0.1,0.6s0.3,0.3,0.5,0.3c0.5,0.1,0.9,0.2,1.3,0.3c0.4,0.1,0.7,0.2,1,0.3c0.2,0.1,0.4,0.2,0.6,0.3C6.9-0.6,7-0.5,7-0.5c0.1,0.1,0.1,0.1,0.1,0.1c0,0.1-0.1,0.2-0.3,0.3C6.6,0,6.3,0.2,5.9,0.3S5,0.6,4.5,0.7S3.3,0.9,2.5,1C1.7,1.1,0.9,1.1,0,1.1s-1.7,0-2.5-0.1s-1.5-0.2-2-0.3s-1-0.3-1.4-0.4C-6.3,0.2-6.6,0-6.8-0.1s-0.3-0.2-0.3-0.3c0,0,0-0.1,0.1-0.1c0.1-0.1,0.2-0.1,0.3-0.2S-6.3-0.9-6.1-1c0.2-0.1,0.6-0.2,1-0.3c0.4-0.1,0.8-0.2,1.3-0.3c0.2,0,0.4-0.1,0.5-0.3c0.1-0.2,0.2-0.4,0.1-0.6c0-0.2-0.1-0.4-0.3-0.5c-0.2-0.1-0.4-0.2-0.6-0.1C-4.7-3-5.2-2.9-5.7-2.7s-1,0.3-1.5,0.6c-0.5,0.2-0.9,0.5-1.1,0.8S-9-0.6-9-0.2z M-4.2-11.4v4.8C-4.2-6.4-4.1-6.2-4-6c0.2,0.2,0.3,0.2,0.6,0.2h0.8V-1c0,0.2,0.1,0.4,0.2,0.6c0.2,0.2,0.3,0.2,0.6,0.2h3.2c0.2,0,0.4-0.1,0.6-0.2C2.2-0.6,2.2-0.7,2.2-1v-4.8H3c0.2,0,0.4-0.1,0.6-0.2c0.2-0.2,0.2-0.3,0.2-0.6v-4.8c0-0.4-0.2-0.8-0.5-1.1S2.6-13,2.2-13h-4.8c-0.4,0-0.8,0.2-1.1,0.5S-4.2-11.8-4.2-11.4z M-3-16.2c0,0.8,0.3,1.4,0.8,2s1.2,0.8,2,0.8s1.4-0.3,2-0.8s0.8-1.2,0.8-2c0-0.8-0.3-1.4-0.8-2c-0.5-0.6-1.2-0.8-2-0.8s-1.4,0.3-2,0.8S-3-17-3-16.2z',
 	    driverIcon = 'M-10.8,1.3c-0.3,0.3-0.7,0.5-1.1,0.5c-0.4,0-0.8-0.2-1.1-0.5s-0.5-0.7-0.5-1.1s0.2-0.8,0.5-1.1s0.7-0.5,1.1-0.5c0.4,0,0.8,0.2,1.1,0.5c0.3,0.3,0.5,0.7,0.5,1.1C-10.3,0.7-10.4,1.1-10.8,1.3z M-15.2-6.6c0-0.1,0-0.2,0.1-0.3l2.5-2.5c0.1,0,0.2-0.1,0.3-0.1h2v3.3h-4.9V-6.6z M0.7,1.3C0.4,1.6-0.1,1.8-0.4,1.8s-0.8-0.2-1.1-0.5s-0.5-0.7-0.5-1.1s0.2-0.8,0.5-1.1c0.3-0.3,0.7-0.5,1.1-0.5s0.8,0.2,1.1,0.5c0.3,0.3,0.5,0.7,0.5,1.1C1.1,0.7,1,1.1,0.7,1.3z M4.2-14.1c-0.2-0.2-0.4-0.3-0.6-0.3h-13c-0.3,0-0.5,0.1-0.6,0.3c-0.1,0.2-0.3,0.3-0.3,0.6v2.4h-2c-0.2,0-0.5,0.1-0.7,0.2c-0.3,0.1-0.5,0.2-0.7,0.4l-2.5,2.5c-0.1,0.1-0.2,0.2-0.3,0.4c-0.1,0.1-0.1,0.2-0.2,0.4c0,0.1-0.1,0.3-0.1,0.5s0,0.3,0,0.4c0,0.1,0,0.3,0,0.5s0,0.4,0,0.4v4.1c-0.2,0-0.4,0.1-0.6,0.2s-0.2,0.4-0.2,0.6c0,0.1,0,0.2,0.1,0.3c0,0.1,0.1,0.2,0.2,0.2s0.2,0.1,0.2,0.1s0.2,0.1,0.3,0.1s0.2,0,0.3,0c0.1,0,0.2,0,0.3,0s0.3,0,0.3,0h0.8c0,0.9,0.3,1.7,1,2.3s1.4,1,2.3,1s1.7-0.3,2.3-1c0.6-0.6,1-1.4,1-2.3h4.9c0,0.9,0.3,1.7,1,2.3s1.4,1,2.3,1s1.7-0.3,2.3-1c0.6-0.6,1-1.4,1-2.3c0,0,0.1,0,0.3,0c0.2,0,0.3,0,0.3,0s0.1,0,0.3,0c0.1,0,0.2,0,0.3-0.1c0.1,0,0.1-0.1,0.2-0.1s0.1-0.1,0.2-0.2c0-0.1,0.1-0.2,0.1-0.3v-13C4.4-13.9,4.3-14,4.2-14.1z',
@@ -60,8 +61,8 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			this.drawDmapBoundary().then(this.filterGtu).then(this.drawGtu).done(function () {
 				googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
 				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
-				self.drawLastLocation();
 			}).done(function () {
+				self.drawLastLocation();
 				var allAssignedGtu = _.map(self.props.gtu.where(function (i) {
 					return i.get('IsAssign') || i.get('WithData');
 				}), function (gtu) {
@@ -72,6 +73,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 					canDrawMap: true
 				});
 				self.publish('hideLoading');
+				infowindow = new google.maps.InfoWindow();
 				window.clearInterval(backgroundIntervalReload);
 				backgroundIntervalReload = window.setInterval(self.reload, 15 * 1000);
 			});
@@ -206,7 +208,6 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			if (this.state.displayMode != 'cover') {
 				return;
 			}
-			this.setState({ busy: true });
 			var def = $.Deferred(),
 			    self = this,
 			    maxDisplayCount = this.state.maxDisplayCount,
@@ -369,10 +370,16 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			}, this));
 		},
 		drawLastLocation: function () {
+			console.log('draw last location');
 			var googleMap = this.getGoogleMap(),
 			    point,
-			    gtuList = this.props.gtu.where({
-				IsAssign: true
+			    taskIsStopped = this.props.task.get('Status') == 1,
+			    gtuList = this.props.gtu.where(function (i) {
+				if (taskIsStopped) {
+					return i.get('WithData');
+				} else {
+					return i.get('IsAssign') || i.get('WithData');
+				}
 			}),
 			    willDrawGtu = _.map(gtuList, function (gtu) {
 				return gtu.get('Id');
@@ -386,18 +393,22 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			});
 
 			_.forEach(gtuList, function (gtu) {
+
 				var gtuId = gtu.get('Id'),
 				    location = gtu.get('Location');
 				if (!location) {
 					delete gtuLocation[gtuId];
+					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' no location');
 					return true;
 				}
 				if (gtuLocation[gtuId]) {
+					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' move location');
 					gtuLocation[gtuId].setPosition({
 						lat: location.lat,
 						lng: location.lng
 					});
 				} else {
+					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' add location');
 					gtuLocation[gtuId] = new google.maps.Marker({
 						position: {
 							lat: location.lat,
@@ -450,11 +461,12 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				}).promise, gtu.fetchGtuLocation(taskId, {
 					quite: true
 				}).promise]).done(function () {
+					self.drawLastLocation();
 					self.prepareGtu();
 					self.drawGtu();
-					self.drawLastLocation();
 				});
 			} else {
+				self.drawLastLocation();
 				self.drawGTUTrack();
 			}
 		},
@@ -483,9 +495,16 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			e.stopPropagation();
 			var googleMap = this.getGoogleMap(),
 			    gtu = this.props.gtu.get(gtuId),
-			    location = gtu.get('Location');
+			    location = gtu.get('Location'),
+			    marker = gtuLocation[gtu.get('Id')];
 			console.log('gtu last location', location);
-			location && googleMap.setCenter(gtu.get('Location'));
+			if (location) {
+				googleMap.setCenter(gtu.get('Location'));
+				infowindow.setContent(gtu.get('ShortUniqueID'));
+				infowindow.open(googleMap, marker);
+			} else {
+				this.publish('showDialog', 'No Data');
+			}
 		},
 		onAssign: function () {
 			var gtu = this.props.gtu,
@@ -542,7 +561,12 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				lastViewArea: null
 			});
 		},
-		onCopyShareLink: function () {},
+		onCopyShareLink: function () {
+			var location = window.location,
+			    path = location.pathname.substr(1);
+			firstPath = location.pathname.substr(0, path.indexOf('/') + 1), task = this.props.task.get('PublicUrl'), address = location.protocol + '//' + window.location.host + firstPath + '/monitor/#' + task;
+			this.publish('showDialog', address);
+		},
 		onOpenMoreMenu: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
@@ -566,6 +590,60 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 							'span',
 							null,
 							'Assign GTU'
+						)
+					)
+				);
+			}
+			//for for Distribution drivers
+			if (!_.isInteger(this.props.task.get('Id'))) {
+				return React.createElement(
+					'span',
+					{ className: 'float-right' },
+					React.createElement(
+						'button',
+						{ className: 'button cirle', 'data-toggle': 'monitor-more-menu', onClick: this.onOpenMoreMenu },
+						React.createElement('i', { className: 'fa fa-ellipsis-h' })
+					),
+					React.createElement(
+						'div',
+						{ id: 'monitor-more-menu', className: 'dropdown-pane bottom',
+							'data-dropdown': true,
+							'data-close-on-click': 'true',
+							'data-auto-focus': 'false',
+							onClick: this.onCloseMoreMenu },
+						React.createElement(
+							'ul',
+							{ className: 'vertical menu' },
+							React.createElement(
+								'li',
+								null,
+								React.createElement(
+									'a',
+									{ href: 'javascript:;', onClick: this.onSwitchDisplayMode },
+									React.createElement('i', { className: this.state.displayMode == 'cover' ? 'fa fa-map' : 'fa fa-map-o' }),
+									' ',
+									React.createElement(
+										'span',
+										null,
+										this.state.displayMode == 'cover' ? 'Track Path' : 'Show Coverage'
+									)
+								)
+							),
+							React.createElement(
+								'li',
+								null,
+								React.createElement(
+									'a',
+									{ href: 'javascript:;', onClick: this.onSwitchShowOutOfBoundaryPoints },
+									React.createElement('i', { className: !this.state.ShowOutOfBoundary ? 'fa fa-compress' : 'fa fa-expand' }),
+									' ',
+									React.createElement(
+										'span',
+										null,
+										!this.state.ShowOutOfBoundary ? 'Show Out of Bounds' : 'Hide Out of Bounds'
+									)
+								)
+							)
 						)
 					)
 				);
@@ -658,17 +736,21 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			    alertIcon = null,
 			    deleteIcon = null,
 			    buttonClass = 'button text-left',
-			    taskIsStopped = this.props.task.get('Status') == 1;
+			    taskIsStopped = this.props.task.get('Status') == 1,
+			    isActive = _.indexOf(this.state.activeGtu, gtu.get('Id')) > -1;
 
 			if (taskIsStopped) {
-				gtuIcon = React.createElement('i', { className: 'fa fa-stop', style: { color: gtu.get('UserColor') } });
+				//gtuIcon = <i className="fa fa-stop" style={{color: gtu.get('UserColor')}}></i>
+				gtuIcon = React.createElement('i', { className: 'fa fa-stop' });
 			} else {
 				switch (gtu.get('Role')) {
 					case 'Driver':
-						gtuIcon = React.createElement('i', { className: 'fa fa-truck', style: { color: gtu.get('UserColor') } });
+						//gtuIcon = <i className="fa fa-truck" style={{color: gtu.get('UserColor')}}></i>
+						gtuIcon = React.createElement('i', { className: 'fa fa-truck' });
 						break;
 					case 'Walker':
-						gtuIcon = React.createElement('i', { className: 'fa fa-street-view', style: { color: gtu.get('UserColor') } });
+						//gtuIcon = <i className="fa fa-street-view" style={{color: gtu.get('UserColor')}}></i>
+						gtuIcon = React.createElement('i', { className: 'fa fa-street-view' });
 						break;
 					default:
 						gtuIcon = null;
@@ -676,7 +758,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				}
 			}
 
-			if (_.indexOf(this.state.activeGtu, gtu.get('Id')) > -1) {
+			if (isActive) {
 				buttonClass += ' active';
 			}
 			if (!taskIsStopped && !gtu.get('IsOnline')) {
@@ -693,7 +775,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				{ className: 'group', key: gtu.get('Id') },
 				React.createElement(
 					'button',
-					{ className: buttonClass, onClick: this.onSelectedGTU.bind(null, gtu.get('Id')) },
+					{ className: buttonClass, style: { 'backgroundColor': isActive ? gtu.get('UserColor') : 'transparent' }, onClick: this.onSelectedGTU.bind(null, gtu.get('Id')) },
 					deleteIcon,
 					gtuIcon,
 					'  ',
@@ -714,6 +796,38 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 		},
 		renderController: function () {
 			var task = this.props.task;
+			//for for Distribution drivers
+			if (!_.isInteger(this.props.task.get('Id'))) {
+				switch (task.get('Status')) {
+					case 0:
+						//started
+						return React.createElement(
+							'h5',
+							null,
+							'STARTED'
+						);
+						break;
+					case 1:
+						//stoped
+						return React.createElement(
+							'h5',
+							null,
+							'STOPPED'
+						);
+						break;
+					case 2:
+						//peased
+						return React.createElement(
+							'h5',
+							null,
+							'PEASED'
+						);
+						break;
+					default:
+						return null;
+						break;
+				}
+			}
 			switch (task.get('Status')) {
 				case 0:
 					//started

@@ -1,9 +1,6 @@
 require.config({
     baseUrl: 'scripts',
-    deps: ['main'],
-    config: {
-        baseUrl: 'http://dev.timm.vargainc.com/'
-    },
+    // deps: ['main'],
     // bundles: {
     //     'foundation': ['foundation.core', 'foundation.util.box','foundation.util.keyboard','foundation.util.triggers','foundation.util.mediaQuery','foundation.util.motion','foundation.reveal']
     // },
@@ -73,7 +70,7 @@ require.config({
             'foundation': 'foundation.hack'
         },
         'foundation.hack': {
-            'foundation': 'foundation'
+            'foundation': 'foundation.core'
         }
     },
     paths: {

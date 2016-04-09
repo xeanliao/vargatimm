@@ -121,10 +121,13 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 			);
 		},
 		render: function () {
-			var collection = this.getCollection(),
+			var collection = this.getCollection().where(function (i) {
+				return i.get('IsAssignedToOther') == false;
+			}),
 			    showError = false,
 			    errorMessage = '',
 			    self = this;
+
 			return React.createElement(
 				'div',
 				null,
@@ -207,7 +210,7 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 					React.createElement(
 						'tbody',
 						null,
-						collection.models.map(function (gtu) {
+						collection.map(function (gtu) {
 							var isAssign = gtu.get('IsAssign'),
 							    gtuId = gtu.get('Id'),
 							    assignButton = React.createElement(
