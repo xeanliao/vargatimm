@@ -100,11 +100,19 @@ define([
 			});
 			$(window).trigger('resize');
 		},
-		componentDidUpdate: function(prevProps, prevState){
-			if(this.state.dialogView && Foundation){
+		componentDidUpdate: function (prevProps, prevState) {
+			if (this.state.dialogView && Foundation) {
 				$('.reveal').foundation();
-				$('.reveal').foundation('open');
-			}else{
+				var dialogSize = this.state.dialogSize;
+				$(document).off('open.zf.reveal.mainView');
+				$(document).one('open.zf.reveal.mainView', function(){
+					console.log('open.zf.reveal.mainView');
+					$('.reveal-overlay').css({
+						display: dialogSize == 'full' ? 'none' : 'block'
+					});
+				});
+				$('.reveal').foundation('open');				
+			} else {
 				$('.reveal').foundation();
 				$('.reveal').foundation('close');
 			}
@@ -214,12 +222,14 @@ define([
 									{search}
 								</div>
 								{mainView}
-								<div id="google-map" className="google-map"></div>
+								<div id="google-map-wrapper">
+									<div id="google-map" className="google-map"></div>
+								</div>
 							</div>
 						</div>
 					</div>
 					
-					<div className={'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass} data-reveal data-options="closeOnClick: false; closeOnEsc: false">
+					<div className={'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass} data-reveal data-options="closeOnClick: false; closeOnEsc: false;">
 						{dialogView}
 					</div>
 

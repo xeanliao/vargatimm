@@ -29,22 +29,17 @@ define([
 				maxDisplayCount: 2000
 			};
 		},
+		onWindowResize: function () {
+			var pageLeftHeight = $(window).height() - $(this.refs.mapArea).position().top;
+			this.setMapHeight(pageLeftHeight);
+		},
 		componentDidMount: function () {
 			this.publish('showLoading');
 			/**
 			 * position google map to main area
 			 */
-			var size = $(this.refs.mapArea).width();
-			$('#google-map').css({
-				'position': 'relative',
-				'top': 0,
-				'left': 0,
-				'right': 'auto',
-				'bottom': 'auto',
-				'width': '100%',
-				'height': size
-			});
-			google.maps.event.trigger(this.getGoogleMap(), "resize");
+			$(window).on('resize.gtu-edit-view', $.proxy(this.onWindowResize, this));
+			this.onWindowResize();
 
 			this.setState({
 				activeGtu: this.props.gtu.at(0)
@@ -60,6 +55,7 @@ define([
 			});
 		},
 		componentWillUnmount: function () {
+			var googleMap = this.getGoogleMap();
 			try {
 				_.forEach(gtuPoints, function (item) {
 					item.setMap(null);
@@ -69,12 +65,10 @@ define([
 				});
 				dmapPolygon.setMap(null);
 				google.maps.event.clearInstanceListeners(googleMap);
+				$(document).off('resize.gtu-edit-view');
 			} catch (ex) {
 				console.log('google map clear error', ex);
 			}
-			$('#google-map').css({
-				'visibility': 'hidden',
-			});
 		},
 		setActiveGtu: function(gtuId){
 			var activeGut = this.props.gtu.get(gtuId);
