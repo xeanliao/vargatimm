@@ -8,19 +8,22 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Data.Entity;
 using System.Text;
-using Vargainc.Timm.EF;
-using Vargainc.Timm.REST.ViewModel.ControlCenter;
 using System.Net.Http;
 using System.IO;
+
+using Vargainc.Timm.EF;
+using Vargainc.Timm.REST.ViewModel.ControlCenter;
+using Vargainc.Timm.Extentions;
 
 namespace Vargainc.Timm.REST.Controllers
 {
     [RoutePrefix("task")]
+    [Helper.PublicAccessFilter]
     public class TaskController : ApiController
     {
         private TimmContext db = new TimmContext();
 
-        [Route("{taskId:int}")]
+        [Route("{taskId}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetById(int taskId)
         {
@@ -31,9 +34,13 @@ namespace Vargainc.Timm.REST.Controllers
             }
             var dbDMap = await db.DistributionMaps.FindAsync(dbTask.DistributionMapId);
             var dbSubMap = await db.SubMaps.FindAsync(dbDMap.SubMapId);
+            var dbCampaign = await db.Campaigns.FindAsync(dbSubMap.CampaignId);
             var taskStatus = await db.TaskTimes.Where(i => i.TaskId == taskId).OrderByDescending(i => i.Id).FirstOrDefaultAsync();
+            
             return Json(new {
                 CampaignId = dbSubMap.CampaignId,
+                ClientName = dbCampaign.ClientName,
+                ClientCode = dbCampaign.ClientCode,
                 SubMapId = dbSubMap.Id,
                 DMapId = dbDMap.Id,
                 dbTask.Id,
@@ -45,11 +52,12 @@ namespace Vargainc.Timm.REST.Controllers
                 dbTask.Email,
                 dbTask.Telephone,
                 HaveGtuInfoMapping = dbTask.TaskGtuInfoMappings.Count() > 0 ? true : false,
-                Status = taskStatus == null ? null : new Nullable<int>(taskStatus.TimeType)
+                Status = taskStatus == null ? null : new Nullable<int>(taskStatus.TimeType),
+                PublicUrl = taskId.ToString().DesEncrypt()
             });
         }
 
-        [Route("{taskId:int}")]
+        [Route("{taskId}")]
         [HttpPut]
         public async Task<IHttpActionResult> UpdateTask(int taskId, [FromBody] TaskViewModel taskInfo)
         {
@@ -65,7 +73,7 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = true });
         }
 
-        [Route("{taskId:int}/finish")]
+        [Route("{taskId}/finish")]
         [HttpPut]
         public async Task<IHttpActionResult> MarkFinished(int taskId)
         {
@@ -84,7 +92,7 @@ namespace Vargainc.Timm.REST.Controllers
             return await SetTaskStop(taskId);
         }
 
-        [Route("{taskId:int}/reopen")]
+        [Route("{taskId}/reopen")]
         [HttpPut]
         public async Task<IHttpActionResult> ReOpen(int taskId)
         {
@@ -98,7 +106,7 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = true });
         }
 
-        [Route("{taskId:int}/import")]
+        [Route("{taskId}/import")]
         [HttpPut]
         public async Task<IHttpActionResult> ImportGtuInfo(int taskId)
         {
@@ -235,11 +243,11 @@ namespace Vargainc.Timm.REST.Controllers
             //    }
         }
 
-        [Route("{taskId:int}/gtu")]
+        [Route("{taskId}/gtu")]
         [HttpGet]
         public async Task<IHttpActionResult> GetGtuListByTaskId(int taskId)
         {
-            var result = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId && i.UserId != null).Select(i => new
+            var result = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new
             {
                 i.GTU.Id,
                 i.GTU.ShortUniqueID,
@@ -248,7 +256,7 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(result);
         }
 
-        [Route("{taskId:int}/dots")]
+        [Route("{taskId}/dots")]
         [HttpPost]
         public async Task<IHttpActionResult> AddGtuDotsToTask(int taskId, [FromBody] List<ViewModel.CustomGTUPoint> dots)
         {
@@ -292,7 +300,7 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = true });
         }
 
-        [Route("{taskId:int}/start")]
+        [Route("{taskId}/start")]
         [HttpPut]
         public async Task<IHttpActionResult> SetTaskStart(int taskId)
         {
@@ -310,7 +318,7 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = true, status = 0 });
         }
 
-        [Route("{taskId:int}/pause")]
+        [Route("{taskId}/pause")]
         [HttpPut]
         public async Task<IHttpActionResult> SetTaskPause(int taskId)
         {
@@ -329,7 +337,7 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = true, status = 2 });
         }
 
-        [Route("{taskId:int}/stop")]
+        [Route("{taskId}/stop")]
         [HttpPut]
         public async Task<IHttpActionResult> SetTaskStop(int taskId)
         {
@@ -357,6 +365,8 @@ namespace Vargainc.Timm.REST.Controllers
             await db.SaveChangesAsync();
             return Json(new { success = true, status = 1 });
         }
+
+        
 
         protected override void Dispose(bool disposing)
         {

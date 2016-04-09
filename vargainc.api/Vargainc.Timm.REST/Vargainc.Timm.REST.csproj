@@ -178,6 +178,7 @@
     <Compile Include="Controllers\TaskController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Helper\CampaignLogFix.cs" />
+    <Compile Include="Helper\PublicAccessFilter.cs" />
     <Compile Include="Helper\UserManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
