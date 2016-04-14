@@ -1,14 +1,24 @@
-define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.googleapis.com/maps/api/js?key=AIzaSyBOhGHk0xE1WEG0laS4QGRp_AGhtB5LMHw&libraries=drawing'], function ($, _, React, BaseView) {
-	var googleMap = window.GoogleMap,
-	    googleItems = window.GoogleItems || [],
+define(['jquery', 'underscore', 'react', 'views/base', 'views/mapBase'], function ($, _, React, BaseView, MapBaseView) {
+	var googleItems = [],
 	    rectangle,
 	    drawingManager;
 	return React.createClass({
-		mixins: [BaseView],
+		mixins: [BaseView, MapBaseView],
 		getInitialState: function () {
 			return {
+				disableDefaultUI: true,
 				activeButton: 'EnterMapDraw',
-				activeMap: 'ROADMAP'
+				activeMap: 'ROADMAP',
+				mapStyle: {
+					'visibility': 'hidden',
+					'position': 'fixed',
+					'width': '100%',
+					'height': '100%',
+					'left': '0',
+					'top': '0',
+					'right': '0',
+					'bottom': '0'
+				}
 			};
 		},
 		getDefaultProps: function () {
@@ -19,51 +29,31 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 				mapType: 'ROADMAP'
 			};
 		},
-		componentWillMount: function () {
-			if ($('#google-map').size() == 0) {
-				$('<div id="google-map" class="google-map"></div>').appendTo('body');
-			}
-		},
 		componentDidMount: function () {
 			$(document).one('open.zf.reveal', $.proxy(this.initGoogleMap, this));
-			$(document).one('closed.zf.reveal', $.proxy(this.componentWillUnmount, this));
+			$(document).one('closed.zf.reveal', $.proxy(this.clearMap, this));
 		},
-		componentWillUnmount: function () {
+		clearMap: function () {
+			console.log('mapZoom clearMap');
+			var googleMap = this.getGoogleMap();
 			try {
 				_.forEach(googleItems, function (item) {
-					item.setMap(null);
+					item && item.setMap && item.setMap(null);
 				});
-				rectangle && rectangle.setMap(null);
-				drawingManager && drawingManager.setMap(null);
+				rectangle && rectangle.setMap && rectangle.setMap(null);
+				drawingManager && drawingManager.setMap && drawingManager.setMap(null);
 				google.maps.event.clearInstanceListeners(googleMap);
 				rectangle = null;
 				drawingManager = null;
 			} catch (ex) {
 				console.log('mapZoom componentWillUnmount error', ex);
 			}
-			$('#google-map').css({
-				'visibility': 'hidden'
-			});
+			this.hideMap();
 		},
 		initGoogleMap: function () {
 			console.log('init google map');
-			$('#google-map').css({
-				'visibility': 'visible'
-			});
-
-			if (!googleMap) {
-				googleMap = new google.maps.Map($('#google-map')[0], {
-					center: new google.maps.LatLng(40.744556, -73.987378),
-					zoom: 18,
-					disableDefaultUI: true,
-					mapTypeId: google.maps.MapTypeId.ROADMAP
-				});
-			} else {
-				googleMap.setMapTypeId(google.maps.MapTypeId[this.props.mapType]);
-				this.setState({ 'activeMap': this.props.mapType });
-			}
-
-			google.maps.event.trigger(googleMap, "resize");
+			var googleMap = this.getGoogleMap();
+			this.showMap();
 
 			var boundary = this.props.boundary,
 			    fillColor = this.props.color,
@@ -119,7 +109,8 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			this.publish('hideLoading');
 		},
 		onReset: function () {
-			var boundary = this.props.boundary,
+			var googleMap = this.getGoogleMap(),
+			    boundary = this.props.boundary,
 			    fillColor = this.props.color,
 			    mapBounds = new google.maps.LatLngBounds();
 			polygon = new google.maps.Polygon({
@@ -140,9 +131,11 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			googleMap.fitBounds(mapBounds);
 		},
 		onZoomIn: function () {
+			var googleMap = this.getGoogleMap();
 			googleMap.setZoom(googleMap.getZoom() + 1);
 		},
 		onZoomOut: function () {
+			var googleMap = this.getGoogleMap();
 			googleMap.setZoom(googleMap.getZoom() - 1);
 		},
 		onExistMapDraw: function () {
@@ -154,6 +147,7 @@ define(['jquery', 'underscore', 'react', 'views/base', 'async!http://maps.google
 			drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
 		},
 		onSwitchMapType: function (mapTypeName) {
+			var googleMap = this.getGoogleMap();
 			if (googleMap && google.maps.MapTypeId && google.maps.MapTypeId[mapTypeName]) {
 				googleMap.setMapTypeId(google.maps.MapTypeId[mapTypeName]);
 			}

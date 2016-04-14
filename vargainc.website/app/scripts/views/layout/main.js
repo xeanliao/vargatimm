@@ -88,6 +88,14 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 		componentDidUpdate: function (prevProps, prevState) {
 			if (this.state.dialogView && Foundation) {
 				$('.reveal').foundation();
+				var dialogSize = this.state.dialogSize;
+				$(document).off('open.zf.reveal.mainView');
+				$(document).one('open.zf.reveal.mainView', function () {
+					console.log('open.zf.reveal.mainView');
+					$('.reveal-overlay').css({
+						display: dialogSize == 'full' ? 'none' : 'block'
+					});
+				});
 				$('.reveal').foundation('open');
 			} else {
 				$('.reveal').foundation();
@@ -243,13 +251,17 @@ define(['jquery', 'react', 'react-dom', 'views/base', 'views/layout/menu', 'view
 								search
 							),
 							mainView,
-							React.createElement('div', { id: 'google-map', className: 'google-map' })
+							React.createElement(
+								'div',
+								{ id: 'google-map-wrapper' },
+								React.createElement('div', { id: 'google-map', className: 'google-map' })
+							)
 						)
 					)
 				),
 				React.createElement(
 					'div',
-					{ className: 'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass, 'data-reveal': true, 'data-options': 'closeOnClick: false; closeOnEsc: false' },
+					{ className: 'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass, 'data-reveal': true, 'data-options': 'closeOnClick: false; closeOnEsc: false;' },
 					dialogView
 				),
 				React.createElement(

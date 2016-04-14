@@ -13,7 +13,24 @@ define([
 		getGoogleItems: function () {
 			return googleItems;
 		},
+		showMap: function(){
+			$('#google-map-wrapper').css({
+				'visibility': 'visible'
+			});
+			google.maps.event.trigger(googleMap, 'resize');
+		},
+		hideMap: function(){
+			$('#google-map-wrapper').css({
+				'visibility': 'hidden'
+			});
+			google.maps.event.trigger(googleMap, 'resize');
+		},
+		setMapHeight: function(height){
+			$('#google-map-wrapper').height(height);
+			google.maps.event.trigger(googleMap, 'resize');
+		},
 		componentWillUnmount: function () {
+			console.log('map base clearMap');
 			try {
 				_.forEach(googleItems, function (item) {
 					item && item.setMap && item.setMap(null);
@@ -22,7 +39,7 @@ define([
 			} catch (ex) {
 				console.log('google map clear error', ex);
 			}
-			$('#google-map').css({
+			$('#google-map-wrapper').css({
 				'visibility': 'hidden',
 			});
 		},
@@ -33,10 +50,20 @@ define([
 				disableDefaultUI = _.has(this.state, 'disableDefaultUI') ? this.state.disableDefaultUI : false,
 				scrollwheel = _.has(this.state, 'scrollwheel') ? this.state.scrollwheel : true,
 				disableDoubleClickZoom = _.has(this.state, 'disableDoubleClickZoom') ? this.state.disableDoubleClickZoom : false;
-
-			$('#google-map').css({
-				'visibility': 'visible'
-			});
+			if (this.state.mapStyle) {
+				$('#google-map-wrapper').css(this.state.mapStyle);
+			} else {
+				$('#google-map-wrapper').css({
+					'visibility': 'visible',
+					'position': '',
+					'width': '',
+					'height': '',
+					'left': '',
+					'top': '',
+					'right': '',
+					'bottom': ''
+				});
+			}
 
 			if (!googleMap) {
 				googleMap = new google.maps.Map($('#google-map')[0], {
@@ -63,7 +90,7 @@ define([
 					}
 				});
 			}
-			google.maps.event.trigger(googleMap, "resize");
+			google.maps.event.trigger(googleMap, 'resize');
 		}
 	};
 });

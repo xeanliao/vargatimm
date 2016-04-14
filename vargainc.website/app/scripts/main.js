@@ -47,6 +47,9 @@ define(function (require, exports, module) {
 		});
 		var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
 		var appRouter = new AppRouter;
+		appRouter.on('route', function(){
+			Topic.publish('showDialog');
+		});
 		Backbone.history.start();
 	}).fail(function () {
 		window.location = '../login.html';
