@@ -89,7 +89,10 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 return Json(new { success = false, error = "You could not mark finish for this task because you have not stop monitor(s) yet!" });
             }
-            return await SetTaskStop(taskId);
+            await SetTaskStop(taskId);
+            dbTask.Status = 1;
+            await db.SaveChangesAsync();
+            return Json(new { success = true, status = 1 });
         }
 
         [Route("{taskId}/reopen")]
@@ -365,8 +368,6 @@ namespace Vargainc.Timm.REST.Controllers
             await db.SaveChangesAsync();
             return Json(new { success = true, status = 1 });
         }
-
-        
 
         protected override void Dispose(bool disposing)
         {

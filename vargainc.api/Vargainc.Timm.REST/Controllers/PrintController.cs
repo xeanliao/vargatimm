@@ -386,53 +386,7 @@ namespace Vargainc.Timm.REST.Controllers
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu")]
         public IHttpActionResult GetDmapGTU(int campaignId, int submapId, int dmapId)
         {
-            var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
-                .SubMaps.FirstOrDefault(i => i.Id == submapId)
-                .DistributionMaps.FirstOrDefault(i => i.Id == dmapId);
-            if (dmap == null)
-            {
-                return NotFound();
-            }
-
-            var query = from task in db.Tasks
-                        join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
-                        join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
-                        where task.DistributionMapId == dmapId && task.Status == 1
-                        orderby task.Id, mapping.GTUId, gtu.Id
-                        select new ViewModel.Location
-                        {
-                            Id = mapping.GTUId,
-                            Latitude = gtu.dwLatitude,
-                            Longitude = gtu.dwLongitude
-                        };
-
-                var dmapPolygon = GetDMapBoundary(campaignId, submapId, dmapId);
-
-            
-
-            List<long?> validGtuId;
-            var locations = FormatLocationGroup(query, dmapPolygon, out validGtuId);
-            var colors = new List<string>();
-            if(validGtuId.Count > 0)
-            {
-                var colorQuery = from task in db.Tasks
-                                 join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
-                                 where task.DistributionMapId == dmapId && task.Status == 1 && validGtuId.Contains(mapping.GTUId)
-                                 orderby task.Id, mapping.GTUId
-                                 select mapping.UserColor;
-                colors = colorQuery.ToList();
-            }
-            return Json(new
-            {
-                debug = new {
-                    locationCount = locations.Count,
-                    colorCount = colors.Count,
-                    gtu = validGtuId
-                },
-                points = locations,
-                pointsColors = colors.ToList(),
-                
-            });
+            return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, true, null);
         }
 
         [HttpGet]
