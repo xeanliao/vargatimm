@@ -97,7 +97,6 @@ define([
 				google.maps.event.clearInstanceListeners(googleMap);
 				$(document).off('resize.gtu-monitor-view');
 			} catch (ex) {
-				console.log('google map clear error', ex);
 			}
 		},
 		shouldComponentUpdate: function (nextProps, nextState) {
@@ -106,22 +105,17 @@ define([
 				xor = _.xor(oldActiveGtu, newActiveGtu);
 
 			if (nextState.displayMode == 'track') {
-				console.log('stop background reload');
 				window.clearInterval(backgroundIntervalReload);
 			} else {
-				console.log('start background reload');
 				window.clearInterval(backgroundIntervalReload);
 				backgroundIntervalReload = window.setInterval(this.reload, 15 * 1000);
 			}
 
 			if (this.state.ShowOutOfBoundary != nextState.ShowOutOfBoundary) {
-				console.log('show out of boundary changed');
 				this.reload();
 			} else if (!_.isEmpty(xor)) {
-				console.log('active gtu changed');
 				this.reload();
 			} else if (this.state.displayMode != nextState.displayMode) {
-				console.log('display model changed');
 				this.clearMap();
 				this.reload();
 			}
@@ -162,7 +156,7 @@ define([
 			}, 5 * 60 * 1000);
 			return def;
 		},
-		filterGtu: function (fnFilter) {
+		filterGtu: function (precision) {
 			var def = $.Deferred(),
 				needFilterOutOfBoundary = !this.state.ShowOutOfBoundary,
 				dots = this.props.dmap.get('Gtu') || [],
@@ -181,13 +175,17 @@ define([
 				} else {
 					var points = gtu.points;
 				}
-				var filterGtu = _.groupBy(points, fnFilter);
+				var filterGtu = _.groupBy(points, function (latlng) {
+					return gtu.color + ':' + (_.round(latlng.lat, precision) + ':' + _.round(latlng.lng, precision));
+				});
+				precision++;
 				_.forEach(filterGtu, function (v, k) {
 					var latlng = k.split(':');
+					var random = Math.pow(0.1, precision) * _.random(9);
 					result.push({
 						key: k,
-						lat: parseFloat(latlng[0]),
-						lng: parseFloat(latlng[1]),
+						lat: parseFloat(latlng[1]) + _.round(random, precision),
+						lng: parseFloat(latlng[2]),
 						color: gtu.color
 					})
 				});
@@ -195,19 +193,10 @@ define([
 			return result;
 		},
 		prepareGtu: function () {
-			var gtu3 = this.filterGtu(function (latlng) {
-					return _.round(latlng.lat, 3) + ':' + _.round(latlng.lng, 3);
-				}),
-				gtu4 = this.filterGtu(function (latlng) {
-					return _.round(latlng.lat, 4) + ':' + _.round(latlng.lng, 4);
-				}),
-				gtu5 = this.filterGtu(function (latlng) {
-					return _.round(latlng.lat, 5) + ':' + _.round(latlng.lng, 5);
-				});
+			var gtu3 = this.filterGtu(3),
+				gtu4 = this.filterGtu(4),
+				gtu5 = this.filterGtu(5);
 			gtuData = [gtu3, gtu4, gtu5];
-			console.log("precision 1000   gut:", gtu3.length);
-			console.log("precision 10000  gut:", gtu4.length);
-			console.log("precision 100000 gut:", gtu5.length);
 		},
 		drawGtu: function () {
 			if (this.state.displayMode != 'cover') {
@@ -230,7 +219,6 @@ define([
 						setTimeout(cutDown, 100);
 					} else {
 						def.resolve();
-						console.log('render gtu finished', _.keys(gtuPoints).length);
 						self.setState({busy: false});
 					}
 				},
@@ -257,6 +245,7 @@ define([
 				});
 				newDisplayGtuIndex = lastDisplayGtuIndex;
 			}
+
 			//remove not in current view are gtu pointes.
 			if (lastDisplayGtuIndex == newDisplayGtuIndex) {
 				var tempPoints = {};
@@ -270,6 +259,7 @@ define([
 						tempPoints[item.key] = item;
 					}
 				});
+				console.log('draw gtu', _.keys(gtuPoints).length, _.keys(tempPoints).length);
 				gtuPoints = tempPoints;
 			} else {
 				_.forEach(gtuPoints, function (item) {
@@ -375,7 +365,6 @@ define([
 			}, this));
 		},
 		drawLastLocation: function () {
-			console.log('draw last location');
 			var googleMap = this.getGoogleMap(),
 				point,
 				taskIsStopped = this.props.task.get('Status') == 1,
@@ -403,17 +392,14 @@ define([
 					location = gtu.get('Location');
 				if(!location){
 					delete gtuLocation[gtuId];
-					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' no location');
 					return true;
 				}
 				if (gtuLocation[gtuId]) {
-					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' move location');
 					gtuLocation[gtuId].setPosition({
 						lat: location.lat,
 						lng: location.lng
 					});
 				} else {
-					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' add location');
 					gtuLocation[gtuId] = new google.maps.Marker({
 						position: {
 							lat: location.lat,
@@ -434,7 +420,6 @@ define([
 			});
 		},
 		clearMap: function(){
-			console.log('clear map');
 			try {
 				_.forEach(gtuPoints, function (item) {
 					item.setMap(null);
@@ -447,11 +432,9 @@ define([
 					});
 				});
 			} catch (ex) {
-				console.log('google map clear error', ex);
 			}
 		},
 		reload: function(){
-			console.log('reload');
 			window.clearTimeout(reloadTimeout);
 			reloadTimeout = window.setTimeout($.proxy(this._reload, this), 2 * 1000);
 		},
@@ -506,7 +489,6 @@ define([
 				gtu = this.props.gtu.get(gtuId),
 				location = gtu.get('Location'),
 				marker = gtuLocation[gtu.get('Id')];
-			console.log('gtu last location', location);
 			if (location) {
 				googleMap.setCenter(gtu.get('Location'));
 				infowindow.setContent(gtu.get('ShortUniqueID'));
