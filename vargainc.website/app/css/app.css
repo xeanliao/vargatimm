@@ -599,6 +599,10 @@ table input[type="color"] {
   max-width: 50px;
 }
 
+table .select2-container {
+  margin: 0;
+}
+
 .select2-container {
   width: 100% !important;
   margin: 0 0 1rem;
@@ -1376,6 +1380,7 @@ html, body {
   padding: 0.25rem;
   vertical-align: middle;
   background-clip: content-box !important;
+  margin: 0 auto;
 }
 
 .google_map_container {

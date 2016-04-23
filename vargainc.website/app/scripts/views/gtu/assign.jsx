@@ -55,8 +55,10 @@ define([
 				});
 			});
 		},
-		onCacnel: function(){
-			this.setState({editId: null});
+		onCacnel: function () {
+			this.setState({
+				editId: null
+			});
 		},
 		onRemove: function (gtuId) {
 			var result = confirm('Are you sure you want to remove the assignment from GTU and Employee?');
@@ -74,8 +76,11 @@ define([
 				self = this;
 			return (
 				<tr key={gtu.get('Id')}>
-					<td>{gtu.get('ShortUniqueID')}</td>
-					<td><input ref="userColor" type="color" autocomplete defaultValue={'#'+Math.floor(Math.random()*16777215).toString(16)} /></td>
+					<td className="text-center">{gtu.get('BagId')}</td>
+					<td className="text-center">{gtu.get('ShortUniqueID')}</td>
+					<td className="text-center">
+						<input ref="userColor" className="color-block" type="color" autocomplete defaultValue={'#'+Math.floor(Math.random()*16777215).toString(16)} />
+					</td>
 					<td colSpan="2">
 						<select ref={'userSelector-' + gtu.get('Id')}>
 							{_.map(user, function(v, k){
@@ -89,8 +94,8 @@ define([
 							})}
 						</select>
 					</td>
-					<td>{gtu.get('IsOnline') ? 'Online' : 'Offline'}</td>
-					<td>
+					<td className="text-center">{gtu.get('IsOnline') ? 'Online' : 'Offline'}</td>
+					<td className="text-center">
 						<button className="button tiny" onClick={self.onSave.bind(self, gtu.get('Id'))}>Save</button>
 						<button className="button tiny alert" onClick={self.onCacnel}>Cancel</button>
 					</td>
@@ -113,6 +118,7 @@ define([
 				  	</div>
 					<table>
 						<colgroup>
+							<col style={{"width": "80px"}} />
 							<col style={{"width": "160px"}} />
 							<col style={{"width": "160px"}} />
 							<col />
@@ -122,17 +128,18 @@ define([
 						</colgroup>
 						<thead>
 							<tr>
-								<th>GTU#</th>
-								<th>Color</th>
-								<th>
+								<th className="text-center">Bag#</th>
+								<th className="text-center">GTU#</th>
+								<th className="text-center">Color</th>
+								<th className="text-center">
 									<div className="row">
 										<div className="small-6 column">Team</div>
 										<div className="small-6 column">Auditor</div>
 									</div>
 								</th>
-								<th>Role</th>
-								<th>Status</th>
-								<th></th>
+								<th className="text-center">Role</th>
+								<th className="text-center">Status</th>
+								<th className="text-center"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -148,17 +155,18 @@ define([
 								} else {
 									return(
 										<tr key={gtu.get('Id')}>
-											<td>{gtu.get('ShortUniqueID')}</td>
-											<td>{colorInput}</td>
+											<td className="text-center">{gtu.get('BagId')}</td>
+											<td className="text-center">{gtu.get('ShortUniqueID')}</td>
+											<td className="text-center">{colorInput}</td>
 											<td>
 												<div className="row">
 													<div className="small-6 column">{gtu.get('Company')}</div>
 													<div className="small-6 column">{gtu.get('Auditor')}</div>
 												</div>
 											</td>
-											<td>{gtu.get('Role')}</td>
-											<td>{gtu.get('IsOnline') ? 'Online' : 'Offline'}</td>
-											<td>
+											<td className="text-center">{gtu.get('Role')}</td>
+											<td className="text-center">{gtu.get('IsOnline') ? 'Online' : 'Offline'}</td>
+											<td className="text-center">
 												{actionButton}
 											</td>
 										</tr>

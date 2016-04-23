@@ -47,7 +47,9 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 			});
 		},
 		onCacnel: function () {
-			this.setState({ editId: null });
+			this.setState({
+				editId: null
+			});
 		},
 		onRemove: function (gtuId) {
 			var result = confirm('Are you sure you want to remove the assignment from GTU and Employee?');
@@ -68,13 +70,18 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 				{ key: gtu.get('Id') },
 				React.createElement(
 					'td',
-					null,
+					{ className: 'text-center' },
+					gtu.get('BagId')
+				),
+				React.createElement(
+					'td',
+					{ className: 'text-center' },
 					gtu.get('ShortUniqueID')
 				),
 				React.createElement(
 					'td',
-					null,
-					React.createElement('input', { ref: 'userColor', type: 'color', autocomplete: true, defaultValue: '#' + Math.floor(Math.random() * 16777215).toString(16) })
+					{ className: 'text-center' },
+					React.createElement('input', { ref: 'userColor', className: 'color-block', type: 'color', autocomplete: true, defaultValue: '#' + Math.floor(Math.random() * 16777215).toString(16) })
 				),
 				React.createElement(
 					'td',
@@ -101,12 +108,12 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 				),
 				React.createElement(
 					'td',
-					null,
+					{ className: 'text-center' },
 					gtu.get('IsOnline') ? 'Online' : 'Offline'
 				),
 				React.createElement(
 					'td',
-					null,
+					{ className: 'text-center' },
 					React.createElement(
 						'button',
 						{ className: 'button tiny', onClick: self.onSave.bind(self, gtu.get('Id')) },
@@ -153,6 +160,7 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 					React.createElement(
 						'colgroup',
 						null,
+						React.createElement('col', { style: { "width": "80px" } }),
 						React.createElement('col', { style: { "width": "160px" } }),
 						React.createElement('col', { style: { "width": "160px" } }),
 						React.createElement('col', null),
@@ -168,17 +176,22 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 							null,
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
+								'Bag#'
+							),
+							React.createElement(
+								'th',
+								{ className: 'text-center' },
 								'GTU#'
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								'Color'
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								React.createElement(
 									'div',
 									{ className: 'row' },
@@ -196,15 +209,15 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								'Role'
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								'Status'
 							),
-							React.createElement('th', null)
+							React.createElement('th', { className: 'text-center' })
 						)
 					),
 					React.createElement(
@@ -235,12 +248,17 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 									{ key: gtu.get('Id') },
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
+										gtu.get('BagId')
+									),
+									React.createElement(
+										'td',
+										{ className: 'text-center' },
 										gtu.get('ShortUniqueID')
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										colorInput
 									),
 									React.createElement(
@@ -263,17 +281,17 @@ define(['jquery', 'backbone', 'react', 'views/base', 'react.backbone', 'select2'
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										gtu.get('Role')
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										gtu.get('IsOnline') ? 'Online' : 'Offline'
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										actionButton
 									)
 								);
