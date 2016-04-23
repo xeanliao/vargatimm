@@ -645,11 +645,15 @@ namespace Vargainc.Timm.REST.Controllers
                 }
 
                 var point = new Point(lng, lat);
-                if (filterOuterSide && (polygon == null || !polygon.Contains(point)))
+                if (filterOuterSide && polygon != null && !polygon.Contains(point))
                 {
                     continue;
                 }
-                item.OutOfBoundary = !polygon.Contains(point);
+                if(polygon != null)
+                {
+                    item.OutOfBoundary = !polygon.Contains(point);
+                }
+                
                 if (!lastId.HasValue || lastId.Value == item.Id)
                 {
                     area.Add(item);
