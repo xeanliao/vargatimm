@@ -127,11 +127,13 @@ namespace Vargainc.Timm.REST.Controllers
                 i.Id,
                 i.UniqueID,
                 i.ShortUniqueID,
-                i.IsEnabled
+                i.IsEnabled,
+                BagId = i.Bag.Id
             }).ToListAsync();
 
             return Json(result.Select(i => new {
                 i.Id,
+                i.BagId,
                 i.UniqueID,
                 i.ShortUniqueID,
                 i.IsEnabled,
@@ -140,7 +142,7 @@ namespace Vargainc.Timm.REST.Controllers
                 OutOfBoundary = onlineGTU.ContainsKey(i.UniqueID) ? !dmapPolygon.Contains(new Point(onlineGTU[i.UniqueID].Longitude ?? 0, onlineGTU[i.UniqueID].Latitude ?? 0)) : true,
                 IsAssign = assignedGtu.ContainsKey(i.Id),
                 IsAssignedToOther = assignedToOtherGtu.Contains(i.Id),
-                UserColor = gtuColor.ContainsKey(i.Id) ? gtuColor[i.Id] : "",
+                UserColor = assignedGtu.ContainsKey(i.Id) && gtuColor.ContainsKey(i.Id) ? gtuColor[i.Id] : "",
                 Company = assignedGtu.ContainsKey(i.Id) ? assignedGtu[i.Id].Company : "",
                 Auditor = assignedGtu.ContainsKey(i.Id) ? assignedGtu[i.Id].Auditor : "",
                 Role = assignedGtu.ContainsKey(i.Id) ? assignedGtu[i.Id].Role.ToString() : "",
