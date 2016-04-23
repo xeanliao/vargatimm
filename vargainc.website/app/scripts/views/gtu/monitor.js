@@ -317,7 +317,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			if (this.state.displayMode != 'track') {
 				return;
 			}
-			if (animateSerial % 20 == 0) {
+			if (animateSerial % 10 == 0) {
 				animateSerial = 1;
 			} else {
 				animateSerial++;
