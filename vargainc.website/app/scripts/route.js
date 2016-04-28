@@ -14,6 +14,7 @@ define([
 			'print/:campaignId/:printType': 'printAction',
 			'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
 			'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
+			'campaign/import': 'importCampaign',
 			'frame/:page': 'frameAction',
 			'frame/*page?*queryString': 'frameAction',
 			'*actions': 'defaultAction'
@@ -95,6 +96,16 @@ define([
 				'views/admin/dashboard'
 			], function (View) {
 				Topic.publish('loadView', View);
+			});
+		},
+		importCampaign: function () {
+			require([
+				'collections/campaign',
+				'views/campaign/import'
+			], function (Collection, View) {
+				Topic.publish('loadView', View, {
+					collection: new Collection()
+				});
 			});
 		},
 		printAction: function (campaignId, printType) {

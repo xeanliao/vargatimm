@@ -84,6 +84,23 @@ define(['underscore', 'react'], function (_, React) {
 											)
 										)
 									)
+								),
+								React.createElement(
+									'div',
+									{ className: 'small-12 column' },
+									React.createElement(
+										'div',
+										{ className: 'callout secondary' },
+										React.createElement(
+											'a',
+											{ href: '#campaign/import' },
+											React.createElement(
+												'span',
+												null,
+												'Import Company'
+											)
+										)
+									)
 								)
 							),
 							React.createElement(

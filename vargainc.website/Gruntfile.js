@@ -137,6 +137,9 @@ module.exports = function (grunt) {
 					src: ['<%= app %>/scripts/views/campaign/publish.jsx'],
 					dest: '<%= app %>/scripts/views/campaign/publish.js'
 				}, {
+					src: ['<%= app %>/scripts/views/campaign/import.jsx'],
+					dest: '<%= app %>/scripts/views/campaign/import.js'
+				}, {
 					src: ['<%= app %>/scripts/views/user/adminList.jsx'],
 					dest: '<%= app %>/scripts/views/user/adminList.js'
 				}, {
