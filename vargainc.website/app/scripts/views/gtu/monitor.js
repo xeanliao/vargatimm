@@ -156,27 +156,33 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 					var points = gtu.points;
 				}
 				var filterGtu = _.groupBy(points, function (latlng) {
-					return gtu.color + ':' + (_.round(latlng.lat, precision) + ':' + _.round(latlng.lng, precision));
+					if (latlng && latlng.lat && latlng.lng) {
+						return gtu.color + ':' + (_.round(latlng.lat, precision) + ':' + _.round(latlng.lng, precision));
+					}
+					return null;
 				});
 				precision++;
 				_.forEach(filterGtu, function (v, k) {
-					var latlng = k.split(':');
-					var random = Math.pow(0.1, precision) * _.random(9);
-					result.push({
-						key: k,
-						lat: parseFloat(latlng[1]) + _.round(random, precision),
-						lng: parseFloat(latlng[2]),
-						color: gtu.color
-					});
+					if (k) {
+						var latlng = k.split(':');
+						var random = Math.pow(0.1, precision) * _.random(9);
+						result.push({
+							key: k,
+							lat: parseFloat(latlng[1]) + _.round(random, precision),
+							lng: parseFloat(latlng[2]),
+							color: gtu.color
+						});
+					}
 				});
 			});
 			return result;
 		},
 		prepareGtu: function () {
-			var gtu3 = this.filterGtu(3),
+			var gtu2 = this.filterGtu(2),
+			    gtu3 = this.filterGtu(3),
 			    gtu4 = this.filterGtu(4),
 			    gtu5 = this.filterGtu(5);
-			gtuData = [gtu3, gtu4, gtu5];
+			gtuData = [gtu2, gtu3, gtu4, gtu5];
 		},
 		drawGtu: function () {
 			if (this.state.displayMode != 'cover') {
@@ -204,7 +210,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			},
 			    filterGtus,
 			    point;
-
+			console.log(gtuData);
 			_.isEmpty(gtuData) && this.prepareGtu();
 			//get less than max display gtu and in current view are latlng.
 			if (lastDisplayGtuIndex === null || lastZoomLevel != zoomLevel) {
