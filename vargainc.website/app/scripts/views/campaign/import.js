@@ -2,7 +2,7 @@ define(['jquery', 'underscore', 'moment', 'backbone', 'react', 'views/base', 're
 	return React.createBackboneClass({
 		mixins: [BaseView],
 		onSearch: function () {
-			var url = this.refs.sourceUrl.value;
+			var url = 'http://timm.vargainc.com/' + this.refs.sourceUrl.value + '/api/campaign';
 			if (_.isEmpty(url)) {
 				this.publish('showDialog', 'Please input source url');
 				return;

@@ -97,7 +97,7 @@ define(['underscore', 'react'], function (_, React) {
 											React.createElement(
 												'span',
 												null,
-												'Import Company'
+												'Import Campaign'
 											)
 										)
 									)
