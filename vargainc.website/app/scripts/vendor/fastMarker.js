@@ -17,16 +17,16 @@
 		set: function (k, v) {
 			var index = this.keys.indexOf(k);
 			if (index > -1) {
-				this.values[index] = v;
+				this.values[index + ''] = v;
 			} else {
 				this.keys.push(k);
-				this.values[this.keys.length - 1] = v;
+				this.values[(this.keys.length - 1) + ''] = v;
 			}
 		},
 		get: function (k) {
 			var index = this.keys.indexOf(k);
 			if (index > -1) {
-				return this.values[index];
+				return this.values[index + ''];
 			} else {
 				return null;
 			}
@@ -38,7 +38,7 @@
 			var index = this.keys.indexOf(k);
 			if (index > -1) {
 				this.keys = this.keys.splice(index, 1);
-				delete this.values[index];
+				delete this.values[index + ''];
 			}
 		}
 	}
@@ -56,10 +56,10 @@
 		if (index > -1) {
 			this._markers = this._markers.slice(index, 1);
 		}
-		if (this._markers.length == 0) {
-			hashMap.delete(this.getMap());
-			this.setMap(null);
-		}
+		// if (this._markers.length == 0) {
+		// 	hashMap.delete(this.getMap());
+		// 	this.setMap(null);
+		// }
 	}
 	FastMarkerLayer.prototype.onAdd = function () {
 		var map = this.getMap(),
@@ -154,6 +154,7 @@
 			this.Layer = layer;
 			this.Map = map;
 			layer.addMarker(this);
+			layer.draw();
 		} else {
 			if (this.Layer && this.Map) {
 				this.Layer.removeMarker(this);

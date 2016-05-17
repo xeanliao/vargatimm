@@ -32,8 +32,10 @@ define([
 			};
 		},
 		onWindowResize: function () {
-			var pageLeftHeight = $(window).height() - $(this.refs.mapArea).position().top;
-			this.setMapHeight(pageLeftHeight);
+			if(this.refs.mapArea){
+				var pageLeftHeight = $(window).height() - $(this.refs.mapArea).position().top;
+				this.setMapHeight(pageLeftHeight);
+			}
 		},
 		componentDidMount: function () {
 			this.publish('showLoading');
