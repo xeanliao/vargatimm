@@ -92,7 +92,8 @@ namespace Vargainc.Timm.REST.Controllers
             var result = await db.Campaigns
                 .Where(i => i.Status.Max(s => s.Status) == 1)
                 .OrderByDescending(i => i.Id)
-                .Select(i => new {
+                .Select(i => new
+                {
                     i.AreaDescription,
                     i.ClientCode,
                     i.ClientName,
@@ -335,22 +336,22 @@ namespace Vargainc.Timm.REST.Controllers
                     db.CampaignBackups.Add(backup);
                     await db.SaveChangesAsync();
 
-                    #region Fast Delete Campaign. 
+                    #region Fast Delete Campaign.
                     //current we used lazy load. you must load all the child entity if want entity framework auto cascade delete
                     db.DistributionJobs.RemoveRange(db.DistributionJobs.Where(i => i.CampaignId == campaignId));
                     await db.SaveChangesAsync();
 
                     var submaps = db.SubMaps.Where(i => i.CampaignId == campaignId).Select(i => i.Id).ToList();
-                    if(submaps != null && submaps.Count > 0)
+                    if (submaps != null && submaps.Count > 0)
                     {
                         var fakeSubmaps = new List<SubMap>();
-                        foreach(var submapId in submaps)
+                        foreach (var submapId in submaps)
                         {
-                            var dmaps = db.DistributionMaps.Where(i => i.SubMapId == submapId).Select(i=>i.Id).ToList();
-                            if(dmaps != null && dmaps.Count > 0)
+                            var dmaps = db.DistributionMaps.Where(i => i.SubMapId == submapId).Select(i => i.Id).ToList();
+                            if (dmaps != null && dmaps.Count > 0)
                             {
                                 var fakeDmaps = new List<DistributionMap>();
-                                foreach(var dmapId in dmaps)
+                                foreach (var dmapId in dmaps)
                                 {
                                     db.DistributionMapRecords.RemoveRange(db.DistributionMapRecords.Where(i => i.DistributionMapId == dmapId));
                                     db.DistributionMapCoordinates.RemoveRange(db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dmapId));
@@ -359,9 +360,9 @@ namespace Vargainc.Timm.REST.Controllers
 
                                     db.TaskGtuInfoMappings.RemoveRange(db.TaskGtuInfoMappings.Where(i => taskId.Contains(i.TaskId)));
                                     db.TaskTimes.RemoveRange(db.TaskTimes.Where(i => taskId.Contains(i.TaskId)));
-                                    
+
                                     db.Tasks.RemoveRange(db.Tasks.Where(i => i.DistributionMapId == dmapId));
-                                    
+
                                     await db.SaveChangesAsync();
                                     fakeDmaps.Add(db.DistributionMaps.Attach(new DistributionMap { Id = dmapId }));
                                 }
@@ -378,10 +379,10 @@ namespace Vargainc.Timm.REST.Controllers
                     }
 
                     var address = db.Addresses.Where(i => i.CampaignId == campaignId).Select(i => i.Id).ToList();
-                    if(address != null && address.Count > 0)
+                    if (address != null && address.Count > 0)
                     {
                         var fakeAddress = new List<Address>();
-                        foreach(var addressId in address)
+                        foreach (var addressId in address)
                         {
                             db.Radiuses.RemoveRange(db.Radiuses.Where(i => i.AddressId == addressId));
                             await db.SaveChangesAsync();
@@ -408,10 +409,10 @@ namespace Vargainc.Timm.REST.Controllers
                     trans.Commit();
                     return Json(new { success = true });
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     trans.Rollback();
-                    return Json(new { success = false, debug = ex.ToString()  });
+                    return Json(new { success = false, debug = ex.ToString() });
                 }
 
             }
@@ -421,24 +422,24 @@ namespace Vargainc.Timm.REST.Controllers
         [HttpPut]
         public async Task<IHttpActionResult> PublishCampaignToDMap(int? campaignId, [FromBody] int? userId)
         {
-            
+
             var dbCampaign = await db.Campaigns.FindAsync(campaignId);
-            if(dbCampaign == null)
+            if (dbCampaign == null)
             {
                 return NotFound();
             }
             var user = await db.Users.FindAsync(userId);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
             var campaignStatus = dbCampaign.Status.Max(i => i.Status);
-            if(campaignStatus != 0)
+            if (campaignStatus != 0)
             {
                 return Json(new { success = false, error = "Campaign is already published or updated. please refresh page and try again." });
             }
-            if(dbCampaign.SubMaps.Count() == 0)
+            if (dbCampaign.SubMaps.Count() == 0)
             {
                 return Json(new { success = false, error = "You have not create submap yet!. please add some submaps first." });
             }
@@ -589,7 +590,8 @@ namespace Vargainc.Timm.REST.Controllers
         {
             using (var tran = db.Database.BeginTransaction())
             {
-                try {
+                try
+                {
                     var submaps = db.SubMaps.Where(i => i.CampaignId == dbCampaign.Id).Select(i => i.Id).ToList();
                     if (submaps != null && submaps.Count > 0)
                     {
@@ -634,7 +636,7 @@ namespace Vargainc.Timm.REST.Controllers
 
                     return Json(new { success = true });
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     tran.Rollback();
                     return Json(new { success = false, ex = ex.ToString() });
@@ -660,7 +662,8 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var trans = db.Database.BeginTransaction())
             {
-                try {
+                try
+                {
                     db.Configuration.AutoDetectChangesEnabled = false;
                     db.Configuration.ValidateOnSaveEnabled = false;
 
@@ -673,7 +676,7 @@ namespace Vargainc.Timm.REST.Controllers
                     newCampaign.ContactName = sourceCampaign.ContactName;
                     newCampaign.CreatorName = sourceCampaign.CreatorName;
                     newCampaign.CustemerName = sourceCampaign.CustemerName;
-                    newCampaign.Date = sourceCampaign.Date;
+                    newCampaign.Date = DateTime.Today; //sourceCampaign.Date;
                     newCampaign.Description = sourceCampaign.Description;
                     newCampaign.Latitude = sourceCampaign.Latitude;
                     newCampaign.Logo = sourceCampaign.Logo;
@@ -723,24 +726,16 @@ namespace Vargainc.Timm.REST.Controllers
                     }
                     #endregion
                     #region campaign address
-                    if (sourceCampaign.Addresses.Count() > 0)
-                    {
-                        foreach (var item in sourceCampaign.Addresses)
-                        {
-                            var address = new Address
-                            {
-                                AddressName = item.AddressName,
-                                Campaign = sourceCampaign,
-                                Color = item.Color,
-                                Latitude = item.Latitude,
-                                Longitude = item.Longitude,
-                                OriginalLatitude = item.OriginalLatitude,
-                                OriginalLongitude = item.OriginalLongitude,
-                                Picture = item.Picture,
-                                ZipCode = item.ZipCode,
-                            };
 
-                            db.Addresses.Add(address);
+                    int addrCount = sourceCampaign.Addresses.Count();
+                    if (addrCount > 0)
+                    {
+                        Address[] copies = new Address[addrCount];
+                        sourceCampaign.Addresses.CopyTo(copies, 0);
+                        foreach (var item in copies)
+                        {
+                            item.Campaign = newCampaign;
+                            db.Addresses.Add(item);
                             await db.SaveChangesAsync();
 
                             if (item.Radiuses.Count() > 0)
@@ -750,7 +745,7 @@ namespace Vargainc.Timm.REST.Controllers
                                     IsDisplay = i.IsDisplay,
                                     Length = i.Length,
                                     LengthMeasuresId = i.LengthMeasuresId,
-                                    Address = address
+                                    Address = item
                                 });
                                 db.Radiuses.AddRange(addressRadiuses);
                                 await db.SaveChangesAsync();
@@ -874,15 +869,15 @@ namespace Vargainc.Timm.REST.Controllers
         public async Task<IHttpActionResult> GetAllowCopyCampaignList()
         {
             var result = await db.Campaigns.Include(i => i.Status)
-                .OrderByDescending(i=>i.Date)
-                .ThenBy(i=>i.CustemerName)
-                .ThenBy(i=>i.UserName)
-                .ThenByDescending(i=>i.Sequence)
+                .OrderByDescending(i => i.Date)
+                .ThenBy(i => i.CustemerName)
+                .ThenBy(i => i.UserName)
+                .ThenByDescending(i => i.Sequence)
                 .ToListAsync();
             List<Models.Campaign> allowCopyCampaign = new List<Models.Campaign>();
-            foreach(var item in result)
+            foreach (var item in result)
             {
-                if((item.Status.Max(i=>i.Status) ?? 0) < 1 && item.SubMaps.Count() > 0)
+                if ((item.Status.Max(i => i.Status) ?? 0) < 1 && item.SubMaps.Count() > 0)
                 {
                     allowCopyCampaign.Add(item);
                 }
@@ -919,13 +914,14 @@ namespace Vargainc.Timm.REST.Controllers
                     s.ColorString,
                     s.CountAdjustment,
                     s.TotalAdjustment,
-                    SubMapCRoutes = s.SubMapRecords.Where(i=>i.Classification == 15 && i.Value == true).Select(i=>i.AreaId).ToList(),
+                    SubMapCRoutes = s.SubMapRecords.Where(i => i.Classification == 15 && i.Value == true).Select(i => i.AreaId).ToList(),
                     SubMapGeoCode = new List<string>(),
                     //SubMapAreas = new List<ViewModel.ImportCRoute>(),
-                    Boundary = s.SubMapCoordinates.OrderBy(i=>i.Id).Select(i=>new { Latitude = i.Latitude, Longitude = i.Longitude }).ToList()
+                    Boundary = s.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new { Latitude = i.Latitude, Longitude = i.Longitude }).ToList()
                 }).ToArray();
 
-            var address = campaign.Addresses.Select(i => new {
+            var address = campaign.Addresses.Select(i => new
+            {
                 i.AddressName,
                 i.Color,
                 i.Latitude,
@@ -934,10 +930,10 @@ namespace Vargainc.Timm.REST.Controllers
                 i.OriginalLongitude,
                 i.Picture,
                 i.ZipCode,
-                Radiuses = i.Radiuses.Select(r=>new { r.Length, r.LengthMeasuresId, r.IsDisplay }).ToList()
+                Radiuses = i.Radiuses.Select(r => new { r.Length, r.LengthMeasuresId, r.IsDisplay }).ToList()
             });
-            var userId = await db.Status.Where(i => i.CampaignId == campaign.Id).OrderBy(i => i.Status).Select(i=>i.UserId).FirstOrDefaultAsync();            
-            var user = db.Users.FirstOrDefault(i=>i.Id == userId);
+            var userId = await db.Status.Where(i => i.CampaignId == campaign.Id).OrderBy(i => i.Status).Select(i => i.UserId).FirstOrDefaultAsync();
+            var user = db.Users.FirstOrDefault(i => i.Id == userId);
             var classifications = campaign.CampaignClassifications.Select(i => i.Classification).ToList();
 
             var allAreas = submaps.SelectMany(i => i.SubMapCRoutes).ToList();
@@ -964,7 +960,8 @@ namespace Vargainc.Timm.REST.Controllers
 
             var cRouteImporteds = await QueryPenetrationByCampaignId(campaignId);
 
-            return Json(new {
+            return Json(new
+            {
                 campaign.AreaDescription,
                 campaign.ClientCode,
                 campaign.ClientName,
@@ -982,7 +979,8 @@ namespace Vargainc.Timm.REST.Controllers
                 UserStatus = user.UserName,
                 Address = address,
                 Classifications = classifications,
-                SubMap = submaps != null ? submaps.Select(s => new {
+                SubMap = submaps != null ? submaps.Select(s => new
+                {
                     s.ColorR,
                     s.ColorG,
                     s.ColorB,
@@ -996,7 +994,7 @@ namespace Vargainc.Timm.REST.Controllers
                 PercentageColors = colors,
                 //Penetration = cRouteImporteds
             });
-            
+
         }
 
         [Route("import")]
@@ -1015,7 +1013,7 @@ namespace Vargainc.Timm.REST.Controllers
             HashSet<int> alreadyAddToSubMapCRoute = new HashSet<int>();
             foreach (var submap in campaign.SubMap)
             {
-                if(submap.Boundary == null || submap.Boundary.Count == 0)
+                if (submap.Boundary == null || submap.Boundary.Count == 0)
                 {
                     continue;
                 }
@@ -1027,7 +1025,7 @@ namespace Vargainc.Timm.REST.Controllers
                 var orignalPolygon = new Polygon(new LinearRing(orginalLinearRing.ToArray()));
                 orignalPolygon.Buffer(0);
                 double? topRightLat = null, topRightLng = null, bottomLeftLat = null, bottomLeftLng = null;
-                foreach(var latlng in orignalPolygon.Envelope.Coordinates)
+                foreach (var latlng in orignalPolygon.Envelope.Coordinates)
                 {
                     topRightLat = !topRightLat.HasValue || latlng.Y > topRightLat ? latlng.Y : topRightLat;
                     topRightLng = !topRightLng.HasValue || latlng.X > topRightLng ? latlng.X : topRightLng;
@@ -1038,7 +1036,7 @@ namespace Vargainc.Timm.REST.Controllers
 
                 List<int> cRoutes = await QueryCRouteInBox(topRightLat.Value, topRightLng.Value, bottomLeftLat.Value, bottomLeftLng.Value);
                 HashSet<string> subMapGeoCode = new HashSet<string>();
-                foreach(var item in submap.SubMapGeoCode)
+                foreach (var item in submap.SubMapGeoCode)
                 {
                     if (!subMapGeoCode.Contains(item))
                     {
@@ -1055,7 +1053,7 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 submap.SubMapCoordinate = boundary;
                 submap.PremiumCRoutes = addedCRoute;
-                foreach(var id in addedCRoute)
+                foreach (var id in addedCRoute)
                 {
                     if (!alreadyAddToSubMapCRoute.Contains(id))
                     {
@@ -1220,7 +1218,7 @@ namespace Vargainc.Timm.REST.Controllers
                         db.CampaignRecords.AddRange(partCampaignRecord);
                         await db.SaveChangesAsync();
                     }
-                    
+
                     if (subMap.SubMapCoordinate != null && subMap.SubMapCoordinate.Count > 0)
                     {
                         var subMapCoordinate = subMap.SubMapCoordinate.Select(i => new SubMapCoordinate
@@ -1366,7 +1364,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             #region Update Total
             var submaps = dbCampaign.SubMaps.ToList();
-            foreach(var item in submaps)
+            foreach (var item in submaps)
             {
                 db.SubMaps.Attach(item);
                 item.Total = await QuerySubMapTotal(dbCampaign.AreaDescription, item.Id.Value);
@@ -1381,7 +1379,7 @@ namespace Vargainc.Timm.REST.Controllers
         }
         private async Task<Dictionary<int, ViewModel.ImportCRoute>> QueryCRoutesById(List<int?> allAreas)
         {
-            if(allAreas == null || allAreas.Count == 0)
+            if (allAreas == null || allAreas.Count == 0)
             {
                 return new Dictionary<int, ViewModel.ImportCRoute>();
             }
@@ -1423,7 +1421,7 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 values.AppendFormat(", '{0}'", allGeoCode[i]);
             }
-            
+
             var sql = string.Format("SELECT [ID], [GEOCODE], [PartCount], [APT_COUNT], [HOME_COUNT] FROM [dbo].[premiumcroutes] WHERE [GEOCODE] IN ({0})", values);
 
             var result = await db.Database.SqlQuery<ViewModel.ImportCRoute>(sql).ToListAsync();
@@ -1492,7 +1490,7 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 crouteCoordinate.Add(new Coordinate { Y = enumerator.Current.Latitude.Value, X = enumerator.Current.Longitude.Value });
                 lastAddedId = enumerator.Current.PreminumCRouteId;
-                
+
             }
             //polygon must contant more than 2 points.
             if (crouteCoordinate.Count > 1)
@@ -1527,7 +1525,8 @@ namespace Vargainc.Timm.REST.Controllers
                     if (intersection.IsEmpty)
                     {
                         haveIntersectionPolygon = false;
-                    }else if(intersection.GeometryType == "Polygon")
+                    }
+                    else if (intersection.GeometryType == "Polygon")
                     {
                         haveIntersectionPolygon = true;
                     }
@@ -1541,11 +1540,11 @@ namespace Vargainc.Timm.REST.Controllers
                             }
                         }
                     }
-                    
+
                     if (haveIntersectionPolygon)
                     {
                         var itemCRoute = db.PremiumCRoutes.Find((int)item.UserData);
-                        if(itemCRoute != null && submapGeoCode.Contains(itemCRoute.GEOCODE))
+                        if (itemCRoute != null && submapGeoCode.Contains(itemCRoute.GEOCODE))
                         {
                             validatedPolygon.Add(item);
                         }
