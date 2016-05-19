@@ -1,9 +1,8 @@
 define([
 	'jquery',
 	'underscore',
-
-	'async!http://maps.googleapis.com/maps/api/js?key=AIzaSyBOhGHk0xE1WEG0laS4QGRp_AGhtB5LMHw&libraries=drawing'
-], function ($, _) {
+	'fastMarker'
+], function ($, _, FastMarker) {
 	var googleMap = window.GoogleMap,
 		googleItems = window.GoogleItems || [];
 	return {

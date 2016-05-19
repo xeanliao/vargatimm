@@ -10,16 +10,16 @@ define([
 	'views/mapBase',
 	'views/gtu/assign',
 	'views/user/employee',
+	'fastMarker',
 
 	'react.backbone'
-], function ($, _, helper, moment, React, UserCollection, UserModel, BaseView, MapBaseView, AssignView, EmployeeView) {
+], function ($, _, helper, moment, React, UserCollection, UserModel, BaseView, MapBaseView, AssignView, EmployeeView, FastMarker) {
 	var reloadTimeout = null,
 		backgroundIntervalReload = null,
 		trackAnimationFrame = null,
 		dmapPolygon = null,
 		dmapBounds = null,
-		gtuData = [],
-		gtuPoints = {},//{key: 'lat:lng', point: google.map.marker}
+		gtuPoints = [],//{key: 'lat:lng', point: google.map.marker}
 		gtuLocation = {},
 		gtuTrack = {},//{key: 'gtu id', {track: google.map.polyline, startPoint: google.map.marker}
 		animateIndex = 0,
@@ -65,10 +65,8 @@ define([
 			var self = this,
 				googleMap = this.getGoogleMap();
 
-			this.drawDmapBoundary().then(this.filterGtu).then(this.drawGtu).done(function () {
-				googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
-				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
-			}).done(function () {
+			this.drawDmapBoundary().done(function () {
+				self.drawGtu();
 				self.drawLastLocation();
 				var allAssignedGtu = _.map(self.props.gtu.where(function (i) {
 					return i.get('IsAssign') || i.get('WithData');
@@ -82,7 +80,7 @@ define([
 				self.publish('hideLoading');
 				infowindow = new google.maps.InfoWindow();
 				window.clearInterval(backgroundIntervalReload);
-				backgroundIntervalReload = window.setInterval(self.reload, 15 * 1000);
+				backgroundIntervalReload = window.setInterval(self.reload, 30 * 1000);
 			});
 			
 			$("#monitor-more-menu").foundation();
@@ -109,7 +107,7 @@ define([
 				window.clearInterval(backgroundIntervalReload);
 			} else {
 				window.clearInterval(backgroundIntervalReload);
-				backgroundIntervalReload = window.setInterval(this.reload, 15 * 1000);
+				backgroundIntervalReload = window.setInterval(this.reload, 30 * 1000);
 			}
 
 			if (this.state.ShowOutOfBoundary != nextState.ShowOutOfBoundary) {
@@ -152,23 +150,28 @@ define([
 				def.resolve();
 			});
 			googleMap.fitBounds(dmapBounds);
-			timeout = window.setTimeout(function () {
-				def.resolve();
-			}, 5 * 60 * 1000);
+			def.resolve();
 			return def;
 		},
-		filterGtu: function (precision) {
-			var def = $.Deferred(),
+		drawGtu: function () {
+			if (this.state.displayMode != 'cover') {
+				return;
+			}
+			var self = this,
+				googleMap = this.getGoogleMap(),
 				needFilterOutOfBoundary = !this.state.ShowOutOfBoundary,
 				dots = this.props.dmap.get('Gtu') || [],
-				activeGtu = this.state.activeGtu,
-				result = [];
+				activeGtu = this.state.activeGtu;
+
+			_.forEach(gtuPoints, function (p) {
+				p.setMap(null);
+			});
+			gtuPoints = [];
 
 			_.forEach(dots, function (gtu) {
 				if (_.indexOf(activeGtu, gtu.gtuId) == -1) {
 					return true;
 				}
-
 				if (needFilterOutOfBoundary) {
 					var points = _.filter(gtu.points, {
 						out: false
@@ -176,135 +179,29 @@ define([
 				} else {
 					var points = gtu.points;
 				}
-				var filterGtu = _.groupBy(points, function (latlng) {
-					if(latlng && latlng.lat && latlng.lng){
-						return gtu.color + ':' + (_.round(latlng.lat, precision) + ':' + _.round(latlng.lng, precision));	
-					}
-					return null;
-				});
-				precision++;
-				_.forEach(filterGtu, function (v, k) {
-					if(k){
-						var latlng = k.split(':');
-						var random = Math.pow(0.1, precision) * _.random(9);
-						result.push({
-							key: k,
-							lat: parseFloat(latlng[1]) + _.round(random, precision),
-							lng: parseFloat(latlng[2]),
-							color: gtu.color
-						})
-					}
-				});
-			});
-			return result;
-		},
-		prepareGtu: function () {
-			var gtu2 = this.filterGtu(2),
-				gtu3 = this.filterGtu(3),
-				gtu4 = this.filterGtu(4),
-				gtu5 = this.filterGtu(5);
-			gtuData = [gtu2, gtu3, gtu4, gtu5];
-		},
-		drawGtu: function () {
-			if (this.state.displayMode != 'cover') {
-				return;
-			}
-			var def = $.Deferred(),
-				self = this,
-				maxDisplayCount = this.state.maxDisplayCount,
-				lastDisplayGtuIndex = this.state.lastDisplayGtuIndex,
-				lastViewArea = this.state.lastViewArea,
-				lastZoomLevel = this.state.lastZoomLevel,
-				newDisplayGtuIndex = null,
-				googleMap = this.getGoogleMap(),
-				viewArea = googleMap.getBounds(),
-				zoomLevel = googleMap.getZoom(),
-				cutDownNumber = 5,
-				cutDown = function () {
-					cutDownNumber--;
-					if (cutDownNumber > 0) {
-						setTimeout(cutDown, 100);
-					} else {
-						def.resolve();
-						self.setState({busy: false});
-					}
-				},
-				filterGtus,
-				point;
-			console.log(gtuData);
-			_.isEmpty(gtuData) && this.prepareGtu();
-			//get less than max display gtu and in current view are latlng.
-			if (lastDisplayGtuIndex === null || lastZoomLevel != zoomLevel) {
-				_.forEach(gtuData, function (points, index) {
-					var visiableGtu = _.filter(points, function (latlng) {
-						return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
-					});
-					if (!filterGtus || visiableGtu.length <= maxDisplayCount) {
-						filterGtus = visiableGtu;
-						newDisplayGtuIndex = index;
-					} else {
-						return false;
-					}
-				});
-			} else {
-				filterGtus = _.filter(gtuData[lastDisplayGtuIndex], function (latlng) {
-					return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
-				});
-				newDisplayGtuIndex = lastDisplayGtuIndex;
-			}
+				var color = gtu.color;
 
-			//remove not in current view are gtu pointes.
-			if (lastDisplayGtuIndex == newDisplayGtuIndex) {
-				var tempPoints = {};
-				_.forEach(gtuPoints, function (item) {
-					var position = item.getPosition();
-					if (!viewArea.contains(position) || !_.some(filterGtus, {
-							key: item.key
-						})) {
-						item.setMap(null);
-					} else {
-						tempPoints[item.key] = item;
+				_.forEach(points, function (latlng) {
+					if (latlng && latlng.lat && latlng.lng) {
+						gtuPoints.push(new FastMarker({
+							position: {
+								lat: latlng.lat,
+								lng: latlng.lng
+							},
+							icon: {
+								path: self.getCirclePath(5),
+								fillColor: color,
+								fillOpacity: 1,
+								strokeOpacity: 1,
+								strokeWeight: 1,
+								strokeColor: '#000'
+							},
+							draggable: false,
+							map: googleMap
+						}));
 					}
 				});
-				gtuPoints = tempPoints;
-			} else {
-				_.forEach(gtuPoints, function (item) {
-					item.setMap(null);
-				});
-				gtuPoints = {};
-				lastViewArea = null;
-			}
-
-			_.forEach(filterGtus, function (gtu) {
-				if (gtuPoints[gtu.key] != null) {
-					return true;
-				}
-				point = new google.maps.Marker({
-					position: {
-						lat: gtu.lat,
-						lng: gtu.lng
-					},
-					icon: {
-						path: self.getCirclePath(5),
-						fillColor: gtu.color,
-						fillOpacity: 1,
-						strokeOpacity: 1,
-						strokeWeight: 1,
-						strokeColor: '#000'
-					},
-					draggable: false,
-					map: googleMap
-				});
-				point.key = gtu.key;
-				gtuPoints[gtu.key] = point;
 			});
-			this.setState({
-				lastDisplayGtuIndex: newDisplayGtuIndex,
-				lastViewArea: viewArea,
-				lastZoomLevel: zoomLevel
-			});
-			cutDown();
-			return def;
 		},
 		prepareGTUTrack: function(){
 			var def = $.Deferred(),
@@ -467,10 +364,8 @@ define([
 						quite: true
 					}).promise
 				]).done(function () {
-					self.drawLastLocation();
-					self.prepareGtu();
 					self.drawGtu();
-					
+					self.drawLastLocation();
 				});
 			} else {
 				self.drawLastLocation();
@@ -480,7 +375,6 @@ define([
 		onReCenter: function () {
 			var googleMap = this.getGoogleMap();
 			googleMap.setCenter(dmapBounds.getCenter());
-			this.drawGtu();
 		},
 		onSelectedGTU: function (gtuId) {
 			var activeGtu = _.clone(this.state.activeGtu);

@@ -91,6 +91,8 @@ require.config({
         'select2': 'vendor/select2',
         'spectrum': 'vendor/spectrum',
         'markerclusterer': 'vendor/markerclusterer',
+        'd3': '//d3js.org/d3.v3.min',
+        'fastMarker': 'vendor/fastMarker',
         'foundation.core': 'vendor/foundation.core',
         'foundation.util.box': 'vendor/foundation.util.box',
         'foundation.util.keyboard': 'vendor/foundation.util.keyboard',

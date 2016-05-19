@@ -6,14 +6,16 @@ define([
 	'react',
 	'views/base',
 	'views/mapBase',
+	'fastMarker',
 
 	'react.backbone'
-], function ($, _, helper, moment, React, BaseView, MapBaseView) {
+], function ($, _, helper, moment, React, BaseView, MapBaseView, FastMarker) {
 	var dmapPolygon = null,
 		dmapBounds = null,
 		gtuData = null,
 		gtuPoints = [],
 		savedCustomPoints = [];
+
 	return React.createBackboneClass({
 		mixins: [
 			BaseView,
@@ -30,8 +32,10 @@ define([
 			};
 		},
 		onWindowResize: function () {
-			var pageLeftHeight = $(window).height() - $(this.refs.mapArea).position().top;
-			this.setMapHeight(pageLeftHeight);
+			if(this.refs.mapArea){
+				var pageLeftHeight = $(window).height() - $(this.refs.mapArea).position().top;
+				this.setMapHeight(pageLeftHeight);
+			}
 		},
 		componentDidMount: function () {
 			this.publish('showLoading');
@@ -49,8 +53,8 @@ define([
 				googleMap = this.getGoogleMap();
 			this.drawDmapBoundary().then(this.filterGtu).then(this.drawGtu).done(function(){
 				dmapPolygon.addListener('click', $.proxy(self.onNewGtu, self));
-				googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
-				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
+				// googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
+				// googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
 				self.publish('hideLoading');
 			});
 		},
@@ -139,6 +143,32 @@ define([
 			// console.log("precision 100000 gut:", gtu5.length);
 		},
 		drawGtu: function () {
+			var gtus = this.props.dmap.get('Gtu') || [],
+				googleMap = this.getGoogleMap(),
+				self = this;
+			_.forEach(gtus, function (colorGtu) {
+				var color = colorGtu.color;
+				_.forEach(colorGtu.points, function (gtu) {
+					new FastMarker({
+						position: {
+							lat: gtu.lat,
+							lng: gtu.lng
+						},
+						icon: {
+							path: self.getCirclePath(5),
+							fillColor: color,
+							fillOpacity: 1,
+							strokeOpacity: 1,
+							strokeWeight: 1,
+							strokeColor: '#000'
+						},
+						draggable: false,
+						map: googleMap
+					});
+				});
+			});
+		},
+		olddrawGtu: function () {
 			var def = $.Deferred(),
 				self = this,
 				maxDisplayCount = this.state.maxDisplayCount,

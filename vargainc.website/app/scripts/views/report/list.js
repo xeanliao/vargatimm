@@ -40,8 +40,8 @@ define(['jquery', 'underscore', 'moment', 'sprintf', 'backbone', 'react', 'views
 			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
 		},
 		onGotoReview: function (campaignId, taskName, taskId) {
-			Backbone.history.navigate('report/' + taskId, { trigger: false });
-			window.location.hash = helper.sprintf('campaign/%d/%s/%d/edit', campaignId, taskName, taskId);
+			var url = helper.sprintf('index.html#campaign/%d/%s/%d/edit', campaignId, taskName, taskId);
+			window.open(url);
 		},
 		onCloseMoreMenu: function (key) {
 			$("#" + this.menuKey + key).foundation('close');
