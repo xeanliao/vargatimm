@@ -259,16 +259,32 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(result);
         }
 
+        class GtuIdTaskGtuInfoId
+        {
+            public int? GTUId { get; set; }
+            public int? TaskgtuinfoId { get; set; }
+        }
+
         [Route("{taskId}/dots")]
         [HttpPost]
         public async Task<IHttpActionResult> AddGtuDotsToTask(int taskId, [FromBody] List<ViewModel.CustomGTUPoint> dots)
         {
-            var taskDic = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new
+            #region Temp Fix
+            var taskList = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new GtuIdTaskGtuInfoId
             {
-                i.GTUId,
+                GTUId = i.GTUId,
                 TaskgtuinfoId = i.Id,
 
-            }).ToDictionaryAsync(i => i.GTUId);
+            }).ToListAsync();
+            var taskDic = new Dictionary<int?, GtuIdTaskGtuInfoId>();
+            foreach(var item in taskList)
+            {
+                if (!taskDic.ContainsKey(item.GTUId))
+                {
+                    taskDic.Add(item.GTUId, item);
+                }
+            }
+            #endregion
 
             List<Models.GtuInfo> newDots = new List<Models.GtuInfo>();
             foreach (var item in dots)
