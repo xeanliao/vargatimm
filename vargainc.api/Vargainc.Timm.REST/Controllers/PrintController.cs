@@ -460,8 +460,24 @@ namespace Vargainc.Timm.REST.Controllers
                                  join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
                                  where task.DistributionMapId == dmapId && validGtuId.Contains(mapping.GTUId)
                                  orderby task.Id, mapping.GTUId
-                                 select mapping.UserColor;
-                colors = colorQuery.ToList();
+                                 select new
+                                 {
+                                     mapping.GTUId,
+                                     mapping.UserColor
+                                 };
+                var colorList = colorQuery.ToList();
+                foreach(var item in validGtuId)
+                {
+                    var color = colorList.FirstOrDefault(i => i.GTUId == item);
+                    if(color != null)
+                    {
+                        colors.Add(color.UserColor);
+                    }
+                    else
+                    {
+                        colors.Add("#000");
+                    }
+                }              
             }
 
             var lastUpdateTime = DateTime.Now;

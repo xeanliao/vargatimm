@@ -2,7 +2,7 @@ function initMap() {
     var mapDom = $('#map');
 
     window.map = new google.maps.Map(mapDom[0], {
-        center: new google.maps.LatLng(40.744556, -73.987378),
+        center: new google.maps.LatLng(0, 0),
         zoom: 18,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         disableDefaultUI: true
