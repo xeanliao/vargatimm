@@ -50,7 +50,7 @@ define([
 			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
 		},
 		onGotoReview: function (campaignId, taskName, taskId) {
-			var url = helper.sprintf('campaign/%d/%s/%d/edit', campaignId, taskName, taskId);
+			var url = helper.sprintf('index.html#campaign/%d/%s/%d/edit', campaignId, taskName, taskId);
 			window.open(url);
 		},
 		onCloseMoreMenu: function (key) {
