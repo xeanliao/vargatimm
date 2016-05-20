@@ -417,16 +417,19 @@ namespace Vargainc.Timm.REST.Controllers
             return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, false, date);
         }
 
-        private IHttpActionResult LoadGtuWithoutTaskStatus(int campaignId, int submapId, int dmapId, bool filterOutside, DateTime? lastTime)
+        private IHttpActionResult LoadGtuWithoutTaskStatus(int campaignId, int submapId, int dmapId, 
+            bool filterOutside, DateTime? lastTime)
         {
             var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
                 .DistributionMaps.FirstOrDefault(i => i.Id == dmapId);
+
+            
             if (dmap == null)
             {
                 return NotFound();
             }
-
+            var inputTime = lastTime;
             var query = from task in db.Tasks
                         join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
                         join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
@@ -439,7 +442,7 @@ namespace Vargainc.Timm.REST.Controllers
                             Latitude = gtu.dwLatitude,
                             Longitude = gtu.dwLongitude
                         };
-
+            var debugSql = query.ToString();
             var locationQuery = query.Select(i => new ViewModel.Location
             {
                 Id = i.GTUId,
@@ -493,7 +496,8 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 points = locations,
                 pointsColors = colors.ToList(),
-                lastUpdateTime = lastUpdateTime.ToString("yyyyMMddhhmmss")
+                lastUpdateTime = lastUpdateTime.ToString("yyyyMMddHHmmss")
+
             });
         }
         #endregion
