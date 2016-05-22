@@ -170,9 +170,9 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 							icon: {
 								path: self.getCirclePath(5),
 								fillColor: color,
-								fillOpacity: 1,
-								strokeOpacity: 1,
+								fillOpacity: 0.8,
 								strokeWeight: 1,
+								strokeOpacity: 0.9,
 								strokeColor: '#000'
 							},
 							draggable: false,

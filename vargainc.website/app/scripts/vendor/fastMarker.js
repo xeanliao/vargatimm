@@ -131,7 +131,9 @@
 			layer.append('path')
 				.attr('d', this.options.icon.path)
 				.attr('fill', this.options.icon.fillColor)
+				.style("opacity", this.options.icon.fillOpacity)
 				.attr('stroke', this.options.icon.strokeColor)
+				.style("stroke-opacity", this.options.icon.strokeOpacity)
 				.attr("transform", function (d) {
 					return "translate(" + (position.x - topLeft.x) + ", " + (position.y - topLeft.y) + ")";
 				});
