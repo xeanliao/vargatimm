@@ -373,7 +373,7 @@ namespace Vargainc.Timm.REST.Controllers
             
 
             return Json(new {
-                lastUpdateTime = lastUpdateTime.ToString("yyyyMMddhhmmss"),
+                lastUpdateTime = lastUpdateTime.ToString("yyyyMMddHHmmss"),
                 data = simplify.Select(i=> new {
                     lat = i.Y,
                     lng = i.X
