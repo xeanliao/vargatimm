@@ -135,6 +135,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			if (this.state.displayMode != 'cover') {
 				return;
 			}
+			console.log('begin draw');
 			var self = this,
 			    googleMap = this.getGoogleMap(),
 			    needFilterOutOfBoundary = !this.state.ShowOutOfBoundary,
@@ -158,7 +159,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 					var points = gtu.points;
 				}
 				var color = gtu.color;
-
+				console.log('draw color: ' + color + ' gtu count:' + points.length);
 				_.forEach(points, function (latlng) {
 					if (latlng && latlng.lat && latlng.lng) {
 						gtuPoints.push(new FastMarker({
@@ -211,9 +212,20 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 				self.clearMap();
 				if (activeGtu && activeGtu.length == 1) {
 					animateIndex = 0;
-					self.animateDrawTrack(gtus.get(activeGtu[0]));
+					var gtu = gtus.get(activeGtu[0]);
+					self.changeToBestTrackView(gtu);
+					self.animateDrawTrack(gtu);
 				}
 			});
+		},
+		changeToBestTrackView: function (gtu) {
+			var path = gtu.get('track'),
+			    googleMap = this.getGoogleMap(),
+			    bounds = new google.maps.LatLngBounds();
+			_.forEach(path, function (point) {
+				bounds.extend(new google.maps.LatLng(point.lat, point.lng));
+			});
+			googleMap.fitBounds(bounds);
 		},
 		animateDrawTrack: function (gtu) {
 			if (this.state.displayMode != 'track') {
@@ -312,7 +324,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 		clearMap: function () {
 			try {
 				_.forEach(gtuPoints, function (item) {
-					item.setMap(null);
+					item && item.setMap && item.setMap(null);
 				});
 				window.window.cancelAnimationFrame(trackAnimationFrame);
 				animateIndex = 0;
@@ -324,10 +336,12 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 			} catch (ex) {}
 		},
 		reload: function () {
+			console.log('reload');
 			window.clearTimeout(reloadTimeout);
-			reloadTimeout = window.setTimeout($.proxy(this._reload, this), 2 * 1000);
+			reloadTimeout = window.setTimeout($.proxy(this._reload, this), 0.5 * 1000);
 		},
 		_reload: function () {
+			console.log('_reload');
 			var dmap = this.props.dmap,
 			    gtu = this.props.gtu,
 			    taskId = this.props.task.get('Id'),

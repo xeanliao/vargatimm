@@ -54,12 +54,13 @@
 	FastMarkerLayer.prototype.removeMarker = function (marker) {
 		var index = this._markers.indexOf(marker);
 		if (index > -1) {
-			this._markers = this._markers.slice(index, 1);
+			if(this._markers.length == 1){
+				this._markers = [];
+			}else{
+				this._markers = this._markers.slice(index, 1);
+			}
 		}
-		// if (this._markers.length == 0) {
-		// 	hashMap.delete(this.getMap());
-		// 	this.setMap(null);
-		// }
+		this.draw();
 	}
 	FastMarkerLayer.prototype.onAdd = function () {
 		var map = this.getMap(),
@@ -90,6 +91,7 @@
 		this.drawTimeout = window.setTimeout($.proxy(this._draw, this), 500);
 	}
 	FastMarkerLayer.prototype._draw = function () {
+		console.log('FastMarker _draw');
 		var projection = this.getProjection(),
 			layer = this.markerLayer,
 			topLeft = {
@@ -100,7 +102,10 @@
 				x: null,
 				y: null
 			};
-
+		if(!layer){
+			console.log('FastMarker error layer is null');
+			return;
+		}
 		layer.selectAll('*').remove();
 		console.log('FastMarker draw', this._markers.length);
 		$.each(this._markers, function () {
@@ -157,9 +162,8 @@
 			layer.draw();
 		} else {
 			if (this.Layer && this.Map) {
-				this.Layer.removeMarker(this);
+				this.Layer.removeMarker.call(this.Layer, this);
 				this.Map = null;
-
 			}
 		}
 	}
