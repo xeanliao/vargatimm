@@ -57,7 +57,7 @@
 			if(this._markers.length == 1){
 				this._markers = [];
 			}else{
-				this._markers = this._markers.slice(index, 1);
+				this._markers = this._markers.slice(index, index + 1);
 			}
 		}
 		this.draw();
