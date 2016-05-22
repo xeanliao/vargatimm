@@ -50,12 +50,14 @@
 	FastMarkerLayer.prototype = new google.maps.OverlayView();
 	FastMarkerLayer.prototype.addMarker = function (marker) {
 		this._markers.push(marker);
+		this.draw();
 	}
 	FastMarkerLayer.prototype.removeMarker = function (marker) {
 		var index = this._markers.indexOf(marker);
 		if (index > -1) {
 			if(this._markers.length == 1){
 				this._markers = [];
+				console.log('FastMarker remove last one');
 			}else{
 				this._markers = this._markers.slice(index, index + 1);
 			}
@@ -102,8 +104,8 @@
 				x: null,
 				y: null
 			};
-		if(!layer){
-			console.log('FastMarker error layer is null');
+		if(!layer || !projection){
+			console.log('FastMarker not ready error.');
 			return;
 		}
 		layer.selectAll('*').remove();
@@ -158,8 +160,7 @@
 			}
 			this.Layer = layer;
 			this.Map = map;
-			layer.addMarker(this);
-			layer.draw();
+			layer.addMarker.call(this.Layer, this);
 		} else {
 			if (this.Layer && this.Map) {
 				this.Layer.removeMarker.call(this.Layer, this);

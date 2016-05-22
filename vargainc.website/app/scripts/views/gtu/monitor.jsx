@@ -163,7 +163,7 @@ define([
 				needFilterOutOfBoundary = !this.state.ShowOutOfBoundary,
 				dots = this.props.dmap.get('Gtu') || [],
 				activeGtu = this.state.activeGtu;
-
+			console.log('already draw gtu', gtuPoints.length);
 			_.forEach(gtuPoints, function (p) {
 				p.setMap(null);
 			});
