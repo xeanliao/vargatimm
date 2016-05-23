@@ -338,7 +338,7 @@ define(['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user'
 		reload: function () {
 			console.log('reload');
 			window.clearTimeout(reloadTimeout);
-			reloadTimeout = window.setTimeout($.proxy(this._reload, this), 0.5 * 1000);
+			reloadTimeout = window.setTimeout($.proxy(this._reload, this), 0.1 * 1000);
 		},
 		_reload: function () {
 			console.log('_reload');
