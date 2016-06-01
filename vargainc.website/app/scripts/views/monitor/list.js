@@ -240,7 +240,7 @@ define(['jquery', 'underscore', 'moment', 'sprintf', 'backbone', 'react', 'views
 									{ key: task.Id },
 									React.createElement(
 										'td',
-										{ onDoubleClick: self.onGotoMonitor.bind(null, campaignId, taskName, task.Id) },
+										{ onClick: self.onGotoMonitor.bind(null, campaignId, taskName, task.Id) },
 										task.Name
 									),
 									React.createElement(

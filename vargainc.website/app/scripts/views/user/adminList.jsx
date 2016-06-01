@@ -52,7 +52,8 @@ define([
 							activeClass = selected ? 'list-group-item active' : 'list-group-item';
 
 			          	return (
-			          		<li className={activeClass} key={id} onClick={self.onSelected.bind(self, id)} onDoubleClick={self.onDbSelected.bind(self, id)}>
+			          		<li className={activeClass} key={id} onClick={self.onSelected.bind(self, id)} 
+			          			onClick={self.onDbSelected.bind(self, id)}>
 			          			{model.get('UserName')}
 		          			</li>
 		          		);

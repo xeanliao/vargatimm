@@ -74,7 +74,7 @@ define([
 			var date = model.get('Date');
 			var displayDate = date ? moment(date).format("MMM DD, YYYY") : '';
 			return (
-				<div className="row scroll-list-item" onDoubleClick={this.onGotoDMap.bind(null, model.get('Id'))}>
+				<div className="row scroll-list-item" onClick={this.onGotoDMap.bind(null, model.get('Id'))}>
 					<div className="hide-for-small-only medium-2 columns">
 						{model.get('ClientName')}
 					</div>

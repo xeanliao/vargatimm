@@ -46,7 +46,8 @@ define(['underscore', 'moment', 'backbone', 'react', 'views/base', 'collections/
 
 					return React.createElement(
 						'li',
-						{ className: activeClass, key: id, onClick: self.onSelected.bind(self, id), onDoubleClick: self.onDbSelected.bind(self, id) },
+						{ className: activeClass, key: id, onClick: self.onSelected.bind(self, id),
+							onClick: self.onDbSelected.bind(self, id) },
 						model.get('UserName')
 					);
 				})

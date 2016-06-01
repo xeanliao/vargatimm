@@ -116,7 +116,7 @@ define([
 									taskName = task.Name;
 								return (
 									<tr key={task.Id} ref={task.Id}>
-										<td onDoubleClick={self.onGotoReview.bind(null, campaignId, taskName, task.Id)}>
+										<td onClick={self.onGotoReview.bind(null, campaignId, taskName, task.Id)}>
 											{task.Name}
 										</td>
 										<td>

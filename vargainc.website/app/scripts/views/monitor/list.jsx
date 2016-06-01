@@ -188,7 +188,7 @@ define([
 									taskName = task.Name;
 								return (
 									<tr key={task.Id}>
-										<td onDoubleClick={self.onGotoMonitor.bind(null, campaignId, taskName, task.Id)}>
+										<td onClick={self.onGotoMonitor.bind(null, campaignId, taskName, task.Id)}>
 											{task.Name}
 										</td>
 										<td>

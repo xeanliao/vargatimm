@@ -171,7 +171,7 @@ define(['jquery', 'underscore', 'moment', 'sprintf', 'backbone', 'react', 'views
 									{ key: task.Id, ref: task.Id },
 									React.createElement(
 										'td',
-										{ onDoubleClick: self.onGotoReview.bind(null, campaignId, taskName, task.Id) },
+										{ onClick: self.onGotoReview.bind(null, campaignId, taskName, task.Id) },
 										task.Name
 									),
 									React.createElement(
