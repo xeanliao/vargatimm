@@ -341,7 +341,7 @@ namespace Vargainc.Timm.REST.Controllers
                 return NotFound();
             }
             var query = db.GtuInfos
-                .Where(i => i.TaskgtuinfoId == mapping.Id && i.dwSpeed > 0 && i.dwSpeed < 100 && (lastTime == null || i.dtReceivedTime > lastTime))
+                .Where(i => i.TaskgtuinfoId == mapping.Id && i.dwSpeed < 150 && (lastTime == null || i.dtReceivedTime > lastTime))
                 .OrderBy(i => i.dtReceivedTime);
 
             var lastReceivedTimeQuery = query.Max(i => i.dtReceivedTime);
