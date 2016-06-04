@@ -53,7 +53,6 @@ define([
             xhr.open(options.method, options.url, true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
-                    //console.log(xhr.responseText);
                     options.success && options.success.call(model, JSON.parse(xhr.responseText));
                 }
             };
@@ -66,6 +65,30 @@ define([
                 options = {
                     url: model.urlRoot + '/' + model.get('Id') + '/dots/',
                     method: 'POST',
+                    data: $.param({
+                        '': dots
+                    }),
+                    success: function (result) {
+                        if (result && result.success) {
+                            return def.resolve();
+                        }
+                        return def.reject();
+                    },
+                    fail: function () {
+                        def.reject();
+                    }
+                };
+            options = _.extend(opts, options);
+
+            (this.sync || Backbone.sync).call(this, '', this, options);
+            return def;
+        },
+        removeGtuDots: function (dots, opts) {
+            var def = $.Deferred(),
+                model = this,
+                options = {
+                    url: model.urlRoot + '/' + model.get('Id') + '/dots/',
+                    method: 'PUT',
                     data: $.param({
                         '': dots
                     }),
