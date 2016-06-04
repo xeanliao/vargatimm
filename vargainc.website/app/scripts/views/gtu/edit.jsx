@@ -13,8 +13,7 @@ define([
 	var dmapPolygon = null,
 		dmapBounds = null,
 		gtuData = null,
-		gtuPoints = [],
-		savedCustomPoints = [];
+		gtuPoints = [];
 
 	return React.createBackboneClass({
 		mixins: [
@@ -62,9 +61,6 @@ define([
 			var googleMap = this.getGoogleMap();
 			try {
 				_.forEach(gtuPoints, function (item) {
-					item.setMap(null);
-				});
-				_.forEach(savedCustomPoints, function (item) {
 					item.setMap(null);
 				});
 				dmapPolygon.setMap(null);
@@ -149,121 +145,58 @@ define([
 			_.forEach(gtus, function (colorGtu) {
 				var color = colorGtu.color;
 				_.forEach(colorGtu.points, function (gtu) {
-					new FastMarker({
-						position: {
-							lat: gtu.lat,
-							lng: gtu.lng
-						},
-						icon: {
-							path: self.getCirclePath(5),
-							fillColor: color,
-							fillOpacity: 1,
-							strokeOpacity: 1,
-							strokeWeight: 1,
-							strokeColor: '#000'
-						},
-						draggable: false,
-						map: googleMap
-					});
-				});
-			});
-		},
-		olddrawGtu: function () {
-			var def = $.Deferred(),
-				self = this,
-				maxDisplayCount = this.state.maxDisplayCount,
-				lastDisplayGtuIndex = this.state.lastDisplayGtuIndex,
-				lastViewArea = this.state.lastViewArea,
-				lastZoomLevel = this.state.lastZoomLevel,
-				newDisplayGtuIndex = null,
-				googleMap = this.getGoogleMap(),
-				viewArea = googleMap.getBounds(),
-				zoomLevel = googleMap.getZoom(),
-				cutDownNumber = 5,
-				cutDown = function () {
-					cutDownNumber--;
-					if (cutDownNumber > 0) {
-						setTimeout(cutDown, 100);
-					} else {
-						def.resolve();
+					if(gtu.out){
+						return true;
 					}
-				},
-				filterGtus,
-				point;
+					if (gtu.cellId == 1) {
+						var editMarker = new google.maps.Marker({
+							position: {
+								lat: gtu.lat,
+								lng: gtu.lng
+							},
+							icon: {
+								path: self.getCirclePath(5),
+								fillColor: color,
+								fillOpacity: 1,
+								strokeOpacity: 1,
+								strokeWeight: 2,
+								strokeColor: '#fff'
+							},
+							draggable: false,
+							map: googleMap
+						});
+						editMarker.gtuInfoId = gtu.gtuInfoId;
+						editMarker.status = 'added';
+						self.state.customPoints.push(editMarker);
+						editMarker.addListener('click', function () {
+							self.onRemoveGtu(editMarker);
+						});
 
-			gtuData || this.prepareGtu();
-			//console.log(lastDisplayGtuIndex, lastZoomLevel, zoomLevel);
-			if (typeof lastDisplayGtuIndex === 'undefined' || lastZoomLevel != zoomLevel) {
-				_.forEach(gtuData, function (points, index) {
-					var visiableGtu = _.filter(points, function (latlng) {
-						return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
-					});
-
-					if (!filterGtus || visiableGtu.length <= maxDisplayCount) {
-						filterGtus = visiableGtu;
-						newDisplayGtuIndex = index;
 					} else {
-						return false;
-					}
-					//console.log(visiableGtu.length + ' / ' + points.length + ' dots in current zoom level ' + googleMap.getZoom() + ' view area');
-				});
-			} else {
-				filterGtus = _.filter(gtuData[lastDisplayGtuIndex], function (latlng) {
-					return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
-				});
-				newDisplayGtuIndex = lastDisplayGtuIndex;
-			}
-
-			if (lastDisplayGtuIndex == newDisplayGtuIndex) {
-				var tempPoints = [];
-				_.forEach(gtuPoints, function (item) {
-					if (!viewArea.contains(item.getPosition())) {
-						item.setMap(null);
-					} else {
-						tempPoints.push(item);
+						new FastMarker({
+							position: {
+								lat: gtu.lat,
+								lng: gtu.lng
+							},
+							icon: {
+								path: self.getCirclePath(5),
+								fillColor: color,
+								fillOpacity: 1,
+								strokeOpacity: 1,
+								strokeWeight: 1,
+								strokeColor: '#000'
+							},
+							draggable: false,
+							map: googleMap
+						});
 					}
 				});
-				gtuPoints = tempPoints;
-			} else {
-				_.forEach(gtuPoints, function (item) {
-					item.setMap(null);
-				});
-				gtuPoints = [];
-				lastViewArea = null;
-			}
-
-			_.forEach(filterGtus, function (gtu) {
-				if (lastViewArea && lastViewArea.contains(new google.maps.LatLng(gtu.lat, gtu.lng))) {
-					return true;
-				}
-				point = new google.maps.Marker({
-					position: {
-						lat: gtu.lat,
-						lng: gtu.lng
-					},
-					icon: {
-						path: self.getCirclePath(5),
-						fillColor: gtu.color,
-						fillOpacity: 1,
-						strokeOpacity: 1,
-						strokeWeight: 1,
-						strokeColor: '#000'
-					},
-					draggable: false,
-					map: googleMap
-				});
-				gtuPoints.push(point);
 			});
-			this.setState({
-				lastDisplayGtuIndex: newDisplayGtuIndex,
-				lastViewArea: viewArea,
-				lastZoomLevel: zoomLevel
-			});
-			cutDown();
 		},
 		onNewGtu: function (e) {
 			var googleMap = this.getGoogleMap(),
-				point = new google.maps.Marker({
+				self = this,
+				newMarker = new google.maps.Marker({
 					position: e.latLng,
 					icon: {
 						path: this.getCirclePath(5),
@@ -273,27 +206,55 @@ define([
 						strokeWeight: 2,
 						strokeColor: '#fff'
 					},
-					draggable: true,
+					draggable: false,
 					map: googleMap
 				});
 
-			point.GtuId = this.state.activeGtu.get('Id');
-			point.date = moment().format('YYYY-MM-DD HH:mm:ss');
-			this.state.customPoints.push(point);
+			newMarker.GtuId = this.state.activeGtu.get('Id');
+			newMarker.date = moment().format('YYYY-MM-DD HH:mm:ss');
+			newMarker.status = 'new';
+			this.state.customPoints.push(newMarker);
+			newMarker.addListener('click', function () {
+				self.onRemoveGtu(newMarker);
+			});
+			this.forceUpdate();
+		},
+		onRemoveGtu: function(gtu){
+			var index = _.indexOf(this.state.customPoints, gtu);
+			if(gtu.status === 'new'){
+				_.remove(this.state.customPoints, gtu);
+			}else{
+				gtu.status = 'deleted';
+			}
+			gtu.setMap(null);
 			this.forceUpdate();
 		},
 		onUnderGtu: function(){
-			var customPoints = this.state.customPoints,
-				lastPoint = _.last(customPoints);
-
-			lastPoint.setMap(null);
-			this.setState({customPoints: _.dropRight(customPoints)});
+			var googleMap = this.getGoogleMap(),
+				customPoints = this.state.customPoints,
+				canUndoPoints = _.filter(customPoints, function(i){
+					return i.status == 'new' || i.status == 'deleted';
+				});
+			if(canUndoPoints && canUndoPoints.length > 0){
+				var lastPoint = _.last(canUndoPoints);
+				if(lastPoint.status == 'new'){
+					lastPoint.setMap(null);
+					_.remove(customPoints, lastPoint);
+				}else{
+					lastPoint.setMap(googleMap);
+					lastPoint.status = 'added';
+				}
+				
+				this.setState({customPoints: customPoints});
+			}
 		},
 		onSaveGtu: function () {
 			var self = this,
 				googleMap = this.getGoogleMap(),
-				savedPoint,
-				postData = _.map(this.state.customPoints, function (item) {
+				addedGtu = _.filter(this.state.customPoints, function(i){
+					return i.status == 'new';
+				}),
+				postData = _.map(addedGtu, function (item) {
 					return {
 						GtuId: item.GtuId,
 						Date: item.date,
@@ -302,21 +263,28 @@ define([
 							Longitude: item.getPosition().lng()
 						}
 					}
+				}),
+				putData = _.map(this.state.customPoints, function(i){
+					return i.status == 'deleted' ? i.gtuInfoId : null;
 				});
-			//console.log('save gtu', postData);
 
-			this.props.task.addGtuDots(postData).done(function () {
+			$.when([
+				this.props.task.addGtuDots(postData),
+				this.props.task.removeGtuDots(putData)
+			]).done(function () {
 				_.forEach(self.state.customPoints, function (point) {
-					var icon = point.getIcon();
-					icon.strokeWeight = 1;
-					icon.strokeColor = '#000';
-					point.setIcon(icon);
-					savedCustomPoints.push(savedPoint);
+					if (point && point.status == 'deleted') {
+						_.remove(self.state.customPoints, point);
+					} else if (point && point.status == 'new') {
+						// var icon = point.getIcon();
+						// icon.strokeWeight = 1;
+						// icon.strokeColor = '#000';
+						// point.setIcon(icon);
+						point.status = 'added';
+					}
 				});
 
-				self.setState({
-					customPoints: []
-				});
+				self.forceUpdate();
 			});
 		},
 		onSetMaxDisplayDots: function(){
@@ -333,7 +301,10 @@ define([
 		render: function () {
 			var self = this,
 				gtuList = this.props.gtu.models || [],
-				canUndoSave = this.state.customPoints.length > 0 ? true : false;
+				newAddedPoints = _.filter(this.state.customPoints, function(i){
+					return i.status == 'new' || i.status == 'deleted';
+				});
+				canUndoSave = _.isEmpty(newAddedPoints) ? false : true;
 			if (!canUndoSave) {
 				var undoButton = <button className="button float-right" disabled onClick={this.onUnderGtu}><i className="fa fa-undo"></i>Undo</button>;
 				var saveButton = <button className="button float-right" disabled onClick={this.onSaveGtu}><i className="fa fa-save"></i>Save</button>;
