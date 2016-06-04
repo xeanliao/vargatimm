@@ -7,6 +7,7 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Web.Http.Cors;
 using System.Configuration;
+using Vargainc.Timm.Extentions;
 
 [assembly: OwinStartup(typeof(Vargainc.Timm.REST.Startup))]
 
@@ -20,7 +21,7 @@ namespace Vargainc.Timm.REST
             HttpConfiguration config = new HttpConfiguration();
             // Web API configuration and services
             // newton.json formatter optimization
-            var json = config.Formatters.JsonFormatter.SerializerSettings;
+            var json = GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings;
             // MM-dd-yyyy date formate
             json.DateFormatHandling = DateFormatHandling.IsoDateFormat;
             json.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -31,7 +32,11 @@ namespace Vargainc.Timm.REST
             json.NullValueHandling = NullValueHandling.Ignore;
             json.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
             json.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-           
+
+            //GlobalConfiguration.Configuration.Formatters.Clear();
+            //GlobalConfiguration.Configuration.Formatters.Add(new CustomJsonFormatter());
+            //config.Formatters.Clear();
+            //config.Formatters.Add(new CustomJsonFormatter());
 
             // Web API Cros for Dev or local test
             var allowWebsite = ConfigurationManager.AppSettings["CorsSite"];
@@ -53,11 +58,8 @@ namespace Vargainc.Timm.REST
             );
 
             config.EnsureInitialized();
-
-            app.UseWebApi(config);
-
             
-
+            app.UseWebApi(config);
         }
     }
 }

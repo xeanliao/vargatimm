@@ -417,8 +417,15 @@ namespace Vargainc.Timm.REST.Controllers
             return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, false, date);
         }
 
+        [HttpGet]
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/foredit")]
+        public IHttpActionResult GetGtuForEdit(int campaignId, int submapId, int dmapId)
+        {
+            return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, false, null, true);
+        }
+
         private IHttpActionResult LoadGtuWithoutTaskStatus(int campaignId, int submapId, int dmapId, 
-            bool filterOutside, DateTime? lastTime)
+            bool filterOutside, DateTime? lastTime, bool withCellId = false)
         {
             var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
@@ -433,22 +440,40 @@ namespace Vargainc.Timm.REST.Controllers
             var query = from task in db.Tasks
                         join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
                         join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
-                        where task.DistributionMapId == dmapId && (lastTime == null || gtu.dtReceivedTime > lastTime)
+                        where task.DistributionMapId == dmapId && gtu.nCellID < 2 && (lastTime == null || gtu.dtReceivedTime > lastTime)
                         orderby task.Id, mapping.GTUId, gtu.Id
                         select new
                         {
                             Time = gtu.dtReceivedTime,
                             GTUId = mapping.GTUId,
                             Latitude = gtu.dwLatitude,
-                            Longitude = gtu.dwLongitude
+                            Longitude = gtu.dwLongitude,
+                            nCellId = gtu.nCellID,
+                            GtuInfoId = gtu.Id
                         };
             var debugSql = query.ToString();
-            var locationQuery = query.Select(i => new ViewModel.Location
+            IQueryable<ViewModel.Location> locationQuery = null;
+            if (!withCellId)
             {
-                Id = i.GTUId,
-                Latitude = i.Latitude,
-                Longitude = i.Longitude
-            });
+                locationQuery = query.Select(i => new ViewModel.Location
+                {
+                    Id = i.GTUId,
+                    Latitude = i.Latitude,
+                    Longitude = i.Longitude
+                });
+            }
+            else
+            {
+                locationQuery = query.Select(i => new ViewModel.Location
+                {
+                    Id = i.GTUId,
+                    Latitude = i.Latitude,
+                    Longitude = i.Longitude,
+                    nCellId = i.nCellId,
+                    GtuInfoId = i.GtuInfoId
+                });
+            }
+            
 
             var lastReceivedTimeQuery = query.Max(i => i.Time);
 
@@ -491,7 +516,6 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 lastUpdateTime = lastTime.Value;
             }
-
             return Json(new
             {
                 points = locations,
