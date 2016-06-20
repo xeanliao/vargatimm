@@ -218,7 +218,7 @@ function draw(params, result) {
 
     var borderColor = 'rgb(' + result.color.r + ',' + result.color.g + ',' + result.color.b + ')';
     //draw cRoute in submap
-    if (result.polygon && result.record && result.polygon.length == result.record.length) {
+    if (result.polygon && result.record && result.polygon.length <= result.record.length) {
         for (var index = 1; index <= result.polygon.length; index++) {
             var cRoute = result.polygon[index - 1],
                 fillColor = params.showPenetrationColors ? getColorByPenetration(params.penetrationColors, result.record[index - 1].Penetration) : borderColor,
