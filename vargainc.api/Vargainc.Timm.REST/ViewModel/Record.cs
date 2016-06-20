@@ -25,7 +25,7 @@ namespace Vargainc.Timm.REST.ViewModel
             {
                 if(!this.TotalHouseHold.HasValue || this.TotalHouseHold.Value == 0)
                 {
-                    return 0;
+                    return 1.0;
                 }
                 return Math.Round((this.TargetHouseHold ?? 0) / this.TotalHouseHold.Value, 4);
             }
