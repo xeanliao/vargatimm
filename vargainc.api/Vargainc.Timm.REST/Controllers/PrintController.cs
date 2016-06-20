@@ -13,6 +13,7 @@ using Wintellect.PowerCollections;
 using Vargainc.Timm.REST.Helper;
 using System.Threading.Tasks;
 using Vargainc.Timm.Extentions;
+using System.Data.Entity;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -39,6 +40,50 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new
             {
                 nda = result
+            });
+        }
+        [HttpGet]
+        [Route("ndaddress/{dmapId:int}")]
+        public async Task<IHttpActionResult> GetNDAddress(int dmapId)
+        {
+            var polygon = GetDMapPolygon(dmapId);
+            var allNdAddress = await db.NdAddresses.Select(i => new
+            {
+                i.Id,
+                i.Latitude,
+                i.Longitude
+            }).ToListAsync();
+
+            List<int?> validId = new List<int?>();
+            foreach (var item in allNdAddress)
+            {
+                Point center = new Point(item.Longitude ?? 0, item.Latitude ?? 0);
+                if (polygon.Contains(center))
+                {
+                    validId.Add(item.Id);
+                }
+            }
+
+            var validNdAddress = await db.NdAddresses.Where(i => validId.Contains(i.Id))
+                .Select(i => new ViewModel.NDAddressViewModel
+                {
+                    Street = i.Street,
+                    ZipCode = i.ZipCode,
+                    Center = new ViewModel.LatLngViewModel {
+                        Latitude = i.Latitude,
+                        Longitude = i.Longitude
+                    },
+                    Boundary = i.NdAddressCoordinates.Select(m => new ViewModel.LatLngViewModel
+                    {
+                        Latitude = m.Latitude,
+                        Longitude = m.Longitude
+                    }).ToList()
+                }).ToListAsync();
+
+
+            return Json(new
+            {
+                nda = validNdAddress
             });
         }
 

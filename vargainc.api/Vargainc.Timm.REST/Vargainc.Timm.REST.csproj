@@ -191,11 +191,13 @@
     <Compile Include="ViewModel\ControlCenter\TaskViewModel.cs" />
     <Compile Include="ViewModel\CustomGTUPoint.cs" />
     <Compile Include="ViewModel\ImportCampaign.cs" />
+    <Compile Include="ViewModel\LatLngViewModel.cs" />
     <Compile Include="ViewModel\Location.cs" />
     <Compile Include="ViewModel\MapImage\MapImageOptions.cs" />
     <Compile Include="ViewModel\MapImage\MapTypeEnum.cs" />
     <Compile Include="ViewModel\MapImage\ServerResult.cs" />
     <Compile Include="ViewModel\MapOptions.cs" />
+    <Compile Include="ViewModel\NDAddressViewModel.cs" />
     <Compile Include="ViewModel\Record.cs" />
     <Compile Include="ViewModel\LoginUser.cs" />
     <Compile Include="ViewModel\ViewEmplyee.cs" />
