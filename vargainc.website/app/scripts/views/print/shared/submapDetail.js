@@ -9,7 +9,7 @@ define(['numeral', 'backbone', 'react', 'views/base', 'views/print/shared/footer
 			return {
 				"type": "submapDetail",
 				"options": [{
-					"title": 'CARRIER ROUTES CONTAINED IN SUBM MAP ' + model.get('OrderId') + ' (' + model.get('Name') + ')'
+					"title": 'CARRIER ROUTES CONTAINED IN SUB- MAP ' + model.get('OrderId') + ' (' + model.get('Name') + ')'
 				}, {
 					"table": "submap-detail",
 					"submapId": model.get('SubMapId')
@@ -29,7 +29,7 @@ define(['numeral', 'backbone', 'react', 'views/base', 'views/print/shared/footer
 					React.createElement(
 						'div',
 						{ className: 'small-12 columns text-center title' },
-						'CARRIER ROUTES CONTAINED IN SUBM MAP ',
+						'CARRIER ROUTES CONTAINED IN SUB-MAP ',
 						model.get('OrderId'),
 						' (',
 						model.get('Name'),
