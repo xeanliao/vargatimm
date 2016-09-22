@@ -345,6 +345,7 @@ function prepareScreenshot() {
 console.log(">>prepareScreenshot");
 
     $("#map").css("background", "transparent");
+    $("#map").children(':first-child').css("background", "transparent");
     $("#map img").hide();
 
     callback({

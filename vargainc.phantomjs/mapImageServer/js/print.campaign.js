@@ -343,6 +343,7 @@ function prepareScreenshot() {
     if(--finallyCutdown <= 0){
         console.log('mission completed');
         $("#map").css("background", "transparent");
+        $("#map").children(':first-child').css("background", "transparent");
         $("#map img").hide();
 
         callback({
