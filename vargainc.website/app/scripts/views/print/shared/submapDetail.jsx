@@ -16,7 +16,7 @@ define([
 			return {
 				"type": "submapDetail",
 				"options": [{
-					"title": 'CARRIER ROUTES CONTAINED IN SUBM MAP ' + model.get('OrderId') + ' (' + model.get('Name') + ')'
+					"title": 'CARRIER ROUTES CONTAINED IN SUB-MAP ' + model.get('OrderId') + ' (' + model.get('Name') + ')'
 				}, {
 					"table": "submap-detail",
 					"submapId": model.get('SubMapId')
@@ -30,7 +30,7 @@ define([
 			return (
 				<div className="page submap-detail">
 					<div className="row">
-						<div className="small-12 columns text-center title">CARRIER ROUTES CONTAINED IN SUBM MAP {model.get('OrderId')} ({model.get('Name')})</div>
+						<div className="small-12 columns text-center title">CARRIER ROUTES CONTAINED IN SUB-MAP {model.get('OrderId')} ({model.get('Name')})</div>
 					</div>
 					<div className="row collapse">
 						<div className="small-12 columns">
