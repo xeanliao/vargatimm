@@ -3,8 +3,8 @@ function initMap() {
 
     window.map = new google.maps.Map(mapDom[0], {
         center: new google.maps.LatLng(0, 0),
-        zoom: 18,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        zoom: 15,
+        mapTypeId: google.maps.MapTypeId.TERRAIN,
         disableDefaultUI: true
     });
 
@@ -84,44 +84,91 @@ function drawMap(params, result) {
             });
         }
 
+
+        /**
+         * change map type and montor tilesloaded event to make sure all map have loaded
+         */
         google.maps.event.addListenerOnce(map, 'tilesloaded', function () {
-            console.log("end find best view");
+            console.log("tilesloaded");
+            clearTimeout(window.timeout);
             checkMapType(params, result);
         });
 
         map.fitBounds(mapBounds);
-
-        /**
-         * timeout for google map render all polygon
-         */
-        window.timeout = setTimeout(function () {
-            callback('wait map tiles time out');
-        }, 5 * 60 * 1000);
+        console.log("end find best view ...");
     } else {
         callback('data error');
     }
 }
 
-function checkMapType(params, result) {
-    console.log('check map type');
-    if (params.mapType != 'ROADMAP') {
+function resize(params, result, mapBounds, haveCustomZoom){
+    var mapWidth = $(window).width();
+    var mapHeight = $(window).height();
+    var projection = map.getProjection();
+    var areaBound = map.getBounds();
+    var topRight = projection.fromLatLngToPoint(mapBounds.getNorthEast());
+    var bottomLeft = projection.fromLatLngToPoint(mapBounds.getSouthWest());
+    var center = projection.fromLatLngToPoint(mapBounds.getCenter());
+    var mapTopRight = projection.fromLatLngToPoint(areaBound.getNorthEast());
+    var mapBottomLeft = projection.fromLatLngToPoint(areaBound.getSouthWest());
+
+    var containerWidth = 0.5 * mapWidth / Math.abs(center.x - mapTopRight.x) * Math.abs(center.x - topRight.x);
+    var containerHeight = 0.5 * mapHeight / Math.abs(center.y - mapTopRight.y) * Math.abs(center.y - topRight.y);
+    containerWidth += 0.5 * mapWidth / Math.abs(center.x - mapBottomLeft.x) * Math.abs(center.x - bottomLeft.x);
+    containerHeight += 0.5 * mapHeight / Math.abs(center.y - mapBottomLeft.y) * Math.abs(center.y - bottomLeft.y);
+    console.log('old map size = ' + mapWidth + ':' + mapHeight);
+    console.log('new map size = ' + containerWidth + ':' + containerHeight);
+
+    if(containerWidth > mapWidth || containerHeight > mapHeight){
+        var widthRate = containerWidth / mapWidth,
+            heightRate = containerHeight / mapHeight,
+            zoomRate = Math.max(widthRate, heightRate),
+            newWidth = mapWidth * zoomRate,
+            newHeight = mapHeight * zoomRate;
+
+        if(Math.max(containerWidth, containerHeight) > 6000){
+            console.log('map size error. return');
+            callback('map size error');
+            return;
+        }
+        callback({
+            success: true,
+            status: 'changeSize',
+            width: Math.ceil(newWidth) + 230,
+            height: Math.ceil(newHeight) + 160
+        });
+
+        map.setCenter(mapBounds.getCenter());
+        console.log('need resize!');
+    }else if(!haveCustomZoom){
+        map.fitBounds(mapBounds);
+        console.log('fitBounds!');
+    }
+    checkMapType(params, result);
+}
+
+function checkMapType(params, result){
+    console.log('map size', $(window).size().width, $(window).size().height);
+    console.log('map zoom:', map.getZoom());
+    console.log('check map type: ' + params.mapType);
+    if(params.mapType != 'TERRAIN'){
         var mapType = google.maps.MapTypeId.ROADMAP;
         switch (params.mapType) {
-        case 'ROADMAP':
-            mapType = google.maps.MapTypeId.ROADMAP;
-            break;
-        case 'SATELLITE':
-            mapType = google.maps.MapTypeId.SATELLITE;
-            break;
-        case 'HYBRID':
-            mapType = google.maps.MapTypeId.HYBRID;
-            break;
-        case 'TERRAIN':
-            mapType = google.maps.MapTypeId.TERRAIN;
-            break;
-        default:
-            mapType = google.maps.MapTypeId.ROADMAP;
-            break;
+            case 'ROADMAP':
+                mapType = google.maps.MapTypeId.ROADMAP;
+                break;
+            case 'SATELLITE':
+                mapType = google.maps.MapTypeId.SATELLITE;
+                break;
+            case 'HYBRID':
+                mapType = google.maps.MapTypeId.HYBRID;
+                break;
+            case 'TERRAIN':
+                mapType = google.maps.MapTypeId.TERRAIN;
+                break;
+            default:
+                mapType = google.maps.MapTypeId.ROADMAP;
+                break;
         }
         /**
          * change map type and montor tilesloaded event to make sure all map have loaded
@@ -132,20 +179,24 @@ function checkMapType(params, result) {
             setTimeout(function () {
                 callback({
                     success: true,
-                    status: 'tilesloaded'
+                    status: 'tilesloaded',
+                    quality: 100
                 });
                 draw(params, result);
-            }, 2000);
+            }, 5000);
         });
         map.setMapTypeId(mapType);
-    } else {
+        window.timeout = setTimeout(function(){
+            callback("timeout");
+        }, 5 * 60 * 1000);
+    }else{
         setTimeout(function () {
             callback({
                 success: true,
                 status: 'tilesloaded'
             });
             draw(params, result);
-        }, 2000);
+        }, 5000);
     }
 }
 
@@ -154,7 +205,7 @@ function getCirclePath(size) {
 }
 
 function draw(params, result) {
-    console.log('draw map polygon');
+    console.log('draw polygon');
     /**
      * draw ndaddress
      */
@@ -185,51 +236,24 @@ function draw(params, result) {
         /**
          * draw polyline for boundary
          */
-        new google.maps.Polygon({
+        var boundaryPolyline = new google.maps.Polygon({
             paths: result.boundary,
             strokeColor: '#000',
             strokeOpacity: 1,
             strokeWeight: 6,
             fillColor: fillColor,
-            fillOpacity: 0.2,
-            map: map
+            fillOpacity: 0.1,
         });
-
-        /**
-         * draw gtu point
-         */
-        var index = 0;
-        params.gTUDotsRadii = params.gTUDotsRadii ? params.gTUDotsRadii : 8;
-        if (result.points && result.points.length > 0) {
-            $.each(result.points, function () {
-                var color = result.pointsColors[index];
-                $.each(this, function () {
-                    new google.maps.Marker({
-                        position: this,
-                        icon: {
-                            path: getCirclePath(params.gTUDotsRadii),
-                            fillColor: color,
-                            fillOpacity: 1,
-                            strokeOpacity: 1,
-                            strokeWeight: 1,
-                            strokeColor: '#000'
-                        },
-                        draggable: true,
-                        map: map
-                    });
-                });
-                index++;
-            });
-        }
+        boundaryPolyline.setMap(map);
 
         console.log("draw map done");
+        setTimeout(prepareScreenshot, 10 * 1000);
     }
 
     /**
      * draw campaign address
      */
     if (result && result.address) {
-        console.log('begin draw campaign address');
         var starx24 = 'M10.8,2.7c0,0-2,4.1-2.5,5.2C7.1,8.1,2.7,8.7,2.7,8.7c-0.5,0.1-1,0.5-1.2,1c0,0.1-0.1,0.3-0.1,0.5c0,0.4,0.2,0.8,0.4,1.1c0,0,3.2,3.2,4,4.1c-0.2,1.2-1,5.7-1,5.7c0,0.1,0,0.2,0,0.3c0,0.5,0.2,0.9,0.6,1.2c0.4,0.3,1,0.4,1.5,0.1c0,0,4-2.1,5-2.7c1,0.6,5,2.7,5,2.7c0.5,0.3,1.1,0.2,1.5-0.1c0.4-0.3,0.6-0.7,0.6-1.2c0-0.1,0-0.2,0-0.2c0,0-0.7-4.5-0.9-5.7c0.8-0.8,4.1-4,4.1-4c0.3-0.3,0.4-0.7,0.4-1.1c0-0.2,0-0.3-0.1-0.5c-0.2-0.5-0.6-0.9-1.2-1c0,0-4.4-0.7-5.6-0.8c-0.5-1.1-2.5-5.2-2.5-5.2c-0.2-0.5-0.7-0.8-1.3-0.8C11.5,1.9,11,2.2,10.8,2.7z';
         $.each(result.address, function () {
             if (this.circle && this.circle.length > 0) {
@@ -290,26 +314,18 @@ function draw(params, result) {
                 }
             }
         });
-        console.log('draw campaign address done!');
     }
-    console.log('wait for all map done.');
-
-    setTimeout(prepareScreenshot, 1000);
 }
 
-var finallyCutdown = 5;
 function prepareScreenshot() {
-    console.log('cutdown', finallyCutdown);
-    if(--finallyCutdown <= 0){
-        console.log('mission completed');
-        $("#map").css("background", "transparent");
-        $("#map img").hide();
 
-        callback({
-            success: true,
-            status: 'finished'
-        });
-    }else{
-        setTimeout(prepareScreenshot, 1000);
-    }
+
+    $("#map").css("background", "transparent");
+    $("#map img").hide();
+
+    callback({
+        success: true,
+        status: 'finished'
+    });
+
 }
