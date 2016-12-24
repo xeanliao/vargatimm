@@ -254,3 +254,5 @@ _Pvt_Extensions
 # sublime text files
 **/*.sublime-project
 **/*.sublime-workspace
+
+.scripts_cache

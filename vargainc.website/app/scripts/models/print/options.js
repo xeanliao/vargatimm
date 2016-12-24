@@ -1,30 +1,25 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'pubsub',
-    'models/print/base'
-], function ($, _, Backbone, Topic, BaseModel) {
-    return BaseModel.extend({
-        urlRoot: 'map',
-        defaults: {
-            suppressCover: true,
+import Backbone from 'backbone';
+import BaseModel from 'models/print/base';
 
-            suppressCampaign: true,
-            suppressCampaignSummary: true,
-            suppressNDAInCampaign: true,
+export default BaseModel.extend({
+    urlRoot: 'map',
+    defaults: {
+        suppressCover: true,
 
-            suppressSubMap: true,
-            suppressSubMapCountDetail: true,
-            suppressNDAInSubMap: true,
+        suppressCampaign: true,
+        suppressCampaignSummary: true,
+        suppressNDAInCampaign: true,
 
-            suppressDMap: false,
-            suppressGTU: true,
-            suppressNDAInDMap: true,
+        suppressSubMap: true,
+        suppressSubMapCountDetail: true,
+        suppressNDAInSubMap: true,
 
-            customSubMapPenetrationColors: false,
-            suppressLocations: true,
-            suppressRadii: true
-        }
-    });
+        suppressDMap: false,
+        suppressGTU: true,
+        suppressNDAInDMap: true,
+
+        customSubMapPenetrationColors: false,
+        suppressLocations: true,
+        suppressRadii: true
+    }
 });

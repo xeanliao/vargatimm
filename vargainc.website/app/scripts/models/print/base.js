@@ -1,8 +1,3 @@
-define([
-    'underscore',
-    'backbone'
-], function (_, Backbone) {
-	return Backbone.Model.extend({
-		
-	});
-});
+import Backbone from 'backbone';
+
+export default Backbone.Model.extend({});

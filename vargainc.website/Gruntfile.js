@@ -3,15 +3,17 @@
 module.exports = function (grunt) {
 	require('load-grunt-tasks')(grunt);
 	grunt.verbose.writeln('begin task...');
-
+	require('time-grunt')(grunt);
+	var lodash = require('lodash');
+	var webpack = require('webpack');
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		app: 'app',
 		dist: 'dist',
 		bower: {
-			all: {
+			style: {
 				dest: '<%= app %>',
-				js_dest: '<%= app %>/scripts/vendor/',
+				js_dest: '<%= app %>/scripts/vendor',
 				scss_dest: '<%= app %>/scss/',
 				css_dest: '<%= app %>/css/',
 				fonts_dest: '<%= app %>/fonts/',
@@ -20,259 +22,209 @@ module.exports = function (grunt) {
 					keepExpandedHierarchy: false,
 					expand: false,
 					ignorePackages: [
-						'what-input'
+						'bootstrap',
+						'jquery',
+						'tether',
+						'SVG-Loaders'
 					],
 					packageSpecific: {
-						'foundation-sites': {
-							'files': [
-								'js/foundation.core.js', 'js/foundation.util.*.js', 'js/foundation.reveal.js',
-								'js/foundation.dropdown.js', 'js/foundation.abide.js', 'js/foundation.tooltip.js'
-							]
-						},
-						'react': {
-							'files': ['react.js', 'react-dom.js', 'react-dom-server.js']
-						},
-						'motion-ui': {
-							'files': ['dist/motion-ui.js']
-						},
-						'lodash': {
-							'files': ['lodash.js']
-						},
 						'font-awesome': {
-							'files': ['fonts/**']
+							'files': ['fonts/**', 'css/font-awesome.css']
 						},
-						'font-awesome-animation': {
-							'files': ['dist/font-awesome-animation.css']
-						},
-						'foundation-datepicker': {
-							'files': ['js/foundation-datepicker.js']
-						},
-						'react-select': {
-							'files': ['dist/react-select.js', 'dist/react-select.css']
-						},
-						'classnames': {
-							'files': ['dedupe.js']
-						},
-						'requirejs-plugins': {
-							'files': ['src/async.js']
+						'leaflet': {
+							'files': ['dist/images/**', 'dist/leaflet.css']
 						}
 					}
 				}
 			}
 		},
-		clean: {
-			dist: {
-				src: ['<%= dist %>/*']
-			},
-		},
 		copy: {
-			dist: {
+			bower: {
 				files: [{
 					expand: true,
-					cwd: '<%= app %>/',
-					src: ['fonts/**', '**/*.html', 'images/**', '!**/*.scss', '!**/*.hbs'],
-					dest: '<%= dist %>/'
+					cwd: 'bower_components/SVG-Loaders',
+					dest: '<%= app %>/images/',
+					src: [
+						'**/*.svg',
+					]
 				}]
 			},
-			stage: {
+			dist: {
 				files: [{
 					expand: true,
-					cwd: '<%= app %>/',
-					src: ['fonts/**', '**/*.html', 'scripts/**', 'images/**', '!**/*.scss', '!**/*.hbs'],
-					dest: '<%= dist %>/'
+					dot: true,
+					cwd: '<%= app %>',
+					dest: '<%= dist %>',
+					src: [
+						'*.{ico,png,txt}',
+						'images/{,*/}*.*',
+						'img/{,*/}*.*',
+						'release.html',
+						'fonts/{,*/}*.*'
+					]
 				}]
 			}
 		},
 		sass: {
-			dist: {
-				options: {
-					sourcemap: 'none',
-					style: 'expanded', // expanded or nested or compact or compressed
-					loadPath: [
-						'bower_components/foundation-sites/scss',
-						'bower_components/motion-ui/src',
-						'bower_components/font-awesome/scss',
-						'bower_components/foundation-datepicker/css',
-						'bower_components/select2/src/scss'
-					],
-					compass: true,
-					quiet: true
-				},
-				files: {
-					'<%= app %>/css/library.css': '<%= app %>/scss/library.scss',
-					'<%= app %>/css/app.css': '<%= app %>/scss/app.scss',
-				}
-			}
-		},
-		babel: {
 			options: {
-				sourceMap: false,
-				presets: ['react'],
-				plugins: ['react-intl'],
-
+				style: 'compact', // expanded or nested or compact or compressed
+				sourcemap: 'none',
+				loadPath: [
+					'bower_components',
+					'node_modules',
+					'node_modules/sass-rem/',
+					'node_modules/select2/src/scss',
+					'node_modules/foundation-sites/scss',
+					'node_modules/foundation-datepicker/scss',
+					'node_modules/motion-ui/src/',
+				],
+				compass: true,
+				quiet: true
 			},
 			dist: {
 				files: [{
-					src: ['<%= app %>/scripts/views/layout/main.jsx'],
-					dest: '<%= app %>/scripts/views/layout/main.js'
-				}, {
-					src: ['<%= app %>/scripts/views/layout/frame.jsx'],
-					dest: '<%= app %>/scripts/views/layout/frame.js'
-				}, {
-					src: ['<%= app %>/scripts/views/layout/menu.jsx'],
-					dest: '<%= app %>/scripts/views/layout/menu.js'
-				}, {
-					src: ['<%= app %>/scripts/views/layout/user.jsx'],
-					dest: '<%= app %>/scripts/views/layout/user.js'
-				}, {
-					src: ['<%= app %>/scripts/views/layout/loading.jsx'],
-					dest: '<%= app %>/scripts/views/layout/loading.js'
-				}, {
-					src: ['<%= app %>/scripts/views/campaign/list.jsx'],
-					dest: '<%= app %>/scripts/views/campaign/list.js'
-				}, {
-					src: ['<%= app %>/scripts/views/campaign/edit.jsx'],
-					dest: '<%= app %>/scripts/views/campaign/edit.js'
-				}, {
-					src: ['<%= app %>/scripts/views/campaign/publish.jsx'],
-					dest: '<%= app %>/scripts/views/campaign/publish.js'
-				}, {
-					src: ['<%= app %>/scripts/views/campaign/import.jsx'],
-					dest: '<%= app %>/scripts/views/campaign/import.js'
-				}, {
-					src: ['<%= app %>/scripts/views/user/adminList.jsx'],
-					dest: '<%= app %>/scripts/views/user/adminList.js'
-				}, {
-					src: ['<%= app %>/scripts/views/user/employee.jsx'],
-					dest: '<%= app %>/scripts/views/user/employee.js'
-				}, {
-					src: ['<%= app %>/scripts/views/distribution/list.jsx'],
-					dest: '<%= app %>/scripts/views/distribution/list.js'
-				}, {
-					src: ['<%= app %>/scripts/views/distribution/publish.jsx'],
-					dest: '<%= app %>/scripts/views/distribution/publish.js'
-				}, {
-					src: ['<%= app %>/scripts/views/distribution/dismiss.jsx'],
-					dest: '<%= app %>/scripts/views/distribution/dismiss.js'
-				}, {
-					src: ['<%= app %>/scripts/views/monitor/list.jsx'],
-					dest: '<%= app %>/scripts/views/monitor/list.js'
-				}, {
-					src: ['<%= app %>/scripts/views/monitor/edit.jsx'],
-					dest: '<%= app %>/scripts/views/monitor/edit.js'
-				}, {
-					src: ['<%= app %>/scripts/views/monitor/dismiss.jsx'],
-					dest: '<%= app %>/scripts/views/monitor/dismiss.js'
-				}, {
-					src: ['<%= app %>/scripts/views/report/list.jsx'],
-					dest: '<%= app %>/scripts/views/report/list.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/cover.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/cover.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/footer.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/footer.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/campaign.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/campaign.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/campaignSummary.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/campaignSummary.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/submap.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/submap.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/submapDetail.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/submapDetail.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/dmap.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/dmap.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/dmapDetailMap.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/dmapDetailMap.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/distributionMap.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/distributionMap.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/distributionDetailMap.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/distributionDetailMap.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/mapZoom.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/mapZoom.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/options.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/options.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/penetrationColor.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/penetrationColor.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/optionsDMapSelector.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/optionsDMapSelector.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/campaignOptions.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/campaignOptions.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/distributionOptions.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/distributionOptions.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/shared/reportOptions.jsx'],
-					dest: '<%= app %>/scripts/views/print/shared/reportOptions.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/campaign.jsx'],
-					dest: '<%= app %>/scripts/views/print/campaign.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/distribution.jsx'],
-					dest: '<%= app %>/scripts/views/print/distribution.js'
-				}, {
-					src: ['<%= app %>/scripts/views/print/report.jsx'],
-					dest: '<%= app %>/scripts/views/print/report.js'
-				}, {
-					src: ['<%= app %>/scripts/views/gtu/edit.jsx'],
-					dest: '<%= app %>/scripts/views/gtu/edit.js'
-				}, {
-					src: ['<%= app %>/scripts/views/gtu/monitor.jsx'],
-					dest: '<%= app %>/scripts/views/gtu/monitor.js'
-				}, {
-					src: ['<%= app %>/scripts/views/gtu/assign.jsx'],
-					dest: '<%= app %>/scripts/views/gtu/assign.js'
-				}, {
-					src: ['<%= app %>/scripts/views/admin/dashboard.jsx'],
-					dest: '<%= app %>/scripts/views/admin/dashboard.js'
-				}, {
-					src: ['<%= app %>/scripts/views/admin/availableGTU.jsx'],
-					dest: '<%= app %>/scripts/views/admin/availableGTU.js'
+					expand: true,
+					cwd: '<%= app %>/scss',
+					src: ['*.{scss,sass}'],
+					dest: '<%= app %>/css',
+					ext: '.css'
 				}]
 			}
 		},
-		requirejs: {
-			compile: {
-				options: {
-					baseUrl: '<%= app %>/scripts/',
-					mainConfigFile: ['<%= app %>/scripts/config.js'],
-					name: "monitor",
-					out: '<%= app %>/scripts/monitor-optimized.js',
-					optimize: 'none',
-					stubModules: ['async'],
-					optimizeAllPluginResources: true,
-					findNestedDependencies: true,
-					wrapShim: true
-				}
+		webpack: {
+			options: {
+				cache: false,
+				output: {
+					path: '<%= app %>/js/',
+					publicPath: '/',
+					filename: '[name].js',
+					pathinfo: false,
+				},
+				resolve: {
+					root: './',
+					alias: {
+						'underscore': 'lodash',
+						'promise': 'bluebird'
+					},
+					extensions: ['', '.js', '.jsx'],
+					modulesDirectories: ['<%= app %>/scripts', 'bower_components', 'node_modules']
+				},
+				module: {
+					loaders: [{
+						test: /\.(jsx?|es|es6)$/,
+						exclude: /(node_modules|bower_components)/,
+						loader: 'babel',
+						query: {
+							cacheDirectory: '.scripts_cache',
+							plugins: ['lodash'],
+							presets: ['latest', 'react']
+						}
+					}],
+					noParse: [
+						/localforage\/dist\/localforage.js/
+					]
+				},
+				hot: false
+			},
+			'dist': {
+				devtool: false,
+				entry: {
+					app: '<%= app %>/scripts/main',
+					vendor: (function () {
+						var pkg = grunt.file.readJSON('package.json');
+						return lodash.keys(pkg.dependencies);
+					})()
+				},
+				output: {
+					filename: '[name].js',
+				},
+				plugins: [
+					new webpack.optimize.CommonsChunkPlugin({
+						name: 'vendor',
+						filename: 'vendor.js'
+					}),
+					new webpack.optimize.OccurrenceOrderPlugin(true),
+					new webpack.optimize.DedupePlugin(),
+					new webpack.DefinePlugin({
+						'process.env': {
+							'NODE_ENV': JSON.stringify('production') // This has effect on the react lib size
+						},
+						DEBUG: JSON.stringify(false)
+					})
+				]
 			}
 		},
-		useminPrepare: {
-			html: ['<%= app %>/index.html'],
-			options: {
-				dest: '<%= dist %>'
+		clean: {
+			dist: {
+				src: ['<%= dist %>/*', '.tmp/**/*']
+			},
+		},
+		copy: {
+			bower: {
+				files: [{
+					expand: true,
+					cwd: 'bower_components/SVG-Loaders',
+					dest: '<%= app %>/images/',
+					src: [
+						'**/*.svg',
+					]
+				}]
+			},
+			dist: {
+				files: [{
+					expand: true,
+					dot: true,
+					cwd: '<%= app %>',
+					dest: '<%= dist %>',
+					src: [
+						'*.{ico,png,txt}',
+						'images/{,*/}*.webp',
+						'release.html',
+						'fonts/{,*/}*.*'
+					]
+				}]
+			}
+		},
+		imagemin: {
+			dist: {
+				files: [{
+					expand: true,
+					cwd: '<%= app %>/images',
+					src: '{,*/}*.{gif,jpeg,jpg,png}',
+					dest: '<%= dist %>/images'
+				}, {
+					expand: true,
+					cwd: '<%= app %>/img',
+					src: '{,*/}*.{gif,jpeg,jpg,png}',
+					dest: '<%= dist %>/img'
+				}]
+			}
+		},
+		svgmin: {
+			dist: {
+				files: [{
+					expand: true,
+					cwd: '<%= app %>/images',
+					src: '{,*/}*.svg',
+					dest: '<%= dist %>/images'
+				}]
 			}
 		},
 		uglify: {
 			options: {
-				preserveComments: 'some',
-				mangle: false,
+				mangle: true,
+				preserveComments: false,
+				report: 'min',
+				// ASCIIOnly: true,
 				compress: {
-					global_defs: {
-						DEBUG: true // That very variable
-					}
+					sequences: true,
+					dead_code: true,
+					conditionals: true,
+					booleans: true,
+					unused: true,
+					if_return: true,
+					join_vars: true,
+					drop_console: true,
 				}
 			}
 		},
@@ -283,41 +235,166 @@ module.exports = function (grunt) {
 			},
 			files: {
 				src: [
-					'<%= dist %>/scripts/**/*.js',
-					'<%= dist %>/css/**/*.css',
-					//'<%= dist %>/images/**/*.{jpg,jpeg,gif,png,ico}'
+					'<%= dist %>/js/{,*/}*.js',
+					'<%= dist %>/css/{,*/}*.css',
+					'<%= dist %>/images/{,*/}*.*',
+					'<%= dist %>/img/{,*/}*.*',
+					'<%= dist %>/fonts/{,*/}*.*',
+					'<%= dist %>/*.{ico,png}'
 				]
 			}
 		},
-		usemin: {
-			html: ['<%= dist %>/**/*.html'],
-			css: ['<%= dist %>/css/**/*.css'],
+		useminPrepare: {
+			html: ['<%= app %>/release.html'],
 			options: {
-				dirs: ['<%= dist %>']
+				dest: '<%= dist %>',
 			}
 		},
-		watch: {
-			grunt: {
-				files: ['Gruntfile.js'],
-				tasks: ['bower', 'sass', 'babel']
+		usemin: {
+			options: {
+				assetsDirs: [
+					'<%= dist %>',
+					'<%= dist %>/images',
+					'<%= dist %>/css',
+				]
 			},
-			sass: {
-				files: '<%= app %>/scss/**/*.scss',
-				tasks: ['sass']
+			html: ['<%= dist %>/{,*/}*.html'],
+			css: ['<%= dist %>/css/{,*/}*.css']
+		},
+		rename: {
+			release: {
+				files: [{
+					src: ['<%= dist %>/release.html'],
+					dest: '<%= dist %>/index.html'
+				}, ]
+			}
+		},
+		concurrent: {
+			dist: [
+				'webpack',
+				'sass',
+				'imagemin',
+				'svgmin'
+			],
+		},
+		'webpack-dev-server': {
+			options: {
+				proxy: {
+					'/api/**': {
+						target: 'http://www.timm.win:8080'
+					},
+				},
+				webpack: {
+					cache: true,
+					entry: {
+						'app': [
+							'./app/scripts/main',
+							'webpack/hot/only-dev-server',
+						],
+						'style-app': ['./app/scss/app.scss', 'webpack/hot/only-dev-server'],
+						'style-lib': ['./app/scss/library.scss', 'webpack/hot/only-dev-server'],
+						'debug': 'webpack-dev-server/client?http://127.0.0.1:8082'
+					},
+					output: {
+						path: '/',
+						publicPath: '../',
+						filename: '[name].js',
+						chunkFilename: '[chunkhash].js',
+					},
+					externals: {
+                        'js-marker-clusterer': 'MarkerClusterer'
+                    },
+					resolve: {
+						root: './',
+						alias: {
+							'underscore': 'lodash',
+							'promise': 'bluebird'
+						},
+						extensions: ['', '.js', '.jsx'],
+						modulesDirectories: [
+							'app/scripts',
+							'bower_components',
+							'node_modules',
+							'node_modules/foundation-datepicker/js'
+						]
+					},
+					module: {
+						loaders: [{
+							test: /\.scss$/,
+							loader: (function () {
+								var path = require('path');
+								var loadPath = [
+									'bower_components',
+									'./bower_components/font-awesome/scss',
+									'node_modules',
+									'./node_modules/compass-mixins/lib',
+									'./node_modules/sass-rem',
+									'./node_modules/select2/src/scss',
+									'./node_modules/foundation-sites/scss',
+									'./node_modules/foundation-datepicker/scss',
+									'./node_modules/motion-ui/src/',
+								];
+								loadPath = lodash.map(loadPath, function (item) {
+									return 'includePaths[]=' + path.resolve(item)
+								});
+								return 'style-loader!css-loader?sourceMap!sass-loader?sourceMap&' + loadPath.join('&');
+							})()
+						}, {
+							test: /\.(jsx?|es|es6)$/,
+							exclude: /(node_modules|bower_components)/,
+							loaders: ['react-hot', 'babel'],
+						}, {
+							test: /\.(jsx?|es|es6)$/,
+							exclude: /(node_modules|bower_components)/,
+							loader: 'babel',
+							query: {
+								cacheDirectory: '.scripts_cache',
+								plugins: ['lodash'],
+								presets: ['es2015', 'react']
+							}
+						}, {
+							test: /.(png|jpg|gif|svg)$/,
+							loader: 'url-loader'
+						}],
+						noParse: [
+							/localforage\/dist\/localforage.js/
+						]
+					},
+					resolveUrlLoader: {
+						root: 'app/'
+					},
+					plugins: [
+						new webpack.HotModuleReplacementPlugin(),
+						new webpack.DefinePlugin({
+							DEBUG: JSON.stringify(true)
+						}),
+					],
+					externals: {
+						jquery: "jQuery"
+					},
+					watch: true,
+					keepalive: true,
+					inline: true,
+				},
+				publicPath: '/',
 			},
-			babel: {
-				files: '<%= app %>/scripts/**/*.jsx',
-				tasks: ['babel']
-			},
-			livereload: {
-				files: ['<%= app %>/**/*.html', '<%= app %>/scripts/**/*.js', '<%= app %>/css/**/*.css', '<%= app %>/images/**/*.{jpg,gif,svg,jpeg,png}'],
-				options: {
-					livereload: true
-				}
+			start: {
+				keepAlive: true,
+				hot: true,
+				webpack: {
+					devtool: 'eval',
+					debug: true
+				},
+				host: '0.0.0.0',
+				port: 8082
 			}
 		},
 	});
 
 	grunt.registerTask('debug', ['bower', 'sass']);
 	grunt.registerTask('default', ['debug']);
+	grunt.registerTask('dev', ['webpack-dev-server']);
+	grunt.registerTask('release', ['clean', 'bower', 'copy:bower', 'copy:dist', 'useminPrepare', 'concurrent:dist',
+		'concat', 'uglify', 'cssmin', 'filerev', 'usemin', 'rename:release'
+	]);
 };

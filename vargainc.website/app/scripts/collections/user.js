@@ -1,50 +1,41 @@
-define([
-	'jquery',
-	'underscore',
-	'backbone',
-	'models/user'
-], function ($, _, Backbone, Model) {
-	return Backbone.Collection.extend({
-		model: Model,
-		url: 'user',
-		fetchInGroup: function (type, opts) {
-			var collection = this,
-				url = collection.url + '/group/' + type,
-				options = {
-					url: url,
-					type: 'GET',
-					// success: function(response){
-					// 	if(response && response.data){
-					// 		_.each(response.data, function(item){
-					// 			collection.add(new Model(item));
-					// 		});
-					// 	}
-					// }
-				};
-			_.extend(options, opts);
+import Backbone from 'backbone';
+import Model from 'models/user';
+import Promise from 'bluebird';
+import {
+	extend
+} from 'lodash';
 
-			//return (this.sync || Backbone.sync).call(this, 'read', this, options);
-			return this.fetch(options);
-		},
-		fetchForGtu: function(opts){
-			var collection = this,
-				options = {
-					url: collection.url + '/gtu/',
-					type: 'GET',
-				};
-			_.extend(options, opts);
+export default Backbone.Collection.extend({
+	model: Model,
+	url: 'user',
+	fetchInGroup: function (type, opts) {
+		var collection = this,
+			url = collection.url + '/group/' + type,
+			options = {
+				url: url,
+				type: 'GET',
+			};
+		extend(options, opts);
+		return this.fetch(options);
+	},
+	fetchForGtu: function (opts) {
+		var collection = this,
+			options = {
+				url: collection.url + '/gtu/',
+				type: 'GET',
+			};
+		extend(options, opts);
 
-			return this.fetch(options);
-		},
-		fetchCompany: function(opts){
-			var collection = this,
-				options = {
-					url: collection.url + '/company/',
-					type: 'GET',
-				};
-			_.extend(options, opts);
+		return this.fetch(options);
+	},
+	fetchCompany: function (opts) {
+		var collection = this,
+			options = {
+				url: collection.url + '/company/',
+				type: 'GET',
+			};
+		extend(options, opts);
 
-			return this.fetch(options);
-		}
-	});
+		return this.fetch(options);
+	}
 });
