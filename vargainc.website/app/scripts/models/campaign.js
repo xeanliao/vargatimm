@@ -93,10 +93,10 @@ export default Backbone.Model.extend({
 
         return (this.sync || Backbone.sync).call(this, 'update', this, options);
     },
-    loadWithTask: function(campaignId){
+    loadWithAllTask: function(campaignId){
         var self = this;
         return (this.sync || Backbone.sync).call(this, 'read', this, {
-            url: `campaign/${campaignId}/tasks`
+            url: `campaign/${campaignId}/tasks/all`
         }).then(result=>{
             var tasks = new TaskCollection();
             tasks.set(result.Tasks);

@@ -84,7 +84,7 @@ export default Backbone.Router.extend({
 		var View = require('views/gtu/campaignMonitor').default;
 		var Model = require('models/campaign').default;
 		var campaignWithTaskModel = new Model();
-		campaignWithTaskModel.loadWithTask(campaignId).then(() => {
+		campaignWithTaskModel.loadWithAllTask(campaignId).then(() => {
 			Topic.publish({
 				channel: 'View',
 				topic: 'loadView',
