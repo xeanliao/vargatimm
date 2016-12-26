@@ -121,13 +121,13 @@ export default React.createBackboneClass({
 		if (this.state.dialogView && Foundation) {
 			$('.reveal').foundation();
 			var dialogSize = this.state.dialogSize;
-			$(document).off('open.zf.reveal.mainView');
-			$(document).one('open.zf.reveal.mainView', function () {
-				console.log('open.zf.reveal.mainView');
-				$('.reveal-overlay').css({
-					display: dialogSize == 'full' ? 'none' : 'block'
-				});
-			});
+			// $(document).off('open.zf.reveal.mainView');
+			// $(document).one('open.zf.reveal.mainView', function () {
+			// 	console.log('open.zf.reveal.mainView');
+			// 	$('.reveal-overlay').css({
+			// 		display: dialogSize == 'full' ? 'none' : 'block'
+			// 	});
+			// });
 			$('.reveal').foundation('open');
 		} else {
 			$('.reveal').foundation();

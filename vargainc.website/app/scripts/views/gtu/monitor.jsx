@@ -437,12 +437,16 @@ export default React.createBackboneClass({
 			user = new UserCollection(),
 			self = this;
 		user.fetchForGtu().done(function () {
-			self.publish('showDialog', AssignView, {
-				collection: gtu,
-				user: user,
-				taskId: taskId
-			}, {
-				size: 'full'
+			self.publish('showDialog', {
+				view: AssignView,
+				params: {
+					collection: gtu,
+					user: user,
+					taskId: taskId,
+				},
+				options: {
+					size: 'full'
+				}
 			});
 		});
 	},
@@ -591,7 +595,8 @@ export default React.createBackboneClass({
 			deleteIcon = null,
 			buttonClass = 'button text-left',
 			taskIsStopped = this.props.task.get('Status') == 1,
-			isActive = indexOf(this.state.activeGtu, gtu.get('Id')) > -1;
+			isActive = indexOf(this.state.activeGtu, gtu.get('Id')) > -1,
+			gtuIcon = null;
 
 		if (taskIsStopped) {
 			//gtuIcon = <i className="fa fa-stop" style={{color: gtu.get('UserColor')}}></i>
