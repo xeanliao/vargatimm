@@ -302,20 +302,22 @@ module.exports = function (grunt) {
 						chunkFilename: '[chunkhash].js',
 					},
 					externals: {
-                        'js-marker-clusterer': 'MarkerClusterer'
-                    },
+						'js-marker-clusterer': 'MarkerClusterer'
+					},
 					resolve: {
 						root: './',
 						alias: {
 							'underscore': 'lodash',
-							'promise': 'bluebird'
+							'promise': 'bluebird',
 						},
 						extensions: ['', '.js', '.jsx'],
 						modulesDirectories: [
 							'app/scripts',
+							'node_modules/foundation-datepicker/js',
+							'node_modules/leaflet-dvf/dist',
+							'node_modules/leaflet-ant-path/dist',
 							'bower_components',
 							'node_modules',
-							'node_modules/foundation-datepicker/js'
 						]
 					},
 					module: {

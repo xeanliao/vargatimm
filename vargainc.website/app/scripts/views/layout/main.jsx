@@ -116,6 +116,10 @@ export default React.createBackboneClass({
 			$(".off-canvas-wrapper-inner").height($(window).height());
 		});
 		$(window).trigger('resize');
+
+		$(window).on('click', function(){
+			self.publish('Global.Window.Click');
+		});
 	},
 	componentDidUpdate: function (prevProps, prevState) {
 		if (this.state.dialogView && Foundation) {
