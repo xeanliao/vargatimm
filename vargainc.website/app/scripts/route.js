@@ -80,6 +80,50 @@ export default Backbone.Router.extend({
 			});
 		});
 	},
+	gtuMonitorAction: function (campaignId, taskName, taskId) {
+		let Task = require('models/task').default;
+		let DMap = require('models/print/dmap').default;
+		let Gtu = require('collections/gtu').default;
+		let View = require('views/gtu/monitor').default;
+
+		let gtu = new Gtu(),
+			task = new Task({
+				Id: taskId
+			});
+		task.fetch().then(() => {
+			let dmap = new DMap({
+				CampaignId: task.get('CampaignId'),
+				SubMapId: task.get('SubMapId'),
+				DMapId: task.get('DMapId')
+			});
+
+			Promise.all([
+				dmap.fetchBoundary(),
+				dmap.fetchAllGtu(),
+				gtu.fetchGtuWithStatusByTask(taskId)
+			]).then(() => {
+				let pageTitle = `GTU Monitor - ${task.get('ClientName')}, ${task.get('ClientCode')}: ${task.get('Name')}`;
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							dmap: dmap,
+							gtu: gtu,
+							task: task
+						}
+					},
+					options: {
+						showMenu: false,
+						showUser: false,
+						showSearch: false,
+						pageTitle: pageTitle
+					}
+				});
+			});
+		});
+	},
 	campaignMonitorAction: function (campaignId) {
 		var View = require('views/gtu/campaignMonitor').default;
 		var Model = require('models/campaign').default;
@@ -257,50 +301,7 @@ export default Backbone.Router.extend({
 
 		});
 	},
-	gtuMonitorAction: function (campaignId, taskName, taskId) {
-		let Task = require('models/task').default;
-		let DMap = require('models/print/dmap').default;
-		let Gtu = require('collections/gtu').default;
-		let View = require('views/gtu/monitor').default;
-
-		let gtu = new Gtu(),
-			task = new Task({
-				Id: taskId
-			});
-		task.fetch().then(() => {
-			let dmap = new DMap({
-				CampaignId: task.get('CampaignId'),
-				SubMapId: task.get('SubMapId'),
-				DMapId: task.get('DMapId')
-			});
-
-			Promise.all([
-				dmap.fetchBoundary(),
-				dmap.fetchAllGtu(),
-				gtu.fetchGtuWithStatusByTask(taskId)
-			]).then(() => {
-				let pageTitle = `GTU Monitor - ${task.get('ClientName')}, ${task.get('ClientCode')}: ${task.get('Name')}`;
-				Topic.publish({
-					channel: 'View',
-					topic: 'loadView',
-					data: {
-						view: View,
-						params: {
-							dmap: dmap,
-							gtu: gtu,
-							task: task
-						}
-					},
-					options: {
-						showMenu: false,
-						showUser: false,
-						showSearch: false,
-						pageTitle: pageTitle
-					}
-				});
-			});
-		});
-	},
+	
 	availableGTUAction: function () {
 		let Collection = require('collections/gtu').default;
 		let View = require('views/admin/availableGTU').default;

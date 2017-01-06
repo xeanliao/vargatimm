@@ -38,33 +38,6 @@ module.exports = function (grunt) {
 				}
 			}
 		},
-		copy: {
-			bower: {
-				files: [{
-					expand: true,
-					cwd: 'bower_components/SVG-Loaders',
-					dest: '<%= app %>/images/',
-					src: [
-						'**/*.svg',
-					]
-				}]
-			},
-			dist: {
-				files: [{
-					expand: true,
-					dot: true,
-					cwd: '<%= app %>',
-					dest: '<%= dist %>',
-					src: [
-						'*.{ico,png,txt}',
-						'images/{,*/}*.*',
-						'img/{,*/}*.*',
-						'release.html',
-						'fonts/{,*/}*.*'
-					]
-				}]
-			}
-		},
 		sass: {
 			options: {
 				style: 'compact', // expanded or nested or compact or compressed
@@ -100,6 +73,10 @@ module.exports = function (grunt) {
 					filename: '[name].js',
 					pathinfo: false,
 				},
+				externals: {
+					jquery: "jQuery",
+					'js-marker-clusterer': 'MarkerClusterer'
+				},
 				resolve: {
 					root: './',
 					alias: {
@@ -107,7 +84,14 @@ module.exports = function (grunt) {
 						'promise': 'bluebird'
 					},
 					extensions: ['', '.js', '.jsx'],
-					modulesDirectories: ['<%= app %>/scripts', 'bower_components', 'node_modules']
+					modulesDirectories: [
+						'app/scripts',
+						'node_modules/foundation-datepicker/js',
+						'node_modules/leaflet-dvf/dist',
+						'node_modules/leaflet-ant-path/dist',
+						'bower_components',
+						'node_modules',
+					]
 				},
 				module: {
 					loaders: [{
@@ -156,7 +140,11 @@ module.exports = function (grunt) {
 		},
 		clean: {
 			dist: {
-				src: ['<%= dist %>/*', '.tmp/**/*']
+				src: [
+					'<%= dist %>/*',
+					'.tmp/**/*',
+					'./*.tar.gz'
+				]
 			},
 		},
 		copy: {
@@ -183,7 +171,18 @@ module.exports = function (grunt) {
 						'fonts/{,*/}*.*'
 					]
 				}]
-			}
+			},
+			vendor: {
+				files: [{
+					expand: true,
+					dot: true,
+					cwd: './node_modules/js-marker-clusterer/src/',
+					dest: '.tmp/concat/js/',
+					src: [
+						'markerclusterer.js'
+					]
+				}]
+			},
 		},
 		imagemin: {
 			dist: {
@@ -277,6 +276,30 @@ module.exports = function (grunt) {
 				'svgmin'
 			],
 		},
+		compress: {
+			options: {
+				archive: function () {
+					let moment = require('moment');
+					let date = moment().format('YYYYMMDDHHmmss');
+					return `website.${date}.tar.gz`;
+				},
+				mode: 'tgz',
+			},
+			release: {
+				files: [{
+					src: ['<%= dist %>/**/*'],
+					dest: './'
+				}]
+			}
+		},
+		shell: {
+			options: {
+				stderr: false
+			},
+			release: {
+				command: 'mv ./*.tar.gz /Volumes/RamDisk/Publish/'
+			},
+		},
 		'webpack-dev-server': {
 			options: {
 				proxy: {
@@ -302,6 +325,7 @@ module.exports = function (grunt) {
 						chunkFilename: '[chunkhash].js',
 					},
 					externals: {
+						jquery: "jQuery",
 						'js-marker-clusterer': 'MarkerClusterer'
 					},
 					resolve: {
@@ -371,9 +395,6 @@ module.exports = function (grunt) {
 							DEBUG: JSON.stringify(true)
 						}),
 					],
-					externals: {
-						jquery: "jQuery"
-					},
 					watch: true,
 					keepalive: true,
 					inline: true,
@@ -396,7 +417,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('debug', ['bower', 'sass']);
 	grunt.registerTask('default', ['debug']);
 	grunt.registerTask('dev', ['webpack-dev-server']);
-	grunt.registerTask('release', ['clean', 'bower', 'copy:bower', 'copy:dist', 'useminPrepare', 'concurrent:dist',
-		'concat', 'uglify', 'cssmin', 'filerev', 'usemin', 'rename:release'
+	grunt.registerTask('release', ['clean', 'bower', 'copy:bower', 'copy:dist', 'copy:vendor', 'useminPrepare', 'concurrent:dist',
+		'concat', 'uglify', 'cssmin', 'filerev', 'usemin', 'rename:release', 'compress', 'shell'
 	]);
 };

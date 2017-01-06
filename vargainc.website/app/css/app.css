@@ -115,15 +115,6 @@
 .select2-container--classic .select2-results__group { cursor: default; display: block; padding: 6px; }
 .select2-container--classic.select2-container--open .select2-dropdown { border-color: #5897fb; }
 
-.off-canvas-wrapper-inner { position: fixed; min-height: 100%; overflow-y: auto; overflow-x: hidden; }
-
-.off-canvas-wrapper-inner.is-off-canvas-open { overflow-y: visible; overflow-x: visible; }
-
-.is-off-canvas-open .sidebar { width: 250px !important; left: -250px !important; max-height: none !important; }
-.is-off-canvas-open .sidebar span, .is-off-canvas-open .sidebar .submenu { display: inline !important; }
-
-.is-off-canvas-open .main { left: 0px !important; }
-
 .panel input[type='checkbox'] { margin-bottom: 0 !important; }
 .panel li { padding-bottom: 0 !important; }
 
@@ -187,19 +178,23 @@ table .select2-container { margin: 0; }
 .overlayer { position: fixed; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height: 100%; background: rgba(100, 100, 100, 0.75); z-index: 9998; display: none; }
 .overlayer .loading { z-index: 9999; }
 
+.campaign-monitor blockquote { border-left: none; margin: 0; padding: 0; }
+
 html, body { font-family: 'Ubuntu', verdana, arial, sans-serif; color: #8a8a8a; font-weight: 300; background-color: #f8f8f8; }
 
 .logo { background: #131e30; height: 50px; top: 0px; left: 0px; width: 250px; text-align: center; position: fixed; }
 
-.sidebar { width: 50px !important; overflow: visible; position: fixed; bottom: 0; left: 0 !important; color: #adb8ca; background: #1a2a42; }
+.sidebar { width: 50px !important; overflow: visible; position: fixed; bottom: 0; left: 0 !important; color: #adb8ca; background: #1a2a42; transform: none !important; }
 .sidebar .menu a { color: #fff; }
 .sidebar .menu a:hover, .sidebar .menu a.active { color: rgba(245, 159, 26, 0.8); background-color: #162439; }
 .sidebar .menu a:hover i, .sidebar .menu a.active i { color: rgba(245, 159, 26, 0.8); text-shadow: 1px 4px 6px #1a2a42,0 0 0 #F59F1A,1px 4px 6px #1a2a42; }
 .sidebar .menu .submenu a { padding-left: 45px; font-size: 12px; }
-.sidebar .menu span, .sidebar .menu .submenu { display: none; }
+.sidebar .menu span, .sidebar .menu .submenu { display: none; padding: 0; }
 .sidebar .menu-text { display: none; }
+.sidebar.is-open { width: 250px !important; }
+.sidebar.is-open .menu-text, .sidebar.is-open span, .sidebar.is-open .submenu { display: initial; }
 
-.is-off-canvas-open .sidebar .menu-text { display: static; }
+.is-open ~ .off-canvas-content { left: 0px !important; }
 
 .menu-icon:after { background: #2199e8; box-shadow: 0 7px 0 #2199e8, 0 14px 0 #2199e8; }
 
@@ -329,3 +324,5 @@ html, body { font-family: 'Ubuntu', verdana, arial, sans-serif; color: #8a8a8a; 
 .google-map-pop { background: transparent; pointer-events: none; margin-top: 0px !important; top: 0px !important; }
 
 iframe { border: none; position: absolute; left: 0; right: 0; width: 100%; top: 0; bottom: 0; }
+
+.leaflet-map-container { z-index: 0; }
