@@ -285,7 +285,7 @@ var MapContainer = React.createBackboneClass({
 		if (!map || !task) {
 			return;
 		}
-		var gtus = task.get('gtuTrack');
+		var gtus = task.get('dmap').get('Gtu');
 		this.drawGtuMarker(gtus);
 		this.drawGtuTrackSnake(gtus);
 		this.drawGtuTrackAnt(gtus);

@@ -177,9 +177,9 @@ module.exports = function (grunt) {
 					expand: true,
 					dot: true,
 					cwd: './node_modules/js-marker-clusterer/src/',
-					dest: '.tmp/concat/js/',
+					dest: '<%= app %>/js/',
 					src: [
-						'markerclusterer.js'
+						'markerclusterer_compiled.js'
 					]
 				}]
 			},
@@ -302,11 +302,6 @@ module.exports = function (grunt) {
 		},
 		'webpack-dev-server': {
 			options: {
-				proxy: {
-					'/api/**': {
-						target: 'http://www.timm.win:8080'
-					},
-				},
 				webpack: {
 					cache: true,
 					entry: {
