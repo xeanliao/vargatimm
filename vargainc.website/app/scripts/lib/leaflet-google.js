@@ -72,8 +72,11 @@ L.GoogleTile = L.Layer.extend({
 	_resize: function () {
 		let size = this._map.getSize(),
 			container = this._container;
-		container.style.width = `${size.x * 1}px`;
-		container.style.height = `${size.y * 1}px`;
+		container.style.position = 'absolute';	
+		container.style.width = `${size.x * 1.2}px`;
+		container.style.height = `${size.y * 1.2}px`;
+		container.style.left = `-${size.x * 0.1}px`;
+		container.style.top = `-${size.y * 0.1}px`;
 	},
 	_zoom: function () {
 		let zoom = this._map.getZoom();
@@ -87,18 +90,6 @@ L.GoogleTile = L.Layer.extend({
 		this._resize();
 		this._zoom();
 		this._update();
-		// let zoom = map.getZoom(),
-		// 	center = map.getCenter(),
-		// 	size = this._map.getSize(),
-		// 	container = this._container;
-
-		// this._googleMap.setZoom(zoom);
-		// this._googleMap.setCenter(center);
-
-		// container.style.width = `${size.x * 1}px`;
-		// container.style.height = `${size.y * 1}px`;
-
-		// L.DomUtil.setPosition(this._container, this._map.containerPointToLayerPoint([0, 0]), false);
 	},
 	_update: function (e) {
 		let center = this._map.getCenter();
