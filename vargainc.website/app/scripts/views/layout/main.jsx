@@ -114,10 +114,14 @@ export default React.createBackboneClass({
 		 */
 		$(window).on('resize', function () {
 			$(".off-canvas-wrapper-inner").height($(window).height());
+			self.publish('Global.Window.Resize', {
+				width: $(window).width(),
+				height: $(window).height()
+			});
 		});
 		$(window).trigger('resize');
 
-		$(window).on('click', function(){
+		$(window).on('click', function () {
 			self.publish('Global.Window.Click');
 		});
 	},

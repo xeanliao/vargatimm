@@ -1,3 +1,5 @@
+import L from 'leaflet';
+
 L.GoogleTile = L.Layer.extend({
 
 	// @section
@@ -70,13 +72,15 @@ L.GoogleTile = L.Layer.extend({
 		});
 	},
 	_resize: function () {
+		const zoomSize = 1.2;
 		let size = this._map.getSize(),
 			container = this._container;
 		container.style.position = 'absolute';	
-		container.style.width = `${size.x * 1.2}px`;
-		container.style.height = `${size.y * 1.2}px`;
-		container.style.left = `-${size.x * 0.1}px`;
-		container.style.top = `-${size.y * 0.1}px`;
+		container.style.width = `${size.x * zoomSize}px`;
+		container.style.height = `${size.y * zoomSize}px`;
+		container.style.left = `-${size.x * ((zoomSize - 1) / 2)}px`;
+		container.style.top = `-${size.y * ((zoomSize - 1) / 2)}px`;
+		google.maps.event.trigger(this._googleMap, 'resize');
 	},
 	_zoom: function () {
 		let zoom = this._map.getZoom();

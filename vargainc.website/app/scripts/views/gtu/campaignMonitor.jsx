@@ -4,10 +4,8 @@ import ReactDOMServer from 'react-dom/server';
 import 'react.backbone';
 import Promise from 'bluebird';
 import L from 'leaflet';
-import 'lib/leaflet-google';
 import 'leaflet-dvf';
-import 'leaflet.polyline.snakeanim';
-import 'leaflet-ant-path';
+import 'lib/leaflet-google';
 import $ from 'jquery';
 import classNames from 'classnames';
 import {
@@ -18,7 +16,9 @@ import {
 	map,
 	each,
 	find,
-	filter
+	filter,
+	indexOf,
+	xor
 } from 'lodash';
 
 import GTUCollection from 'collections/gtu';
@@ -39,8 +39,9 @@ var MapContainer = React.createBackboneClass({
 	getInitialState: function () {
 		return {
 			gtuMarkerLayer: {},
-			gtuSnakeTrackLayerGroup: null,
-			gtuAntTrackLayerGroup: null,
+			gtuTrackLayer: {},
+			gtuLocationLayer: null,
+			displayGtus: [],
 			showOutOfBoundaryGtu: false,
 			drawMode: 'marker'
 		}
@@ -57,28 +58,29 @@ var MapContainer = React.createBackboneClass({
 			animate: false,
 			scrollWheelZoom: false,
 		});
-		new L.googleTile({
-			mapTypeId: google.maps.MapTypeId.HYBRID
-		}).addTo(monitorMap);
 
 		/**
 		 * prepare track pane
 		 */
-		monitorMap.createPane('GtuAntTrackPane', monitorMap.getPane('overlayPane'));
-		monitorMap.createPane('GtuSnakeTrackPane', monitorMap.getPane('overlayPane'));
+		monitorMap.createPane('GtuTrackPane', monitorMap.getPane('overlayPane'));
 		monitorMap.createPane('GtuMarkerPane', monitorMap.getPane('markerPane'));
 
 		this.setState({
 			map: monitorMap
 		}, () => {
 			self.drawBoundary(monitorMap);
+			self.registerTopic();
 		});
+	},
+	registerTopic: function () {
+		var self = this;
 		this.subscribe('Campaign.Monitor.ZoomToTask', taskId => {
 			self.flyToTask(taskId);
 		});
-		this.subscribe('Campaign.Monitor.DrawGtu', task => {
+		this.subscribe('Campaign.Monitor.DrawGtu', data => {
 			self.setState({
-				task: task
+				task: data.task,
+				displayGtus: data.displayGtus
 			}, () => {
 				self.drawGtu();
 				window.clearInterval(self.state.reloadTimeout);
@@ -101,8 +103,34 @@ var MapContainer = React.createBackboneClass({
 				self.drawGtu();
 			});
 		});
+		this.subscribe('Campaign.Monitor.SwitchGtu', gtus => {
+			self.setState({
+				displayGtus: gtus
+			}, () => {
+				self.drawGtu();
+			});
+		});
+		this.subscribe('Campaign.Monitor.LocatGtu', gtuId => {
+			self.state.gtuLocationLayer.eachLayer(layer => {
+				if (layer && layer.latlng && layer.gtuId == gtuId) {
+					self.state.map.flyTo(layer.latlng);
+					return false;
+				}
+			})
+		});
+		this.subscribe('Campaign.Monitor.CenterToTask', () => {
+			self.flyToTask(self.state.task.get('Id'));
+		});
+		this.subscribe('Campaign.Monitor.Reload', () => {
+			self.reload();
+		});
+		this.subscribe('Global.Window.Resize', size => {
+			mapContainer.style.width = `${size.width}px`;
+			mapContainer.style.height = `${size.height}px`;
+		});
 	},
 	drawBoundary: function (monitorMap) {
+		console.time();
 		var self = this,
 			model = this.getModel(),
 			campaignId = model.get('Id'),
@@ -119,6 +147,7 @@ var MapContainer = React.createBackboneClass({
 			promiseSubmapArray.push($.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`));
 		});
 		return Promise.all(promiseSubmapArray).then(data => {
+			console.timeEnd();
 			return Promise.each(data, result => {
 				let latlngs = map(result.boundary, i => {
 					boundaryBounds.extend(i);
@@ -138,70 +167,84 @@ var MapContainer = React.createBackboneClass({
 					promiseTaskArray.push(new Promise((resolve, reject) => {
 						let url = `../api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`;
 						$.getJSON(url).then(result => {
-							let latlngArray = []; //for draw map polygon
-							let coordinateList = []; //for use jsts get polygon center
-							each(result.boundary, i => {
-								latlngArray.push([i.lat, i.lng]);
-								coordinateList.push(new geom.Coordinate(i.lng, i.lat));
+							resolve({
+								task: task,
+								result: result
 							});
-							let factory = new geom.GeometryFactory();
-							let boundaryLineRing = factory.createLinearRing(coordinateList);
-							let polygon = factory.createPolygon(boundaryLineRing);
-							var center = polygon.getCentroid();
-							let color = `rgb(${result.color.r}, ${result.color.g}, ${result.color.b})`;
-							let opt = {
-								taskId: task.get('Id'),
-								center: {
-									lat: center.getY(),
-									lng: center.getX()
-								},
-								text: {
-									text: `${task.get('Name')}`
-								},
-								weight: 1,
-								color: color,
-								opacity: 0.75,
-								fill: true,
-								fillColor: !task.get('IsFinished') ? color : '#000',
-								fillOpacity: !task.get('IsFinished') ? 0.1 : 0.75,
-								noClip: true,
-								clickable: !task.get('IsFinished'),
-								dropShadow: !task.get('IsFinished'),
-								fillPattern: !task.get('IsFinished') ? null : {
-									url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
-									pattern: {
-										width: '8px',
-										height: '8px',
-										patternUnits: 'userSpaceOnUse',
-										patternContentUnits: 'Default'
-									},
-									image: {
-										width: '8px',
-										height: '8px'
-									}
-								}
-							};
-							var boundary = L.polyline(latlngArray, opt)
-								.on('click', self.onTaskAreaClickHandler, self);
-							boundary.getCenter = function () {
-								return {
-									lat: center.getY(),
-									lng: center.getX()
-								};
-							};
-							taskBoundaryLayerGroup.addLayer(boundary);
-							resolve();
 						});
 					}));
 				});
 			});
 
 			return Promise.all(promiseTaskArray);
+		}).then(response => {
+			console.timeEnd();
+			return Promise.each(response, data => {
+				let task = data.task;
+				let result = data.result;
+				let latlngArray = []; //for draw map polygon
+				let coordinateList = []; //for use jsts get polygon center
+				each(result.boundary, i => {
+					latlngArray.push([i.lat, i.lng]);
+					coordinateList.push(new geom.Coordinate(i.lng, i.lat));
+				});
+				let factory = new geom.GeometryFactory();
+				let boundaryLineRing = factory.createLinearRing(coordinateList);
+				let polygon = factory.createPolygon(boundaryLineRing);
+				var center = polygon.getCentroid();
+				let color = `rgb(${result.color.r}, ${result.color.g}, ${result.color.b})`;
+				let opt = {
+					taskId: task.get('Id'),
+					center: {
+						lat: center.getY(),
+						lng: center.getX()
+					},
+					text: {
+						text: `${task.get('Name')}`
+					},
+					weight: 1,
+					color: color,
+					opacity: 0.75,
+					fill: true,
+					fillColor: !task.get('IsFinished') ? color : '#000',
+					fillOpacity: !task.get('IsFinished') ? 0.1 : 0.75,
+					noClip: true,
+					clickable: !task.get('IsFinished'),
+					dropShadow: !task.get('IsFinished'),
+					fillPattern: !task.get('IsFinished') ? null : {
+						url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
+						pattern: {
+							width: '8px',
+							height: '8px',
+							patternUnits: 'userSpaceOnUse',
+							patternContentUnits: 'Default'
+						},
+						image: {
+							width: '8px',
+							height: '8px'
+						}
+					}
+				};
+				var boundary = L.polyline(latlngArray, opt)
+					.on('click', self.onTaskAreaClickHandler, self);
+				boundary.getCenter = function () {
+					return {
+						lat: center.getY(),
+						lng: center.getX()
+					};
+				};
+				taskBoundaryLayerGroup.addLayer(boundary);
+				return Promise.resolve();
+			});
 		}).then(() => {
 			taskBoundaryLayerGroup.addTo(monitorMap);
-			monitorMap.flyToBounds(boundaryBounds);
+			monitorMap.fitBounds(boundaryBounds);
 			self.setState({
 				taskBoundaryLayerGroup: taskBoundaryLayerGroup
+			}, () => {
+				new L.googleTile({
+					mapTypeId: google.maps.MapTypeId.HYBRID
+				}).addTo(monitorMap);
 			})
 		});
 	},
@@ -228,7 +271,7 @@ var MapContainer = React.createBackboneClass({
 		}
 		var gtuList = [];
 		var templat = (
-			<div className="row section" style={{'min-width': '320px;'}}>
+			<div className="row section" style={{'minWidth': '320px;'}}>
 				<div className="small-7 columns">{task.get('Name')}</div>
 				<div className="small-5 columns text-right">{taskStatus}</div>
 				<div className="small-12 columns">
@@ -287,8 +330,11 @@ var MapContainer = React.createBackboneClass({
 		}
 		var gtus = task.get('dmap').get('Gtu');
 		this.drawGtuMarker(gtus);
-		this.drawGtuTrackSnake(gtus);
-		this.drawGtuTrackAnt(gtus);
+		this.drawGtuTrack(gtus);
+		this.drawGtuLocation();
+	},
+	updateGtu: function () {
+		// setLatLngs
 	},
 	drawGtuMarker: function (gtus) {
 		var self = this;
@@ -296,178 +342,169 @@ var MapContainer = React.createBackboneClass({
 		if (!monitorMap) {
 			return;
 		}
-		if (this.state.drawMode != 'marker') {
-			each(this.state.gtuMarkerLayer, layer => {
-				layer.remove();
-			});
+		if (this.state.drawMode.indexOf('marker') == -1) {
+			//hide all marker
+			$('.leaflet-GtuMarker-pane').hide();
 			return;
 		}
+		$('.leaflet-GtuMarker-pane').show();
 		each(gtus, data => {
-			if (data.points && data.points.length > 0) {
-				let gtuId = data.points[0].Id;
-				var dataLayer = this.state.gtuMarkerLayer[gtuId];
-				if (!dataLayer) {
-					var gtuRadiusFunction = new L.LinearFunction(new L.Point(0, 3), new L.Point(1, 10));
-					var dataLayer = new L.MapMarkerDataLayer(data, {
-						recordsField: 'points',
-						locationMode: L.LocationModes.LATLNG,
-						latitudeField: 'lat',
-						longitudeField: 'lng',
-						tooltipOptions: null,
-						getMarker: function (location, options, record) {
-							return new L.RegularPolygonMarker(location, options);
-						},
-						filter: function (value) {
-							return self.state.showOutOfBoundaryGtu ? true : value.out == false;
-						},
-						layerOptions: {
-							weight: 0.1,
-							opacity: 0.7,
-							fillColor: data.color,
-							fillOpacity: 1.0,
-							fill: true,
-							stroke: true,
-							numberOfSides: 50,
-							stroke: false,
-							fillOpacity: 0.75,
-							dropShadow: true,
-							radius: 5,
-							clickable: false,
-							noClip: false,
-							showLegendTooltips: false,
-							pane: 'GtuMarkerPane',
-							gradient: function () {
-								return {
-									gradientType: 'radial',
-									stops: [{
-										offset: '0%',
-										style: {
-											color: data.color,
-											opacity: 1
-										}
-									}, {
-										offset: '30%',
-										style: {
-											color: data.color,
-											opacity: 0.5
-										}
-									}, {
-										offset: '100%',
-										style: {
-											color: data.color,
-											opacity: 0
-										}
-									}]
+			let gtuId = data.points[0].Id;
+			var markerLayer = this.state.gtuMarkerLayer[gtuId];
+			if (indexOf(this.state.displayGtus, gtuId) == -1 && markerLayer) {
+				markerLayer.remove();
+				return true;
+			}
+			if (markerLayer) {
+				markerLayer.remove();
+			}
+			markerLayer = L.markerGroup();
+			each(data.points, latlng => {
+				if (!self.state.showOutOfBoundaryGtu && latlng.out) {
+					return true;
+				}
+				L.triangleMarker(latlng, {
+					gtuId: gtuId,
+					weight: 0.1,
+					opacity: 0.7,
+					fillColor: data.color,
+					fillOpacity: 1.0,
+					fill: true,
+					stroke: true,
+					numberOfSides: 50,
+					stroke: false,
+					fillOpacity: 0.75,
+					dropShadow: true,
+					rotation: 0,
+					radius: 5,
+					clickable: false,
+					noClip: false,
+					showLegendTooltips: false,
+					pane: 'GtuMarkerPane',
+					gradient: function () {
+						return {
+							gradientType: 'radial',
+							stops: [{
+								offset: '0%',
+								style: {
+									color: data.color,
+									opacity: 1
 								}
-							},
-						},
-					});
-					self.state.gtuMarkerLayer[gtuId] = dataLayer;
+							}, {
+								offset: '30%',
+								style: {
+									color: data.color,
+									opacity: 0.5
+								}
+							}, {
+								offset: '100%',
+								style: {
+									color: data.color,
+									opacity: 0
+								}
+							}]
+						}
+					},
+				}).addTo(markerLayer);
+			});
+			self.state.gtuMarkerLayer[gtuId] = markerLayer;
+			markerLayer.addTo(monitorMap);
+		});
+	},
+	drawGtuTrack: function (gtus) {
+		var self = this;
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			return;
+		}
+		if (this.state.drawMode.indexOf('track') == -1) {
+			//hide all track
+			$('.leaflet-GtuTrack-pane').hide();
+			return;
+		}
+		$('.leaflet-GtuTrack-pane').show();
+		each(gtus, data => {
+			let gtuId = data.points[0].Id;
+			var trackLayer = this.state.gtuTrackLayer[gtuId];
+			if (indexOf(this.state.displayGtus, gtuId) == -1 && trackLayer) {
+				trackLayer.remove();
+				return true;
+			}
+
+			if (trackLayer) {
+				trackLayer.remove();
+			}
+			let latlngs = filter(data.points, p => {
+				return self.state.showOutOfBoundaryGtu ? true : p.out == false;
+			});
+			trackLayer = L.polyline(latlngs, {
+				gtuId: gtuId,
+				weight: 2,
+				color: data.color,
+				opacity: 0.75,
+				noClip: false,
+				dropShadow: true,
+				snakingSpeed: 200,
+				pane: 'GtuTrackPane'
+			});
+			self.state.gtuTrackLayer[gtuId] = trackLayer;
+			trackLayer.addTo(monitorMap);
+			trackLayer.animateLine && trackLayer.animateLine();
+		});
+	},
+	drawGtuLocation: function (gtus) {
+		var self = this;
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			return;
+		}
+		let taskIsStopped = this.state.task.get('Status') == 1,
+			gtuList = this.state.task.get('gtuList').where(function (i) {
+				if (taskIsStopped) {
+					return i.get('WithData')
 				} else {
-					dataLayer.setData(data);
+					return i.get('IsAssign') || i.get('WithData');
 				}
-				dataLayer.addTo(monitorMap);
-			}
+			}),
+			gtuLocationLayer = this.state.gtuLocationLayer;
+		if (gtuLocationLayer) {
+			gtuLocationLayer.remove();
+		}
+
+		gtuLocationLayer = L.layerGroup();
+		each(gtuList, gtu => {
+			let locationMarker = L.markerGroup();
+			let latlng = gtu.get('Location');
+			L.triangleMarker(latlng, {
+				gtuId: gtu.get('Id'),
+				radius: 15,
+				fillColor: gtu.get('UserColor'),
+				fillOpacity: 0.75,
+				fill: true,
+				stroke: false,
+				numberOfSides: 50,
+				pane: 'GtuMarkerPane',
+				gradient: true
+			}).addTo(locationMarker);
+			L.triangleMarker(latlng, {
+				gtuId: gtu.get('Id'),
+				radius: 30,
+				fillColor: gtu.get('UserColor'),
+				fillOpacity: 0.25,
+				fill: true,
+				stroke: false,
+				numberOfSides: 50,
+				pane: 'GtuMarkerPane',
+				gradient: false
+			}).addTo(locationMarker);
+			locationMarker.gtuId = gtu.get('Id');
+			locationMarker.latlng = latlng;
+			locationMarker.addTo(gtuLocationLayer);
 		});
-	},
-	drawGtuTrackSnake: function (gtus) {
-		var monitorMap = this.state.map;
-		if (!monitorMap) {
-			return;
-		}
-		var trackLayerGroup = this.state.gtuSnakeTrackLayerGroup;
-		if (this.state.drawMode != 'snakeTrack') {
-			trackLayerGroup && trackLayerGroup.remove();
-			return;
-		}
-
-		if (!trackLayerGroup) {
-			trackLayerGroup = L.layerGroup();
-			this.setState({
-				gtuSnakeTrackLayerGroup: trackLayerGroup
-			});
-		}
-		each(gtus, data => {
-			if (data.points && data.points.length > 0) {
-				var gtuId = data.points[0].Id;
-				var gtuLayer = null;
-				trackLayerGroup.eachLayer(layer => {
-					if (layer.options.gtuId == gtuId) {
-						gtuLayer = layer;
-					}
-				});
-				if (!gtuLayer) {
-					let latlngs = map(data.points, p => {
-						return {
-							lat: p.lat,
-							lng: p.lng
-						};
-					});
-					L.polyline(latlngs, {
-						gtuId: gtuId,
-						weight: 2,
-						color: data.color,
-						opacity: 0.75,
-						noClip: false,
-						dropShadow: true,
-						snakingSpeed: 200,
-						pane: 'GtuSnakeTrackPane'
-					}).addTo(trackLayerGroup);
-				}
-			}
+		gtuLocationLayer.addTo(monitorMap);
+		self.setState({
+			gtuLocationLayer: gtuLocationLayer
 		});
-
-		trackLayerGroup.addTo(monitorMap).snakeIn();
-	},
-	drawGtuTrackAnt: function (gtus) {
-		var monitorMap = this.state.map;
-		if (!monitorMap) {
-			return;
-		}
-		var trackLayerGroup = this.state.gtuAntTrackLayerGroup;
-		if (this.state.drawMode != 'antTrack') {
-			trackLayerGroup && trackLayerGroup.remove();
-			return;
-		}
-
-		if (!trackLayerGroup) {
-			trackLayerGroup = L.layerGroup();
-			this.setState({
-				gtuAntTrackLayerGroup: trackLayerGroup
-			});
-		}
-		each(gtus, data => {
-			if (data.points && data.points.length > 0) {
-				var gtuId = data.points[0].Id;
-				var gtuLayer = null;
-				trackLayerGroup.eachLayer(layer => {
-					if (layer.options.gtuId == gtuId) {
-						gtuLayer = layer;
-					}
-				});
-				if (!gtuLayer) {
-					let latlngs = map(data.points, p => {
-						return {
-							lat: p.lat,
-							lng: p.lng
-						};
-					});
-					new L.Polyline.AntPath(latlngs, {
-						gtuId: gtuId,
-						weight: 2,
-						color: data.color,
-						opacity: 0.75,
-						noClip: false,
-						dropShadow: true,
-						delay: 15 * 1000,
-						dashArray: [5, 40],
-						pane: 'GtuAntTrackPane'
-					}).addTo(trackLayerGroup);
-				}
-			}
-		});
-
-		trackLayerGroup.addTo(monitorMap);
 	},
 	flyToTask: function (taskId) {
 		var map = this.state.map;
@@ -483,11 +520,7 @@ var MapContainer = React.createBackboneClass({
 	},
 	render: function () {
 		return (
-			<div className="row">
-				<div className="small-12">
-					<div className="leaflet-map-container" ref={this.onInit} style={{'minHeight': '640px'}}></div>
-				</div>
-			</div>
+			<div className="leaflet-map-container" ref={this.onInit} style={{'minHeight': '640px'}}></div>
 		);
 	}
 });
@@ -496,7 +529,8 @@ export default React.createBackboneClass({
 	mixins: [BaseView],
 	getInitialState: function () {
 		return {
-			activeTask: null
+			activeTask: null,
+			displayGtus: []
 		}
 	},
 	componentDidMount: function () {
@@ -518,26 +552,37 @@ export default React.createBackboneClass({
 			Gtu: []
 		});
 		var trackQuery = taskDMap.updateGtuAfterTime(null, {
-			quite: true
+			quite: false
 		});
 
 		var gtu = new GtuCollection();
 		var locationQuery = gtu.fetchGtuWithStatusByTask(task.get('Id'), {
-			quite: true
+			quite: false
 		}).then(() => {
 			return gtu.fetchGtuLocation(task.get('Id'), {
-				quite: true
+				quite: false
 			});
 		});
 
 		return Promise.all([trackQuery, locationQuery]).then(() => {
 			task.set('dmap', taskDMap);
 			task.set('gtuList', gtu);
+			/**
+			 * set all gtu as default display
+			 */
+			var displayGtus = taskDMap.get('Gtu') || [];
+			displayGtus = map(displayGtus, gtu => {
+				return gtu.points && gtu.points.length > 0 ? gtu.points[0].Id : null;
+			});
 			self.setState({
-				activeTask: task
+				activeTask: task,
+				displayGtus: displayGtus
 			}, () => {
 				self.publish('Campaign.Monitor.ZoomToTask', task.get('Id'));
-				self.publish('Campaign.Monitor.DrawGtu', task);
+				self.publish('Campaign.Monitor.DrawGtu', {
+					task: task,
+					displayGtus: displayGtus
+				});
 			});
 
 		});
@@ -588,6 +633,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onSwitchShowOutOfBoundaryGtu: function () {
+		var self = this;
 		var showOutOfBoundaryGtu = !this.state.ShowOutOfBoundaryGtu;
 		this.setState({
 			ShowOutOfBoundaryGtu: showOutOfBoundaryGtu,
@@ -625,15 +671,23 @@ export default React.createBackboneClass({
 		});
 	},
 	onReCenter: function () {
-		this.publish('', this.state.activeTask.get('Id'));
+		this.publish('Campaign.Monitor.CenterToTask');
 	},
 	onReload: function () {
-		this.onSwitchActiveTask(this.state.activeTask);
+		this.publish('Campaign.Monitor.Reload');
 	},
-	onGotoGTU: function () {
-
+	onGotoGTU: function (gtuId) {
+		this.publish('Campaign.Monitor.LocatGtu', gtuId);
 	},
-	onSelectedGTU: function () {},
+	onSelectedGTU: function (gtuId) {
+		var self = this;
+		let displayGtus = xor(this.state.displayGtus, [gtuId]);
+		this.setState({
+			displayGtus: displayGtus
+		}, () => {
+			self.publish('Campaign.Monitor.SwitchGtu', displayGtus);
+		});
+	},
 	renderTaskDropdown: function () {
 		var self = this,
 			model = this.getModel(),
@@ -668,7 +722,7 @@ export default React.createBackboneClass({
 				<ul className="dropdown menu float-right">
 					<li className={parentClass}>
 						<a href="javascript:;" onClick={this.onOpenDropDown}>Switch Active Task</a>
-						<div style={{'min-width': '768px'}} className={menuClass} onClick={this.onCloseDropDown}>
+						<div style={{'minWidth': '768px'}} className={menuClass} onClick={this.onCloseDropDown}>
 							{map(tasks, t=>{
 								return (
 									<div className="column" key={t.get('Id')}>
@@ -758,8 +812,7 @@ export default React.createBackboneClass({
 			deleteIcon = null,
 			buttonClass = 'button text-left',
 			taskIsStopped = this.state.activeTask.get('Status') == 1,
-			// isActive = indexOf(this.state.activeGtu, gtu.get('Id')) > -1,
-			isActive = true,
+			isActive = indexOf(this.state.displayGtus, gtu.get('Id')) > -1,
 			gtuIcon = null;
 
 		if (taskIsStopped) {
@@ -879,13 +932,8 @@ export default React.createBackboneClass({
 							</a>
 						</li>
 						<li>
-							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'snakeTrack')}>
-								Track Path (Snake Style)
-							</a>
-						</li>
-						<li>
-							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'antTrack')}>
-								Track Path (Ant Style)
+							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'marker_track')}>
+								Track Path
 							</a>
 						</li>
 						<li>

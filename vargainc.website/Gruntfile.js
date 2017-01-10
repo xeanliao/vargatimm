@@ -320,7 +320,7 @@ module.exports = function (grunt) {
 						chunkFilename: '[chunkhash].js',
 					},
 					externals: {
-						jquery: "jQuery",
+						'jquery': 'jQuery',
 						'js-marker-clusterer': 'MarkerClusterer'
 					},
 					resolve: {
