@@ -13983,6 +13983,8 @@ webpackJsonp([1],[
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+	var TAG = '[CAMPAIGN-MONITOR]';
+
 	var MapContainer = _react2.default.createBackboneClass({
 		mixins: [_base2.default],
 		shouldComponentUpdate: function shouldComponentUpdate() {
@@ -14010,9 +14012,6 @@ webpackJsonp([1],[
 				animate: false,
 				scrollWheelZoom: false
 			});
-			new _leaflet2.default.googleTile({
-				mapTypeId: google.maps.MapTypeId.HYBRID
-			}).addTo(monitorMap);
 
 			/**
 	   * prepare track pane
@@ -14021,7 +14020,8 @@ webpackJsonp([1],[
 			monitorMap.createPane('GtuMarkerPane', monitorMap.getPane('markerPane'));
 
 			this.setState({
-				map: monitorMap
+				map: monitorMap,
+				mapContainer: mapContainer
 			}, function () {
 				self.drawBoundary(monitorMap);
 				self.registerTopic();
@@ -14080,11 +14080,15 @@ webpackJsonp([1],[
 				self.reload();
 			});
 			this.subscribe('Global.Window.Resize', function (size) {
-				mapContainer.style.width = size.width + 'px';
-				mapContainer.style.height = size.height + 'px';
+				if (self.state.mapContainer) {
+					console.log(TAG + ' window resize width: ' + size.width + ' height: ' + size.height);
+					self.state.mapContainer.style.width = size.width + 'px';
+					self.state.mapContainer.style.height = size.height + 'px';
+				}
 			});
 		},
 		drawBoundary: function drawBoundary(monitorMap) {
+			this.publish('showLoading');
 			var self = this,
 			    model = this.getModel(),
 			    campaignId = model.get('Id'),
@@ -14101,6 +14105,7 @@ webpackJsonp([1],[
 				promiseSubmapArray.push(_jquery2.default.getJSON('../api/print/campaign/' + campaignId + '/submap/' + submapId + '/boundary'));
 			});
 			return _bluebird2.default.all(promiseSubmapArray).then(function (data) {
+				console.timeEnd();
 				return _bluebird2.default.each(data, function (result) {
 					var latlngs = (0, _map3.default)(result.boundary, function (i) {
 						boundaryBounds.extend(i);
@@ -14120,69 +14125,71 @@ webpackJsonp([1],[
 						promiseTaskArray.push(new _bluebird2.default(function (resolve, reject) {
 							var url = '../api/print/campaign/' + task.get('CampaignId') + '/submap/' + task.get('SubMapId') + '/dmap/' + task.get('DMapId') + '/boundary';
 							_jquery2.default.getJSON(url).then(function (result) {
-								var latlngArray = []; //for draw map polygon
-								var coordinateList = []; //for use jsts get polygon center
-								(0, _each3.default)(result.boundary, function (i) {
-									latlngArray.push([i.lat, i.lng]);
-									coordinateList.push(new _jsts.geom.Coordinate(i.lng, i.lat));
+								resolve({
+									task: task,
+									result: result
 								});
-								var factory = new _jsts.geom.GeometryFactory();
-								var boundaryLineRing = factory.createLinearRing(coordinateList);
-								var polygon = factory.createPolygon(boundaryLineRing);
-								var center = polygon.getCentroid();
-								var color = 'rgb(' + result.color.r + ', ' + result.color.g + ', ' + result.color.b + ')';
-								var opt = {
-									taskId: task.get('Id'),
-									center: {
-										lat: center.getY(),
-										lng: center.getX()
-									},
-									text: {
-										text: '' + task.get('Name')
-									},
-									weight: 1,
-									color: color,
-									opacity: 0.75,
-									fill: true,
-									fillColor: !task.get('IsFinished') ? color : '#000',
-									fillOpacity: !task.get('IsFinished') ? 0.1 : 0.75,
-									noClip: true,
-									clickable: !task.get('IsFinished'),
-									dropShadow: !task.get('IsFinished'),
-									fillPattern: !task.get('IsFinished') ? null : {
-										url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
-										pattern: {
-											width: '8px',
-											height: '8px',
-											patternUnits: 'userSpaceOnUse',
-											patternContentUnits: 'Default'
-										},
-										image: {
-											width: '8px',
-											height: '8px'
-										}
-									}
-								};
-								var boundary = _leaflet2.default.polyline(latlngArray, opt).on('click', self.onTaskAreaClickHandler, self);
-								boundary.getCenter = function () {
-									return {
-										lat: center.getY(),
-										lng: center.getX()
-									};
-								};
-								taskBoundaryLayerGroup.addLayer(boundary);
-								resolve();
 							});
 						}));
 					});
 				});
 
 				return _bluebird2.default.all(promiseTaskArray);
+			}).then(function (response) {
+				console.timeEnd();
+				return _bluebird2.default.each(response, function (data) {
+					var task = data.task;
+					var result = data.result;
+					var latlngArray = []; //for draw map polygon
+					var coordinateList = []; //for use jsts get polygon center
+					(0, _each3.default)(result.boundary, function (i) {
+						latlngArray.push([i.lat, i.lng]);
+						coordinateList.push(new _jsts.geom.Coordinate(i.lng, i.lat));
+					});
+					var factory = new _jsts.geom.GeometryFactory();
+					var boundaryLineRing = factory.createLinearRing(coordinateList);
+					var polygon = factory.createPolygon(boundaryLineRing);
+					var center = polygon.getCentroid();
+					var color = 'rgb(' + result.color.r + ', ' + result.color.g + ', ' + result.color.b + ')';
+					var opt = {
+						taskId: task.get('Id'),
+						center: {
+							lat: center.getY(),
+							lng: center.getX()
+						},
+						text: {
+							text: '' + task.get('Name')
+						},
+						weight: 1,
+						color: color,
+						opacity: 0.75,
+						fill: true,
+						fillColor: !task.get('IsFinished') ? color : '#000',
+						fillOpacity: !task.get('IsFinished') ? 0.1 : 0.75,
+						noClip: true,
+						clickable: !task.get('IsFinished'),
+						dropShadow: !task.get('IsFinished')
+					};
+					var boundary = _leaflet2.default.polyline(latlngArray, opt).on('click', self.onTaskAreaClickHandler, self);
+					boundary.getCenter = function () {
+						return {
+							lat: center.getY(),
+							lng: center.getX()
+						};
+					};
+					taskBoundaryLayerGroup.addLayer(boundary);
+					return _bluebird2.default.resolve();
+				});
 			}).then(function () {
 				taskBoundaryLayerGroup.addTo(monitorMap);
-				monitorMap.flyToBounds(boundaryBounds);
+				monitorMap.fitBounds(boundaryBounds);
 				self.setState({
 					taskBoundaryLayerGroup: taskBoundaryLayerGroup
+				}, function () {
+					new _leaflet2.default.googleTile({
+						mapTypeId: google.maps.MapTypeId.HYBRID
+					}).addTo(monitorMap);
+					self.publish('hideLoading');
 				});
 			});
 		},
@@ -14332,7 +14339,7 @@ webpackJsonp([1],[
 				(0, _each3.default)(data.points, function (latlng) {
 					var _L$triangleMarker;
 
-					if (!self.state.showOutOfBoundaryGtu && latlng.out) {
+					if (!latlng.lat || !latlng.lng || !self.state.showOutOfBoundaryGtu && latlng.out) {
 						return true;
 					}
 					_leaflet2.default.triangleMarker(latlng, (_L$triangleMarker = {
@@ -14344,7 +14351,7 @@ webpackJsonp([1],[
 						fill: true,
 						stroke: true,
 						numberOfSides: 50
-					}, _defineProperty(_L$triangleMarker, 'stroke', false), _defineProperty(_L$triangleMarker, 'fillOpacity', 0.75), _defineProperty(_L$triangleMarker, 'dropShadow', true), _defineProperty(_L$triangleMarker, 'rotation', 0), _defineProperty(_L$triangleMarker, 'radius', 5), _defineProperty(_L$triangleMarker, 'clickable', false), _defineProperty(_L$triangleMarker, 'noClip', false), _defineProperty(_L$triangleMarker, 'showLegendTooltips', false), _defineProperty(_L$triangleMarker, 'pane', 'GtuMarkerPane'), _defineProperty(_L$triangleMarker, 'gradient', function gradient() {
+					}, _defineProperty(_L$triangleMarker, 'stroke', false), _defineProperty(_L$triangleMarker, 'fillOpacity', 0.75), _defineProperty(_L$triangleMarker, 'dropShadow', true), _defineProperty(_L$triangleMarker, 'rotation', 0), _defineProperty(_L$triangleMarker, 'radius', 5), _defineProperty(_L$triangleMarker, 'clickable', false), _defineProperty(_L$triangleMarker, 'noClip', true), _defineProperty(_L$triangleMarker, 'showLegendTooltips', false), _defineProperty(_L$triangleMarker, 'pane', 'GtuMarkerPane'), _defineProperty(_L$triangleMarker, 'gradient', function gradient() {
 						return {
 							gradientType: 'radial',
 							stops: [{
@@ -14374,47 +14381,7 @@ webpackJsonp([1],[
 			});
 		},
 		drawGtuTrack: function drawGtuTrack(gtus) {
-			var _this2 = this;
-
-			var self = this;
-			var monitorMap = this.state.map;
-			if (!monitorMap) {
-				return;
-			}
-			if (this.state.drawMode.indexOf('track') == -1) {
-				//hide all track
-				(0, _jquery2.default)('.leaflet-GtuTrack-pane').hide();
-				return;
-			}
-			(0, _jquery2.default)('.leaflet-GtuTrack-pane').show();
-			(0, _each3.default)(gtus, function (data) {
-				var gtuId = data.points[0].Id;
-				var trackLayer = _this2.state.gtuTrackLayer[gtuId];
-				if ((0, _indexOf3.default)(_this2.state.displayGtus, gtuId) == -1 && trackLayer) {
-					trackLayer.remove();
-					return true;
-				}
-
-				if (trackLayer) {
-					trackLayer.remove();
-				}
-				var latlngs = (0, _filter3.default)(data.points, function (p) {
-					return self.state.showOutOfBoundaryGtu ? true : p.out == false;
-				});
-				trackLayer = _leaflet2.default.polyline(latlngs, {
-					gtuId: gtuId,
-					weight: 2,
-					color: data.color,
-					opacity: 0.75,
-					noClip: false,
-					dropShadow: true,
-					snakingSpeed: 200,
-					pane: 'GtuTrackPane'
-				});
-				self.state.gtuTrackLayer[gtuId] = trackLayer;
-				trackLayer.addTo(monitorMap);
-				trackLayer.animateLine && trackLayer.animateLine();
-			});
+			(0, _each3.default)(this.state.gtuMarkerLayer, function (layer) {});
 		},
 		drawGtuLocation: function drawGtuLocation(gtus) {
 			var self = this;
@@ -14478,7 +14445,7 @@ webpackJsonp([1],[
 			this.state.taskBoundaryLayerGroup.eachLayer(function (layer) {
 				if (layer.options.taskId == taskId) {
 					var taskBounds = layer.getBounds();
-					map.flyToBounds(taskBounds);
+					map.fitBounds(taskBounds);
 				}
 			});
 		},
@@ -14514,15 +14481,15 @@ webpackJsonp([1],[
 				Gtu: []
 			});
 			var trackQuery = taskDMap.updateGtuAfterTime(null, {
-				quite: true
+				quite: false
 			});
 
 			var gtu = new _gtu2.default();
 			var locationQuery = gtu.fetchGtuWithStatusByTask(task.get('Id'), {
-				quite: true
+				quite: false
 			}).then(function () {
 				return gtu.fetchGtuLocation(task.get('Id'), {
-					quite: true
+					quite: false
 				});
 			});
 
@@ -14644,7 +14611,7 @@ webpackJsonp([1],[
 			var self = this;
 			var displayGtus = (0, _xor3.default)(this.state.displayGtus, [gtuId]);
 			this.setState({
-				displayedGtus: displayGtus
+				displayGtus: displayGtus
 			}, function () {
 				self.publish('Campaign.Monitor.SwitchGtu', displayGtus);
 			});

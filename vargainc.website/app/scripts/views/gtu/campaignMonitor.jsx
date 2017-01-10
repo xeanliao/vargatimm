@@ -136,7 +136,7 @@ var MapContainer = React.createBackboneClass({
 		});
 	},
 	drawBoundary: function (monitorMap) {
-		console.time();
+		this.publish('showLoading');
 		var self = this,
 			model = this.getModel(),
 			campaignId = model.get('Id'),
@@ -217,19 +217,19 @@ var MapContainer = React.createBackboneClass({
 					noClip: true,
 					clickable: !task.get('IsFinished'),
 					dropShadow: !task.get('IsFinished'),
-					fillPattern: !task.get('IsFinished') ? null : {
-						url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
-						pattern: {
-							width: '8px',
-							height: '8px',
-							patternUnits: 'userSpaceOnUse',
-							patternContentUnits: 'Default'
-						},
-						image: {
-							width: '8px',
-							height: '8px'
-						}
-					}
+					// fillPattern: !task.get('IsFinished') ? null : {
+					// 	url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
+					// 	pattern: {
+					// 		width: '8px',
+					// 		height: '8px',
+					// 		patternUnits: 'userSpaceOnUse',
+					// 		patternContentUnits: 'Default'
+					// 	},
+					// 	image: {
+					// 		width: '8px',
+					// 		height: '8px'
+					// 	}
+					// }
 				};
 				var boundary = L.polyline(latlngArray, opt)
 					.on('click', self.onTaskAreaClickHandler, self);
@@ -251,6 +251,7 @@ var MapContainer = React.createBackboneClass({
 				new L.googleTile({
 					mapTypeId: google.maps.MapTypeId.HYBRID
 				}).addTo(monitorMap);
+				self.publish('hideLoading');
 			})
 		});
 	},
@@ -366,7 +367,7 @@ var MapContainer = React.createBackboneClass({
 			}
 			markerLayer = L.markerGroup();
 			each(data.points, latlng => {
-				if (!self.state.showOutOfBoundaryGtu && latlng.out) {
+				if (!latlng.lat || !latlng.lng || !self.state.showOutOfBoundaryGtu && latlng.out) {
 					return true;
 				}
 				L.triangleMarker(latlng, {
@@ -384,7 +385,7 @@ var MapContainer = React.createBackboneClass({
 					rotation: 0,
 					radius: 5,
 					clickable: false,
-					noClip: false,
+					noClip: true,
 					showLegendTooltips: false,
 					pane: 'GtuMarkerPane',
 					gradient: function () {
@@ -418,44 +419,8 @@ var MapContainer = React.createBackboneClass({
 		});
 	},
 	drawGtuTrack: function (gtus) {
-		var self = this;
-		var monitorMap = this.state.map;
-		if (!monitorMap) {
-			return;
-		}
-		if (this.state.drawMode.indexOf('track') == -1) {
-			//hide all track
-			$('.leaflet-GtuTrack-pane').hide();
-			return;
-		}
-		$('.leaflet-GtuTrack-pane').show();
-		each(gtus, data => {
-			let gtuId = data.points[0].Id;
-			var trackLayer = this.state.gtuTrackLayer[gtuId];
-			if (indexOf(this.state.displayGtus, gtuId) == -1 && trackLayer) {
-				trackLayer.remove();
-				return true;
-			}
+		each(this.state.gtuMarkerLayer, layer=>{
 
-			if (trackLayer) {
-				trackLayer.remove();
-			}
-			let latlngs = filter(data.points, p => {
-				return self.state.showOutOfBoundaryGtu ? true : p.out == false;
-			});
-			trackLayer = L.polyline(latlngs, {
-				gtuId: gtuId,
-				weight: 2,
-				color: data.color,
-				opacity: 0.75,
-				noClip: false,
-				dropShadow: true,
-				snakingSpeed: 200,
-				pane: 'GtuTrackPane'
-			});
-			self.state.gtuTrackLayer[gtuId] = trackLayer;
-			trackLayer.addTo(monitorMap);
-			trackLayer.animateLine && trackLayer.animateLine();
 		});
 	},
 	drawGtuLocation: function (gtus) {
@@ -520,7 +485,7 @@ var MapContainer = React.createBackboneClass({
 		this.state.taskBoundaryLayerGroup.eachLayer(layer => {
 			if (layer.options.taskId == taskId) {
 				var taskBounds = layer.getBounds()
-				map.flyToBounds(taskBounds);
+				map.fitBounds(taskBounds);
 			}
 		});
 	},
