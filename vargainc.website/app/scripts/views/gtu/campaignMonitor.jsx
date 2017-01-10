@@ -31,6 +31,8 @@ import BaseView from 'views/base';
 import AssignView from 'views/gtu/assign';
 import EmployeeView from 'views/user/employee';
 
+const TAG = '[CAMPAIGN-MONITOR]';
+
 var MapContainer = React.createBackboneClass({
 	mixins: [BaseView],
 	shouldComponentUpdate: function () {
@@ -66,7 +68,8 @@ var MapContainer = React.createBackboneClass({
 		monitorMap.createPane('GtuMarkerPane', monitorMap.getPane('markerPane'));
 
 		this.setState({
-			map: monitorMap
+			map: monitorMap,
+			mapContainer: mapContainer
 		}, () => {
 			self.drawBoundary(monitorMap);
 			self.registerTopic();
@@ -125,8 +128,11 @@ var MapContainer = React.createBackboneClass({
 			self.reload();
 		});
 		this.subscribe('Global.Window.Resize', size => {
-			mapContainer.style.width = `${size.width}px`;
-			mapContainer.style.height = `${size.height}px`;
+			if (self.state.mapContainer) {
+				console.log(`${TAG} window resize width: ${size.width} height: ${size.height}`);
+				self.state.mapContainer.style.width = `${size.width}px`;
+				self.state.mapContainer.style.height = `${size.height}px`;
+			}
 		});
 	},
 	drawBoundary: function (monitorMap) {
