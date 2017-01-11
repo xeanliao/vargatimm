@@ -11556,11 +11556,14 @@ webpackJsonp([1],[
 					topic: 'loadView',
 					data: {
 						view: View,
-						options: {
-							showMenu: false
-						},
 						params: {
 							model: campaignWithTaskModel
+						},
+						options: {
+							showMenu: false,
+							showUser: true,
+							showSearch: false,
+							pageTitle: 'GTU Campaign Monitor'
 						}
 					}
 				});
@@ -11718,7 +11721,6 @@ webpackJsonp([1],[
 				});
 			});
 		},
-
 		availableGTUAction: function availableGTUAction() {
 			var Collection = __webpack_require__(70).default;
 			var View = __webpack_require__(363).default;
@@ -14025,6 +14027,7 @@ webpackJsonp([1],[
 			}, function () {
 				self.drawBoundary(monitorMap);
 				self.registerTopic();
+				(0, _jquery2.default)(window).trigger('resize');
 			});
 		},
 		registerTopic: function registerTopic() {
@@ -14040,7 +14043,7 @@ webpackJsonp([1],[
 					self.drawGtu();
 					window.clearInterval(self.state.reloadTimeout);
 					self.setState({
-						reloadTimeout: window.setInterval(self.reload, 30 * 1000)
+						// reloadTimeout: window.setInterval(self.reload, 10 * 1000)
 					});
 				});
 			});
@@ -14168,7 +14171,20 @@ webpackJsonp([1],[
 						fillOpacity: !task.get('IsFinished') ? 0.1 : 0.75,
 						noClip: true,
 						clickable: !task.get('IsFinished'),
-						dropShadow: !task.get('IsFinished')
+						dropShadow: !task.get('IsFinished'),
+						fillPattern: !task.get('IsFinished') ? null : {
+							url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
+							pattern: {
+								width: '8px',
+								height: '8px',
+								patternUnits: 'userSpaceOnUse',
+								patternContentUnits: 'Default'
+							},
+							image: {
+								width: '8px',
+								height: '8px'
+							}
+						}
 					};
 					var boundary = _leaflet2.default.polyline(latlngArray, opt).on('click', self.onTaskAreaClickHandler, self);
 					boundary.getCenter = function () {
@@ -14281,20 +14297,33 @@ webpackJsonp([1],[
 			}).setLatLng(taskAreaCenter).setContent(popContent).openOn(this.state.map);
 		},
 		reload: function reload() {
-			if (!this.state.task) {
+			var _this = this;
+
+			if (!this.state.task || this.state.reloading) {
 				return;
 			}
-			var self = this,
-			    task = this.state.task,
-			    dmap = task.get('dmap'),
-			    gtus = task.get('gtuList');
 
-			return _bluebird2.default.all([dmap.updateGtuAfterTime(null, {
-				quite: true
-			}), gtus.fetchGtuLocation(task.get('Id'), {
-				quite: true
-			})]).then(function () {
-				self.drawGtu();
+			var self = this;
+			return new _bluebird2.default(function (resolve, reject) {
+				_this.setState({
+					reloading: true
+				}, function () {
+					var task = self.state.task,
+					    dmap = task.get('dmap'),
+					    gtus = task.get('gtuList');
+
+					_bluebird2.default.all([dmap.updateGtuAfterTime(null, {
+						quite: true
+					}), gtus.fetchGtuLocation(task.get('Id'), {
+						quite: true
+					})]).then(function () {
+						self.setState({
+							reloading: false
+						}, function () {
+							self.drawGtu();
+						});
+					});
+				});
 			});
 		},
 		drawGtu: function drawGtu() {
@@ -14312,7 +14341,7 @@ webpackJsonp([1],[
 			// setLatLngs
 		},
 		drawGtuMarker: function drawGtuMarker(gtus) {
-			var _this = this;
+			var _this2 = this;
 
 			var self = this;
 			var monitorMap = this.state.map;
@@ -14327,8 +14356,8 @@ webpackJsonp([1],[
 			(0, _jquery2.default)('.leaflet-GtuMarker-pane').show();
 			(0, _each3.default)(gtus, function (data) {
 				var gtuId = data.points[0].Id;
-				var markerLayer = _this.state.gtuMarkerLayer[gtuId];
-				if ((0, _indexOf3.default)(_this.state.displayGtus, gtuId) == -1 && markerLayer) {
+				var markerLayer = _this2.state.gtuMarkerLayer[gtuId];
+				if ((0, _indexOf3.default)(_this2.state.displayGtus, gtuId) == -1 && markerLayer) {
 					markerLayer.remove();
 					return true;
 				}
@@ -14345,26 +14374,26 @@ webpackJsonp([1],[
 					_leaflet2.default.triangleMarker(latlng, (_L$triangleMarker = {
 						gtuId: gtuId,
 						weight: 0.1,
-						opacity: 0.7,
+						opacity: 0.65,
 						fillColor: data.color,
-						fillOpacity: 1.0,
+						fillOpacity: 0.65,
 						fill: true,
 						stroke: true,
 						numberOfSides: 50
-					}, _defineProperty(_L$triangleMarker, 'stroke', false), _defineProperty(_L$triangleMarker, 'fillOpacity', 0.75), _defineProperty(_L$triangleMarker, 'dropShadow', true), _defineProperty(_L$triangleMarker, 'rotation', 0), _defineProperty(_L$triangleMarker, 'radius', 5), _defineProperty(_L$triangleMarker, 'clickable', false), _defineProperty(_L$triangleMarker, 'noClip', true), _defineProperty(_L$triangleMarker, 'showLegendTooltips', false), _defineProperty(_L$triangleMarker, 'pane', 'GtuMarkerPane'), _defineProperty(_L$triangleMarker, 'gradient', function gradient() {
+					}, _defineProperty(_L$triangleMarker, 'stroke', false), _defineProperty(_L$triangleMarker, 'dropShadow', true), _defineProperty(_L$triangleMarker, 'rotation', 0), _defineProperty(_L$triangleMarker, 'radius', 5), _defineProperty(_L$triangleMarker, 'clickable', false), _defineProperty(_L$triangleMarker, 'noClip', true), _defineProperty(_L$triangleMarker, 'showLegendTooltips', false), _defineProperty(_L$triangleMarker, 'pane', 'GtuMarkerPane'), _defineProperty(_L$triangleMarker, 'gradient', function gradient() {
 						return {
 							gradientType: 'radial',
 							stops: [{
 								offset: '0%',
 								style: {
 									color: data.color,
-									opacity: 1
+									opacity: 0.65
 								}
 							}, {
 								offset: '30%',
 								style: {
 									color: data.color,
-									opacity: 0.5
+									opacity: 0.3
 								}
 							}, {
 								offset: '100%',
@@ -14404,11 +14433,15 @@ webpackJsonp([1],[
 
 			gtuLocationLayer = _leaflet2.default.layerGroup();
 			(0, _each3.default)(gtuList, function (gtu) {
-				var locationMarker = _leaflet2.default.markerGroup();
+
 				var latlng = gtu.get('Location');
+				if (!latlng || !latlng.lat || !latlng.lng) {
+					return true;
+				}
+				var locationMarker = _leaflet2.default.markerGroup();
 				_leaflet2.default.triangleMarker(latlng, {
 					gtuId: gtu.get('Id'),
-					radius: 15,
+					radius: 5,
 					fillColor: gtu.get('UserColor'),
 					fillOpacity: 0.75,
 					fill: true,
@@ -14419,7 +14452,7 @@ webpackJsonp([1],[
 				}).addTo(locationMarker);
 				_leaflet2.default.triangleMarker(latlng, {
 					gtuId: gtu.get('Id'),
-					radius: 30,
+					radius: 10,
 					fillColor: gtu.get('UserColor'),
 					fillOpacity: 0.25,
 					fill: true,
@@ -14449,6 +14482,14 @@ webpackJsonp([1],[
 				}
 			});
 		},
+		clearTask: function clearTask() {
+			(0, _each3.default)(gtuMarkerLayer, function (layer) {
+				layer && layer.remove && layer.remove();
+			});
+			this.setState({
+				gtuMarkerLayer: []
+			});
+		},
 		render: function render() {
 			return _react2.default.createElement('div', { className: 'leaflet-map-container', ref: this.onInit, style: { 'minHeight': '640px' } });
 		}
@@ -14474,6 +14515,7 @@ webpackJsonp([1],[
 		},
 		onSwitchActiveTask: function onSwitchActiveTask(task) {
 			var self = this;
+			this.publish('clearTask');
 			var taskDMap = new _dmap2.default({
 				CampaignId: task.get('CampaignId'),
 				SubMapId: task.get('SubMapId'),
@@ -14622,7 +14664,8 @@ webpackJsonp([1],[
 			    tasks = model && model.get('Tasks') ? model.get('Tasks').models : [];
 
 			tasks = (0, _filter3.default)(tasks, function (t) {
-				return !t.get('IsFinished');
+				return true;
+				// return !t.get('IsFinished');
 			});
 			var parentClass = (0, _classnames2.default)({
 				'is-dropdown-submenu-parent': true,

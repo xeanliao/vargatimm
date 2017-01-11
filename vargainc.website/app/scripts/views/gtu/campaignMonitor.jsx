@@ -73,6 +73,7 @@ var MapContainer = React.createBackboneClass({
 		}, () => {
 			self.drawBoundary(monitorMap);
 			self.registerTopic();
+			$(window).trigger('resize');
 		});
 	},
 	registerTopic: function () {
@@ -88,7 +89,7 @@ var MapContainer = React.createBackboneClass({
 				self.drawGtu();
 				window.clearInterval(self.state.reloadTimeout);
 				self.setState({
-					reloadTimeout: window.setInterval(self.reload, 30 * 1000)
+					// reloadTimeout: window.setInterval(self.reload, 10 * 1000)
 				});
 			});
 		});
@@ -217,19 +218,19 @@ var MapContainer = React.createBackboneClass({
 					noClip: true,
 					clickable: !task.get('IsFinished'),
 					dropShadow: !task.get('IsFinished'),
-					// fillPattern: !task.get('IsFinished') ? null : {
-					// 	url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
-					// 	pattern: {
-					// 		width: '8px',
-					// 		height: '8px',
-					// 		patternUnits: 'userSpaceOnUse',
-					// 		patternContentUnits: 'Default'
-					// 	},
-					// 	image: {
-					// 		width: '8px',
-					// 		height: '8px'
-					// 	}
-					// }
+					fillPattern: !task.get('IsFinished') ? null : {
+						url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
+						pattern: {
+							width: '8px',
+							height: '8px',
+							patternUnits: 'userSpaceOnUse',
+							patternContentUnits: 'Default'
+						},
+						image: {
+							width: '8px',
+							height: '8px'
+						}
+					}
 				};
 				var boundary = L.polyline(latlngArray, opt)
 					.on('click', self.onTaskAreaClickHandler, self);
@@ -310,23 +311,34 @@ var MapContainer = React.createBackboneClass({
 			.openOn(this.state.map);
 	},
 	reload: function () {
-		if (!this.state.task) {
+		if (!this.state.task || this.state.reloading) {
 			return;
 		}
-		var self = this,
-			task = this.state.task,
-			dmap = task.get('dmap'),
-			gtus = task.get('gtuList');
 
-		return Promise.all([
-			dmap.updateGtuAfterTime(null, {
-				quite: true
-			}),
-			gtus.fetchGtuLocation(task.get('Id'), {
-				quite: true
-			})
-		]).then(() => {
-			self.drawGtu();
+		var self = this;
+		return new Promise((resolve, reject) => {
+			this.setState({
+				reloading: true
+			}, () => {
+				var task = self.state.task,
+					dmap = task.get('dmap'),
+					gtus = task.get('gtuList');
+
+				Promise.all([
+					dmap.updateGtuAfterTime(null, {
+						quite: true
+					}),
+					gtus.fetchGtuLocation(task.get('Id'), {
+						quite: true
+					})
+				]).then(() => {
+					self.setState({
+						reloading: false
+					}, () => {
+						self.drawGtu();
+					});
+				});
+			});
 		});
 	},
 	drawGtu: function () {
@@ -373,14 +385,13 @@ var MapContainer = React.createBackboneClass({
 				L.triangleMarker(latlng, {
 					gtuId: gtuId,
 					weight: 0.1,
-					opacity: 0.7,
+					opacity: 0.65,
 					fillColor: data.color,
-					fillOpacity: 1.0,
+					fillOpacity: 0.65,
 					fill: true,
 					stroke: true,
 					numberOfSides: 50,
 					stroke: false,
-					fillOpacity: 0.75,
 					dropShadow: true,
 					rotation: 0,
 					radius: 5,
@@ -395,13 +406,13 @@ var MapContainer = React.createBackboneClass({
 								offset: '0%',
 								style: {
 									color: data.color,
-									opacity: 1
+									opacity: 0.65
 								}
 							}, {
 								offset: '30%',
 								style: {
 									color: data.color,
-									opacity: 0.5
+									opacity: 0.3
 								}
 							}, {
 								offset: '100%',
@@ -419,7 +430,7 @@ var MapContainer = React.createBackboneClass({
 		});
 	},
 	drawGtuTrack: function (gtus) {
-		each(this.state.gtuMarkerLayer, layer=>{
+		each(this.state.gtuMarkerLayer, layer => {
 
 		});
 	},
@@ -444,11 +455,15 @@ var MapContainer = React.createBackboneClass({
 
 		gtuLocationLayer = L.layerGroup();
 		each(gtuList, gtu => {
-			let locationMarker = L.markerGroup();
+
 			let latlng = gtu.get('Location');
+			if (!latlng || !latlng.lat || !latlng.lng) {
+				return true;
+			}
+			let locationMarker = L.markerGroup();
 			L.triangleMarker(latlng, {
 				gtuId: gtu.get('Id'),
-				radius: 15,
+				radius: 5,
 				fillColor: gtu.get('UserColor'),
 				fillOpacity: 0.75,
 				fill: true,
@@ -459,7 +474,7 @@ var MapContainer = React.createBackboneClass({
 			}).addTo(locationMarker);
 			L.triangleMarker(latlng, {
 				gtuId: gtu.get('Id'),
-				radius: 30,
+				radius: 10,
 				fillColor: gtu.get('UserColor'),
 				fillOpacity: 0.25,
 				fill: true,
@@ -489,6 +504,14 @@ var MapContainer = React.createBackboneClass({
 			}
 		});
 	},
+	clearTask: function () {
+		each(gtuMarkerLayer, layer => {
+			layer && layer.remove && layer.remove();
+		});
+		this.setState({
+			gtuMarkerLayer: []
+		});
+	},
 	render: function () {
 		return (
 			<div className="leaflet-map-container" ref={this.onInit} style={{'minHeight': '640px'}}></div>
@@ -516,6 +539,7 @@ export default React.createBackboneClass({
 	},
 	onSwitchActiveTask: function (task) {
 		var self = this;
+		this.publish('clearTask');
 		var taskDMap = new DMap({
 			CampaignId: task.get('CampaignId'),
 			SubMapId: task.get('SubMapId'),
@@ -665,7 +689,8 @@ export default React.createBackboneClass({
 			tasks = model && model.get('Tasks') ? model.get('Tasks').models : [];
 
 		tasks = filter(tasks, t => {
-			return !t.get('IsFinished');
+			return true;
+			// return !t.get('IsFinished');
 		});
 		var parentClass = classNames({
 			'is-dropdown-submenu-parent': true,

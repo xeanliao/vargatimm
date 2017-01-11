@@ -296,12 +296,23 @@ module.exports = function (grunt) {
 			options: {
 				stderr: false
 			},
-			release: {
+			'release-folder': {
+				command: 'mkdir -p /Volumes/RamDisk/Publish/'
+			},
+			'release-copy': {
 				command: 'mv ./*.tar.gz /Volumes/RamDisk/Publish/'
 			},
 		},
 		'webpack-dev-server': {
 			options: {
+				proxy: {
+					'/api/**': {
+						target: 'http://timm.vargainc.com/',
+						pathRewrite: function (path, req) {
+							return path.replace('/api/', '/201610/api/');
+						}
+					},
+				},
 				webpack: {
 					cache: true,
 					entry: {

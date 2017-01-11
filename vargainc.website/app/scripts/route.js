@@ -134,11 +134,14 @@ export default Backbone.Router.extend({
 				topic: 'loadView',
 				data: {
 					view: View,
-					options: {
-						showMenu: false,
-					},
 					params: {
 						model: campaignWithTaskModel,
+					},
+					options: {
+						showMenu: false,
+						showUser: true,
+						showSearch: false,
+						pageTitle: 'GTU Campaign Monitor'
 					}
 				}
 			});
@@ -301,7 +304,6 @@ export default Backbone.Router.extend({
 
 		});
 	},
-	
 	availableGTUAction: function () {
 		let Collection = require('collections/gtu').default;
 		let View = require('views/admin/availableGTU').default;
