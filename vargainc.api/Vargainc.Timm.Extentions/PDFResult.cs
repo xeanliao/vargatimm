@@ -34,7 +34,7 @@ namespace Vargainc.Timm.Extentions
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
             result.Content = new StreamContent(this.OutputStream);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
-            result.Content.Headers.TryAddWithoutValidation("Content-Disposition", string.Format("attachment; filename={0}", this.FileName));
+            result.Content.Headers.TryAddWithoutValidation("Content-Disposition", string.Format("inline; filename={0}", this.FileName));
             
             return Task.FromResult(result);
 

@@ -1,249 +1,327 @@
-define([
-	'backbone',
-	'pubsub'
-], function (Backbone, Topic) {
-	return Backbone.Router.extend({
-		routes: {
-			'campaign': 'defaultAction',
-			'distribution': 'distributionAction',
-			'monitor': 'monitorAction',
-			'report': 'reportAction',
-			'report/:taskId': 'reportAction',
-			'admin': 'adminAction',
-			'admin/gtu': 'availableGTUAction',
-			'print/:campaignId/:printType': 'printAction',
-			'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
-			'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
-			'campaign/import': 'importCampaign',
-			'frame/:page': 'frameAction',
-			'frame/*page?*queryString': 'frameAction',
-			'*actions': 'defaultAction'
-		},
-		defaultAction: function () {
-			require([
-				'collections/campaign',
-				'views/campaign/list'
-			], function (Collection, View) {
-				var campaignlist = new Collection();
-				campaignlist.fetch().done(function () {
-					Topic.publish('loadView', View, {
+import Backbone from 'backbone';
+import React from 'react';
+import Topic from 'postal';
+import Promise from 'bluebird';
+
+export default Backbone.Router.extend({
+	routes: {
+		'campaign': 'defaultAction',
+		'distribution': 'distributionAction',
+		'monitor': 'monitorAction',
+		'campaign/:campaignId/monitor': 'campaignMonitorAction',
+		'report': 'reportAction',
+		'report/:taskId': 'reportAction',
+		'admin': 'adminAction',
+		'admin/gtu': 'availableGTUAction',
+		'print/:campaignId/:printType': 'printAction',
+		'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
+		'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
+		'campaign/import': 'importCampaign',
+		'frame/:page': 'frameAction',
+		'frame/*page?*queryString': 'frameAction',
+		'*actions': 'defaultAction'
+	},
+	defaultAction: function () {
+		var Collection = require('collections/campaign').default;
+		var View = require('views/campaign/list').default;
+		var campaignlist = new Collection();
+		campaignlist.fetch().then(() => {
+			Topic.publish({
+				channel: 'View',
+				topic: 'loadView',
+				data: {
+					view: View,
+					params: {
 						collection: campaignlist
-					});
+					}
+				}
+			});
+		});
+	},
+	frameAction: function (page, query) {
+		var url = "../" + page;
+		if (query) {
+			url += "?" + query;
+		}
+		window.open(url, '_blank', 'resizable=yes,status=yes,toolbar=no,scrollbars=yes,menubar=no,location=no');
+		Backbone.history.history.back(-2);
+	},
+	distributionAction: function () {
+		let Collection = require('collections/campaign').default;
+		let View = require('views/distribution/list').default;
+		let campaignlist = new Collection();
+		campaignlist.fetchForDistribution().then(() => {
+			Topic.publish({
+				channel: 'View',
+				topic: 'loadView',
+				data: {
+					view: View,
+					params: {
+						collection: campaignlist
+					}
+				}
+			});
+		});
+	},
+	monitorAction: function () {
+		let Collection = require('collections/campaign').default;
+		let View = require('views/monitor/list').default;
+		let campaignlist = new Collection();
+		campaignlist.fetchForTask().then(() => {
+			Topic.publish({
+				channel: 'View',
+				topic: 'loadView',
+				data: {
+					view: View,
+					params: {
+						collection: campaignlist
+					}
+				}
+			});
+		});
+	},
+	gtuMonitorAction: function (campaignId, taskName, taskId) {
+		let Task = require('models/task').default;
+		let DMap = require('models/print/dmap').default;
+		let Gtu = require('collections/gtu').default;
+		let View = require('views/gtu/monitor').default;
+
+		let gtu = new Gtu(),
+			task = new Task({
+				Id: taskId
+			});
+		task.fetch().then(() => {
+			let dmap = new DMap({
+				CampaignId: task.get('CampaignId'),
+				SubMapId: task.get('SubMapId'),
+				DMapId: task.get('DMapId')
+			});
+
+			Promise.all([
+				dmap.fetchBoundary(),
+				dmap.fetchAllGtu(),
+				gtu.fetchGtuWithStatusByTask(taskId)
+			]).then(() => {
+				let pageTitle = `GTU Monitor - ${task.get('ClientName')}, ${task.get('ClientCode')}: ${task.get('Name')}`;
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							dmap: dmap,
+							gtu: gtu,
+							task: task
+						}
+					},
+					options: {
+						showMenu: false,
+						showUser: false,
+						showSearch: false,
+						pageTitle: pageTitle
+					}
 				});
 			});
-		},
-		frameAction: function (page, query) {
-			// require([
-			// 	'views/frame'
-			// ], function (View) {
-			// 	var FrameView = React.createFactory(View);
-			// 	var frameView = FrameView({
-			// 		page: '../' + page,
-			// 		query: query
-			// 	});
-			// 	Topic.publish('loadView', frameView);
-			// });
-			var url = "../" + page;
-			if (query) {
-				url += "?" + query;
-			}
-			window.open(url, '_blank', 'resizable=yes,status=yes,toolbar=no,scrollbars=yes,menubar=no,location=no');
-			Backbone.history.history.back(-2);
-		},
-		distributionAction: function () {
-			require([
-				'collections/campaign',
-				'views/distribution/list'
-			], function (Collection, View) {
-				var campaignlist = new Collection();
-				campaignlist.fetchForDistribution().done(function () {
-					Topic.publish('loadView', View, {
-						collection: campaignlist
-					});
-				});
+		});
+	},
+	campaignMonitorAction: function (campaignId) {
+		var View = require('views/gtu/campaignMonitor').default;
+		var Model = require('models/campaign').default;
+		var campaignWithTaskModel = new Model();
+		campaignWithTaskModel.loadWithAllTask(campaignId).then(() => {
+			Topic.publish({
+				channel: 'View',
+				topic: 'loadView',
+				data: {
+					view: View,
+					params: {
+						model: campaignWithTaskModel,
+					},
+					options: {
+						showMenu: false,
+						showUser: true,
+						showSearch: false,
+						pageTitle: 'GTU Campaign Monitor'
+					}
+				}
 			});
-		},
-		monitorAction: function () {
-			require([
-				'collections/campaign',
-				'views/monitor/list'
-			], function (Collection, View) {
-				var campaignlist = new Collection();
-				campaignlist.fetchForTask().done(function () {
-					Topic.publish('loadView', View, {
-						collection: campaignlist
-					});
-				});
-			});
-		},
-		reportAction: function (taskId) {
-			require([
-				'models/campaign',
-				'collections/campaign',
-				'views/report/list'
-			], function (Model, Collection, View) {
-				var campaignlist = new Collection();
-				campaignlist.fetchForReport().done(function () {
-					Topic.publish('loadView', View, {
+		});
+	},
+	reportAction: function (taskId) {
+		let Model = require('models/campaign').default;
+		let Collection = require('collections/campaign').default;
+		let View = require('views/report/list').default;
+		let campaignlist = new Collection();
+		campaignlist.fetchForReport().then(() => {
+			Topic.publish({
+				channel: 'View',
+				topic: 'loadView',
+				data: {
+					view: View,
+					params: {
 						collection: campaignlist,
 						taskId: taskId
-					});
-				});
+					}
+				}
 			});
-		},
-		adminAction: function () {
-			require([
-				'views/admin/dashboard'
-			], function (View) {
-				Topic.publish('loadView', View);
-			});
-		},
-		importCampaign: function () {
-			require([
-				'collections/campaign',
-				'views/campaign/import'
-			], function (Collection, View) {
-				Topic.publish('loadView', View, {
-					collection: new Collection()
-				});
-			});
-		},
-		printAction: function (campaignId, printType) {
-			switch (printType) {
-			case 'campaign':
-				require([
-					'views/print/campaign',
-					'collections/print'
-				], function (View, Collection) {
-					var print = new Collection();
-					print.fetchForCampaignMap(campaignId).done(function () {
-						Topic.publish('loadView', View, {
-							collection: print
-						}, {
-							showMenu: false,
-							showUser: false,
-							showSearch: false,
-							pageTitle: 'Timm Print Preview'
-						});
-					});
-				});
-				break;
-			case 'distribution':
-				require([
-					'views/print/distribution',
-					'collections/print'
-				], function (View, Collection) {
-					var print = new Collection();
-					print.fetchForDistributionMap(campaignId).done(function () {
-						Topic.publish('loadView', View, {
-							collection: print
-						}, {
-							showMenu: false,
-							showUser: false,
-							showSearch: false,
-							pageTitle: 'Timm Print Preview'
-						});
-					});
-				});
-				break;
-			case 'report':
-				require([
-					'views/print/report',
-					'collections/print'
-				], function (View, Collection) {
-					var print = new Collection();
-					print.fetchForReportMap(campaignId).done(function () {
-						Topic.publish('loadView', View, {
-							collection: print
-						}, {
-							showMenu: false,
-							showUser: false,
-							showSearch: false,
-							pageTitle: 'Timm Print Preview'
-						});
-					});
-				});
-				break;
-			default:
-
-				break;
+		});
+	},
+	adminAction: function () {
+		let View = require('views/admin/dashboard').default;
+		Topic.publish({
+			channel: 'View',
+			topic: 'loadView',
+			data: {
+				view: View,
 			}
-		},
-		gtuEditAction: function (campaignId, taskName, taskId) {
-			require([
-				'models/task',
-				'models/print/dmap',
-				'collections/gtu',
-				'views/gtu/edit'
-			], function (Task, DMap, Gtu, View) {
-				var gtu = new Gtu(),
-					task = new Task({
-						Id: taskId
-					});
-				task.fetch().then(function () {
-					var dmap = new DMap({
-						CampaignId: task.get('CampaignId'),
-						SubMapId: task.get('SubMapId'),
-						DMapId: task.get('DMapId')
-					});
-
-					$.when(dmap.fetchBoundary(), dmap.fetchGtu(), gtu.fetchByTask(taskId)).done(function () {
-						Topic.publish('loadView', View, {
-							dmap: dmap,
-							gtu: gtu,
-							task: task
-						});
-					});
-				});
-
-			});
-		},
-		gtuMonitorAction: function (campaignId, taskName, taskId) {
-			require([
-				'models/task',
-				'models/print/dmap',
-				'collections/gtu',
-				'views/gtu/monitor'
-			], function (Task, DMap, Gtu, View) {
-				var gtu = new Gtu(),
-					task = new Task({
-						Id: taskId
-					});
-				task.fetch().then(function () {
-					var dmap = new DMap({
-						CampaignId: task.get('CampaignId'),
-						SubMapId: task.get('SubMapId'),
-						DMapId: task.get('DMapId')
-					});
-
-					$.when(dmap.fetchBoundary(), dmap.fetchAllGtu(), gtu.fetchGtuWithStatusByTask(taskId)).done(function () {
-						Topic.publish('loadView', View, {
-							dmap: dmap,
-							gtu: gtu,
-							task: task
-						}, {
+		});
+	},
+	importCampaign: function () {
+		let Collection = require('collections/campaign').default;
+		let View = require('views/campaign/import').default;
+		Topic.publish({
+			channel: 'View',
+			topic: 'loadView',
+			data: {
+				view: View,
+				params: {
+					collection: new Collection()
+				},
+			}
+		});
+	},
+	printAction: function (campaignId, printType) {
+		switch (printType) {
+		case 'campaign':
+			var Collection = require('collections/print').default;
+			var View = require('views/print/campaign').default;
+			var print = new Collection();
+			print.fetchForCampaignMap(campaignId).then(() => {
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							collection: print
+						},
+						options: {
 							showMenu: false,
 							showUser: false,
 							showSearch: false,
-							pageTitle: 'GTU Monitor - ' + task.get('ClientName') + ', ' + task.get('ClientCode') + ': ' + task.get('Name')
-						});
-					});
+							pageTitle: 'Timm Print Preview'
+						}
+					}
 				});
+			});
+			break;
+		case 'distribution':
+			var Collection = require('collections/print').default;
+			var View = require('views/print/distribution').default;
+			var print = new Collection();
+			print.fetchForDistributionMap(campaignId).then(() => {
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							collection: print
+						},
+						options: {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						}
+					}
+				});
+			});
+			break;
+		case 'report':
+			var Collection = require('collections/print').default;
+			var View = require('views/print/report').default;
+			var print = new Collection();
+			print.fetchForReportMap(campaignId).then(() => {
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							collection: print
+						},
+						options: {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'Timm Print Preview'
+						}
+					}
+				});
+			});
+			break;
+		default:
 
+			break;
+		}
+	},
+	gtuEditAction: function (campaignId, taskName, taskId) {
+		let Task = require('models/task').default;
+		let DMap = require('models/print/dmap').default;
+		let Gtu = require('collections/gtu').default;
+		let View = require('views/gtu/edit').default;
+
+		let gtu = new Gtu(),
+			task = new Task({
+				Id: taskId
 			});
-		},
-		availableGTUAction: function(){
-			require([
-				'collections/gtu',
-				'views/admin/availableGTU'
-			], function (Collection, View) {
-				var gtuList = new Collection();
-				gtuList.fetch().done(function () {
-					Topic.publish('loadView', View, {
-						collection: gtuList
-					}, {showSearch: false});
+		task.fetch().then(() => {
+			let dmap = new DMap({
+				CampaignId: task.get('CampaignId'),
+				SubMapId: task.get('SubMapId'),
+				DMapId: task.get('DMapId')
+			});
+
+			Promise.all([
+				dmap.fetchBoundary(),
+				dmap.fetchGtuForEdit(),
+				gtu.fetchByTask(taskId)
+			]).then(() => {
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							dmap: dmap,
+							gtu: gtu,
+							task: task
+						}
+					}
 				});
 			});
-		}
-	});
+
+		});
+	},
+	availableGTUAction: function () {
+		let Collection = require('collections/gtu').default;
+		let View = require('views/admin/availableGTU').default;
+		let gtuList = new Collection();
+		gtuList.fetch().then(() => {
+			Topic.publish({
+				channel: 'View',
+				topic: 'loadView',
+				data: {
+					view: View,
+					params: {
+						collection: gtuList,
+					},
+					options: {
+						showSearch: false
+					}
+				}
+			});
+		});
+	}
 });

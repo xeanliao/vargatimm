@@ -1,24 +1,8 @@
 {
   "name": "vargainc_front-end_application",
   "dependencies": {
-    "lodash": "~4.0.0",
-    "requirejs": "~2.1.22",
-    "backbone": "~1.2.3",
-    "foundation-sites": "~6.1.1",
-    "react": "~0.14.6",
-    "react.backbone": "~0.6.0",
-    "underscore": "~1.8.3",
-    "motion-ui": "~1.1.1",
     "font-awesome": "~4.5.0",
-    "moment": "~2.11.1",
-    "pubsub.js": "~0.1.0",
-    "numeral": "~1.5.3",
-    "requirejs-plugins": "~1.0.3",
-    "sprintf": "~1.0.3",
-    "select2": "~4.0.2",
-    "spectrum": "~1.8.0",
-    "font-awesome-animation": "~0.0.8",
-    "js-marker-clusterer": "*"
+    "leaflet": "^1.0.1"
   },
   "description": "",
   "main": "",
@@ -37,9 +21,5 @@
     "bower_components",
     "test",
     "tests"
-  ],
-  "resolutions": {
-    "react": "~0.14.6",
-    "moment": "~2.11.1"
-  }
+  ]
 }

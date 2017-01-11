@@ -13,6 +13,7 @@ using Wintellect.PowerCollections;
 using Vargainc.Timm.REST.Helper;
 using System.Threading.Tasks;
 using Vargainc.Timm.Extentions;
+using System.Data.Entity;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -41,6 +42,50 @@ namespace Vargainc.Timm.REST.Controllers
                 nda = result
             });
         }
+        [HttpGet]
+        [Route("ndaddress/{dmapId:int}")]
+        public async Task<IHttpActionResult> GetNDAddress(int dmapId)
+        {
+            var polygon = GetDMapPolygon(dmapId);
+            var allNdAddress = await db.NdAddresses.Select(i => new
+            {
+                i.Id,
+                i.Latitude,
+                i.Longitude
+            }).ToListAsync();
+
+            List<int?> validId = new List<int?>();
+            foreach (var item in allNdAddress)
+            {
+                Point center = new Point(item.Longitude ?? 0, item.Latitude ?? 0);
+                if (polygon.Contains(center))
+                {
+                    validId.Add(item.Id);
+                }
+            }
+
+            var validNdAddress = await db.NdAddresses.Where(i => validId.Contains(i.Id))
+                .Select(i => new ViewModel.NDAddressViewModel
+                {
+                    Street = i.Street,
+                    ZipCode = i.ZipCode,
+                    Center = new ViewModel.LatLngViewModel {
+                        Latitude = i.Latitude,
+                        Longitude = i.Longitude
+                    },
+                    Boundary = i.NdAddressCoordinates.Select(m => new ViewModel.LatLngViewModel
+                    {
+                        Latitude = m.Latitude,
+                        Longitude = m.Longitude
+                    }).ToList()
+                }).ToListAsync();
+
+
+            return Json(new
+            {
+                nda = validNdAddress
+            });
+        }
 
         #region Campaign
         /// <summary>
@@ -66,7 +111,7 @@ namespace Vargainc.Timm.REST.Controllers
                     s.OrderId,
                     TotalHouseHold = s.Total ?? 0 + s.TotalAdjustment ?? 0,
                     TargetHouseHold = s.Penetration ?? 0 + s.CountAdjustment ?? 0,
-                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 0,
+                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 1.0,
                     s.ColorR,
                     s.ColorG,
                     s.ColorB,
@@ -91,7 +136,7 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 totalHouseHold = submaps.Sum(i => i.TotalHouseHold);
                 targetHouseHold = submaps.Sum(i => i.TargetHouseHold);
-                penetration = (totalHouseHold ?? 0) > 0 ? (float)(targetHouseHold ?? 0) / (float)(totalHouseHold ?? 0) : 0;
+                penetration = (totalHouseHold ?? 0) > 0 ? (float)(targetHouseHold ?? 0) / (float)(totalHouseHold ?? 0) : 1;
             }
             return Json(new
             {
@@ -173,7 +218,7 @@ namespace Vargainc.Timm.REST.Controllers
                     s.OrderId,
                     TotalHouseHold = s.Total ?? 0 + s.TotalAdjustment ?? 0,
                     TargetHouseHold = s.Penetration ?? 0 + s.CountAdjustment ?? 0,
-                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 0,
+                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 1.0,
                     s.ColorR,
                     s.ColorG,
                     s.ColorB,
@@ -417,35 +462,63 @@ namespace Vargainc.Timm.REST.Controllers
             return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, false, date);
         }
 
-        private IHttpActionResult LoadGtuWithoutTaskStatus(int campaignId, int submapId, int dmapId, bool filterOutside, DateTime? lastTime)
+        [HttpGet]
+        [Route("campaign/{campaignId:int}/submap/{submapId:int}/dmap/{dmapId:int}/gtu/foredit")]
+        public IHttpActionResult GetGtuForEdit(int campaignId, int submapId, int dmapId)
+        {
+            return LoadGtuWithoutTaskStatus(campaignId, submapId, dmapId, false, null, true);
+        }
+
+        private IHttpActionResult LoadGtuWithoutTaskStatus(int campaignId, int submapId, int dmapId, 
+            bool filterOutside, DateTime? lastTime, bool withCellId = false)
         {
             var dmap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId)
                 .SubMaps.FirstOrDefault(i => i.Id == submapId)
                 .DistributionMaps.FirstOrDefault(i => i.Id == dmapId);
+
+            
             if (dmap == null)
             {
                 return NotFound();
             }
-
+            var inputTime = lastTime;
             var query = from task in db.Tasks
                         join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
                         join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
-                        where task.DistributionMapId == dmapId && (lastTime == null || gtu.dtReceivedTime > lastTime)
+                        where task.DistributionMapId == dmapId && gtu.nCellID < 2 && (lastTime == null || gtu.dtReceivedTime > lastTime)
                         orderby task.Id, mapping.GTUId, gtu.Id
                         select new
                         {
                             Time = gtu.dtReceivedTime,
                             GTUId = mapping.GTUId,
                             Latitude = gtu.dwLatitude,
-                            Longitude = gtu.dwLongitude
+                            Longitude = gtu.dwLongitude,
+                            nCellId = gtu.nCellID,
+                            GtuInfoId = gtu.Id
                         };
-
-            var locationQuery = query.Select(i => new ViewModel.Location
+            var debugSql = query.ToString();
+            IQueryable<ViewModel.Location> locationQuery = null;
+            if (!withCellId)
             {
-                Id = i.GTUId,
-                Latitude = i.Latitude,
-                Longitude = i.Longitude
-            });
+                locationQuery = query.Select(i => new ViewModel.Location
+                {
+                    Id = i.GTUId,
+                    Latitude = i.Latitude,
+                    Longitude = i.Longitude
+                });
+            }
+            else
+            {
+                locationQuery = query.Select(i => new ViewModel.Location
+                {
+                    Id = i.GTUId,
+                    Latitude = i.Latitude,
+                    Longitude = i.Longitude,
+                    nCellId = i.nCellId,
+                    GtuInfoId = i.GtuInfoId
+                });
+            }
+            
 
             var lastReceivedTimeQuery = query.Max(i => i.Time);
 
@@ -488,12 +561,12 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 lastUpdateTime = lastTime.Value;
             }
-
             return Json(new
             {
                 points = locations,
                 pointsColors = colors.ToList(),
                 lastUpdateTime = lastUpdateTime.ToString("yyyyMMddHHmmss")
+
             });
         }
         #endregion
@@ -648,10 +721,6 @@ namespace Vargainc.Timm.REST.Controllers
             HashSet<string> ducplicateLocation = new HashSet<string>();
             foreach (var item in coordinates)
             {
-                if(!item.Latitude.HasValue || !item.Longitude.HasValue)
-                {
-                    continue;
-                }
                 float lat = (int)(item.Latitude * 100000) / 100000f;
                 float lng = (int)(item.Longitude * 100000) / 100000f;
                 var key = string.Format("{0}:{1}", lat, lng);

@@ -1,249 +1,127 @@
-define([
-	'jquery',
-	'underscore',
-	'moment',
-	'sprintf',
-	'backbone',
-	'react',
-	'views/base',
-	'models/task',
-	'react.backbone'
-], function ($, _, moment, helper, Backbone, React, BaseView, TaskModel) {
-	var ReportRow = React.createBackboneClass({
-		mixins: [BaseView],
-		menuKey: 'report-menu-ddl-',
-		getDefaultProps: function () {
-			return {
-				address: null,
-				icon: null,
-				name: null,
-				scrollToTaskId: null
-			};
-		},
-		componentDidMount: function () {
-			$('.has-tip').foundation();
-			var scrollToTaskId = this.props.scrollToTaskId;
-			if (scrollToTaskId && this.refs[scrollToTaskId]) {
-				this.scrollTop(this.refs[scrollToTaskId]);
-				this.props.scrollToTaskId = null;
-			}
-		},
-		onReOpenTask: function (taskId) {
-			var confirmResult = confirm('Do you really want to move report back to GPS Montor?'),
-				self = this;
-			if (confirmResult) {
-				var model = new TaskModel({
-					Id: taskId
-				});
-				model.reOpen({
-					success: function (result) {
-						if (result && result.success) {
-							self.publish('report/refresh');
-						} else {
-							alert(result.error);
-						}
-					}
-				});
-			}
-		},
-		onGotoReport: function (taskId) {
-			window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId;
-		},
-		onGotoReview: function (campaignId, taskName, taskId) {
-			Backbone.history.navigate('report/' + taskId, { trigger: false });
-			window.location.hash = helper.sprintf('campaign/%d/%s/%d/edit', campaignId, taskName, taskId);
-		},
-		onCloseMoreMenu: function (key) {
-			$("#" + this.menuKey + key).foundation('close');
-		},
-		renderMoreMenu: function (key) {
-			var id = this.menuKey + key;
-			return (
-				<span>
-					<button className="button cirle" data-toggle={id}>
-						<i className="fa fa-ellipsis-h"></i>
-					</button>
-					<div id={id} className="dropdown-pane bottom"
-						data-dropdown
-						data-close-on-click="true"
-						data-auto-focus="false"
-						onClick={this.onCloseMoreMenu.bind(null, key)}>
-						<ul className="vertical menu">
-							<li><a href="javascript:;" onClick={this.onEdit}><i className="fa fa-edit"></i><span>Edit</span></a></li>
-							<li><a href="javascript:;" onClick={this.onOpenUploadFile.bind(null, key)}><i className="fa fa-cloud-upload"></i><span>Import</span></a></li>
-							<input type="file" id={'upload-file-' + key} multiple style={{'display':'none'}} onChange={this.onImport.bind(null, key)} />
-						</ul>
-					</div>
-				</span>
-			);
-		},
-		render: function () {
-			var model = this.getModel(),
-				date = model.get('Date'),
-				displayDate = date ? moment(date).format("MMM DD, YYYY") : '',
-				self = this;
-			return (
-				<div className="row scroll-list-item">
-					<div className="hide-for-small-only medium-2 columns">
-						{model.get('ClientName')}
-					</div>
-					<div className="small-10 medium-5 columns">
-						{model.get('ClientCode')}
-					</div>
-					<div className="small-2 medium-2 columns">
-						{displayDate}
-					</div>
-					<div className="small-2 medium-3 columns">
-						<span className="show-for-large">{model.get('AreaDescription')}</span>
-						<div className="float-right tool-bar">
-							<a  className="button row-button" href={"#frame/handler/PhantomjsPrintHandler.ashx?campaignId=" + model.get('Id') + "&type=print"}>
-								<i className="fa fa-print"></i><small>Print</small>
-							</a>
-						</div>
-					</div>
-					<div className="small-12 columns">
-						<table className="hover">
-							<colgroup>
-								<col />
-								<col style={{'width': "160px"}} />
-							</colgroup>
-							<tbody>
-							{model.get('Tasks').map(function(task){
-								if(task.visiable === false){
-									return null;
-								}
-								var campaignId = model.get('Id'),
-									taskName = task.Name;
-								return (
-									<tr key={task.Id} ref={task.Id}>
-										<td onDoubleClick={self.onGotoReview.bind(null, campaignId, taskName, task.Id)}>
-											{task.Name}
-										</td>
-										<td>
-											<div className="float-right tool-bar">
-												<a className="button row-button" onClick={self.onGotoReport.bind(null, task.Id)}>
-													<i className="fa fa-file-text-o"></i><small>Report</small>
-												</a>
-												<button onClick={self.onReOpenTask.bind(null, task.Id)}
-													className="button has-tip top" title="dismiss"
-													data-tooltip aria-haspopup="true"
-													data-disable-hover='false' tabIndex="1">
-													<i className="fa fa-reply"></i>
-												</button>
-											</div>
-										</td>
-									</tr>
-								);
-							})}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			);
-		}
-	});
-	return React.createBackboneClass({
-		mixins: [BaseView],
-		getInitialState: function(){
-			return {
-				orderByFiled: null,
-				orderByAsc: false,
-				search: null,
+import Backbone from 'backbone';
+import React from 'react';
+import 'react.backbone';
+import moment from 'moment';
+import $ from 'jquery';
+import {
+	each,
+	map,
+	orderBy,
+	uniq,
+	filter,
+	values,
+	some,
+	toString,
+	indexOf
+} from 'lodash';
+
+import BaseView from 'views/base';
+import ReportRow from './row';
+
+export default React.createBackboneClass({
+	mixins: [BaseView],
+	getInitialState: function () {
+		return {
+			orderByFiled: null,
+			orderByAsc: false,
+			search: null,
+			filterField: null,
+			filterValues: []
+		};
+	},
+	componentDidMount: function () {
+		var self = this;
+
+		this.subscribe('report/refresh', function () {
+			self.getCollection().fetchForReport();
+		});
+		this.subscribe('search', function (words) {
+			self.setState({
+				search: words,
 				filterField: null,
 				filterValues: []
-			};
-		},
-		componentDidMount: function(){
-			var self = this;
-
-			this.subscribe('report/refresh', function(){
-				self.getCollection().fetchForReport();
 			});
-			this.subscribe('search', function(words){
-				self.setState({
-					search: words,
-					filterField: null,
-					filterValues: []
-				});
-			});
+		});
 
-			$("#report-filter-ddl-ClientName, #report-filter-ddl-ClientCode, #report-filter-ddl-Date, #report-filter-ddl-AreaDescription").foundation();
-		},
-		onOrderBy: function(field, reactObj, reactId, e){
-			e.preventDefault();
-			e.stopPropagation();
-			if(this.state.orderByFiled == field){
-				this.setState({orderByAsc: !this.state.orderByAsc});
-			}else{
-				this.setState({
-					orderByFiled: field,
-					orderByAsc: true
-				});
-			}
-		},
-		onFilter: function(field, e){
-			e.preventDefault();
-			e.stopPropagation();
-			var els = $(":checked", e.currentTarget),
-				values = _.map(els, function(item){
-					return $(item).val();
-				});
-
+		$("#report-filter-ddl-ClientName, #report-filter-ddl-ClientCode, #report-filter-ddl-Date, #report-filter-ddl-AreaDescription").foundation();
+	},
+	onOrderBy: function (field, reactObj, reactId, e) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (this.state.orderByFiled == field) {
 			this.setState({
-				filterField: values.length > 0 ? field : null,
-				filterValues: values.length > 0 ? values : [],
-				search: null
+				orderByAsc: !this.state.orderByAsc
 			});
-			$('#report-filter-ddl-' + field).foundation('close');
-		},
-		onClearFilter: function(field, e){
-			e.preventDefault();
-			e.stopPropagation();
+		} else {
 			this.setState({
-				filterField: null,
-				filterValues: [],
-				search: null
+				orderByFiled: field,
+				orderByAsc: true
 			});
-			$('#report-filter-ddl-' + field).foundation('close');
-			$(e.currentTarget).closest('form').get(0).reset();
-		},
-		renderHeader: function(field, displayName){
-			var dataSource = this.getCollection(),
-				sortIcon = null,
-				filterIcon = null,
-				filterMenu = null;
-			dataSource = dataSource ? dataSource.toArray() : [];
+		}
+	},
+	onFilter: function (field, e) {
+		e.preventDefault();
+		e.stopPropagation();
+		var els = $(":checked", e.currentTarget),
+			values = map(els, function (item) {
+				return $(item).val();
+			});
 
-			if(this.state.orderByFiled == field){
-				if(this.state.orderByAsc){
-					sortIcon = <i className="fa fa-sort-up active"></i>
-				}else{
-					sortIcon = <i className="fa fa-sort-down active"></i>
-				}
-			}else{
-				sortIcon = <i className="fa fa-sort"></i>
+		this.setState({
+			filterField: values.length > 0 ? field : null,
+			filterValues: values.length > 0 ? values : [],
+			search: null
+		});
+		$('#report-filter-ddl-' + field).foundation('close');
+	},
+	onClearFilter: function (field, e) {
+		e.preventDefault();
+		e.stopPropagation();
+		this.setState({
+			filterField: null,
+			filterValues: [],
+			search: null
+		});
+		$('#report-filter-ddl-' + field).foundation('close');
+		$(e.currentTarget).closest('form').get(0).reset();
+	},
+	renderHeader: function (field, displayName) {
+		var dataSource = this.getCollection(),
+			sortIcon = null,
+			filterIcon = null,
+			filterMenu = null;
+		dataSource = dataSource ? dataSource.toArray() : [];
+
+		if (this.state.orderByFiled == field) {
+			if (this.state.orderByAsc) {
+				sortIcon = <i className="fa fa-sort-up active"></i>
+			} else {
+				sortIcon = <i className="fa fa-sort-down active"></i>
 			}
-			sortIcon = <a onClick={this.onOrderBy.bind(null, field)}>&nbsp;{sortIcon}</a>
+		} else {
+			sortIcon = <i className="fa fa-sort"></i>
+		}
+		sortIcon = <a onClick={this.onOrderBy.bind(null, field)}>&nbsp;{sortIcon}</a>
 
-			if(this.state.filterField && this.state.filterField == field){
-				filterIcon = (
-					<a data-toggle={"report-filter-ddl-" + field}>
+		if (this.state.filterField && this.state.filterField == field) {
+			filterIcon = (
+				<a data-toggle={"report-filter-ddl-" + field}>
 						&nbsp;<i className="fa fa-filter active"></i>
 					</a>
-				);
-			}
-			if(dataSource){
-				var fieldValues = _.map(dataSource, function(i){
-					var fieldValue = i.get(field);
-					var dateCheck = moment(fieldValue, moment.ISO_8601);
-					if(dateCheck.isValid()){
-						return dateCheck.format("MMM DD, YYYY");
-					}
-					return fieldValue;
-				});
-				var menuItems = _.uniq(fieldValues).sort();
-				filterMenu = (
-					<div id={"report-filter-ddl-" + field}
+			);
+		}
+		if (dataSource) {
+			var fieldValues = map(dataSource, function (i) {
+				var fieldValue = i.get(field);
+				var dateCheck = moment(fieldValue, moment.ISO_8601);
+				if (dateCheck.isValid()) {
+					return dateCheck.format("MMM DD, YYYY");
+				}
+				return fieldValue;
+			});
+			var menuItems = uniq(fieldValues).sort();
+			filterMenu = (
+				<div id={"report-filter-ddl-" + field}
 						className="dropdown-pane bottom"
 						style={{width: 'auto'}}
 						data-dropdown
@@ -261,11 +139,11 @@ define([
 							<button className="button tiny warning" type="reset" onClick={this.onClearFilter.bind(this, field)}>Clear</button>
 						</form>
 					</div>
-				);
-			}
+			);
+		}
 
-			return(
-				<div>
+		return (
+			<div>
 					<a data-toggle={"report-filter-ddl-" + field}>
 						{displayName}
 					</a>
@@ -273,60 +151,62 @@ define([
 					{filterIcon}
 					{filterMenu}
 				</div>
-			);
-		},
-		getDataSource: function(){
-			var dataSource = this.getCollection();
-			dataSource = dataSource ? dataSource.toArray() : [];
-			if(this.state.orderByFiled){
-				dataSource = _.orderBy(dataSource, ['attributes.' + this.state.orderByFiled], [this.state.orderByAsc ? 'asc' : 'desc']);
-			}
-			if(this.state.search){
-				var keyword = this.state.search.toLowerCase(),
-					campaignValues = null,
-					campaignSearch = null,
-					taskValues = null,
-					taskSearch = null;
-				dataSource = _.filter(dataSource, function(i) {
-					campaignValues  = _.values(i.attributes);
-					campaignSearch = _.some(campaignValues, function(i){
-						var dateCheck = moment(i, moment.ISO_8601);
-						if(dateCheck.isValid()){
-							return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;
-						}
-						return _.toString(i).toLowerCase().indexOf(keyword) > -1;
-					});
-					/**
-					 * update task visiable logical.
-					 * if campaign in search keyward. show all task
-					 * otherwise only show task name in search word.
-					 * if there is no task need show hide this campaign.
-					 */
-					taskValues = _.values(i.attributes.Tasks);
-					_.forEach(taskValues, function(i){
-						i.visiable = campaignSearch || i.Name.toLowerCase().indexOf(keyword) > -1;
-					});
-					return campaignSearch || _.some(taskValues, {visiable:true});
-				});
-			}else if(this.state.filterField && this.state.filterValues){
-				var filterField = this.state.filterField,
-					filterValues = this.state.filterValues;
-				dataSource = _.filter(dataSource, function(i) {
-					var fieldValue = i.get(filterField);
-					var dateCheck = moment(fieldValue, moment.ISO_8601);
-					if(dateCheck.isValid()){
-						return _.indexOf(filterValues, dateCheck.format("MMM DD, YYYY")) > -1;
+		);
+	},
+	getDataSource: function () {
+		var dataSource = this.getCollection();
+		dataSource = dataSource ? dataSource.toArray() : [];
+		if (this.state.orderByFiled) {
+			dataSource = orderBy(dataSource, ['attributes.' + this.state.orderByFiled], [this.state.orderByAsc ? 'asc' : 'desc']);
+		}
+		if (this.state.search) {
+			var keyword = this.state.search.toLowerCase(),
+				campaignValues = null,
+				campaignSearch = null,
+				taskValues = null,
+				taskSearch = null;
+			dataSource = filter(dataSource, function (i) {
+				campaignValues = values(i.attributes);
+				campaignSearch = some(campaignValues, function (i) {
+					var dateCheck = moment(i, moment.ISO_8601);
+					if (dateCheck.isValid()) {
+						return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;
 					}
-					return _.indexOf(filterValues, fieldValue) > -1;
+					return toString(i).toLowerCase().indexOf(keyword) > -1;
 				});
-			}
-			return dataSource;
-		},
-		render: function () {
-			var list = this.getDataSource(),
-				scrollToTaskId = this.props.taskId;
-			return (
-				<div className="section row">
+				/**
+				 * update task visiable logical.
+				 * if campaign in search keyward. show all task
+				 * otherwise only show task name in search word.
+				 * if there is no task need show hide this campaign.
+				 */
+				taskValues = values(i.attributes.Tasks);
+				each(taskValues, function (i) {
+					i.visiable = campaignSearch || i.Name.toLowerCase().indexOf(keyword) > -1;
+				});
+				return campaignSearch || some(taskValues, {
+					visiable: true
+				});
+			});
+		} else if (this.state.filterField && this.state.filterValues) {
+			var filterField = this.state.filterField,
+				filterValues = this.state.filterValues;
+			dataSource = filter(dataSource, function (i) {
+				var fieldValue = i.get(filterField);
+				var dateCheck = moment(fieldValue, moment.ISO_8601);
+				if (dateCheck.isValid()) {
+					return indexOf(filterValues, dateCheck.format("MMM DD, YYYY")) > -1;
+				}
+				return indexOf(filterValues, fieldValue) > -1;
+			});
+		}
+		return dataSource;
+	},
+	render: function () {
+		var list = this.getDataSource(),
+			scrollToTaskId = this.props.taskId;
+		return (
+			<div className="section row">
 					<div className="small-12 columns">
 						<div className="section-header">
 							<div className="row">
@@ -368,7 +248,6 @@ define([
 				        </div>
 				    </div>
 		        </div>
-			);
-		}
-	});
+		);
+	}
 });

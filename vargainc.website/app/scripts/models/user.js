@@ -1,66 +1,60 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone'
-], function ($, _, Backbone) {
-    return Backbone.Model.extend({
-        urlRoot: 'user',
-        idAttribute: 'Id',
-        defaults: {
-            Id: null,
-            UserCode: null,
-            UserName: null,
-            FullName: null,
-            Emai: null,
-            Token: null
-        },
-        fetchCurrentUser: function (opts) {
-            var def = $.Deferred(),
-                model = this,
-                url = model.urlRoot + '/info',
-                options = {
-                    url: url,
-                    type: 'GET',
-                    success: function (result) {
-                        if (result && result.success) {
-                            model.set(result.data);
-                            def.resolve();
-                        } else {
-                            def.reject();
-                        }
-                    },
-                    fail: function () {
-                        def.reject();
-                    }
-                };
-            _.extend(options, opts);
+import Backbone from 'backbone';
+import $ from 'jquery';
+import Promise from 'bluebird';
+import {
+    extend
+} from 'lodash';
 
-            (this.sync || Backbone.sync).call(this, 'read', this, options);
-            return def;
-        },
-        addEmployee: function (file, opts) {
-            var def = $.Deferred(),
-                model = this,
-                options = {
-                    url: '../api/' + model.urlRoot + '/employee/',
-                    method: 'POST'
-                };
-            options = _.extend(opts, options);
+export default Backbone.Model.extend({
+    urlRoot: 'user',
+    idAttribute: 'Id',
+    defaults: {
+        Id: null,
+        UserCode: null,
+        UserName: null,
+        FullName: null,
+        Emai: null,
+        Token: null
+    },
+    fetchCurrentUser: function (opts) {
+        var model = this,
+            url = model.urlRoot + '/info',
+            options = {
+                url: url,
+                type: 'GET'
+            };
+        extend(options, opts);
 
+        return (this.sync || Backbone.sync).call(this, 'read', this, options)
+            .then((result) => {
+                if (result && result.success) {
+                    model.set(result.data);
+                    return Promise.resolve();
+                }
+                return Promise.reject();
+            });
+    },
+    addEmployee: function (file, opts) {
+        var model = this,
+            options = {
+                url: '../api/' + model.urlRoot + '/employee/',
+                method: 'POST'
+            };
+        options = extend(opts, options);
+        return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
             var fd = new FormData();
 
             xhr.open(options.method, options.url, true);
-            xhr.onreadystatechange = function () {
+            xhr.onreadystatechange = () => {
                 if (xhr.readyState == 4) {
                     if (xhr.status == 200) {
                         var result = JSON.parse(xhr.responseText);
                         model.set(result);
                         options.success && options.success.call(model, result);
-                        def.resolve();
-                    } else {
-                        def.reject();
+                        return resolve();
                     }
+                    return reject(new Error('xhr states not OK'));
                 }
             };
             fd.append('Picture', file);
@@ -71,18 +65,17 @@ define([
             fd.append('DateOfBirth', model.get('DateOfBirth'));
             fd.append('Notes', model.get('Notes'));
             xhr.send(fd);
-            return def;
-        },
-        logout: function (opts) {
-            var model = this,
-                url = model.urlRoot + '/logout',
-                options = {
-                    url: url,
-                    type: 'POST'
-                };
-            _.extend(options, opts);
+        });
+    },
+    logout: function (opts) {
+        var model = this,
+            url = model.urlRoot + '/logout',
+            options = {
+                url: url,
+                type: 'POST'
+            };
+        extend(options, opts);
 
-            return (this.sync || Backbone.sync).call(this, null, this, options);
-        }
-    });
+        return (this.sync || Backbone.sync).call(this, null, this, options);
+    }
 });

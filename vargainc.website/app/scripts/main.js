@@ -1,57 +1,72 @@
-define(function (require, exports, module) {
-	var $ = require('jquery'),
-		Backbone = require('backbone'),
-		React = require('react'),
-		ReactDOM = require('react-dom'),
-		Topic = require('pubsub');
+import $ from 'jquery';
+import Backbone from 'backbone';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Topic from 'postal';
+import {
+	isFunction
+} from 'lodash';
+import AppRouter from 'route';
+import UserModel from 'models/user';
+import LayoutView from 'views/layout/main';
 
-	/**
-	 * register loading event except ajax request is quite
-	 */
-	$(document).ajaxSend(function (event, xhr, settings) {
-		if (settings.quite !== true) {
-			Topic.publish('showLoading');
-		}
-	});
-	$(document).ajaxComplete(function (event, xhr, settings) {
-		if (settings.quite !== true) {
-			Topic.publish('hideLoading');
-		}
-	});
 
-	/**
-	 * override base url
-	 */
-	var backboneSync = Backbone.sync;
-	Backbone.sync = function (method, model, options) {
-		if (!options.url) {
-			options.url = _.isFunction(model.url) ? model.url() : model.url;
-		}
-		if (!options.url) {
-			options.url = model.urlRoot;
-		}
-		options.url = '../api/' + options.url;
-		//options.url = 'http://timm.vargainc.com/201603-4/api/' + options.url;
-		return backboneSync(method, model, options);
+/**
+ * register loading event except ajax request is quite
+ */
+$(document).ajaxSend(function (event, xhr, settings) {
+	if (settings.quite !== true) {
+		Topic.publish({
+			channel: 'View',
+			topic: 'showLoading'
+		});
+
 	}
+});
+$(document).ajaxComplete(function (event, xhr, settings) {
+	if (settings.quite !== true) {
+		Topic.publish({
+			channel: 'View',
+			topic: 'hideLoading'
+		});
+	}
+});
 
-	var AppRouter = require('route');
-	var appRouter = new AppRouter;
-		var UserModel = require('models/user');
-	var LayoutView = require('views/layout/main');
-	var userModel = new UserModel();
-	userModel.fetchCurrentUser().done(function () {
+/**
+ * override base url
+ */
+var backboneSync = Backbone.sync;
+Backbone.sync = function (method, model, options) {
+	if (!options.url) {
+		options.url = isFunction(model.url) ? model.url() : model.url;
+	}
+	if (!options.url) {
+		options.url = model.urlRoot;
+	}
+	options.url = '../api/' + options.url;
+	if (typeof RELEASE_VERSION !== 'undefined') {
+		options.url = 'http://timm.vargainc.com/' + RELEASE_VERSION + '/api/' + options.url;
+	}
+	return backboneSync(method, model, options);
+}
+
+var appRouter = new AppRouter;
+var userModel = new UserModel();
+userModel.fetchCurrentUser()
+	.then(function () {
 		var LayoutViewInstance = React.createFactory(LayoutView);
 		var layoutViewInstance = LayoutViewInstance({
 			user: userModel
 		});
 		var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
 		var appRouter = new AppRouter;
-		appRouter.on('route', function(){
-			Topic.publish('showDialog');
+		appRouter.on('route', function () {
+			// Topic.publish({
+			// 	channel: 'View',
+			// 	topic: 'showLoading'
+			// });
 		});
 		Backbone.history.start();
-	}).fail(function () {
-		window.location = '../login.html';
+	}).catch(function () {
+		// window.location = '../login.html';
 	});
-});

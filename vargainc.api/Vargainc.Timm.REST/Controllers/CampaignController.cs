@@ -709,7 +709,7 @@ namespace Vargainc.Timm.REST.Controllers
                     var newCampaign = db.Campaigns.Create();
                     newCampaign.AreaDescription = sourceCampaign.AreaDescription;
                     newCampaign.ClientCode = sourceCampaign.ClientCode;
-                    newCampaign.ClientName = sourceCampaign.ClientName;
+                    newCampaign.ClientName = sourceCampaign.ClientName + " - copy";
                     newCampaign.ContactName = sourceCampaign.ContactName;
                     newCampaign.CreatorName = sourceCampaign.CreatorName;
                     newCampaign.CustemerName = sourceCampaign.CustemerName;

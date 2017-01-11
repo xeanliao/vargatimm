@@ -3,9 +3,7 @@
 	"loadImages": true,
 	"localToRemoteUrlAccess": true,	
 	"proxyType": "http",
-	"proxy": "10.8.0.1:3128",
-//	"proxyType": "http",
-//	"proxy": "127.0.0.1:8888",
+	"proxy": "127.0.0.1:8123",
 	"webSecurity": false,
 	"sslProtocol": "any",
 	"ignoreSslErrors": true

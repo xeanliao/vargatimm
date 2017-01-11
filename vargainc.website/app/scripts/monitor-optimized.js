@@ -49560,6 +49560,14 @@ define('views/layout/main',['jquery', 'react', 'react-dom', 'views/base', 'views
 		componentDidUpdate: function (prevProps, prevState) {
 			if (this.state.dialogView && Foundation) {
 				$('.reveal').foundation();
+				var dialogSize = this.state.dialogSize;
+				$(document).off('open.zf.reveal.mainView');
+				$(document).one('open.zf.reveal.mainView', function () {
+					console.log('open.zf.reveal.mainView');
+					$('.reveal-overlay').css({
+						display: dialogSize == 'full' ? 'none' : 'block'
+					});
+				});
 				$('.reveal').foundation('open');
 			} else {
 				$('.reveal').foundation();
@@ -49715,13 +49723,17 @@ define('views/layout/main',['jquery', 'react', 'react-dom', 'views/base', 'views
 								search
 							),
 							mainView,
-							React.createElement('div', { id: 'google-map', className: 'google-map' })
+							React.createElement(
+								'div',
+								{ id: 'google-map-wrapper' },
+								React.createElement('div', { id: 'google-map', className: 'google-map' })
+							)
 						)
 					)
 				),
 				React.createElement(
 					'div',
-					{ className: 'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass, 'data-reveal': true, 'data-options': 'closeOnClick: false; closeOnEsc: false' },
+					{ className: 'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass, 'data-reveal': true, 'data-options': 'closeOnClick: false; closeOnEsc: false;' },
 					dialogView
 				),
 				React.createElement(
@@ -54042,12 +54054,186 @@ define('collections/user',[
 });
 define('async',{load: function(id){throw new Error("Dynamic load not allowed: " + id);}});
 
+(function (factory) {
+	if (typeof define === 'function' && define.amd) {
+		define('fastMarker',[
+			'jquery',
+			'd3',
+			'async!//maps.googleapis.com/maps/api/js?key=AIzaSyBXfuPGYb4AfCh-u3ZlPrjsagHs2wMrHBk&libraries=drawing'
+		], factory);
+	} else if (typeof exports === 'object') {
+		module.exports = factory();
+	} else {
+		window.FastMarker = factory();
+	}
+}(function () {
+	var hashMap = {
+		keys: [],
+		values: {},
+		set: function (k, v) {
+			var index = this.keys.indexOf(k);
+			if (index > -1) {
+				this.values[index + ''] = v;
+			} else {
+				this.keys.push(k);
+				this.values[(this.keys.length - 1) + ''] = v;
+			}
+		},
+		get: function (k) {
+			var index = this.keys.indexOf(k);
+			if (index > -1) {
+				return this.values[index + ''];
+			} else {
+				return null;
+			}
+		},
+		has: function (k) {
+			return this.keys.indexOf(k) > -1;
+		},
+		delete: function (k) {
+			var index = this.keys.indexOf(k);
+			if (index > -1) {
+				this.keys = this.keys.splice(index, 1);
+				delete this.values[index + ''];
+			}
+		}
+	}
+
+	function FastMarkerLayer(map) {
+		this.setMap(map);
+		this._markers = [];
+	}
+	FastMarkerLayer.prototype = new google.maps.OverlayView();
+	FastMarkerLayer.prototype.addMarker = function (marker) {
+		this._markers.push(marker);
+		this.draw();
+	}
+	FastMarkerLayer.prototype.removeMarker = function (marker) {
+		var index = this._markers.indexOf(marker);
+		if (index > -1) {
+			if(this._markers.length == 1){
+				this._markers = [];
+				console.log('FastMarker remove last one');
+			}else{
+				this._markers = this._markers.slice(index, index + 1);
+			}
+		}
+		this.draw();
+	}
+	FastMarkerLayer.prototype.onAdd = function () {
+		var map = this.getMap(),
+			panes = this.getPanes(),
+			projection = this.getProjection(),
+			targetLayer = panes.overlayLayer;
+		map.overlayMapTypes.insertAt(0, this);
+		if (projection && panes && targetLayer && $('.fastMarkerLayer', targetLayer).size() == 0) {
+			var center = projection.fromLatLngToDivPixel(map.getCenter());
+			this.width = center.x * 2;
+			this.height = center.y * 2;
+			var markerLayer = d3.select(targetLayer)
+				.append("svg")
+				.attr('style', 'position:absolute; top: 0; left: 0;')
+				.attr('class', 'fastMarkerLayer');
+			this.markerLayer = markerLayer;
+		}
+	}
+	FastMarkerLayer.prototype.onRemove = function () {
+		var map = this.getMap(),
+			panes = this.getPanes(),
+			targetLayer = panes.overlayLayer;
+		$('.fastMarkerLayer', targetLayer).remove();
+	}
+	FastMarkerLayer.prototype.drawTimeout = null;
+	FastMarkerLayer.prototype.draw = function () {
+		window.clearTimeout(this.drawTimeout);
+		this.drawTimeout = window.setTimeout($.proxy(this._draw, this), 500);
+	}
+	FastMarkerLayer.prototype._draw = function () {
+		console.log('FastMarker _draw');
+		var projection = this.getProjection(),
+			layer = this.markerLayer,
+			topLeft = {
+				x: null,
+				y: null
+			},
+			bottomRight = {
+				x: null,
+				y: null
+			};
+		if(!layer || !projection){
+			console.log('FastMarker not ready error.');
+			return;
+		}
+		layer.selectAll('*').remove();
+		console.log('FastMarker draw', this._markers.length);
+		$.each(this._markers, function () {
+			var position = projection.fromLatLngToDivPixel(this.options.position);
+			topLeft.x = topLeft.x == null || topLeft.x > position.x ? position.x : topLeft.x;
+			topLeft.y = topLeft.y == null || topLeft.y > position.y ? position.y : topLeft.y;
+			bottomRight.x = bottomRight.x == null || bottomRight.x < position.x ? position.x : bottomRight.x;
+			bottomRight.y = bottomRight.y == null || bottomRight.y < position.y ? position.y : bottomRight.y;
+		});
+		//Todo: we just extend boundary 50px should use marker max size to extend
+		topLeft.x -= 50;
+		topLeft.y -= 50;
+		bottomRight.x += 50;
+		bottomRight.y += 50;
+		layer.attr('width', Math.abs(bottomRight.x - topLeft.x))
+			.attr('height', Math.abs(bottomRight.y - topLeft.y))
+			.attr('style', 'position:absolute; left: ' + topLeft.x + 'px; top: ' + topLeft.y + 'px;');
+
+		$.each(this._markers, function () {
+			var position = projection.fromLatLngToDivPixel(this.options.position);
+			layer.append('path')
+				.attr('d', this.options.icon.path)
+				.attr('fill', this.options.icon.fillColor)
+				.style("opacity", this.options.icon.fillOpacity)
+				.attr('stroke', this.options.icon.strokeColor)
+				.style("stroke-opacity", this.options.icon.strokeOpacity)
+				.attr("transform", function (d) {
+					return "translate(" + (position.x - topLeft.x) + ", " + (position.y - topLeft.y) + ")";
+				});
+		});
+	}
+
+	function FastMarker(options) {
+		this.options = options;
+		if (this.options && this.options.position) {
+			this.options.position = new google.maps.LatLng(this.options.position.lat, this.options.position.lng);
+		}
+		if (options && options.map) {
+			var map = options.map;
+			this.setMap(map);
+		}
+	}
+
+	FastMarker.prototype.setMap = function (map) {
+		if (map != null) {
+			var layer;
+			if (!hashMap.has(map)) {
+				layer = new FastMarkerLayer(map);
+				hashMap.set(map, layer);
+			} else {
+				layer = hashMap.get(map);
+			}
+			this.Layer = layer;
+			this.Map = map;
+			layer.addMarker.call(this.Layer, this);
+		} else {
+			if (this.Layer && this.Map) {
+				this.Layer.removeMarker.call(this.Layer, this);
+				this.Map = null;
+			}
+		}
+	}
+
+	return FastMarker;
+}));
 define('views/mapBase',[
 	'jquery',
 	'underscore',
-
-	'async!http://maps.googleapis.com/maps/api/js?key=AIzaSyBOhGHk0xE1WEG0laS4QGRp_AGhtB5LMHw&libraries=drawing'
-], function ($, _) {
+	'fastMarker'
+], function ($, _, FastMarker) {
 	var googleMap = window.GoogleMap,
 		googleItems = window.GoogleItems || [];
 	return {
@@ -54057,7 +54243,24 @@ define('views/mapBase',[
 		getGoogleItems: function () {
 			return googleItems;
 		},
+		showMap: function(){
+			$('#google-map-wrapper').css({
+				'visibility': 'visible'
+			});
+			google.maps.event.trigger(googleMap, 'resize');
+		},
+		hideMap: function(){
+			$('#google-map-wrapper').css({
+				'visibility': 'hidden'
+			});
+			google.maps.event.trigger(googleMap, 'resize');
+		},
+		setMapHeight: function(height){
+			$('#google-map-wrapper').height(height);
+			google.maps.event.trigger(googleMap, 'resize');
+		},
 		componentWillUnmount: function () {
+			console.log('map base clearMap');
 			try {
 				_.forEach(googleItems, function (item) {
 					item && item.setMap && item.setMap(null);
@@ -54066,7 +54269,7 @@ define('views/mapBase',[
 			} catch (ex) {
 				console.log('google map clear error', ex);
 			}
-			$('#google-map').css({
+			$('#google-map-wrapper').css({
 				'visibility': 'hidden',
 			});
 		},
@@ -54077,10 +54280,20 @@ define('views/mapBase',[
 				disableDefaultUI = _.has(this.state, 'disableDefaultUI') ? this.state.disableDefaultUI : false,
 				scrollwheel = _.has(this.state, 'scrollwheel') ? this.state.scrollwheel : true,
 				disableDoubleClickZoom = _.has(this.state, 'disableDoubleClickZoom') ? this.state.disableDoubleClickZoom : false;
-
-			$('#google-map').css({
-				'visibility': 'visible'
-			});
+			if (this.state.mapStyle) {
+				$('#google-map-wrapper').css(this.state.mapStyle);
+			} else {
+				$('#google-map-wrapper').css({
+					'visibility': 'visible',
+					'position': '',
+					'width': '',
+					'height': '',
+					'left': '',
+					'top': '',
+					'right': '',
+					'bottom': ''
+				});
+			}
 
 			if (!googleMap) {
 				googleMap = new google.maps.Map($('#google-map')[0], {
@@ -54107,7 +54320,7 @@ define('views/mapBase',[
 					}
 				});
 			}
-			google.maps.event.trigger(googleMap, "resize");
+			google.maps.event.trigger(googleMap, 'resize');
 		}
 	};
 });
@@ -62065,7 +62278,9 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 			});
 		},
 		onCacnel: function () {
-			this.setState({ editId: null });
+			this.setState({
+				editId: null
+			});
 		},
 		onRemove: function (gtuId) {
 			var result = confirm('Are you sure you want to remove the assignment from GTU and Employee?');
@@ -62086,13 +62301,18 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 				{ key: gtu.get('Id') },
 				React.createElement(
 					'td',
-					null,
+					{ className: 'text-center' },
+					gtu.get('BagId')
+				),
+				React.createElement(
+					'td',
+					{ className: 'text-center' },
 					gtu.get('ShortUniqueID')
 				),
 				React.createElement(
 					'td',
-					null,
-					React.createElement('input', { ref: 'userColor', type: 'color', autocomplete: true, defaultValue: '#' + Math.floor(Math.random() * 16777215).toString(16) })
+					{ className: 'text-center' },
+					React.createElement('input', { ref: 'userColor', className: 'color-block', type: 'color', autocomplete: true, defaultValue: '#' + Math.floor(Math.random() * 16777215).toString(16) })
 				),
 				React.createElement(
 					'td',
@@ -62119,12 +62339,12 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 				),
 				React.createElement(
 					'td',
-					null,
+					{ className: 'text-center' },
 					gtu.get('IsOnline') ? 'Online' : 'Offline'
 				),
 				React.createElement(
 					'td',
-					null,
+					{ className: 'text-center' },
 					React.createElement(
 						'button',
 						{ className: 'button tiny', onClick: self.onSave.bind(self, gtu.get('Id')) },
@@ -62139,10 +62359,13 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 			);
 		},
 		render: function () {
-			var collection = this.getCollection(),
+			var collection = this.getCollection().where(function (i) {
+				return i.get('IsAssignedToOther') == false;
+			}),
 			    showError = false,
 			    errorMessage = '',
 			    self = this;
+
 			return React.createElement(
 				'div',
 				null,
@@ -62168,6 +62391,7 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 					React.createElement(
 						'colgroup',
 						null,
+						React.createElement('col', { style: { "width": "80px" } }),
 						React.createElement('col', { style: { "width": "160px" } }),
 						React.createElement('col', { style: { "width": "160px" } }),
 						React.createElement('col', null),
@@ -62183,17 +62407,22 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 							null,
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
+								'Bag#'
+							),
+							React.createElement(
+								'th',
+								{ className: 'text-center' },
 								'GTU#'
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								'Color'
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								React.createElement(
 									'div',
 									{ className: 'row' },
@@ -62211,21 +62440,21 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								'Role'
 							),
 							React.createElement(
 								'th',
-								null,
+								{ className: 'text-center' },
 								'Status'
 							),
-							React.createElement('th', null)
+							React.createElement('th', { className: 'text-center' })
 						)
 					),
 					React.createElement(
 						'tbody',
 						null,
-						collection.models.map(function (gtu) {
+						collection.map(function (gtu) {
 							var isAssign = gtu.get('IsAssign'),
 							    gtuId = gtu.get('Id'),
 							    assignButton = React.createElement(
@@ -62250,12 +62479,17 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 									{ key: gtu.get('Id') },
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
+										gtu.get('BagId')
+									),
+									React.createElement(
+										'td',
+										{ className: 'text-center' },
 										gtu.get('ShortUniqueID')
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										colorInput
 									),
 									React.createElement(
@@ -62278,17 +62512,17 @@ define('views/gtu/assign',['jquery', 'backbone', 'react', 'views/base', 'react.b
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										gtu.get('Role')
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										gtu.get('IsOnline') ? 'Online' : 'Offline'
 									),
 									React.createElement(
 										'td',
-										null,
+										{ className: 'text-center' },
 										actionButton
 									)
 								);
@@ -62508,24 +62742,20 @@ define('views/user/employee',['moment', 'backbone', 'react', 'views/base', 'reac
 	});
 });
 
-define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user', 'models/user', 'views/base', 'views/mapBase', 'views/gtu/assign', 'views/user/employee', 'react.backbone'], function ($, _, helper, moment, React, UserCollection, UserModel, BaseView, MapBaseView, AssignView, EmployeeView) {
+define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react', 'collections/user', 'models/user', 'views/base', 'views/mapBase', 'views/gtu/assign', 'views/user/employee', 'fastMarker', 'react.backbone'], function ($, _, helper, moment, React, UserCollection, UserModel, BaseView, MapBaseView, AssignView, EmployeeView, FastMarker) {
 	var reloadTimeout = null,
 	    backgroundIntervalReload = null,
 	    trackAnimationFrame = null,
 	    dmapPolygon = null,
 	    dmapBounds = null,
-	    gtuData = [],
-	    gtuPoints = {},
+	    gtuPoints = [],
 	    //{key: 'lat:lng', point: google.map.marker}
 	gtuLocation = {},
 	    gtuTrack = {},
 	    //{key: 'gtu id', {track: google.map.polyline, startPoint: google.map.marker}
 	animateIndex = 0,
-	    infowindow = null,
-	    startPointIcon = 'M1.8-25.1c-0.3-0.3-0.7-0.5-1.2-0.5c-0.4,0-0.8,0.2-1.2,0.5C-1-24.8-1-24.4-1-23.9c0,0.4,0.1,0.8,0.4,1c0.3,0.3,0.4,0.6,0.4,1v21.4c0,0.1,0,0.2,0.1,0.3C0,0,0.1,0,0.2,0H1c0.1,0,0.2,0,0.3-0.1s0.1-0.2,0.1-0.3v-21.4c0-0.4,0.2-0.7,0.4-1s0.4-0.6,0.4-1C2.3-24.4,2.1-24.8,1.8-25.1z M16.8-23.7c-0.2-0.2-0.4-0.2-0.6-0.2c-0.1,0-0.3,0.1-0.7,0.3c-0.4,0.2-0.6,0.4-1,0.5c-0.1,0,0.8,0.1,0.7,0.1c-0.4,0.1-0.8,0.3-1.3,0.5s-1,0.3-1.5,0.3c-0.4,0-0.8-0.1-1.1-0.2c-1.1-0.5-1-0.9-1.8-1.1c-0.8-0.3-1.7-0.4-2.6-0.4c-1.6,0-1.4,0.5-3.4,1.5c-0.5,0.2-0.8,0.4-1,0.5c-0.3,0.2-0.4,0.4-0.4,0.7v7.4c0,0.2,0.1,0.4,0.2,0.6S2.8-13,3-13c0.1,0,0.3,0,0.4-0.1C5.7-14.3,5.7-15,7.3-15c0.6,0,1.2,0.1,1.8,0.3s1.1,0.4,1.5,0.6c0.4,0.2-0.1,0.4,0.4,0.6c0.5,0.2,1.1,0.3,1.6,0.3c1.3,0,1.9-0.5,3.7-1.5c0.2-0.1,0.4-0.2,0.5-0.4c0.1-0.1,0.2-0.3,0.2-0.5v-7.5C17-23.4,16.9-23.5,16.8-23.7z',
-	    walkerIcon = 'M-9-0.2c0,0.5,0.3,1,0.8,1.4S-7,2-6.1,2.2c0.9,0.3,1.8,0.4,2.8,0.6C-2.3,2.9-1.2,3-0.1,3S2,2.9,3.1,2.8c1-0.1,2-0.3,2.8-0.6c0.9-0.3,1.5-0.6,2-1s0.8-0.9,0.8-1.4c0-0.4-0.1-0.8-0.4-1.1C8-1.6,7.6-1.9,7.2-2.1c-0.5-0.2-1-0.4-1.5-0.6C5.2-2.8,4.7-3,4.1-3.1c-0.2,0-0.4,0-0.6,0.1C3.3-2.9,3.2-2.7,3.2-2.5s0,0.4,0.1,0.6s0.3,0.3,0.5,0.3c0.5,0.1,0.9,0.2,1.3,0.3c0.4,0.1,0.7,0.2,1,0.3c0.2,0.1,0.4,0.2,0.6,0.3C6.9-0.6,7-0.5,7-0.5c0.1,0.1,0.1,0.1,0.1,0.1c0,0.1-0.1,0.2-0.3,0.3C6.6,0,6.3,0.2,5.9,0.3S5,0.6,4.5,0.7S3.3,0.9,2.5,1C1.7,1.1,0.9,1.1,0,1.1s-1.7,0-2.5-0.1s-1.5-0.2-2-0.3s-1-0.3-1.4-0.4C-6.3,0.2-6.6,0-6.8-0.1s-0.3-0.2-0.3-0.3c0,0,0-0.1,0.1-0.1c0.1-0.1,0.2-0.1,0.3-0.2S-6.3-0.9-6.1-1c0.2-0.1,0.6-0.2,1-0.3c0.4-0.1,0.8-0.2,1.3-0.3c0.2,0,0.4-0.1,0.5-0.3c0.1-0.2,0.2-0.4,0.1-0.6c0-0.2-0.1-0.4-0.3-0.5c-0.2-0.1-0.4-0.2-0.6-0.1C-4.7-3-5.2-2.9-5.7-2.7s-1,0.3-1.5,0.6c-0.5,0.2-0.9,0.5-1.1,0.8S-9-0.6-9-0.2z M-4.2-11.4v4.8C-4.2-6.4-4.1-6.2-4-6c0.2,0.2,0.3,0.2,0.6,0.2h0.8V-1c0,0.2,0.1,0.4,0.2,0.6c0.2,0.2,0.3,0.2,0.6,0.2h3.2c0.2,0,0.4-0.1,0.6-0.2C2.2-0.6,2.2-0.7,2.2-1v-4.8H3c0.2,0,0.4-0.1,0.6-0.2c0.2-0.2,0.2-0.3,0.2-0.6v-4.8c0-0.4-0.2-0.8-0.5-1.1S2.6-13,2.2-13h-4.8c-0.4,0-0.8,0.2-1.1,0.5S-4.2-11.8-4.2-11.4z M-3-16.2c0,0.8,0.3,1.4,0.8,2s1.2,0.8,2,0.8s1.4-0.3,2-0.8s0.8-1.2,0.8-2c0-0.8-0.3-1.4-0.8-2c-0.5-0.6-1.2-0.8-2-0.8s-1.4,0.3-2,0.8S-3-17-3-16.2z',
-	    driverIcon = 'M-10.8,1.3c-0.3,0.3-0.7,0.5-1.1,0.5c-0.4,0-0.8-0.2-1.1-0.5s-0.5-0.7-0.5-1.1s0.2-0.8,0.5-1.1s0.7-0.5,1.1-0.5c0.4,0,0.8,0.2,1.1,0.5c0.3,0.3,0.5,0.7,0.5,1.1C-10.3,0.7-10.4,1.1-10.8,1.3z M-15.2-6.6c0-0.1,0-0.2,0.1-0.3l2.5-2.5c0.1,0,0.2-0.1,0.3-0.1h2v3.3h-4.9V-6.6z M0.7,1.3C0.4,1.6-0.1,1.8-0.4,1.8s-0.8-0.2-1.1-0.5s-0.5-0.7-0.5-1.1s0.2-0.8,0.5-1.1c0.3-0.3,0.7-0.5,1.1-0.5s0.8,0.2,1.1,0.5c0.3,0.3,0.5,0.7,0.5,1.1C1.1,0.7,1,1.1,0.7,1.3z M4.2-14.1c-0.2-0.2-0.4-0.3-0.6-0.3h-13c-0.3,0-0.5,0.1-0.6,0.3c-0.1,0.2-0.3,0.3-0.3,0.6v2.4h-2c-0.2,0-0.5,0.1-0.7,0.2c-0.3,0.1-0.5,0.2-0.7,0.4l-2.5,2.5c-0.1,0.1-0.2,0.2-0.3,0.4c-0.1,0.1-0.1,0.2-0.2,0.4c0,0.1-0.1,0.3-0.1,0.5s0,0.3,0,0.4c0,0.1,0,0.3,0,0.5s0,0.4,0,0.4v4.1c-0.2,0-0.4,0.1-0.6,0.2s-0.2,0.4-0.2,0.6c0,0.1,0,0.2,0.1,0.3c0,0.1,0.1,0.2,0.2,0.2s0.2,0.1,0.2,0.1s0.2,0.1,0.3,0.1s0.2,0,0.3,0c0.1,0,0.2,0,0.3,0s0.3,0,0.3,0h0.8c0,0.9,0.3,1.7,1,2.3s1.4,1,2.3,1s1.7-0.3,2.3-1c0.6-0.6,1-1.4,1-2.3h4.9c0,0.9,0.3,1.7,1,2.3s1.4,1,2.3,1s1.7-0.3,2.3-1c0.6-0.6,1-1.4,1-2.3c0,0,0.1,0,0.3,0c0.2,0,0.3,0,0.3,0s0.1,0,0.3,0c0.1,0,0.2,0,0.3-0.1c0.1,0,0.1-0.1,0.2-0.1s0.1-0.1,0.2-0.2c0-0.1,0.1-0.2,0.1-0.3v-13C4.4-13.9,4.3-14,4.2-14.1z',
-	    angleIcon = 'M0.9,0C0.9,0,0.9,0,0.9,0l-1.4-1.5c0,0,0,0-0.1,0c0,0,0,0-0.1,0l-0.2,0.2c0,0,0,0,0,0.1s0,0,0,0.1L0.3,0l-1.2,1.2c0,0,0,0,0,0.1c0,0,0,0,0,0.1l0.2,0.2c0,0,0,0,0.1,0c0,0,0,0,0.1,0L0.9,0C0.9,0,0.9,0,0.9,0z';
+	    animateSerial = 0;
+	infowindow = null, startPointIcon = 'M1.8-25.1c-0.3-0.3-0.7-0.5-1.2-0.5c-0.4,0-0.8,0.2-1.2,0.5C-1-24.8-1-24.4-1-23.9c0,0.4,0.1,0.8,0.4,1c0.3,0.3,0.4,0.6,0.4,1v21.4c0,0.1,0,0.2,0.1,0.3C0,0,0.1,0,0.2,0H1c0.1,0,0.2,0,0.3-0.1s0.1-0.2,0.1-0.3v-21.4c0-0.4,0.2-0.7,0.4-1s0.4-0.6,0.4-1C2.3-24.4,2.1-24.8,1.8-25.1z M16.8-23.7c-0.2-0.2-0.4-0.2-0.6-0.2c-0.1,0-0.3,0.1-0.7,0.3c-0.4,0.2-0.6,0.4-1,0.5c-0.1,0,0.8,0.1,0.7,0.1c-0.4,0.1-0.8,0.3-1.3,0.5s-1,0.3-1.5,0.3c-0.4,0-0.8-0.1-1.1-0.2c-1.1-0.5-1-0.9-1.8-1.1c-0.8-0.3-1.7-0.4-2.6-0.4c-1.6,0-1.4,0.5-3.4,1.5c-0.5,0.2-0.8,0.4-1,0.5c-0.3,0.2-0.4,0.4-0.4,0.7v7.4c0,0.2,0.1,0.4,0.2,0.6S2.8-13,3-13c0.1,0,0.3,0,0.4-0.1C5.7-14.3,5.7-15,7.3-15c0.6,0,1.2,0.1,1.8,0.3s1.1,0.4,1.5,0.6c0.4,0.2-0.1,0.4,0.4,0.6c0.5,0.2,1.1,0.3,1.6,0.3c1.3,0,1.9-0.5,3.7-1.5c0.2-0.1,0.4-0.2,0.5-0.4c0.1-0.1,0.2-0.3,0.2-0.5v-7.5C17-23.4,16.9-23.5,16.8-23.7z', walkerIcon = 'M-9-0.2c0,0.5,0.3,1,0.8,1.4S-7,2-6.1,2.2c0.9,0.3,1.8,0.4,2.8,0.6C-2.3,2.9-1.2,3-0.1,3S2,2.9,3.1,2.8c1-0.1,2-0.3,2.8-0.6c0.9-0.3,1.5-0.6,2-1s0.8-0.9,0.8-1.4c0-0.4-0.1-0.8-0.4-1.1C8-1.6,7.6-1.9,7.2-2.1c-0.5-0.2-1-0.4-1.5-0.6C5.2-2.8,4.7-3,4.1-3.1c-0.2,0-0.4,0-0.6,0.1C3.3-2.9,3.2-2.7,3.2-2.5s0,0.4,0.1,0.6s0.3,0.3,0.5,0.3c0.5,0.1,0.9,0.2,1.3,0.3c0.4,0.1,0.7,0.2,1,0.3c0.2,0.1,0.4,0.2,0.6,0.3C6.9-0.6,7-0.5,7-0.5c0.1,0.1,0.1,0.1,0.1,0.1c0,0.1-0.1,0.2-0.3,0.3C6.6,0,6.3,0.2,5.9,0.3S5,0.6,4.5,0.7S3.3,0.9,2.5,1C1.7,1.1,0.9,1.1,0,1.1s-1.7,0-2.5-0.1s-1.5-0.2-2-0.3s-1-0.3-1.4-0.4C-6.3,0.2-6.6,0-6.8-0.1s-0.3-0.2-0.3-0.3c0,0,0-0.1,0.1-0.1c0.1-0.1,0.2-0.1,0.3-0.2S-6.3-0.9-6.1-1c0.2-0.1,0.6-0.2,1-0.3c0.4-0.1,0.8-0.2,1.3-0.3c0.2,0,0.4-0.1,0.5-0.3c0.1-0.2,0.2-0.4,0.1-0.6c0-0.2-0.1-0.4-0.3-0.5c-0.2-0.1-0.4-0.2-0.6-0.1C-4.7-3-5.2-2.9-5.7-2.7s-1,0.3-1.5,0.6c-0.5,0.2-0.9,0.5-1.1,0.8S-9-0.6-9-0.2z M-4.2-11.4v4.8C-4.2-6.4-4.1-6.2-4-6c0.2,0.2,0.3,0.2,0.6,0.2h0.8V-1c0,0.2,0.1,0.4,0.2,0.6c0.2,0.2,0.3,0.2,0.6,0.2h3.2c0.2,0,0.4-0.1,0.6-0.2C2.2-0.6,2.2-0.7,2.2-1v-4.8H3c0.2,0,0.4-0.1,0.6-0.2c0.2-0.2,0.2-0.3,0.2-0.6v-4.8c0-0.4-0.2-0.8-0.5-1.1S2.6-13,2.2-13h-4.8c-0.4,0-0.8,0.2-1.1,0.5S-4.2-11.8-4.2-11.4z M-3-16.2c0,0.8,0.3,1.4,0.8,2s1.2,0.8,2,0.8s1.4-0.3,2-0.8s0.8-1.2,0.8-2c0-0.8-0.3-1.4-0.8-2c-0.5-0.6-1.2-0.8-2-0.8s-1.4,0.3-2,0.8S-3-17-3-16.2z', driverIcon = 'M-10.8,1.3c-0.3,0.3-0.7,0.5-1.1,0.5c-0.4,0-0.8-0.2-1.1-0.5s-0.5-0.7-0.5-1.1s0.2-0.8,0.5-1.1s0.7-0.5,1.1-0.5c0.4,0,0.8,0.2,1.1,0.5c0.3,0.3,0.5,0.7,0.5,1.1C-10.3,0.7-10.4,1.1-10.8,1.3z M-15.2-6.6c0-0.1,0-0.2,0.1-0.3l2.5-2.5c0.1,0,0.2-0.1,0.3-0.1h2v3.3h-4.9V-6.6z M0.7,1.3C0.4,1.6-0.1,1.8-0.4,1.8s-0.8-0.2-1.1-0.5s-0.5-0.7-0.5-1.1s0.2-0.8,0.5-1.1c0.3-0.3,0.7-0.5,1.1-0.5s0.8,0.2,1.1,0.5c0.3,0.3,0.5,0.7,0.5,1.1C1.1,0.7,1,1.1,0.7,1.3z M4.2-14.1c-0.2-0.2-0.4-0.3-0.6-0.3h-13c-0.3,0-0.5,0.1-0.6,0.3c-0.1,0.2-0.3,0.3-0.3,0.6v2.4h-2c-0.2,0-0.5,0.1-0.7,0.2c-0.3,0.1-0.5,0.2-0.7,0.4l-2.5,2.5c-0.1,0.1-0.2,0.2-0.3,0.4c-0.1,0.1-0.1,0.2-0.2,0.4c0,0.1-0.1,0.3-0.1,0.5s0,0.3,0,0.4c0,0.1,0,0.3,0,0.5s0,0.4,0,0.4v4.1c-0.2,0-0.4,0.1-0.6,0.2s-0.2,0.4-0.2,0.6c0,0.1,0,0.2,0.1,0.3c0,0.1,0.1,0.2,0.2,0.2s0.2,0.1,0.2,0.1s0.2,0.1,0.3,0.1s0.2,0,0.3,0c0.1,0,0.2,0,0.3,0s0.3,0,0.3,0h0.8c0,0.9,0.3,1.7,1,2.3s1.4,1,2.3,1s1.7-0.3,2.3-1c0.6-0.6,1-1.4,1-2.3h4.9c0,0.9,0.3,1.7,1,2.3s1.4,1,2.3,1s1.7-0.3,2.3-1c0.6-0.6,1-1.4,1-2.3c0,0,0.1,0,0.3,0c0.2,0,0.3,0,0.3,0s0.1,0,0.3,0c0.1,0,0.2,0,0.3-0.1c0.1,0,0.1-0.1,0.2-0.1s0.1-0.1,0.2-0.2c0-0.1,0.1-0.2,0.1-0.3v-13C4.4-13.9,4.3-14,4.2-14.1z', angleIcon = 'M0.9,0C0.9,0,0.9,0,0.9,0l-1.4-1.5c0,0,0,0-0.1,0c0,0,0,0-0.1,0l-0.2,0.2c0,0,0,0,0,0.1s0,0,0,0.1L0.3,0l-1.2,1.2c0,0,0,0,0,0.1c0,0,0,0,0,0.1l0.2,0.2c0,0,0,0,0.1,0c0,0,0,0,0.1,0L0.9,0C0.9,0,0.9,0,0.9,0z';
 
 	return React.createBackboneClass({
 		mixins: [BaseView, MapBaseView],
@@ -62544,34 +62774,22 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 			};
 		},
 		onWindowResize: function () {
-			console.log('window resize');
 			var pageLeftHeight = $(window).height() - $(this.refs.mapArea).position().top;
-			$('#google-map').css({
-				'position': 'relative',
-				'top': 0,
-				'left': 0,
-				'right': 'auto',
-				'bottom': 'auto',
-				'width': '100%',
-				'height': pageLeftHeight
-			});
-			google.maps.event.trigger(this.getGoogleMap(), "resize");
+			this.setMapHeight(pageLeftHeight);
 		},
 		componentDidMount: function () {
 			this.publish('showLoading');
 			/**
     * position google map to main area
     */
-			$(window).on('resize', $.proxy(this.onWindowResize, this));
+			$(window).on('resize.gtu-monitor-view', $.proxy(this.onWindowResize, this));
 			this.onWindowResize();
 
 			var self = this,
 			    googleMap = this.getGoogleMap();
 
-			this.drawDmapBoundary().then(this.filterGtu).then(this.drawGtu).done(function () {
-				googleMap.addListener('zoom_changed', $.proxy(self.drawGtu, self));
-				googleMap.addListener('dragend', $.proxy(self.drawGtu, self));
-			}).done(function () {
+			this.drawDmapBoundary().done(function () {
+				self.drawGtu();
 				self.drawLastLocation();
 				var allAssignedGtu = _.map(self.props.gtu.where(function (i) {
 					return i.get('IsAssign') || i.get('WithData');
@@ -62585,12 +62803,13 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				self.publish('hideLoading');
 				infowindow = new google.maps.InfoWindow();
 				window.clearInterval(backgroundIntervalReload);
-				backgroundIntervalReload = window.setInterval(self.reload, 15 * 1000);
+				backgroundIntervalReload = window.setInterval(self.reload, 30 * 1000);
 			});
 
 			$("#monitor-more-menu").foundation();
 		},
 		componentWillUnmount: function () {
+			var googleMap = this.getGoogleMap();
 			try {
 				this.clearMap();
 				_.forEach(gtuLocation, function (item) {
@@ -62598,12 +62817,8 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				});
 				dmapPolygon.setMap(null);
 				google.maps.event.clearInstanceListeners(googleMap);
-			} catch (ex) {
-				console.log('google map clear error', ex);
-			}
-			$('#google-map').css({
-				'visibility': 'hidden'
-			});
+				$(document).off('resize.gtu-monitor-view');
+			} catch (ex) {}
 		},
 		shouldComponentUpdate: function (nextProps, nextState) {
 			var oldActiveGtu = nextState.activeGtu,
@@ -62611,22 +62826,17 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 			    xor = _.xor(oldActiveGtu, newActiveGtu);
 
 			if (nextState.displayMode == 'track') {
-				console.log('stop background reload');
 				window.clearInterval(backgroundIntervalReload);
 			} else {
-				console.log('start background reload');
 				window.clearInterval(backgroundIntervalReload);
-				backgroundIntervalReload = window.setInterval(this.reload, 15 * 1000);
+				backgroundIntervalReload = window.setInterval(this.reload, 30 * 1000);
 			}
 
 			if (this.state.ShowOutOfBoundary != nextState.ShowOutOfBoundary) {
-				console.log('show out of boundary changed');
 				this.reload();
 			} else if (!_.isEmpty(xor)) {
-				console.log('active gtu changed');
 				this.reload();
 			} else if (this.state.displayMode != nextState.displayMode) {
-				console.log('display model changed');
 				this.clearMap();
 				this.reload();
 			}
@@ -62662,23 +62872,29 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				def.resolve();
 			});
 			googleMap.fitBounds(dmapBounds);
-			timeout = window.setTimeout(function () {
-				def.resolve();
-			}, 5 * 60 * 1000);
+			def.resolve();
 			return def;
 		},
-		filterGtu: function (fnFilter) {
-			var def = $.Deferred(),
+		drawGtu: function () {
+			if (this.state.displayMode != 'cover') {
+				return;
+			}
+			console.log('begin draw');
+			var self = this,
+			    googleMap = this.getGoogleMap(),
 			    needFilterOutOfBoundary = !this.state.ShowOutOfBoundary,
 			    dots = this.props.dmap.get('Gtu') || [],
-			    activeGtu = this.state.activeGtu,
-			    result = [];
+			    activeGtu = this.state.activeGtu;
+			console.log('already draw gtu', gtuPoints.length);
+			_.forEach(gtuPoints, function (p) {
+				p.setMap(null);
+			});
+			gtuPoints = [];
 
 			_.forEach(dots, function (gtu) {
 				if (_.indexOf(activeGtu, gtu.gtuId) == -1) {
 					return true;
 				}
-
 				if (needFilterOutOfBoundary) {
 					var points = _.filter(gtu.points, {
 						out: false
@@ -62686,134 +62902,29 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				} else {
 					var points = gtu.points;
 				}
-				var filterGtu = _.groupBy(points, fnFilter);
-				_.forEach(filterGtu, function (v, k) {
-					var latlng = k.split(':');
-					result.push({
-						key: k,
-						lat: parseFloat(latlng[0]),
-						lng: parseFloat(latlng[1]),
-						color: gtu.color
-					});
-				});
-			});
-			return result;
-		},
-		prepareGtu: function () {
-			var gtu3 = this.filterGtu(function (latlng) {
-				return _.round(latlng.lat, 3) + ':' + _.round(latlng.lng, 3);
-			}),
-			    gtu4 = this.filterGtu(function (latlng) {
-				return _.round(latlng.lat, 4) + ':' + _.round(latlng.lng, 4);
-			}),
-			    gtu5 = this.filterGtu(function (latlng) {
-				return _.round(latlng.lat, 5) + ':' + _.round(latlng.lng, 5);
-			});
-			gtuData = [gtu3, gtu4, gtu5];
-			console.log("precision 1000   gut:", gtu3.length);
-			console.log("precision 10000  gut:", gtu4.length);
-			console.log("precision 100000 gut:", gtu5.length);
-		},
-		drawGtu: function () {
-			if (this.state.displayMode != 'cover') {
-				return;
-			}
-			var def = $.Deferred(),
-			    self = this,
-			    maxDisplayCount = this.state.maxDisplayCount,
-			    lastDisplayGtuIndex = this.state.lastDisplayGtuIndex,
-			    lastViewArea = this.state.lastViewArea,
-			    lastZoomLevel = this.state.lastZoomLevel,
-			    newDisplayGtuIndex = null,
-			    googleMap = this.getGoogleMap(),
-			    viewArea = googleMap.getBounds(),
-			    zoomLevel = googleMap.getZoom(),
-			    cutDownNumber = 5,
-			    cutDown = function () {
-				cutDownNumber--;
-				if (cutDownNumber > 0) {
-					setTimeout(cutDown, 100);
-				} else {
-					def.resolve();
-					console.log('render gtu finished', _.keys(gtuPoints).length);
-					self.setState({ busy: false });
-				}
-			},
-			    filterGtus,
-			    point;
-
-			_.isEmpty(gtuData) && this.prepareGtu();
-			//get less than max display gtu and in current view are latlng.
-			if (lastDisplayGtuIndex === null || lastZoomLevel != zoomLevel) {
-				_.forEach(gtuData, function (points, index) {
-					var visiableGtu = _.filter(points, function (latlng) {
-						return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
-					});
-					if (!filterGtus || visiableGtu.length <= maxDisplayCount) {
-						filterGtus = visiableGtu;
-						newDisplayGtuIndex = index;
-					} else {
-						return false;
+				var color = gtu.color;
+				console.log('draw color: ' + color + ' gtu count:' + points.length);
+				_.forEach(points, function (latlng) {
+					if (latlng && latlng.lat && latlng.lng) {
+						gtuPoints.push(new FastMarker({
+							position: {
+								lat: latlng.lat,
+								lng: latlng.lng
+							},
+							icon: {
+								path: self.getCirclePath(5),
+								fillColor: color,
+								fillOpacity: 0.8,
+								strokeWeight: 1,
+								strokeOpacity: 0.9,
+								strokeColor: '#000'
+							},
+							draggable: false,
+							map: googleMap
+						}));
 					}
 				});
-			} else {
-				filterGtus = _.filter(gtuData[lastDisplayGtuIndex], function (latlng) {
-					return viewArea.contains(new google.maps.LatLng(latlng.lat, latlng.lng));
-				});
-				newDisplayGtuIndex = lastDisplayGtuIndex;
-			}
-			//remove not in current view are gtu pointes.
-			if (lastDisplayGtuIndex == newDisplayGtuIndex) {
-				var tempPoints = {};
-				_.forEach(gtuPoints, function (item) {
-					var position = item.getPosition();
-					if (!viewArea.contains(position) || !_.some(filterGtus, {
-						key: item.key
-					})) {
-						item.setMap(null);
-					} else {
-						tempPoints[item.key] = item;
-					}
-				});
-				gtuPoints = tempPoints;
-			} else {
-				_.forEach(gtuPoints, function (item) {
-					item.setMap(null);
-				});
-				gtuPoints = {};
-				lastViewArea = null;
-			}
-
-			_.forEach(filterGtus, function (gtu) {
-				if (gtuPoints[gtu.key] != null) {
-					return true;
-				}
-				point = new google.maps.Marker({
-					position: {
-						lat: gtu.lat,
-						lng: gtu.lng
-					},
-					icon: {
-						path: self.getCirclePath(5),
-						fillColor: gtu.color,
-						fillOpacity: 1,
-						strokeOpacity: 1,
-						strokeWeight: 1,
-						strokeColor: '#000'
-					},
-					draggable: false,
-					map: googleMap
-				});
-				point.key = gtu.key;
-				gtuPoints[gtu.key] = point;
 			});
-			this.setState({
-				lastDisplayGtuIndex: newDisplayGtuIndex,
-				lastViewArea: viewArea,
-				lastZoomLevel: zoomLevel
-			});
-			cutDown();
-			return def;
 		},
 		prepareGTUTrack: function () {
 			var def = $.Deferred(),
@@ -62845,12 +62956,32 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				self.clearMap();
 				if (activeGtu && activeGtu.length == 1) {
 					animateIndex = 0;
-					self.animateDrawTrack(gtus.get(activeGtu[0]));
+					var gtu = gtus.get(activeGtu[0]);
+					self.changeToBestTrackView(gtu);
+					self.animateDrawTrack(gtu);
 				}
 			});
 		},
+		changeToBestTrackView: function (gtu) {
+			var path = gtu.get('track'),
+			    googleMap = this.getGoogleMap(),
+			    bounds = new google.maps.LatLngBounds();
+			_.forEach(path, function (point) {
+				bounds.extend(new google.maps.LatLng(point.lat, point.lng));
+			});
+			googleMap.fitBounds(bounds);
+		},
 		animateDrawTrack: function (gtu) {
 			if (this.state.displayMode != 'track') {
+				return;
+			}
+			if (animateSerial % 10 == 0) {
+				animateSerial = 1;
+			} else {
+				animateSerial++;
+				trackAnimationFrame = window.requestAnimationFrame($.proxy(function () {
+					this.animateDrawTrack(gtu);
+				}, this));
 				return;
 			}
 			var path = gtu.get('track');
@@ -62880,7 +63011,6 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 			}, this));
 		},
 		drawLastLocation: function () {
-			console.log('draw last location');
 			var googleMap = this.getGoogleMap(),
 			    point,
 			    taskIsStopped = this.props.task.get('Status') == 1,
@@ -62908,17 +63038,14 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				    location = gtu.get('Location');
 				if (!location) {
 					delete gtuLocation[gtuId];
-					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' no location');
 					return true;
 				}
 				if (gtuLocation[gtuId]) {
-					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' move location');
 					gtuLocation[gtuId].setPosition({
 						lat: location.lat,
 						lng: location.lng
 					});
 				} else {
-					console.log('draw gtu ' + gtu.get('ShortUniqueID') + ' add location');
 					gtuLocation[gtuId] = new google.maps.Marker({
 						position: {
 							lat: location.lat,
@@ -62939,10 +63066,9 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 			});
 		},
 		clearMap: function () {
-			console.log('clear map');
 			try {
 				_.forEach(gtuPoints, function (item) {
-					item.setMap(null);
+					item && item.setMap && item.setMap(null);
 				});
 				window.window.cancelAnimationFrame(trackAnimationFrame);
 				animateIndex = 0;
@@ -62951,16 +63077,15 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 						point && point.setMap && point.setMap(null);
 					});
 				});
-			} catch (ex) {
-				console.log('google map clear error', ex);
-			}
+			} catch (ex) {}
 		},
 		reload: function () {
 			console.log('reload');
 			window.clearTimeout(reloadTimeout);
-			reloadTimeout = window.setTimeout($.proxy(this._reload, this), 2 * 1000);
+			reloadTimeout = window.setTimeout($.proxy(this._reload, this), 0.5 * 1000);
 		},
 		_reload: function () {
+			console.log('_reload');
 			var dmap = this.props.dmap,
 			    gtu = this.props.gtu,
 			    taskId = this.props.task.get('Id'),
@@ -62971,9 +63096,8 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				}).promise, gtu.fetchGtuLocation(taskId, {
 					quite: true
 				}).promise]).done(function () {
-					self.drawLastLocation();
-					self.prepareGtu();
 					self.drawGtu();
+					self.drawLastLocation();
 				});
 			} else {
 				self.drawLastLocation();
@@ -62983,7 +63107,6 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 		onReCenter: function () {
 			var googleMap = this.getGoogleMap();
 			googleMap.setCenter(dmapBounds.getCenter());
-			this.drawGtu();
 		},
 		onSelectedGTU: function (gtuId) {
 			var activeGtu = _.clone(this.state.activeGtu);
@@ -63007,7 +63130,6 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 			    gtu = this.props.gtu.get(gtuId),
 			    location = gtu.get('Location'),
 			    marker = gtuLocation[gtu.get('Id')];
-			console.log('gtu last location', location);
 			if (location) {
 				googleMap.setCenter(gtu.get('Location'));
 				infowindow.setContent(gtu.get('ShortUniqueID'));
@@ -63072,7 +63194,9 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 			});
 		},
 		onCopyShareLink: function () {
-			var address = window.location.protocol + '//' + window.location.host + '/monitor/#' + this.props.task.get('PublicUrl');
+			var location = window.location,
+			    path = location.pathname.substr(1);
+			firstPath = location.pathname.substr(0, path.indexOf('/') + 1), task = this.props.task.get('PublicUrl'), address = location.protocol + '//' + window.location.host + firstPath + '/monitor/#' + task;
 			this.publish('showDialog', address);
 		},
 		onOpenMoreMenu: function (e) {
@@ -63283,7 +63407,7 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				{ className: 'group', key: gtu.get('Id') },
 				React.createElement(
 					'button',
-					{ className: buttonClass, style: { 'background-color': isActive ? gtu.get('UserColor') : 'transparent' }, onClick: this.onSelectedGTU.bind(null, gtu.get('Id')) },
+					{ className: buttonClass, style: { 'backgroundColor': isActive ? gtu.get('UserColor') : 'transparent' }, onClick: this.onSelectedGTU.bind(null, gtu.get('Id')) },
 					deleteIcon,
 					gtuIcon,
 					'  ',
@@ -63467,6 +63591,7 @@ define('views/gtu/monitor',['jquery', 'underscore', 'sprintf', 'moment', 'react'
 				React.createElement('div', { ref: 'mapArea' })
 			);
 		}
+
 	});
 });
 

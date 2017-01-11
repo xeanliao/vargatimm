@@ -4,20 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vargainc Timm Application</title>
-    <!-- build:css css/main.css -->
-    <link rel="stylesheet" href="css/jquery-ui.css">
-    <link rel="stylesheet" href="css/font-awesome-animation.css">
-    <link rel="stylesheet" href="css/library.css">
-    <link rel="stylesheet" href="css/app.css">
-    <!-- endbuild -->
+    <link rel="stylesheet" href="css/font-awesome.css">
+    <link rel="stylesheet" href="css/leaflet.css">
   </head>
   <body>
     <div id="main-container"></div>
-    <script src="scripts/vendor/require.js"></script>
-    <script>
-        require(['scripts/config'], function() {
-            require(['scripts/main.js']);
-        });
-    </script>
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyBXfuPGYb4AfCh-u3ZlPrjsagHs2wMrHBk&libraries=drawing"></script>
+    <script src="/node_modules/js-marker-clusterer/src/markerclusterer_compiled.js"></script>
+    
+<!--     <script src="/node_modules/leaflet/dist/leaflet-src.js"></script>
+    <script src="/node_modules/leaflet-dvf/dist/leaflet-dvf.js"></script>
+    <script src="/node_modules/leaflet.polyline.snakeanim/L.Polyline.SnakeAnim.js"></script> -->
+    
+    <script src="/debug.js"></script>
+    <script src="/style-lib.js"></script>
+    <script src="/style-app.js"></script>
+    <script src="/app.js"></script>
   </body>
 </html>

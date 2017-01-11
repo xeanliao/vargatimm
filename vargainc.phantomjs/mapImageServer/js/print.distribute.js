@@ -1,4 +1,5 @@
 function initMap() {
+console.log(">>initMap");
     var mapDom = $('#map');
 
     window.map = new google.maps.Map(mapDom[0], {
@@ -13,13 +14,17 @@ function initMap() {
 }
 
 function callback(msg) {
+console.log(">>callback", msg);
     console.log('callback', msg);
     typeof window.callPhantom === 'function' && window.callPhantom(msg);
+
+console.log("callback<<", msg);
 }
 
 var tryReadyCount = 0;
 
 function begin(params) {
+console.log(">>begin");
     tryReadyCount++;
     if (window.mapIsReady == true) {
         loadMap(params);
@@ -34,7 +39,7 @@ function begin(params) {
 }
 
 function loadMap(params) {
-    console.log('loadMap', params);
+    console.log('>>loadMap', params);
 
     var query = [];
     var locationUrl = params.baseUrl + 'print/campaign/' + params.campaignId + '/submap/' + params.submapId + '/dmap/' + params.dmapId + '/location';
@@ -47,7 +52,7 @@ function loadMap(params) {
 
     if (!params.suppressGTU) {
         var gtuUrl = params.baseUrl + 'print/campaign/' + params.campaignId + '/submap/' + params.submapId + '/dmap/' + params.dmapId + '/gtu';
-        console.log(gtuUrl);
+        console.log('gtuUrl', gtuUrl);
         query.push($.getJSON(gtuUrl));
     }
     if (!params.suppressNDAInDMap) {
@@ -64,14 +69,16 @@ function loadMap(params) {
                 $.extend(result, v[0]);
             }
         });
-        console.log(result);
+        console.log('result:', result);
         drawMap(params, result);
     }).fail(function () {
         callback('ajax call failed.');
     });
+console.log("loadMap <<");
 }
 
 function drawMap(params, result) {
+console.log(">>drawMap");
     console.log('begin find map best view');
     if (result && result.boundary) {
         var mapBounds = new google.maps.LatLngBounds();
@@ -88,20 +95,28 @@ function drawMap(params, result) {
         /**
          * change map type and montor tilesloaded event to make sure all map have loaded
          */
-        google.maps.event.addListenerOnce(map, 'tilesloaded', function () {
-            console.log("tilesloaded");
+        var listener = google.maps.event.addListenerOnce(map, 'tilesloaded', function () {
+            console.log("tilesloaded-97");
             clearTimeout(window.timeout);
             checkMapType(params, result);
         });
 
+	window.timeout = setTimeout(function() {
+  	    console.log("timeout-105");
+	    google.maps.event.removeListener(listener);
+  	    checkMapType(params, result);
+	}, 5000);
+
         map.fitBounds(mapBounds);
-        console.log("end find best view");
+        console.log("end find best view ...");
     } else {
         callback('data error');
     }
+console.log("drawMap<<");
 }
 
 function resize(params, result, mapBounds, haveCustomZoom){
+console.log(">>resize");
     var mapWidth = $(window).width();
     var mapHeight = $(window).height();
     var projection = map.getProjection();
@@ -141,13 +156,16 @@ function resize(params, result, mapBounds, haveCustomZoom){
         map.setCenter(mapBounds.getCenter());
         console.log('need resize!');
     }else if(!haveCustomZoom){
+console.log(">>!haveCustomZoom");
         map.fitBounds(mapBounds);
         console.log('fitBounds!');
     }
     checkMapType(params, result);
+console.log("resize<<")
 }
 
 function checkMapType(params, result){
+console.log(">>checkMapType");
     console.log('map size', $(window).size().width, $(window).size().height);
     console.log('map zoom:', map.getZoom());
     console.log('check map type: ' + params.mapType);
@@ -174,9 +192,11 @@ function checkMapType(params, result){
          * change map type and montor tilesloaded event to make sure all map have loaded
          */
         google.maps.event.addListenerOnce(map, 'tilesloaded', function () {
-            console.log("tilesloaded");
+console.log(">>");
+            console.log(">>tilesloaded-188");
             clearTimeout(window.timeout);
             setTimeout(function () {
+console.log(">>191");
                 callback({
                     success: true,
                     status: 'tilesloaded',
@@ -187,10 +207,12 @@ function checkMapType(params, result){
         });
         map.setMapTypeId(mapType);
         window.timeout = setTimeout(function(){
+console.log(">>202");
             callback("timeout");
         }, 5 * 60 * 1000);
     }else{
         setTimeout(function () {
+console.log(">>207");
             callback({
                 success: true,
                 status: 'tilesloaded'
@@ -205,6 +227,7 @@ function getCirclePath(size) {
 }
 
 function draw(params, result) {
+console.log(">>draw");
     console.log('draw polygon');
     /**
      * draw ndaddress
@@ -319,8 +342,10 @@ function draw(params, result) {
 
 function prepareScreenshot() {
 
+console.log(">>prepareScreenshot");
 
     $("#map").css("background", "transparent");
+    $("#map").children(':first-child').css("background", "transparent");
     $("#map img").hide();
 
     callback({

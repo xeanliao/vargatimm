@@ -10,6 +10,7 @@ using System.Data.Entity;
 using System.Text;
 using System.Net.Http;
 using System.IO;
+using EntityFramework.Extensions;
 
 using Vargainc.Timm.EF;
 using Vargainc.Timm.REST.ViewModel.ControlCenter;
@@ -259,16 +260,32 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(result);
         }
 
+        class GtuIdTaskGtuInfoId
+        {
+            public int? GTUId { get; set; }
+            public int? TaskgtuinfoId { get; set; }
+        }
+
         [Route("{taskId}/dots")]
         [HttpPost]
         public async Task<IHttpActionResult> AddGtuDotsToTask(int taskId, [FromBody] List<ViewModel.CustomGTUPoint> dots)
         {
-            var taskDic = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new
+            #region Temp Fix
+            var taskList = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).Select(i => new GtuIdTaskGtuInfoId
             {
-                i.GTUId,
+                GTUId = i.GTUId,
                 TaskgtuinfoId = i.Id,
 
-            }).ToDictionaryAsync(i => i.GTUId);
+            }).ToListAsync();
+            var taskDic = new Dictionary<int?, GtuIdTaskGtuInfoId>();
+            foreach(var item in taskList)
+            {
+                if (!taskDic.ContainsKey(item.GTUId))
+                {
+                    taskDic.Add(item.GTUId, item);
+                }
+            }
+            #endregion
 
             List<Models.GtuInfo> newDots = new List<Models.GtuInfo>();
             foreach (var item in dots)
@@ -300,6 +317,22 @@ namespace Vargainc.Timm.REST.Controllers
             }
             db.GtuInfos.AddRange(newDots);
             await db.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        [Route("{taskId}/dots")]
+        [HttpPut]
+        public async Task<IHttpActionResult> RemoveGtuDotsToTask(int taskId, [FromBody] List<long?> dots)
+        {
+            var task = await db.Tasks.FindAsync(taskId);
+            if(task == null)
+            {
+                return NotFound();
+            }
+
+            await db.GtuInfos.Where(i => dots.Contains(i.Id))
+                .UpdateAsync(t=> new Models.GtuInfo { nCellID = 2 });
+            
             return Json(new { success = true });
         }
 

@@ -29,6 +29,17 @@ namespace Vargainc.Timm.REST.ViewModel
         [JsonProperty("out")]
         public bool? OutOfBoundary { get; set; }
 
-
+        /// <summary>
+        /// nCellId: 0-original ,1-added ,2-removed
+        /// only the added gtu returned gtuinfo.id
+        /// </summary>
+        [JsonProperty("cellId")]
+        public int? nCellId { get; set; }
+        /// <summary>
+        /// gtu record id in table gtuinfo
+        /// </summary>
+        [JsonProperty("gtuInfoId")]
+        public long? GtuInfoId { get; set; }
+        
     }
 }
