@@ -493,7 +493,7 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 points = locations,
                 pointsColors = colors.ToList(),
-                lastUpdateTime = lastUpdateTime.ToString("yyyyMMddhhmmss")
+                lastUpdateTime = lastUpdateTime.ToString("yyyyMMddHHmmss")
             });
         }
         #endregion
@@ -648,6 +648,10 @@ namespace Vargainc.Timm.REST.Controllers
             HashSet<string> ducplicateLocation = new HashSet<string>();
             foreach (var item in coordinates)
             {
+                if(!item.Latitude.HasValue || !item.Longitude.HasValue)
+                {
+                    continue;
+                }
                 float lat = (int)(item.Latitude * 100000) / 100000f;
                 float lng = (int)(item.Longitude * 100000) / 100000f;
                 var key = string.Format("{0}:{1}", lat, lng);

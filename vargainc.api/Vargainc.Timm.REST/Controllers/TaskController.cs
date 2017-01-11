@@ -52,7 +52,7 @@ namespace Vargainc.Timm.REST.Controllers
                 dbTask.Email,
                 dbTask.Telephone,
                 HaveGtuInfoMapping = dbTask.TaskGtuInfoMappings.Count() > 0 ? true : false,
-                Status = taskStatus == null ? null : new Nullable<int>(taskStatus.TimeType),
+                Status = taskStatus == null ? null : taskStatus.TimeType,
                 PublicUrl = taskId.ToString().DesEncrypt()
             });
         }

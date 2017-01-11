@@ -137,10 +137,47 @@ namespace Vargainc.Timm.REST.Controllers
                          t.Id,
                          t.Name,
                          t.Date,
-                         t.Status
+                         t.Status,
                      })
                  }).ToListAsync();
             return Json(result.Where(i => i.Tasks.Count() > 0).ToList());
+        }
+
+        [Route("{campaignId:int}/tasks/all")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetCampaignWithAllTask(int? campaignId)
+        {
+            var result = await db.Campaigns
+                 .Where(i => i.Status.Max(s => s.Status) == 2)
+                 .Where(i => i.Id == campaignId)
+                 .OrderByDescending(i => i.Id)
+                 .Select(i => new
+                 {
+                     i.AreaDescription,
+                     i.ClientCode,
+                     i.ClientName,
+                     i.ContactName,
+                     i.CreatorName,
+                     i.CustemerName,
+                     i.Description,
+                     i.Date,
+                     i.Id,
+                     i.Name,
+                     i.Sequence,
+                     i.UserName,
+                     Tasks = i.SubMaps.SelectMany(s => s.DistributionMaps.SelectMany(d => d.Tasks)).Select(t => new
+                     {
+                         CampaignId = i.Id,
+                         SubMapId = t.DistributionMap.SubMapId,
+                         DMapId = t.DistributionMapId,
+                         t.Id,
+                         t.Name,
+                         t.Date,
+                         IsFinished = t.Status == 1,
+                         Status = db.TaskTimes.Where(m=>m.TaskId == t.Id).OrderByDescending(m => m.Id).FirstOrDefault().TimeType
+                     })
+                 }).FirstOrDefaultAsync();
+            return Json(result);
         }
 
         [Route("report")]

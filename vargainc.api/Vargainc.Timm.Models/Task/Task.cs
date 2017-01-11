@@ -10,10 +10,18 @@ namespace Vargainc.Timm.Models
         public int? Id { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; }
+        /// <summary>
+        /// 1: finished
+        /// 0: process mean (start/stop/pause) status, this should base the TaskTimes.TimeType value
+        /// TimeType: 1 Stopped
+        /// TimeType: 2 Paused
+        /// TimeType: 0 Start
+        /// </summary>
         [DefaultValue(0)]
         public int? Status { get; set; }
         public string Telephone { get; set; }
         public string Email { get; set; }
+
         [DefaultValue(0)]
         public int DistributionMapId { get; set; }
         

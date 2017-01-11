@@ -28,6 +28,7 @@ namespace Vargainc.Timm.REST.ViewModel
 
         [JsonProperty("out")]
         public bool? OutOfBoundary { get; set; }
-        
+
+
     }
 }

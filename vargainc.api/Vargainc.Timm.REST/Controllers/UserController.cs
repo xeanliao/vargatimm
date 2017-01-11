@@ -296,6 +296,57 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = false });
         }
 
+        [Route("login")]
+        [HttpGet]
+        public async Task<IHttpActionResult> Login(string username, string password)
+        {
+            var existUser = await db.Users.Where(i => i.UserName == username && i.Password == password && i.Enabled == true).FirstOrDefaultAsync();
+            if (existUser != null)
+            {
+                //var claims = new List<System.Security.Claims.Claim>();
+                //claims.Add(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, existUser.FullName));
+                //var id = new System.Security.Claims.ClaimsIdentity(claims, "");
+                //ClaimsIdentity identity = new System.Security.Claims.ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie, ClaimTypes.Name, ClaimTypes.Role);
+
+                //var ctx = Request.GetOwinContext();
+                //var authenticationManager = ctx.Authentication;
+                //authenticationManager.SignIn(id);
+
+                //AuthenticationManager
+
+                string token = null;
+                if (existUser.LastLoginTime.HasValue && existUser.LastLoginTime.Value > DateTime.Now.AddDays(-12) && !string.IsNullOrWhiteSpace(existUser.Token))
+                {
+                    token = existUser.Token;
+                }
+                else
+                {
+                    token = Guid.NewGuid().ToString();
+                }
+                existUser.Token = token;
+                existUser.LastLoginTime = DateTime.Now;
+                await db.SaveChangesAsync();
+
+                var authCookie = new HttpCookie("ssid");
+                authCookie.HttpOnly = true;
+                authCookie.Shareable = false;
+                authCookie.Value = token;
+
+                HttpContext.Current.Response.SetCookie(authCookie);
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        token = token,
+                        displayName = existUser.FullName,
+                        email = existUser.Email
+                    }
+                });
+            }
+            return Json(new { success = false });
+        }
+
         [Route("logout")]
         [HttpPost]
         public IHttpActionResult Logout()
