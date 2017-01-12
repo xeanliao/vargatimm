@@ -72,11 +72,11 @@ var MapContainer = React.createBackboneClass({
 			mapContainer: mapContainer
 		}, () => {
 			self.drawBoundary(monitorMap);
-			self.registerTopic();
+			self.registerTopic(monitorMap);
 			$(window).trigger('resize');
 		});
 	},
-	registerTopic: function () {
+	registerTopic: function (monitorMap) {
 		var self = this;
 		this.subscribe('Campaign.Monitor.ZoomToTask', taskId => {
 			self.flyToTask(taskId);
@@ -89,7 +89,7 @@ var MapContainer = React.createBackboneClass({
 				self.drawGtu();
 				window.clearInterval(self.state.reloadTimeout);
 				self.setState({
-					// reloadTimeout: window.setInterval(self.reload, 10 * 1000)
+					reloadTimeout: window.setInterval(self.reload, 10 * 1000)
 				});
 			});
 		});
@@ -134,6 +134,12 @@ var MapContainer = React.createBackboneClass({
 				self.state.mapContainer.style.width = `${size.width}px`;
 				self.state.mapContainer.style.height = `${size.height}px`;
 			}
+		});
+		monitorMap.on('zoomstart', () => {
+			$('.leaflet-GtuMarker-pane').hide();
+		});
+		monitorMap.on('zoomend', () => {
+			$('.leaflet-GtuMarker-pane').show();
 		});
 	},
 	drawBoundary: function (monitorMap) {
@@ -335,11 +341,15 @@ var MapContainer = React.createBackboneClass({
 					self.setState({
 						reloading: false
 					}, () => {
-						self.drawGtu();
+						return resolve();
 					});
-				});
+				}).catch(() => {
+					return reject(new Error('unkown error in reload'));
+				})
 			});
-		});
+		}).then(() => {
+			self.drawGtu();
+		})
 	},
 	drawGtu: function () {
 		var map = this.state.map;
@@ -431,7 +441,9 @@ var MapContainer = React.createBackboneClass({
 	},
 	drawGtuTrack: function (gtus) {
 		each(this.state.gtuMarkerLayer, layer => {
+			layer.eachLayer(marker => {
 
+			});
 		});
 	},
 	drawGtuLocation: function (gtus) {
@@ -449,15 +461,26 @@ var MapContainer = React.createBackboneClass({
 				}
 			}),
 			gtuLocationLayer = this.state.gtuLocationLayer;
-		if (gtuLocationLayer) {
-			gtuLocationLayer.remove();
+		if (!gtuLocationLayer) {
+			// gtuLocationLayer.remove();
+			gtuLocationLayer = L.layerGroup();
 		}
-
-		gtuLocationLayer = L.layerGroup();
+		
 		each(gtuList, gtu => {
-
 			let latlng = gtu.get('Location');
 			if (!latlng || !latlng.lat || !latlng.lng) {
+				return true;
+			}
+			let gtuId = gtu.get('Id');
+			let exisitMarkerLayer = false;
+			gtuLocationLayer.eachLayer(markerLayer=>{
+				if(markerLayer.gtuId == gtuId){
+					markerLayer.setLatLng(latlng);
+					exisitMarkerLayer = true;
+					return false;
+				}
+			});
+			if(exisitMarkerLayer){
 				return true;
 			}
 			let locationMarker = L.markerGroup();
@@ -472,18 +495,27 @@ var MapContainer = React.createBackboneClass({
 				pane: 'GtuMarkerPane',
 				gradient: true
 			}).addTo(locationMarker);
-			L.triangleMarker(latlng, {
+			var gtuLocationMarker = L.triangleMarker(latlng, {
 				gtuId: gtu.get('Id'),
-				radius: 10,
+				radius: 20,
 				fillColor: gtu.get('UserColor'),
-				fillOpacity: 0.25,
+				fillOpacity: 0.2,
 				fill: true,
 				stroke: false,
 				numberOfSides: 50,
 				pane: 'GtuMarkerPane',
 				gradient: false
 			}).addTo(locationMarker);
-			locationMarker.gtuId = gtu.get('Id');
+			// L.AnimationUtils.animate(gtuLocationMarker, {
+			// 	duration: 0,
+			// 	easing: L.AnimationUtils.easingFunctions.easeIn,
+			// 	from: gtuLocationMarker.options,
+			// 	to: L.extend({}, gtuLocationMarker.options, {
+			// 		fillOpacity: '0',
+			// 		radius: 20,
+			// 	})
+			// });
+			locationMarker.gtuId = gtuId;
 			locationMarker.latlng = latlng;
 			locationMarker.addTo(gtuLocationLayer);
 		});
