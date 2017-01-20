@@ -108,12 +108,15 @@ export default React.createBackboneClass({
 		);
 	},
 	render: function () {
-		var collection = this.getCollection().where(function (i) {
-				return i.get('IsAssignedToOther') == false;
-			}),
+		var collection = this.getCollection() || [],
 			showError = false,
 			errorMessage = '',
 			self = this;
+		if (collection && collection.where) {
+			collection = collection.where(function (i) {
+				return i.get('IsAssignedToOther') == false;
+			});
+		}
 
 		return (
 			<div>

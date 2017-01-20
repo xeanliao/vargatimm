@@ -180,6 +180,12 @@ table .select2-container { margin: 0; }
 
 .campaign-monitor blockquote { border-left: none; margin: 0; padding: 0; }
 
+.leaflet-map-container { z-index: 0; }
+
+@keyframes gtu-location-flash { from { opacity: 1; }
+  to { opacity: 0.5; } }
+.gtu-last-location { animation-duration: 0.5s; animation-name: gtu-location-flash; animation-iteration-count: infinite; animation-direction: alternate; }
+
 html, body { font-family: 'Ubuntu', verdana, arial, sans-serif; color: #8a8a8a; font-weight: 300; background-color: #f8f8f8; }
 
 .logo { background: #131e30; height: 50px; top: 0px; left: 0px; width: 250px; text-align: center; position: fixed; }
@@ -304,8 +310,7 @@ html, body { font-family: 'Ubuntu', verdana, arial, sans-serif; color: #8a8a8a; 
 .gtu .group button:last-child { min-width: 25px; margin-left: 0; padding-left: 0; padding-right: 0; box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25); background: white; }
 .gtu .group button:last-child:hover, .gtu .group button:last-child:focus { box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.25); }
 .gtu .button { color: #2199e8; background: transparent; padding: 5px 10px; margin-bottom: 10px; min-width: 120px; text-align: left !important; font-weight: 600; }
-.gtu .button.active { box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25) !important; opacity: 0.75; color: #fff; }
-.gtu .button.active i { color: #fff; opacity: 1; }
+.gtu .button.active { box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25) !important; opacity: 0.75; }
 .gtu .button.offline { color: #a7a7a7; font-weight: 400; opacity: 0.35; }
 .gtu .button.offline i { opacity: 1; }
 .gtu i.alert { color: #ec5840; }
@@ -324,5 +329,3 @@ html, body { font-family: 'Ubuntu', verdana, arial, sans-serif; color: #8a8a8a; 
 .google-map-pop { background: transparent; pointer-events: none; margin-top: 0px !important; top: 0px !important; }
 
 iframe { border: none; position: absolute; left: 0; right: 0; width: 100%; top: 0; bottom: 0; }
-
-.leaflet-map-container { z-index: 0; }

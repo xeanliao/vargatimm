@@ -319,7 +319,7 @@ var MapContainer = React.createBackboneClass({
 			setActiveButton = (
 				<div className="small-8 align-center columns">
 					<div className="button-group" style={{marginTop: "20px"}}>
-						<button id={task.get('Id')} className="button btnSetActiveTask">Set Active</button>
+						<button id={task.get('Id')} className="button btnSetActiveTask">Switch</button>
 					</div>
 				</div>
 			);
@@ -1033,7 +1033,7 @@ export default React.createBackboneClass({
 					{alertIcon}
 				</button>
 				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))}>
-					<i className="location fa fa-crosshairs" style={{color:'black'}}></i>
+					<i className="location fa fa-crosshairs" style={{color:'black', 'backgroundColor': gtu.get('UserColor')}}></i>
 				</button>
 			</span>
 		);
