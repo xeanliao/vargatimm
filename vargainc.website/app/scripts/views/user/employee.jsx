@@ -20,7 +20,10 @@ export default React.createBackboneClass({
 		$('form').foundation();
 	},
 	componentWillUnmount: function () {
-		$(companySelector).select2('destroy');
+		let ddl = $(this.refs.companySelector);
+		if(ddl && ddl.select2){
+			ddl.select2('destroy');
+		}
 		$('#birthdayDatePicker').off('changeDate').fdatepicker('remove');
 	},
 	onSave: function (e) {

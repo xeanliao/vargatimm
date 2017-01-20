@@ -14026,11 +14026,11 @@ webpackJsonp([1],[
 				mapContainer: mapContainer
 			}, function () {
 				self.drawBoundary(monitorMap);
-				self.registerTopic();
+				self.registerTopic(monitorMap);
 				(0, _jquery2.default)(window).trigger('resize');
 			});
 		},
-		registerTopic: function registerTopic() {
+		registerTopic: function registerTopic(monitorMap) {
 			var self = this;
 			this.subscribe('Campaign.Monitor.ZoomToTask', function (taskId) {
 				self.flyToTask(taskId);
@@ -14043,7 +14043,7 @@ webpackJsonp([1],[
 					self.drawGtu();
 					window.clearInterval(self.state.reloadTimeout);
 					self.setState({
-						// reloadTimeout: window.setInterval(self.reload, 10 * 1000)
+						reloadTimeout: window.setInterval(self.reload, 10 * 1000)
 					});
 				});
 			});
@@ -14088,6 +14088,12 @@ webpackJsonp([1],[
 					self.state.mapContainer.style.width = size.width + 'px';
 					self.state.mapContainer.style.height = size.height + 'px';
 				}
+			});
+			monitorMap.on('zoomstart', function () {
+				(0, _jquery2.default)('.leaflet-GtuMarker-pane').hide();
+			});
+			monitorMap.on('zoomend', function () {
+				(0, _jquery2.default)('.leaflet-GtuMarker-pane').show();
 			});
 		},
 		drawBoundary: function drawBoundary(monitorMap) {
@@ -14320,10 +14326,14 @@ webpackJsonp([1],[
 						self.setState({
 							reloading: false
 						}, function () {
-							self.drawGtu();
+							return resolve();
 						});
+					}).catch(function () {
+						return reject(new Error('unkown error in reload'));
 					});
 				});
+			}).then(function () {
+				self.drawGtu();
 			});
 		},
 		drawGtu: function drawGtu() {
@@ -14410,7 +14420,11 @@ webpackJsonp([1],[
 			});
 		},
 		drawGtuTrack: function drawGtuTrack(gtus) {
-			(0, _each3.default)(this.state.gtuMarkerLayer, function (layer) {});
+			// each(this.state.gtuMarkerLayer, layer => {
+			// 	layer.eachLayer(marker => {
+
+			// 	});
+			// });
 		},
 		drawGtuLocation: function drawGtuLocation(gtus) {
 			var self = this;
@@ -14427,15 +14441,26 @@ webpackJsonp([1],[
 				}
 			}),
 			    gtuLocationLayer = this.state.gtuLocationLayer;
-			if (gtuLocationLayer) {
-				gtuLocationLayer.remove();
+			if (!gtuLocationLayer) {
+				// gtuLocationLayer.remove();
+				gtuLocationLayer = _leaflet2.default.layerGroup();
 			}
 
-			gtuLocationLayer = _leaflet2.default.layerGroup();
 			(0, _each3.default)(gtuList, function (gtu) {
-
 				var latlng = gtu.get('Location');
 				if (!latlng || !latlng.lat || !latlng.lng) {
+					return true;
+				}
+				var gtuId = gtu.get('Id');
+				var exisitMarkerLayer = false;
+				gtuLocationLayer.eachLayer(function (markerLayer) {
+					if (markerLayer.gtuId == gtuId) {
+						markerLayer.setLatLng(latlng);
+						exisitMarkerLayer = true;
+						return false;
+					}
+				});
+				if (exisitMarkerLayer) {
 					return true;
 				}
 				var locationMarker = _leaflet2.default.markerGroup();
@@ -14450,18 +14475,27 @@ webpackJsonp([1],[
 					pane: 'GtuMarkerPane',
 					gradient: true
 				}).addTo(locationMarker);
-				_leaflet2.default.triangleMarker(latlng, {
+				var gtuLocationMarker = _leaflet2.default.triangleMarker(latlng, {
 					gtuId: gtu.get('Id'),
-					radius: 10,
+					radius: 20,
 					fillColor: gtu.get('UserColor'),
-					fillOpacity: 0.25,
+					fillOpacity: 0.2,
 					fill: true,
 					stroke: false,
 					numberOfSides: 50,
 					pane: 'GtuMarkerPane',
 					gradient: false
 				}).addTo(locationMarker);
-				locationMarker.gtuId = gtu.get('Id');
+				// L.AnimationUtils.animate(gtuLocationMarker, {
+				// 	duration: 0,
+				// 	easing: L.AnimationUtils.easingFunctions.easeIn,
+				// 	from: gtuLocationMarker.options,
+				// 	to: L.extend({}, gtuLocationMarker.options, {
+				// 		fillOpacity: '0',
+				// 		radius: 20,
+				// 	})
+				// });
+				locationMarker.gtuId = gtuId;
 				locationMarker.latlng = latlng;
 				locationMarker.addTo(gtuLocationLayer);
 			});

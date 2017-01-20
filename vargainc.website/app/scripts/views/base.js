@@ -10,14 +10,19 @@ import {
 	isFunction,
 	isObject
 } from 'lodash';
-import 'jquery';
+import $ from 'jquery';
 import 'foundation-sites';
 
 export default {
 	getDefaultProps: function () {
 		return {
-			registeredTopic: {}
+			registeredTopic: {},
+			registeredEvents: []
 		}
+	},
+	on: function(event, element, callback){
+		$('body').on(event, element, callback);
+		this.props.registeredEvents.push(event);
 	},
 	subscribe: function (opt) {
 		var params;
@@ -125,6 +130,9 @@ export default {
 	componentWillUnmount: function () {
 		forEach(this.props.registeredTopic, function (i) {
 			i.unsubscribe();
+		});
+		forEach(this.props.registeredEvents, function (i) {
+			$('body').off(i);
 		});
 	},
 	scrollTop: function (ele) {

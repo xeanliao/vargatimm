@@ -5,6 +5,7 @@
 @import "util/_unit";
 
 @import "campaign-monitor";
+@import "map";
 
 html, body {
     font-family: 'Ubuntu', verdana, arial, sans-serif;
@@ -754,8 +755,4 @@ iframe {
     width: 100%;
     top: 0;
     bottom: 0;
-}
-
-.leaflet-map-container{
-    z-index: 0;
 }

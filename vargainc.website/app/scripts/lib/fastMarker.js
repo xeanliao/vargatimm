@@ -22,9 +22,11 @@ FastMarkerLayer.prototype.onAdd = function () {
 	var map = this.getMap(),
 		panes = this.getPanes(),
 		projection = this.getProjection(),
-		targetLayer = panes.overlayLayer;
+		targetLayer = panes.overlayLayer,
+		markerLayer = $('.fastMarkerLayer', targetLayer);
 	map.overlayMapTypes.insertAt(0, this);
-	if (projection && panes && targetLayer && $('.fastMarkerLayer', targetLayer).size() == 0) {
+
+	if (projection && panes && targetLayer && markerLayer && markerLayer.size && markerLayer.size() == 0) {
 		var center = projection.fromLatLngToDivPixel(map.getCenter());
 		this.width = center.x * 2;
 		this.height = center.y * 2;
@@ -59,7 +61,11 @@ FastMarkerLayer.prototype._draw = function () {
 			y: null
 		};
 	if (!layer || !projection) {
-		console.log('FastMarker not ready error.');
+		console.log('FastMarker not ready need redraw.');
+		var self = this;
+		window.setTimeout(function(){
+			self._draw.call(self)
+		}, 5000);
 		return;
 	}
 	layer.selectAll('*').remove();
