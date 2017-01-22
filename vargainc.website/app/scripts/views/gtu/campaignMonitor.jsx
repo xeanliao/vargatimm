@@ -319,7 +319,7 @@ var MapContainer = React.createBackboneClass({
 			setActiveButton = (
 				<div className="small-8 align-center columns">
 					<div className="button-group" style={{marginTop: "20px"}}>
-						<button id={task.get('Id')} className="button btnSetActiveTask">Switch</button>
+						<button id={task.get('Id')} className="button btnSetActiveTask">GO</button>
 					</div>
 				</div>
 			);
@@ -1157,10 +1157,14 @@ export default React.createBackboneClass({
 						<div className="section-header">
 							<div className="row">
 								<div className="small-10 column">
-									<blockquote>
-										<h5>{model.getDisplayName()}</h5>
-										<cite>{this.state.activeTask ? this.state.activeTask.get('Name') : 'NO ACTIVE TASK'}</cite>
-									</blockquote>
+									<nav aria-label="You are here:" role="navigation">
+									  	<ul className="breadcrumbs">
+									    	<li>{model.getDisplayName()}</li>
+									    	<li>
+									      		<span className="show-for-sr">Current: </span> {this.state.activeTask ? this.state.activeTask.get('Name') : null}
+									    	</li>
+									  	</ul>
+									</nav>
 								</div>
 								<div className="small-2 column">
 									{this.renderTaskDropdown()}
