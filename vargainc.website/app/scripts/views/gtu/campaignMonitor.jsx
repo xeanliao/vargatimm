@@ -1032,7 +1032,7 @@ export default React.createBackboneClass({
 					&nbsp;&nbsp;<span>{gtu.get('ShortUniqueID')}</span>&nbsp;&nbsp;
 					{alertIcon}
 				</button>
-				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))}>
+				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
 					<i className="location fa fa-crosshairs" style={{color:'black', 'backgroundColor': gtu.get('UserColor')}}></i>
 				</button>
 			</span>
@@ -1120,12 +1120,6 @@ export default React.createBackboneClass({
 							<a href="javascript:;" onClick={this.onEdit.bind(this, taskId)}>
 								<i className="fa fa-edit"></i>
 								&nbsp;<span>Edit</span>
-							</a>
-						</li>
-						<li>
-							<a id={taskId} href="javascript:;" onClick={this.onOpenUploadFile.bind(null, taskId)}>
-								<i className="fa fa-cloud-upload"></i>
-								&nbsp;<span>Import</span>
 							</a>
 						</li>
 						<li>
