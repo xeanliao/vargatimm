@@ -174,39 +174,6 @@ export default React.createBackboneClass({
 						</div>
 					</div>
 				</div>
-				
-				<div className="small-12 columns">
-					<table className="hover">
-						<colgroup>
-							<col />
-							<col style={{'width': "160px"}} />
-						</colgroup>
-						<tbody>
-						{model.get('Tasks').map(function(task){
-							if (task.visiable === false) {
-								return null;
-							}
-							var campaignId = model.get('Id'),
-								taskName = task.Name;
-							return (
-								<tr key={task.Id}>
-									<td onClick={self.onGotoMonitor.bind(null, campaignId, taskName, task.Id)}>
-										{task.Name}
-									</td>
-									<td>
-										<div className="float-right tool-bar">
-											<button onClick={self.onFinished.bind(null, task.Id)} className="button">
-												<i className="fa fa-check"></i><small>Finish</small>
-											</button>
-											{self.renderMoreMenu(task.Id)}
-										</div>
-									</td>
-								</tr>
-							);
-						})}
-						</tbody>
-					</table>
-				</div>
 			</div>
 		);
 	}
