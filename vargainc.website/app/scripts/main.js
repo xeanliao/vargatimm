@@ -9,7 +9,7 @@ import {
 import AppRouter from 'route';
 import UserModel from 'models/user';
 import LayoutView from 'views/layout/main';
-
+import Promise from 'bluebird';
 
 /**
  * register loading event except ajax request is quite
@@ -52,21 +52,23 @@ Backbone.sync = function (method, model, options) {
 
 var appRouter = new AppRouter;
 var userModel = new UserModel();
-userModel.fetchCurrentUser()
-	.then(function () {
-		var LayoutViewInstance = React.createFactory(LayoutView);
-		var layoutViewInstance = LayoutViewInstance({
-			user: userModel
-		});
-		var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
-		var appRouter = new AppRouter;
-		appRouter.on('route', function () {
-			// Topic.publish({
-			// 	channel: 'View',
-			// 	topic: 'showLoading'
-			// });
-		});
-		Backbone.history.start();
-	}).catch(function () {
-		// window.location = '../login.html';
+userModel.fetchCurrentUser().then(function (isSuccess) {
+	if(!isSuccess){
+		window.location = '../login.html';
+		return Promise.reject();
+	}
+	var LayoutViewInstance = React.createFactory(LayoutView);
+	var layoutViewInstance = LayoutViewInstance({
+		user: userModel
 	});
+	var layout = ReactDOM.render(layoutViewInstance, document.getElementById('main-container'));
+	var appRouter = new AppRouter;
+	appRouter.on('route', function () {
+		// Topic.publish({
+		// 	channel: 'View',
+		// 	topic: 'showLoading'
+		// });
+	});
+	Backbone.history.start();
+	return Promise.resolve();
+});

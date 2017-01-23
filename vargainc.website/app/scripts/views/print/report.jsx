@@ -73,8 +73,12 @@ export default React.createBackboneClass({
 		var params = extend(opts, {
 			model: model
 		});
-		this.publish('showDialog', OptionsView, params, {
-			size: 'large'
+		this.publish('showDialog', {
+			view: OptionsView,
+			params: params,
+			options: {
+				size: 'large'
+			}
 		});
 	},
 	onApplyOptions: function (options) {
@@ -91,7 +95,7 @@ export default React.createBackboneClass({
 			oldOptions = pick(this.state.options.attributes, compareProperty),
 			newOptions = pick(options.attributes, compareProperty);
 		if (!eq(oldOptions, newOptions)) {
-			forEach(this.refs, function (page) {
+			each(this.refs, function (page) {
 				page.setState({
 					imageLoaded: null
 				});
@@ -113,7 +117,7 @@ export default React.createBackboneClass({
 				options: []
 			},
 			self = this;
-		forEach(collecton.models, function (page) {
+		each(collecton.models, function (page) {
 			if (self.refs[page.get('key')]) {
 				postData.options.push(self.refs[page.get('key')].getExportParamters());
 			}

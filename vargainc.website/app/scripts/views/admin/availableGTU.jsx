@@ -5,7 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import {
 	sortBy,
 	concat,
-	forEach,
+	each,
 	map
 } from 'lodash';
 import $ from 'jquery';
@@ -116,7 +116,7 @@ export default React.createBackboneClass({
 	componentWillUnmount: function () {
 		try {
 			this.clearMap();
-			forEach(gtuLocation, function (item) {
+			each(gtuLocation, function (item) {
 				item.setMap(null);
 			});
 			google.maps.event.clearInstanceListeners(googleMap);
@@ -149,7 +149,7 @@ export default React.createBackboneClass({
 			self = this;
 
 
-		forEach(gtu.models, i => {
+		each(gtu.models, i => {
 			if (i.get('HaveLocation')) {
 				var latlng = new google.maps.LatLng(i.get('Latitude'), i.get('Longitude'));
 				bounds.extend(latlng);

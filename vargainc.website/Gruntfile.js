@@ -74,7 +74,7 @@ module.exports = function (grunt) {
 					pathinfo: false,
 				},
 				externals: {
-					jquery: "jQuery",
+					'jquery': 'jQuery',
 					'js-marker-clusterer': 'MarkerClusterer'
 				},
 				resolve: {

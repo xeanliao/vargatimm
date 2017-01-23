@@ -71,8 +71,12 @@ export default React.createBackboneClass({
 		var params = extend(opts, {
 			model: model
 		});
-		this.publish('showDialog', OptionsView, params, {
-			size: 'large'
+		this.publish('showDialog', {
+			view: OptionsView,
+			params: params,
+			options: {
+				size: 'large'
+			}
 		});
 	},
 	onApplyOptions: function (options) {

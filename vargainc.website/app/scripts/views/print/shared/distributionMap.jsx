@@ -136,14 +136,19 @@ export default React.createBackboneClass({
 				key = 'distribution-' + model.get('DMapId');
 			self.unsubscribe('print.mapzoom@' + key);
 			self.subscribe('print.mapzoom@' + key, $.proxy(self.onCreateDetailMap, self));
-			self.publish('showDialog', MapZoomView, {
-				sourceKey: key,
-				boundary: model.get('Boundary'),
-				color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
-			}, {
-				size: 'full',
-				customClass: 'google-map-pop'
+			self.publish('showDialog', {
+				view: MapZoomView,
+				params: {
+					sourceKey: key,
+					boundary: model.get('Boundary'),
+					color: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')'
+				},
+				options: {
+					size: 'full',
+					customClass: 'google-map-pop'
+				}
 			});
+
 		});
 	},
 	getExportParamters: function () {

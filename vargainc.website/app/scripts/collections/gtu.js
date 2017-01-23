@@ -3,7 +3,7 @@ import Model from 'models/gtu';
 import Promise from 'bluebird';
 import {
     extend,
-    forEach
+    each
 } from 'lodash';
 
 export default Backbone.Collection.extend({
@@ -33,7 +33,7 @@ export default Backbone.Collection.extend({
                 method: 'GET',
                 success: (result) => {
                     if (result) {
-                        forEach(result, (item) => {
+                        each(result, (item) => {
                             var gtu = collection.get(item.Id);
                             if (gtu) {
                                 var location = null;

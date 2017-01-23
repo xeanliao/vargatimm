@@ -25,14 +25,15 @@ export default Backbone.Model.extend({
             };
         extend(options, opts);
 
-        return (this.sync || Backbone.sync).call(this, 'read', this, options)
-            .then((result) => {
+        return (this.sync || Backbone.sync).call(this, 'read', this, options).then((result) => {
+            return new Promise((resolve, reject) => {
                 if (result && result.success) {
                     model.set(result.data);
-                    return Promise.resolve();
+                    return resolve(true);
                 }
-                return Promise.reject();
+                return resolve(false);
             });
+        });
     },
     addEmployee: function (file, opts) {
         var model = this,

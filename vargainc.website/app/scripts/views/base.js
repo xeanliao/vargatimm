@@ -5,7 +5,7 @@ import Promise from 'bluebird';
 import {
 	assign,
 	unset,
-	forEach,
+	each,
 	isString,
 	isFunction,
 	isObject
@@ -128,10 +128,10 @@ export default {
 		}, opt));
 	},
 	componentWillUnmount: function () {
-		forEach(this.props.registeredTopic, function (i) {
+		each(this.props.registeredTopic, function (i) {
 			i.unsubscribe();
 		});
-		forEach(this.props.registeredEvents, function (i) {
+		each(this.props.registeredEvents, function (i) {
 			$('body').off(i);
 		});
 	},

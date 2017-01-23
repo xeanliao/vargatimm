@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Promise from 'bluebird';
 import {
     extend,
-    forEach
+    each
 } from 'lodash';
 import BaseModel from 'models/print/base';
 import FooterModel from 'models/print/footer';
@@ -78,7 +78,7 @@ export default Backbone.Collection.extend({
                         Footer: footerModel
                     }));
 
-                    forEach(result.SubMaps, (submap) => {
+                    each(result.SubMaps, (submap) => {
                         collection.submaps.push({
                             Name: submap.Name,
                             OrderId: submap.OrderId,
@@ -122,8 +122,8 @@ export default Backbone.Collection.extend({
                     collection.campaignId = campaignId;
                     collection.dmaps = [];
                     var displayName = result.DisplayName;
-                    forEach(result.SubMaps, function (submap) {
-                        forEach(submap.DMaps, function (dmap) {
+                    each(result.SubMaps, function (submap) {
+                        each(submap.DMaps, function (dmap) {
                             collection.dmaps.push({
                                 Selected: false,
                                 Id: dmap.Id,
@@ -199,7 +199,7 @@ export default Backbone.Collection.extend({
                         Footer: footerModel
                     }));
 
-                    forEach(result.SubMaps, function (submap) {
+                    each(result.SubMaps, function (submap) {
                         collection.submaps.push({
                             Name: submap.Name,
                             OrderId: submap.OrderId,
@@ -230,8 +230,8 @@ export default Backbone.Collection.extend({
                         }));
                     });
 
-                    forEach(result.SubMaps, function (submap) {
-                        forEach(submap.DMaps, function (dmap) {
+                    each(result.SubMaps, function (submap) {
+                        each(submap.DMaps, function (dmap) {
                             collection.dmaps.push({
                                 Selected: false,
                                 Id: dmap.Id,

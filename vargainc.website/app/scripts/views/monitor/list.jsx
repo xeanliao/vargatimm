@@ -2,14 +2,15 @@ import Backbone from 'backbone';
 import React from 'react';
 import 'react.backbone';
 import {
-	forEach,
+	each,
 	uniq,
 	orderBy,
 	filter,
 	values,
 	some,
 	toString,
-	indexOf
+	indexOf,
+	map
 } from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
@@ -64,7 +65,7 @@ export default React.createBackboneClass({
 		e.stopPropagation();
 
 		var els = $(":checked", e.currentTarget),
-			values = _.map(els, function (item) {
+			values = map(els, function (item) {
 				return $(item).val();
 			});
 
@@ -113,7 +114,7 @@ export default React.createBackboneClass({
 			);
 		}
 		if (dataSource) {
-			var fieldValues = _.map(dataSource, function (i) {
+			var fieldValues = map(dataSource, function (i) {
 				var fieldValue = i.get(field);
 				var dateCheck = moment(fieldValue, moment.ISO_8601);
 				if (dateCheck.isValid()) {
@@ -121,7 +122,7 @@ export default React.createBackboneClass({
 				}
 				return fieldValue;
 			});
-			var menuItems = _.uniq(fieldValues).sort();
+			var menuItems = uniq(fieldValues).sort();
 			filterMenu = (
 				<div id={"monitor-filter-ddl-" + field} 
 					className="dropdown-pane bottom" 
@@ -159,7 +160,7 @@ export default React.createBackboneClass({
 		var dataSource = this.getCollection();
 		dataSource = dataSource ? dataSource.toArray() : [];
 		if (this.state.orderByFiled) {
-			dataSource = _.orderBy(dataSource, ['attributes.' + this.state.orderByFiled], [this.state.orderByAsc ? 'asc' : 'desc']);
+			dataSource = orderBy(dataSource, ['attributes.' + this.state.orderByFiled], [this.state.orderByAsc ? 'asc' : 'desc']);
 		}
 		if (this.state.search) {
 			var keyword = this.state.search.toLowerCase(),
@@ -167,14 +168,14 @@ export default React.createBackboneClass({
 				campaignSearch = null,
 				taskValues = null,
 				taskSearch = null;
-			dataSource = _.filter(dataSource, function (i) {
-				campaignValues = _.values(i.attributes);
-				campaignSearch = _.some(campaignValues, function (i) {
+			dataSource = filter(dataSource, function (i) {
+				campaignValues = values(i.attributes);
+				campaignSearch = some(campaignValues, function (i) {
 					var dateCheck = moment(i, moment.ISO_8601);
 					if (dateCheck.isValid()) {
 						return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;
 					}
-					return _.toString(i).toLowerCase().indexOf(keyword) > -1;
+					return toString(i).toLowerCase().indexOf(keyword) > -1;
 				});
 				/**
 				 * update task visiable logical.
@@ -182,24 +183,24 @@ export default React.createBackboneClass({
 				 * otherwise only show task name in search word.
 				 * if there is no task need show hide this campaign.
 				 */
-				taskValues = _.values(i.attributes.Tasks);
-				_.forEach(taskValues, function (i) {
+				taskValues = values(i.attributes.Tasks);
+				each(taskValues, function (i) {
 					i.visiable = campaignSearch || i.Name.toLowerCase().indexOf(keyword) > -1;
 				});
-				return campaignSearch || _.some(taskValues, {
+				return campaignSearch || some(taskValues, {
 					visiable: true
 				});
 			});
 		} else if (this.state.filterField && this.state.filterValues) {
 			var filterField = this.state.filterField,
 				filterValues = this.state.filterValues;
-			dataSource = _.filter(dataSource, function (i) {
+			dataSource = filter(dataSource, function (i) {
 				var fieldValue = i.get(filterField);
 				var dateCheck = moment(fieldValue, moment.ISO_8601);
 				if (dateCheck.isValid()) {
-					return _.indexOf(filterValues, dateCheck.format("MMM DD, YYYY")) > -1;
+					return indexOf(filterValues, dateCheck.format("MMM DD, YYYY")) > -1;
 				}
-				return _.indexOf(filterValues, fieldValue) > -1;
+				return indexOf(filterValues, fieldValue) > -1;
 			});
 		}
 		return dataSource;

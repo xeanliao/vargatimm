@@ -2,6 +2,10 @@ import Backbone from 'backbone';
 import React from 'react';
 import 'react.backbone';
 
+import {
+	each
+} from 'lodash';
+
 import BaseView from 'views/base';
 
 export default React.createBackboneClass({
@@ -9,7 +13,7 @@ export default React.createBackboneClass({
 	onSelectAll: function (e) {
 		var collection = this.getCollection(),
 			value = e.currentTarget.checked;
-		collection.forEach(function (item) {
+		each(collection, function (item) {
 			item.set('Selected', value);
 		});
 		this.forceUpdate();

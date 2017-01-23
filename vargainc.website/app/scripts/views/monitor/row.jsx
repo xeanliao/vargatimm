@@ -111,7 +111,12 @@ export default React.createBackboneClass({
 			self = this;
 
 		model.fetch().then(function () {
-			self.publish('showDialog', EditView, model);
+			self.publish('showDialog', {
+				view: EditView,
+				params: {
+					model: model,
+				}
+			});
 		});
 	},
 	onGotoMonitor: function (campaignId, taskName, taskId) {
@@ -145,7 +150,7 @@ export default React.createBackboneClass({
 			</span>
 		);
 	},
-	onCompanyMonitor: function(campaignId){
+	onCompanyMonitor: function (campaignId) {
 		window.open(`./#campaign/${campaignId}/monitor`);
 	},
 	render: function () {
