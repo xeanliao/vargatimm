@@ -56,16 +56,39 @@ var MapContainer = React.createBackboneClass({
 	},
 	onInit: function (mapContainer) {
 		var self = this;
+		var googleMap = new L.googleTile({
+			mapTypeId: google.maps.MapTypeId.HYBRID
+		});
+
 		var monitorMap = L.map(mapContainer, {
 			center: {
-				lat: 41.850033,
-				lng: -87.6500523
+				lat: 40.744556,
+				lng: -73.987378
 			},
-			zoom: 13,
+			zoom: 18,
+			zoomAnimation: false,
+			fadeAnimation: false,
+			markerZoomAnimation: false,
+			zoomControl: false,
 			preferCanvas: false,
 			animate: false,
 			scrollWheelZoom: false,
+			layers: [roadMap, hybridMap]
 		});
+
+		L.control.zoom({
+			position: 'topright'
+		}).addTo(monitorMap);
+
+		var baseMaps = {
+			"ROADMAP": function(){
+				console.log('roadmap')
+			},
+			"HYBRID": function(){
+				console.log('hybrid');
+			}
+		};
+		L.control.layers(baseMaps).addTo(monitorMap);
 
 		/**
 		 * prepare track pane
@@ -272,9 +295,6 @@ var MapContainer = React.createBackboneClass({
 			self.setState({
 				taskBoundaryLayerGroup: taskBoundaryLayerGroup
 			}, () => {
-				new L.googleTile({
-					mapTypeId: google.maps.MapTypeId.HYBRID
-				}).addTo(monitorMap);
 				self.publish('hideLoading');
 			})
 		});
@@ -512,7 +532,6 @@ var MapContainer = React.createBackboneClass({
 			}),
 			gtuLocationLayer = this.state.gtuLocationLayer;
 		if (!gtuLocationLayer) {
-			// gtuLocationLayer.remove();
 			gtuLocationLayer = L.layerGroup();
 		}
 
@@ -536,36 +555,18 @@ var MapContainer = React.createBackboneClass({
 			let locationMarker = L.markerGroup();
 			let gtuLocationPoint = L.triangleMarker(latlng, {
 				gtuId: gtu.get('Id'),
-				radius: 5,
+				className: 'gtu-last-location',
+				radius: 2,
 				fillColor: gtu.get('UserColor'),
-				fillOpacity: 0.75,
+				fillOpacity: 1,
 				fill: true,
-				stroke: false,
+				stroke: true,
 				numberOfSides: 50,
 				pane: 'GtuMarkerPane',
-				gradient: true,
+				gradient: false,
+				// imageCircleUrl: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath d="M1120 608q0 -12 -10 -24l-319 -319q-11 -9 -23 -9t-23 9l-320 320q-15 16 -7 35q8 20 30 20h192v352q0 14 9 23t23 9h192q14 0 23 -9t9 -23v-352h192q14 0 23 -9t9 -23zM768 1184q-148 0 -273 -73t-198 -198t-73 -273t73 -273t198 -198t273 -73t273 73t198 198t73 273 t-73 273t-198 198t-273 73zM1536 640q0 -209 -103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5t103 -385.5z"/%3E%3C/svg%3E'
 			}).addTo(locationMarker);
 
-			var gtuLocationMarker = L.triangleMarker(latlng, {
-				gtuId: gtu.get('Id'),
-				radius: 20,
-				fillColor: gtu.get('UserColor'),
-				fillOpacity: 0.2,
-				fill: true,
-				stroke: false,
-				numberOfSides: 50,
-				pane: 'GtuMarkerPane',
-				gradient: false
-			}).addTo(locationMarker);
-			L.AnimationUtils.animate(gtuLocationMarker, {
-				duration: 0,
-				easing: L.AnimationUtils.easingFunctions.easeIn,
-				from: gtuLocationMarker.options,
-				to: L.extend({}, gtuLocationMarker.options, {
-					fillOpacity: '0',
-					radius: 20,
-				})
-			});
 			locationMarker.gtuId = gtuId;
 			locationMarker.latlng = latlng;
 			locationMarker.addTo(gtuLocationLayer);

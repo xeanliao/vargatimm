@@ -1,5 +1,5 @@
 import L from 'leaflet';
-
+var initGoogleMap = false;
 L.GoogleTile = L.Layer.extend({
 
 	// @section
@@ -7,6 +7,7 @@ L.GoogleTile = L.Layer.extend({
 	options: {
 		pane: 'tilePane',
 		interactive: false,
+		mapType: 'ROADMAP'
 	},
 
 	initialize: function (options) {
@@ -15,6 +16,8 @@ L.GoogleTile = L.Layer.extend({
 	onAdd: function () {
 		if (!this._googleMap) {
 			this._initMap();
+		} else if (this.options.mapType) {
+			this._googleMap.setMapTypeId(this.options.mapType);
 		}
 
 		this.getPane().appendChild(this._container);
@@ -54,12 +57,16 @@ L.GoogleTile = L.Layer.extend({
 		};
 	},
 	_initMap: function () {
+		if (initGoogleMap) {
+			return;
+		}
+		initGoogleMap = true;
 		if (!this._container) {
 			var container = this._container = L.DomUtil.create('div', 'leaflet-google-layer ');
 		} else {
 			var container = this._container;
 		}
-
+		let googleMapType = this.options.mapType ? this.options.mapType : google.maps.MapTypeId.ROADMAP;
 		this._googleMap = new google.maps.Map(container, {
 			disableDefaultUI: true,
 			disableDoubleClickZoom: true,
@@ -68,14 +75,19 @@ L.GoogleTile = L.Layer.extend({
 			scrollwheel: false,
 			animatedZoom: false,
 			animated: false,
-			animate: false
+			animate: false,
+			mapTypeId: googleMapType
 		});
+		window.setTimeout(function () {
+			initGoogleMap = false;
+		}, 3 * 1000);
+
 	},
 	_resize: function () {
 		const zoomSize = 1.2;
 		let size = this._map.getSize(),
 			container = this._container;
-		container.style.position = 'absolute';	
+		container.style.position = 'absolute';
 		container.style.width = `${size.x * zoomSize}px`;
 		container.style.height = `${size.y * zoomSize}px`;
 		container.style.left = `-${size.x * ((zoomSize - 1) / 2)}px`;

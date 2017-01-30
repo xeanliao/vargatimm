@@ -14826,36 +14826,17 @@ webpackJsonp([1],[
 				var locationMarker = _leaflet2.default.markerGroup();
 				var gtuLocationPoint = _leaflet2.default.triangleMarker(latlng, {
 					gtuId: gtu.get('Id'),
-					radius: 5,
+					className: 'gtu-last-location',
+					radius: 2,
 					fillColor: gtu.get('UserColor'),
-					fillOpacity: 0.75,
+					fillOpacity: 1,
 					fill: true,
-					stroke: false,
-					numberOfSides: 50,
-					pane: 'GtuMarkerPane',
-					gradient: true
-				}).addTo(locationMarker);
-
-				var gtuLocationMarker = _leaflet2.default.triangleMarker(latlng, {
-					gtuId: gtu.get('Id'),
-					radius: 20,
-					fillColor: gtu.get('UserColor'),
-					fillOpacity: 0.2,
-					fill: true,
-					stroke: false,
+					stroke: true,
 					numberOfSides: 50,
 					pane: 'GtuMarkerPane',
 					gradient: false
 				}).addTo(locationMarker);
-				_leaflet2.default.AnimationUtils.animate(gtuLocationMarker, {
-					duration: 0,
-					easing: _leaflet2.default.AnimationUtils.easingFunctions.easeIn,
-					from: gtuLocationMarker.options,
-					to: _leaflet2.default.extend({}, gtuLocationMarker.options, {
-						fillOpacity: '0',
-						radius: 20
-					})
-				});
+
 				locationMarker.gtuId = gtuId;
 				locationMarker.latlng = latlng;
 				locationMarker.addTo(gtuLocationLayer);
