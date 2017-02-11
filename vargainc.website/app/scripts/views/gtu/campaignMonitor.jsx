@@ -3,10 +3,8 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import 'react.backbone';
 import Promise from 'bluebird';
+// import 'mapbox-gl';
 import L from 'leaflet';
-import 'leaflet-dvf';
-import 'lib/leaflet-google';
-import 'lib/animateSVGLayer';
 import $ from 'jquery';
 import classNames from 'classnames';
 import {
@@ -51,58 +49,34 @@ var MapContainer = React.createBackboneClass({
 			gtuLocationLayer: null,
 			displayGtus: [],
 			showOutOfBoundaryGtu: false,
-			drawMode: 'marker'
+			drawMode: 'marker',
+			taskBounds: {}
 		}
 	},
 	onInit: function (mapContainer) {
 		var self = this;
-		var googleMap = new L.googleTile({
-			mapTypeId: google.maps.MapTypeId.HYBRID
+		mapboxgl.accessToken = 'pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA';
+		var monitorMap = new mapboxgl.Map({
+			container: mapContainer,
+			// style: 'mapbox://styles/mapbox/light-v9',
+			style: 'mapbox://styles/mapbox/dark-v9',
+			// style: 'mapbox://styles/mapbox/streets-v9',
+			zoom: 8,
+			center: [-73.987378, 40.744556]
 		});
+		monitorMap.on('load', function () {
+			var nav = new mapboxgl.NavigationControl();
+			monitorMap.addControl(nav, 'top-right');
 
-		var monitorMap = L.map(mapContainer, {
-			center: {
-				lat: 40.744556,
-				lng: -73.987378
-			},
-			zoom: 18,
-			zoomAnimation: false,
-			fadeAnimation: false,
-			markerZoomAnimation: false,
-			zoomControl: false,
-			preferCanvas: false,
-			animate: false,
-			scrollWheelZoom: false,
-			layers: [roadMap, hybridMap]
-		});
+			self.setState({
+				map: monitorMap,
+				mapContainer: mapContainer
+			}, () => {
+				self.drawBoundary(monitorMap);
+				self.registerTopic(monitorMap);
+				// $(window).trigger('resize');
+			});
 
-		L.control.zoom({
-			position: 'topright'
-		}).addTo(monitorMap);
-
-		var baseMaps = {
-			"ROADMAP": function(){
-				console.log('roadmap')
-			},
-			"HYBRID": function(){
-				console.log('hybrid');
-			}
-		};
-		L.control.layers(baseMaps).addTo(monitorMap);
-
-		/**
-		 * prepare track pane
-		 */
-		monitorMap.createPane('GtuTrackPane', monitorMap.getPane('overlayPane'));
-		monitorMap.createPane('GtuMarkerPane', monitorMap.getPane('markerPane'));
-
-		this.setState({
-			map: monitorMap,
-			mapContainer: mapContainer
-		}, () => {
-			self.drawBoundary(monitorMap);
-			self.registerTopic(monitorMap);
-			$(window).trigger('resize');
 		});
 	},
 	registerTopic: function (monitorMap) {
@@ -193,25 +167,42 @@ var MapContainer = React.createBackboneClass({
 			}),
 			promiseSubmapArray = [],
 			promiseTaskArray = [],
-			taskBoundaryLayerGroup = L.layerGroup(),
-			boundaryBounds = L.latLngBounds();
+			boundaryBounds = new mapboxgl.LngLatBounds();
 
 		each(submapTasks, (groupTasks, submapId) => {
 			promiseSubmapArray.push($.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`));
 		});
 		return Promise.all(promiseSubmapArray).then(data => {
 			console.timeEnd();
+			var index = 0;
 			return Promise.each(data, result => {
 				let latlngs = map(result.boundary, i => {
-					boundaryBounds.extend(i);
-					return [i.lat, i.lng];
+					boundaryBounds.extend([i.lng, i.lat]);
+					return [i.lng, i.lat];
 				});
-				L.polyline(latlngs, {
-					color: `rgb(${result.color.r}, ${result.color.g}, ${result.color.b})`,
-					weight: 3,
-					noClip: true,
-					dropShadow: true
-				}).addTo(monitorMap);
+				monitorMap.addLayer({
+					id: `submap-${index}`,
+					type: 'line',
+					source: {
+						type: 'geojson',
+						data: {
+							type: 'Feature',
+							geometry: {
+								type: 'LineString',
+								coordinates: latlngs
+							}
+						}
+					},
+					layout: {
+						'line-join': "round",
+						'line-cap': "round"
+					},
+					paint: {
+						'line-color': `rgb(${result.color.r}, ${result.color.g}, ${result.color.b})`,
+						'line-width': 2
+					}
+				});
+				index++;
 				return Promise.resolve();
 			});
 		}).then(() => {
@@ -228,7 +219,6 @@ var MapContainer = React.createBackboneClass({
 					}));
 				});
 			});
-
 			return Promise.all(promiseTaskArray);
 		}).then(response => {
 			console.timeEnd();
@@ -237,96 +227,69 @@ var MapContainer = React.createBackboneClass({
 				let result = data.result;
 				let latlngArray = []; //for draw map polygon
 				let coordinateList = []; //for use jsts get polygon center
+				let taskBounds = new mapboxgl.LngLatBounds();
 				each(result.boundary, i => {
-					latlngArray.push([i.lat, i.lng]);
+					latlngArray.push([i.lng, i.lat]);
+					taskBounds.extend([i.lng, i.lat]);
 					coordinateList.push(new geom.Coordinate(i.lng, i.lat));
 				});
-				let factory = new geom.GeometryFactory();
-				let boundaryLineRing = factory.createLinearRing(coordinateList);
-				let polygon = factory.createPolygon(boundaryLineRing);
-				var center = polygon.getCentroid();
 				let color = `rgb(${result.color.r}, ${result.color.g}, ${result.color.b})`;
-				let opt = {
-					taskId: task.get('Id'),
-					center: {
-						lat: center.getY(),
-						lng: center.getX()
-					},
-					text: {
-						text: `${task.get('Name')}`
-					},
-					weight: 1,
-					color: color,
-					opacity: 0.75,
-					fill: true,
-					fillColor: !task.get('IsFinished') ? color : '#000',
-					fillOpacity: !task.get('IsFinished') ? 0.1 : 0.75,
-					noClip: true,
-					clickable: !task.get('IsFinished'),
-					dropShadow: !task.get('IsFinished'),
-					fillPattern: !task.get('IsFinished') ? null : {
-						url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
-						pattern: {
-							width: '8px',
-							height: '8px',
-							patternUnits: 'userSpaceOnUse',
-							patternContentUnits: 'Default'
-						},
-						image: {
-							width: '8px',
-							height: '8px'
+				let taskLayer = monitorMap.addLayer({
+					id: `task-${task.get('Id')}`,
+					'type': 'fill',
+					'source': {
+						'type': 'geojson',
+						'data': {
+							'type': 'Feature',
+							'geometry': {
+								'type': 'Polygon',
+								'coordinates': [latlngArray]
+							}
 						}
-					}
-				};
-				var boundary = L.polyline(latlngArray, opt)
-					.on('click', self.onTaskAreaClickHandler, self);
-				boundary.getCenter = function () {
-					return {
-						lat: center.getY(),
-						lng: center.getX()
-					};
-				};
-				taskBoundaryLayerGroup.addLayer(boundary);
+					},
+					'layout': {},
+					'paint': {
+						'fill-color': !task.get('IsFinished') ? color : '#fff',
+						'fill-opacity': !task.get('IsFinished') ? 0.25 : 0.75,
+					},
+				});
+				self.state.taskBounds[task.get('Id')] = taskBounds.toArray();
 				return Promise.resolve();
 			});
 		}).then(() => {
-			taskBoundaryLayerGroup.addTo(monitorMap);
-			monitorMap.fitBounds(boundaryBounds);
-			self.setState({
-				taskBoundaryLayerGroup: taskBoundaryLayerGroup
-			}, () => {
-				self.publish('hideLoading');
-			})
+			var debug = boundaryBounds.toArray();
+			monitorMap.fitBounds(debug);
+			self.publish('hideLoading');
 		});
 	},
 	redrawBoundary: function (taskId) {
-		var self = this;
-		this.state.taskBoundaryLayerGroup.eachLayer(layer => {
-			if (layer.options.taskId == taskId) {
-				extend(layer.options, {
-					fillColor: '#000',
-					fillOpacity: 0.75,
-					clickable: false,
-					dropShadow: false,
-					fillPattern: {
-						url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
-						pattern: {
-							width: '8px',
-							height: '8px',
-							patternUnits: 'userSpaceOnUse',
-							patternContentUnits: 'Default'
-						},
-						image: {
-							width: '8px',
-							height: '8px'
-						}
-					}
-				});
-				layer.remove();
-				layer.addTo(self.state.taskBoundaryLayerGroup);
-				return false;
-			}
-		});
+		// var self = this;
+		// this.state.taskBoundaryLayerGroup.eachLayer(layer => {
+		// 	if (layer.options.taskId == taskId) {
+		// 		extend(layer.options, {
+		// 			fillColor: '#000',
+		// 			fillOpacity: 0.75,
+		// 			clickable: false,
+		// 			dropShadow: false,
+		// 			fillPattern: {
+		// 				url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
+		// 				pattern: {
+		// 					width: '8px',
+		// 					height: '8px',
+		// 					patternUnits: 'userSpaceOnUse',
+		// 					patternContentUnits: 'Default'
+		// 				},
+		// 				image: {
+		// 					width: '8px',
+		// 					height: '8px'
+		// 				}
+		// 			}
+		// 		});
+		// 		layer.remove();
+		// 		layer.addTo(self.state.taskBoundaryLayerGroup);
+		// 		return false;
+		// 	}
+		// });
 	},
 	buildTaskPopup: function (task) {
 		var self = this;
@@ -429,8 +392,8 @@ var MapContainer = React.createBackboneClass({
 		}
 		var gtus = task.get('dmap').get('Gtu');
 		this.drawGtuMarker(gtus);
-		this.drawGtuTrack(gtus);
-		this.drawGtuLocation();
+		// this.drawGtuTrack(gtus);
+		// this.drawGtuLocation();
 	},
 	updateGtu: function () {
 		// setLatLngs
@@ -441,72 +404,49 @@ var MapContainer = React.createBackboneClass({
 		if (!monitorMap) {
 			return;
 		}
-		if (this.state.drawMode.indexOf('marker') == -1) {
-			//hide all marker
-			$('.leaflet-GtuMarker-pane').hide();
-			return;
-		}
-		$('.leaflet-GtuMarker-pane').show();
+		// if (this.state.drawMode.indexOf('marker') == -1) {
+		// 	//hide all marker
+		// 	$('.leaflet-GtuMarker-pane').hide();
+		// 	return;
+		// }
+		// $('.leaflet-GtuMarker-pane').show();
+		var taskId = this.state.task.get('Id');
 		each(gtus, data => {
 			let gtuId = data.points[0].Id;
-			var markerLayer = this.state.gtuMarkerLayer[gtuId];
+			let markerLayer = monitorMap.getLayer(`gut-marker-${taskId}-${gtuId}`);
 			if (indexOf(this.state.displayGtus, gtuId) == -1 && markerLayer) {
-				markerLayer.remove();
+				monitorMap.setLayoutProperty(markerLayer, 'visibility', 'none');
 				return true;
-			}
-			if (markerLayer) {
-				markerLayer.remove();
-			}
-			markerLayer = L.markerGroup();
-			each(data.points, latlng => {
-				if (!latlng.lat || !latlng.lng || !self.state.showOutOfBoundaryGtu && latlng.out) {
-					return true;
-				}
-				L.triangleMarker(latlng, {
-					gtuId: gtuId,
-					weight: 0.1,
-					opacity: 0.65,
-					fillColor: data.color,
-					fillOpacity: 0.65,
-					fill: true,
-					stroke: true,
-					numberOfSides: 50,
-					stroke: false,
-					dropShadow: true,
-					rotation: 0,
-					radius: 5,
-					clickable: false,
-					noClip: true,
-					showLegendTooltips: false,
-					pane: 'GtuMarkerPane',
-					gradient: function () {
-						return {
-							gradientType: 'radial',
-							stops: [{
-								offset: '0%',
-								style: {
-									color: data.color,
-									opacity: 0.65
-								}
-							}, {
-								offset: '30%',
-								style: {
-									color: data.color,
-									opacity: 0.3
-								}
-							}, {
-								offset: '100%',
-								style: {
-									color: data.color,
-									opacity: 0
-								}
-							}]
+			} else if (markerLayer == null) {
+				monitorMap.addLayer({
+					'id': `gut-marker-${taskId}-${gtuId}`,
+					'type': 'circle',
+					'source': {
+						'type': 'geojson',
+						'data': {
+							'type': 'Feature',
+							'geometry': {
+								'type': 'MultiPoint',
+								'coordinates': map(data.points, latlng => {
+									return [latlng.lng, latlng.lat]
+								})
+							}
 						}
 					},
-				}).addTo(markerLayer);
-			});
-			self.state.gtuMarkerLayer[gtuId] = markerLayer;
-			markerLayer.addTo(monitorMap);
+					'paint': {
+						// make circles larger as the user zooms from z12 to z22
+						'circle-radius': {
+							'base': 1.75,
+							'stops': [
+								[12, 2],
+								[22, 20]
+							]
+						},
+						// color circles by ethnicity, using data-driven styles
+						'circle-color': data.color
+					}
+				});
+			}
 		});
 	},
 	drawGtuTrack: function (gtus) {
@@ -588,12 +528,8 @@ var MapContainer = React.createBackboneClass({
 		if (!map) {
 			return;
 		}
-		this.state.taskBoundaryLayerGroup.eachLayer(layer => {
-			if (layer.options.taskId == taskId) {
-				var taskBounds = layer.getBounds()
-				map.fitBounds(taskBounds);
-			}
-		});
+		let bounds = this.state.taskBounds[taskId];
+		bounds && map.fitBounds(bounds);
 	},
 	clearTask: function () {
 		each(gtuMarkerLayer, layer => {
@@ -876,6 +812,7 @@ export default React.createBackboneClass({
 			tasks = model && model.get('Tasks') ? model.get('Tasks').models : [];
 
 		tasks = filter(tasks, t => {
+			return true;
 			return !t.get('IsFinished');
 		});
 		var parentClass = classNames({
