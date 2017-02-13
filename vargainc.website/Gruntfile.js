@@ -1,5 +1,13 @@
 'use strict';
 
+// Hack for Ubuntu on Windows: interface enumeration fails with EINVAL, so return empty.
+try {
+  require('os').networkInterfaces()
+} catch (e) {
+  require('os').networkInterfaces = () => ({})
+}
+
+
 module.exports = function (grunt) {
 	require('load-grunt-tasks')(grunt);
 	grunt.verbose.writeln('begin task...');
@@ -305,14 +313,6 @@ module.exports = function (grunt) {
 		},
 		'webpack-dev-server': {
 			options: {
-				proxy: {
-					'/api/**': {
-						target: 'http://timm.vargainc.com/',
-						pathRewrite: function (path, req) {
-							return path.replace('/api/', '/201610/api/');
-						}
-					},
-				},
 				webpack: {
 					cache: true,
 					entry: {

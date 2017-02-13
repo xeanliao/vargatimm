@@ -56,11 +56,12 @@ var MapContainer = React.createBackboneClass({
 	onInit: function (mapContainer) {
 		var self = this;
 		mapboxgl.accessToken = 'pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA';
+
 		var monitorMap = new mapboxgl.Map({
 			container: mapContainer,
 			// style: 'mapbox://styles/mapbox/light-v9',
-			style: 'mapbox://styles/mapbox/dark-v9',
-			// style: 'mapbox://styles/mapbox/streets-v9',
+			// style: 'mapbox://styles/mapbox/dark-v9',
+			style: 'mapbox://styles/mapbox/streets-v9',
 			zoom: 8,
 			center: [-73.987378, 40.744556]
 		});
@@ -539,9 +540,27 @@ var MapContainer = React.createBackboneClass({
 			gtuMarkerLayer: []
 		});
 	},
+	switchMapStyle: function(style){
+		var map = this.state.map;
+		if(!map){
+			return;
+		}
+		map.setStyle('mapbox://styles/mapbox/' + style + '-v9');
+	},
 	render: function () {
 		return (
-			<div className="leaflet-map-container" ref={this.onInit} style={{'minHeight': '640px'}}></div>
+			<div className="mapbox-wrapper">
+				<div className="mapbox-container" ref={this.onInit} style={{'minHeight': '640px'}}></div>
+				<div className='map-overlay topleft'>
+				    <div className='map-overlay-inner'>
+				        <ul>
+				        	<li>
+				        		<a className="btn btn-small" OnClick={switchMapStyle}></a>
+			        		</li>
+				        </ul>
+				    </div>
+				</div>
+			</div>
 		);
 	}
 });

@@ -1,25 +1,17 @@
-.leaflet-map-container {
+@import "util/_unit";
+
+.mapbox-wrapper {
     z-index: 0;
-}
-
-//svg animate
-@keyframes gtu-location-flash {
-    0% {
-        opacity: 1;
+    position: relative;
+    .mapbox-container{
+        z-index: -1;
     }
-
-    75% {
-        opacity: 0.25;
+    .map-overlay{
+        z-index: 1;
+        &.topleft{
+            position: absolute;
+            left: 10px;
+            top: 10px;
+        }
     }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-.gtu-last-location {
-    animation-duration: 3s;
-    animation-name: gtu-location-flash;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
 }
