@@ -2,11 +2,10 @@
 
 // Hack for Ubuntu on Windows: interface enumeration fails with EINVAL, so return empty.
 try {
-  require('os').networkInterfaces()
+	require('os').networkInterfaces()
 } catch (e) {
-  require('os').networkInterfaces = () => ({})
+	require('os').networkInterfaces = () => ({})
 }
-
 
 module.exports = function (grunt) {
 	require('load-grunt-tasks')(grunt);
@@ -14,6 +13,7 @@ module.exports = function (grunt) {
 	require('time-grunt')(grunt);
 	var lodash = require('lodash');
 	var webpack = require('webpack');
+	var path = require('path');
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		app: 'app',
@@ -339,6 +339,8 @@ module.exports = function (grunt) {
 						alias: {
 							'underscore': 'lodash',
 							'promise': 'bluebird',
+							'webworkify': 'webworkify-webpack',
+							'mapbox-gl': path.resolve('./node_modules/mapbox-gl/dist/mapbox-gl-dev.js')
 						},
 						extensions: ['', '.js', '.jsx'],
 						modulesDirectories: [
@@ -387,6 +389,19 @@ module.exports = function (grunt) {
 						}, {
 							test: /.(png|jpg|gif|svg)$/,
 							loader: 'url-loader'
+						}, {
+							test: /\.js$/,
+							include: path.resolve(__dirname, 'node_modules/webworkify/index.js'),
+							loader: 'worker'
+						}, {
+							test: /\.glsl$/,
+							loader: 'shader'
+						}, {
+							test: /\.json$/,
+							loader: 'json'
+						}, {
+							test: /mapbox-gl.+\.js$/,
+							loader: 'transform/cacheable?brfs'
 						}],
 						noParse: [
 							/localforage\/dist\/localforage.js/

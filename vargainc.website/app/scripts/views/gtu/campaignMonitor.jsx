@@ -2,9 +2,9 @@ import Backbone from 'backbone';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import 'react.backbone';
+import localStorage from 'localforage';
 import Promise from 'bluebird';
-// import 'mapbox-gl';
-import L from 'leaflet';
+import mapboxgl from 'mapbox-gl';
 import $ from 'jquery';
 import classNames from 'classnames';
 import {
@@ -18,7 +18,9 @@ import {
 	filter,
 	indexOf,
 	xor,
-	extend
+	extend,
+	startsWith,
+	keys
 } from 'lodash';
 
 import d3 from 'd3';
@@ -50,7 +52,9 @@ var MapContainer = React.createBackboneClass({
 			displayGtus: [],
 			showOutOfBoundaryGtu: false,
 			drawMode: 'marker',
-			taskBounds: {}
+			taskBounds: {},
+			mapCache: {},
+			animations: {}
 		}
 	},
 	onInit: function (mapContainer) {
@@ -59,9 +63,6 @@ var MapContainer = React.createBackboneClass({
 
 		var monitorMap = new mapboxgl.Map({
 			container: mapContainer,
-			// style: 'mapbox://styles/mapbox/light-v9',
-			// style: 'mapbox://styles/mapbox/dark-v9',
-			style: 'mapbox://styles/mapbox/streets-v9',
 			zoom: 8,
 			center: [-73.987378, 40.744556]
 		});
@@ -73,11 +74,11 @@ var MapContainer = React.createBackboneClass({
 				map: monitorMap,
 				mapContainer: mapContainer
 			}, () => {
-				self.drawBoundary(monitorMap);
+				self.loadBoundary().then(function () {
+					return self.drawBoundary();
+				});
 				self.registerTopic(monitorMap);
-				// $(window).trigger('resize');
 			});
-
 		});
 	},
 	registerTopic: function (monitorMap) {
@@ -156,8 +157,25 @@ var MapContainer = React.createBackboneClass({
 			self.publish("Map.Popup.SetActiveTask", taskId);
 			self.state.map.closePopup()
 		});
+
+		/**
+		 * animate
+		 */
+		this.gtuLocationAnimate = requestAnimationFrame(this.animate);
 	},
-	drawBoundary: function (monitorMap) {
+	animate: function (time) {
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			return;
+		}
+		time = parseInt(time);
+		each(this.state.animations, fn => {
+			fn.call(monitorMap, time);
+		});
+		requestAnimationFrame(this.animate);
+	},
+	loadBoundary: function () {
+		console.time("load boundary");
 		this.publish('showLoading');
 		var self = this,
 			model = this.getModel(),
@@ -166,131 +184,196 @@ var MapContainer = React.createBackboneClass({
 			submapTasks = groupBy(tasks.models, t => {
 				return t.get('SubMapId')
 			}),
-			promiseSubmapArray = [],
-			promiseTaskArray = [],
-			boundaryBounds = new mapboxgl.LngLatBounds();
-
-		each(submapTasks, (groupTasks, submapId) => {
-			promiseSubmapArray.push($.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`));
-		});
-		return Promise.all(promiseSubmapArray).then(data => {
-			console.timeEnd();
-			var index = 0;
-			return Promise.each(data, result => {
-				let latlngs = map(result.boundary, i => {
-					boundaryBounds.extend([i.lng, i.lat]);
-					return [i.lng, i.lat];
-				});
-				monitorMap.addLayer({
-					id: `submap-${index}`,
-					type: 'line',
-					source: {
-						type: 'geojson',
-						data: {
-							type: 'Feature',
-							geometry: {
-								type: 'LineString',
-								coordinates: latlngs
-							}
-						}
-					},
-					layout: {
-						'line-join': "round",
-						'line-cap': "round"
-					},
-					paint: {
-						'line-color': `rgb(${result.color.r}, ${result.color.g}, ${result.color.b})`,
-						'line-width': 2
-					}
-				});
-				index++;
-				return Promise.resolve();
-			});
-		}).then(() => {
-			each(submapTasks, groupTasks => {
-				each(groupTasks, task => {
-					promiseTaskArray.push(new Promise((resolve, reject) => {
-						let url = `../api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`;
-						$.getJSON(url).then(result => {
-							resolve({
-								task: task,
-								result: result
+			submaps = keys(submapTasks);
+		var loadSubmapBoundaryPromise = function () {
+			return Promise.each(submaps, submapId => {
+				return localStorage.getItem(`boundary-submap-${submapId}`).then(result => {
+					if (result) {
+						return Promise.resolve();
+					} else {
+						return $.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`).then(response => {
+							return localStorage.setItem(`boundary-submap-${submapId}`, {
+								type: 'Feature',
+								properties: {
+									userColor: `rgb(${response.color.r}, ${response.color.g}, ${response.color.b})`
+								},
+								geometry: {
+									type: 'LineString',
+									coordinates: map(response.boundary, i => {
+										return [i.lng, i.lat]
+									})
+								}
 							});
 						});
-					}));
+					}
 				});
 			});
-			return Promise.all(promiseTaskArray);
-		}).then(response => {
-			console.timeEnd();
-			return Promise.each(response, data => {
-				let task = data.task;
-				let result = data.result;
-				let latlngArray = []; //for draw map polygon
-				let coordinateList = []; //for use jsts get polygon center
-				let taskBounds = new mapboxgl.LngLatBounds();
-				each(result.boundary, i => {
-					latlngArray.push([i.lng, i.lat]);
-					taskBounds.extend([i.lng, i.lat]);
-					coordinateList.push(new geom.Coordinate(i.lng, i.lat));
+		}
+		var loadDMapBoundaryPromise = function () {
+			return Promise.each(tasks.models, task => {
+				return localStorage.getItem(`boundary-dmap-${task.get('DMapId')}`).then(result => {
+					if (result) {
+						return Promise.resolve();
+					} else {
+						let url = `../api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`;
+						$.getJSON(url).then(response => {
+							return localStorage.setItem(`boundary-dmap-${task.get('DMapId')}`, {
+								type: 'Feature',
+								properties: {
+									userColor: `rgb(${response.color.r}, ${response.color.g}, ${response.color.b})`
+								},
+								geometry: {
+									type: 'LineString',
+									coordinates: map(response.boundary, i => {
+										return [i.lng, i.lat]
+									})
+								},
+							});
+						});
+					}
 				});
-				let color = `rgb(${result.color.r}, ${result.color.g}, ${result.color.b})`;
-				let taskLayer = monitorMap.addLayer({
-					id: `task-${task.get('Id')}`,
-					'type': 'fill',
-					'source': {
-						'type': 'geojson',
-						'data': {
-							'type': 'Feature',
-							'geometry': {
-								'type': 'Polygon',
-								'coordinates': [latlngArray]
-							}
-						}
-					},
-					'layout': {},
-					'paint': {
-						'fill-color': !task.get('IsFinished') ? color : '#fff',
-						'fill-opacity': !task.get('IsFinished') ? 0.25 : 0.75,
-					},
-				});
-				self.state.taskBounds[task.get('Id')] = taskBounds.toArray();
-				return Promise.resolve();
 			});
-		}).then(() => {
-			var debug = boundaryBounds.toArray();
-			monitorMap.fitBounds(debug);
+		}
+		return Promise.all([
+			loadSubmapBoundaryPromise(),
+			loadDMapBoundaryPromise()
+		]).then(() => {
 			self.publish('hideLoading');
+			console.timeEnd("load boundary");
 		});
 	},
-	redrawBoundary: function (taskId) {
-		// var self = this;
-		// this.state.taskBoundaryLayerGroup.eachLayer(layer => {
-		// 	if (layer.options.taskId == taskId) {
-		// 		extend(layer.options, {
-		// 			fillColor: '#000',
-		// 			fillOpacity: 0.75,
-		// 			clickable: false,
-		// 			dropShadow: false,
-		// 			fillPattern: {
-		// 				url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==',
-		// 				pattern: {
-		// 					width: '8px',
-		// 					height: '8px',
-		// 					patternUnits: 'userSpaceOnUse',
-		// 					patternContentUnits: 'Default'
-		// 				},
-		// 				image: {
-		// 					width: '8px',
-		// 					height: '8px'
-		// 				}
-		// 			}
-		// 		});
-		// 		layer.remove();
-		// 		layer.addTo(self.state.taskBoundaryLayerGroup);
-		// 		return false;
-		// 	}
-		// });
+	drawBoundary: function () {
+		var map = this.state.map;
+		if (!map) {
+			console.error('map is not ready');
+			return;
+		}
+		console.time("draw boundary");
+		this.publish('showLoading');
+		var self = this,
+			model = this.getModel(),
+			campaignId = model.get('Id'),
+			tasks = model.get('Tasks'),
+			submapTasks = groupBy(tasks.models, t => {
+				return t.get('SubMapId');
+			}),
+			submaps = keys(submapTasks),
+			boundaryBounds = new mapboxgl.LngLatBounds();
+		var drawSubmapPromise = function () {
+			return Promise.each(submaps, submapId => {
+				return localStorage.getItem(`boundary-submap-${submapId}`).then(result => {
+					result.geometry.type = 'LineString';
+					var source = map.getSource(`boundary-submap-${submapId}`);
+					if (source) {
+						return Promise.resolve();
+					} else {
+						map.addSource(`boundary-submap-${submapId}`, {
+							type: 'geojson',
+							data: result
+						});
+						map.addLayer({
+							id: `boundary-submap-${submapId}-layer`,
+							type: 'line',
+							source: `boundary-submap-${submapId}`,
+							layout: {
+								'line-join': 'round',
+								'line-cap': 'round',
+							},
+							paint: {
+								'line-color': {
+									property: 'userColor',
+									type: 'identity',
+								},
+								'line-width': 4,
+							}
+						});
+						map.addLayer({
+							id: `boundary-submap-${submapId}-shadow-layer`,
+							type: 'line',
+							source: `boundary-submap-${submapId}`,
+							layout: {
+								'line-join': 'round',
+								'line-cap': 'round',
+							},
+							paint: {
+								'line-color': {
+									property: 'userColor',
+									type: 'identity',
+								},
+								'line-width': 4,
+								'line-blur': 8,
+								'line-offset': 4,
+							}
+						});
+					}
+
+					each(result.geometry.coordinates, latlng => {
+						boundaryBounds.extend(latlng);
+					});
+					return Promise.resolve();
+				});
+			});
+		}
+		var drawDMapPromise = function () {
+			return Promise.each(tasks.models, task => {
+				return localStorage.getItem(`boundary-dmap-${task.get('DMapId')}`).then(result => {
+					var source = map.getSource(`boundary-dmap-${task.get('DMapId')}`);
+					if (source) {
+						return Promise.resolve();
+					} else {
+						map.addSource(`boundary-dmap-${task.get('DMapId')}`, {
+							type: 'geojson',
+							data: {
+								"type": "Feature",
+								"geometry": {
+									"type": "Polygon",
+									"coordinates": [result.geometry.coordinates]
+								},
+								"properties": result.properties
+							}
+						});
+						map.addLayer({
+							id: `boundary-dmap-${task.get('DMapId')}-line-layer`,
+							type: 'line',
+							source: `boundary-dmap-${task.get('DMapId')}`,
+							paint: {
+								'line-color': {
+									property: 'userColor',
+									type: 'identity',
+								},
+								'line-width': 2,
+								'line-offset': 2,
+								'line-opacity': 0.5,
+							}
+						});
+						map.addLayer({
+							id: `boundary-dmap-${task.get('DMapId')}-layer`,
+							type: 'fill',
+							source: `boundary-dmap-${task.get('DMapId')}`,
+							paint: {
+								'fill-color': {
+									property: 'userColor',
+									type: 'identity',
+								},
+								'fill-opacity': 0.25,
+							}
+						});
+					}
+					each(result.geometry.coordinates, latlng => {
+						boundaryBounds.extend(latlng);
+					});
+					return Promise.resolve();
+				});
+			});
+		}
+		return Promise.all([
+			drawSubmapPromise(),
+			drawDMapPromise()
+		]).then(() => {
+			map.fitBounds(boundaryBounds);
+			self.publish('hideLoading');
+			console.timeEnd("draw boundary");
+		});
 	},
 	buildTaskPopup: function (task) {
 		var self = this;
@@ -392,9 +475,7 @@ var MapContainer = React.createBackboneClass({
 			return;
 		}
 		var gtus = task.get('dmap').get('Gtu');
-		this.drawGtuMarker(gtus);
-		// this.drawGtuTrack(gtus);
-		// this.drawGtuLocation();
+		this.drawGtuLocation(gtus);
 	},
 	updateGtu: function () {
 		// setLatLngs
@@ -458,6 +539,89 @@ var MapContainer = React.createBackboneClass({
 		// });
 	},
 	drawGtuLocation: function (gtus) {
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			return;
+		}
+		var self = this;
+		let taskIsStopped = this.state.task.get('Status') == 1,
+			gtuList = this.state.task.get('gtuList').where(function (gtu) {
+				return gtu.get('Location') != null;
+			});
+		var geoJson = {
+			type: 'FeatureCollection',
+			features: map(gtuList, gtu => {
+				let latlng = gtu.get('Location');
+				if (!latlng || !latlng.lat || !latlng.lng) {
+					return null;
+				}
+				return {
+					type: 'Feature',
+					geometry: {
+						type: 'Point',
+						coordinates: [latlng.lng, latlng.lat]
+					},
+					properties: {
+						userColor: '#ff0000',
+						visiable: taskIsStopped ? gtu.get('WithData') : gtu.get('IsAssign') || gtu.get('WithData'),
+					}
+				}
+			})
+		};
+		var source = monitorMap.getSource(`GTU-LastLocation`);
+		if (source == null) {
+			monitorMap.addSource(`GTU-LastLocation`, {
+				type: 'geojson',
+				data: geoJson
+			});
+			// for (var index = 0; index < 4; index++) {
+				monitorMap.addLayer({
+					id: `GTU-LastLocation-Layer`,
+					source: 'GTU-LastLocation',
+					type: 'circle',
+					paint: {
+						'circle-radius': 20,
+						'circle-opacity': 0,
+						'circle-stroke-opacity': 0.75,
+						'circle-stroke-width': 1,
+						'circle-stroke-color': {
+							property: 'userColor',
+							type: 'identity',
+						},
+					}
+				});
+				monitorMap.addLayer({
+					id: `GTU-LastLocation-Icon-Layer`,
+					source: 'GTU-LastLocation',
+					type: 'symbo',
+					source: 'basic-v9',
+					layout:{
+						"icon-image": "car-15",
+        				"icon-size":1.5
+					},
+					paint: {
+						'circle-radius': 20,
+						'circle-opacity': 0,
+						'circle-stroke-opacity': 0.75,
+						'circle-stroke-width': 1,
+						'circle-stroke-color': {
+							property: 'userColor',
+							type: 'identity',
+						},
+					}
+				});
+			// }
+			// this.state.animations['GTU-LastLocation'] = function (time) {
+			// 	for (let index = 0; index < 4; index++) {
+			// 		let opacity =  parseInt(time / 100) % 8 / 8; 
+			// 		this.setPaintProperty(`GTU-LastLocation-Layer-${index}`, 'circle-stroke-opacity', opacity);
+			// 	}
+			// }
+		} else {
+			source.setData(geoJson);
+		}
+	},
+	drawGtuLocation2: function (gtus) {
 		var self = this;
 		var monitorMap = this.state.map;
 		if (!monitorMap) {
@@ -540,25 +704,40 @@ var MapContainer = React.createBackboneClass({
 			gtuMarkerLayer: []
 		});
 	},
-	switchMapStyle: function(style){
+	/**
+	 * mapbox://styles/mapbox/streets-v9
+	 * mapbox://styles/mapbox/outdoors-v9
+	 * mapbox://styles/mapbox/light-v9
+	 * mapbox://styles/mapbox/dark-v9
+	 * mapbox://styles/mapbox/satellite-v9
+	 * mapbox://styles/mapbox/satellite-streets-v9
+	 */
+	switchMapStyle: function (style) {
 		var map = this.state.map;
-		if(!map){
+		if (!map) {
 			return;
 		}
+		var self = this;
+		map.off('style.load', this.repaint);
+		map.on('style.load', this.repaint);
 		map.setStyle('mapbox://styles/mapbox/' + style + '-v9');
+	},
+	repaint: function () {
+		this.drawBoundary();
 	},
 	render: function () {
 		return (
 			<div className="mapbox-wrapper">
 				<div className="mapbox-container" ref={this.onInit} style={{'minHeight': '640px'}}></div>
-				<div className='map-overlay topleft'>
-				    <div className='map-overlay-inner'>
-				        <ul>
-				        	<li>
-				        		<a className="btn btn-small" OnClick={switchMapStyle}></a>
-			        		</li>
-				        </ul>
-				    </div>
+				<div className='map-overlay'>
+					<div className="mapboxgl-ctrl-top-left">
+						<div className="mapboxgl-ctrl mapboxgl-ctrl-group">
+							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-stree" onClick={this.switchMapStyle.bind(this, "streets")}></button>
+							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-light" onClick={this.switchMapStyle.bind(this, "light")}></button>
+							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-dark" onClick={this.switchMapStyle.bind(this, "dark")}></button>
+							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-satellite" onClick={this.switchMapStyle.bind(this, "satellite-streets")}></button>
+						</div>
+					</div>
 				</div>
 			</div>
 		);
@@ -933,13 +1112,13 @@ export default React.createBackboneClass({
 							</div>
 						</div>
 					</div>
-				</div> 
+				</div>
 				<div className="row gtu">
 					<div className="small-12 columns">
 						{map(gtuList, function(gtu) {
 							return self.renderGtu(gtu);
 						})}
-					</div> 
+					</div>
 				</div>
 			</div>
 		);
