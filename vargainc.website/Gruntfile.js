@@ -113,7 +113,8 @@ module.exports = function (grunt) {
 						}
 					}],
 					noParse: [
-						/localforage\/dist\/localforage.js/
+						/localforage\/dist\/localforage.js/,
+						/mapbox-gl/
 					]
 				},
 				hot: false

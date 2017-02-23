@@ -325,8 +325,10 @@ var MapContainer = React.createBackboneClass({
 					}
 				});
 				each(data, feature => {
-					each(feature.geometry.coordinates, latlng => {
-						campaignBounds.extend([latlng[0], latlng[1]])
+					each(feature.geometry.coordinates, latlngGroup => {
+						each(latlngGroup, latlng=>{
+							campaignBounds.extend([latlng[0], latlng[1]])	
+						});
 					});
 				})
 				return Promise.resolve();
