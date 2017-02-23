@@ -338,16 +338,12 @@ module.exports = function (grunt) {
 						root: './',
 						alias: {
 							'underscore': 'lodash',
-							'promise': 'bluebird',
-							'webworkify': 'webworkify-webpack',
-							'mapbox-gl': path.resolve('./node_modules/mapbox-gl/dist/mapbox-gl-dev.js')
+							'promise': 'bluebird'
 						},
 						extensions: ['', '.js', '.jsx'],
 						modulesDirectories: [
 							'app/scripts',
 							'node_modules/foundation-datepicker/js',
-							'node_modules/leaflet-dvf/dist',
-							'node_modules/leaflet-ant-path/dist',
 							'bower_components',
 							'node_modules',
 						]
@@ -390,18 +386,8 @@ module.exports = function (grunt) {
 							test: /.(png|jpg|gif|svg)$/,
 							loader: 'url-loader'
 						}, {
-							test: /\.js$/,
-							include: path.resolve(__dirname, 'node_modules/webworkify/index.js'),
-							loader: 'worker'
-						}, {
-							test: /\.glsl$/,
-							loader: 'shader'
-						}, {
 							test: /\.json$/,
-							loader: 'json'
-						}, {
-							test: /mapbox-gl.+\.js$/,
-							loader: 'transform/cacheable?brfs'
+							loader: 'json-loader'
 						}],
 						noParse: [
 							/localforage\/dist\/localforage.js/
