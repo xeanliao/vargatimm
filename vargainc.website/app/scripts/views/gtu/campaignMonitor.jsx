@@ -54,7 +54,8 @@ var MapContainer = React.createBackboneClass({
 			drawMode: 'marker',
 			taskBounds: {},
 			mapCache: {},
-			animations: {}
+			animations: {},
+			popup: null
 		}
 	},
 	onInit: function (mapContainer) {
@@ -154,7 +155,7 @@ var MapContainer = React.createBackboneClass({
 		this.subscribe('Global.Window.Resize', size => {
 			if (self.state.mapContainer) {
 				$('.mapbox-wrapper').width(`${size.width}px`);
-				let mapHeight = size.height - $('.title-bar').outerHeight() - $('.section-header').outerHeight() - $('.map-toolbar').outerHeight() - 30;
+				let mapHeight = size.height - $('.title-bar').outerHeight() - $('.section-header').outerHeight() - $('.map-toolbar').outerHeight() - 10;
 				$('.mapbox-wrapper').height(`${mapHeight}px`);
 				monitorMap.resize();
 			}
@@ -163,7 +164,11 @@ var MapContainer = React.createBackboneClass({
 		this.on('click.map.popup', '.btnSetActiveTask', function () {
 			var taskId = $(this).attr("id");
 			self.publish("Map.Popup.SetActiveTask", taskId);
-			self.state.map.closePopup()
+			self.state.popup && self.state.popup.remove();
+		});
+
+		monitorMap.on('click', function(e){
+			self.onTaskAreaClickHandler.call(self, e);
 		});
 	},
 	animate: function (time) {
@@ -234,7 +239,8 @@ var MapContainer = React.createBackboneClass({
 									userColor: `rgb(${response.color.r}, ${response.color.g}, ${response.color.b})`,
 									Name: task.get('Name'),
 									IsFinished: task.get('IsFinished'),
-									TaskId: task.get('Id')
+									TaskId: task.get('Id'),
+									Task: task.toJSON()
 								},
 								geometry: {
 									type: 'Polygon',
@@ -301,10 +307,6 @@ var MapContainer = React.createBackboneClass({
 						'line-cap': 'round',
 					},
 					paint: {
-						// 'line-color': {
-						// 	property: 'userColor',
-						// 	type: 'identity',
-						// },
 						'line-color': 'black',
 						'line-width': {
 							stops: [
@@ -314,31 +316,7 @@ var MapContainer = React.createBackboneClass({
 						}
 					}
 				});
-				// monitorMap.addLayer({
-				// 	id: `boundary-submap-shadow-layer`,
-				// 	type: 'line',
-				// 	source: `boundary-submap`,
-				// 	layout: {
-				// 		'line-join': 'round',
-				// 		'line-cap': 'round',
-				// 	},
-				// 	paint: {
-				// 		// 'line-color': {
-				// 		// 	property: 'userColor',
-				// 		// 	type: 'identity',
-				// 		// },
-				// 		'line-color': 'black',
-				// 		'line-width': {
-				// 			stops:[
-				// 				[10, 2],
-				// 				[20, 4]
-				// 			]
-				// 		},
-				// 		'line-blur': 4,
-				// 		'line-offset': 4,
-				// 		'line-opacity': 0.25,
-				// 	}
-				// });
+				
 				each(data, feature => {
 					each(feature.geometry.coordinates, latlngGroup => {
 						each(latlngGroup, latlng => {
@@ -453,19 +431,19 @@ var MapContainer = React.createBackboneClass({
 		var self = this;
 		var taskStatus = null;
 		var setActiveButton = null;
-		var isFinished = task.get('IsFinished');
+		var isFinished = task.IsFinished;
 		if (isFinished) {
 			taskStatus = [<span key={'finished'}>FINISHED</span>];
 		} else {
 			setActiveButton = (
 				<div className="small-8 align-center columns">
 					<div className="button-group" style={{marginTop: "20px"}}>
-						<button id={task.get('Id')} className="button btnSetActiveTask">GO</button>
+						<button id={task.Id} className="button btnSetActiveTask">GO</button>
 					</div>
 				</div>
 			);
 
-			switch (task.get('Status')) {
+			switch (task.Status) {
 			case 0: //started
 				taskStatus = [<span key={'started'}>STARTED</span>];
 				break;
@@ -483,7 +461,7 @@ var MapContainer = React.createBackboneClass({
 		var gtuList = [];
 		var templat = (
 			<div className="row align-center section" style={{'minWidth': '320px'}}>
-				<div className="small-7 columns">{task.get('Name')}</div>
+				<div className="small-7 columns">{task.Name}</div>
 				<div className="small-5 columns text-right">{taskStatus}</div>
 				{setActiveButton}
 			</div>
@@ -491,21 +469,23 @@ var MapContainer = React.createBackboneClass({
 
 		return ReactDOMServer.renderToStaticMarkup(templat);
 	},
-	onTaskAreaClickHandler: function (evt) {
-		console.log(this);
-		var self = this;
-		var taskAreaCenter = evt.target.options.center,
-			taskId = evt.target.options.taskId,
-			allTask = this.getModel().get('Tasks'),
-			task = find(allTask.models, i => {
-				return i.get('Id') == taskId
-			}),
-			popContent = self.buildTaskPopup(task);
-		L.popup({
-				maxWidth: 640
-			}).setLatLng(taskAreaCenter)
-			.setContent(popContent)
-			.openOn(this.state.map);
+	onTaskAreaClickHandler: function (e) {
+		var monitorMap = this.state.map;
+		var feature = head(monitorMap.queryRenderedFeatures(e.point, {
+			layers: ['boundary-dmap-layer', 'boundary-dmap-finished-layer']
+		}));
+		if(feature){
+			var task = JSON.parse(feature.properties.Task);
+			var popContent = this.buildTaskPopup(task);
+			this.state.popup && this.state.popup.remove();
+			this.state.popup = new mapboxgl.Popup({
+				closeButton: false,
+				anchor: 'top'
+			}).setLngLat(e.lngLat)
+			.setHTML(popContent)
+			.addTo(monitorMap);
+		}
+		
 	},
 	reload: function () {
 		if (!this.state.task || this.state.reloading) {
