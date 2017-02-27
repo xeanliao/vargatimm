@@ -377,12 +377,12 @@ var MapContainer = React.createBackboneClass({
 					],
 					source: `boundary-dmap`,
 					paint: {
-						// 'fill-pattern': 'bg-red-x',
+						'fill-pattern': 'bg-red-x',
 						'fill-color': {
 							property: 'userColor',
 							type: 'identity',
 						},
-						'fill-opacity': 0.25,
+						'fill-opacity': 0.55,
 					}
 				}, 'ferry');
 				monitorMap.addLayer({
