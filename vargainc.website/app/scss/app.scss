@@ -1,8 +1,10 @@
 @import "core";
 @import "framework";
 
-@import url('//fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic');
-@import url('//fonts.googleapis.com/css?family=Ubuntu+Mono:400,700');
+@import url("//fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic");
+
+@import url("//fonts.googleapis.com/css?family=Ubuntu+Mono:400,700");
+
 @import "util/_unit";
 
 @import "campaign-monitor";
@@ -66,15 +68,16 @@ html, body {
         display: none;
     }
 
-    &.is-open  {
+    &.is-open {
         width: 250px !important;
-        .menu-text,span, .submenu {
+
+        .menu-text, span, .submenu {
             display: initial;
         }
     }
 }
 
-.is-open ~ .off-canvas-content{
+.is-open ~ .off-canvas-content {
     left: 0px !important;
 }
 
@@ -667,16 +670,14 @@ $A3LeftRightMargin: 0.5in;
         font-family: 'Ubuntu Mono', monospace;
         font-size: 16px;
         font-weight: 700;
-    
-        i{
+
+        i {
             margin-right: 4px;
         }
 
         &.active {
             box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25) !important;
             opacity: 0.75;
-
-
         }
     }
 
@@ -701,6 +702,14 @@ $A3LeftRightMargin: 0.5in;
 
     i.location {
         color: #000;
+    }
+}
+
+.campaign-monitor {
+    .section-header {
+        line-height: 20px;
+        padding-left: 0;
+        margin-top: 5px;
     }
 }
 
