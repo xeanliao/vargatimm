@@ -60,7 +60,6 @@ var MapContainer = React.createBackboneClass({
 	onInit: function (mapContainer) {
 		var self = this;
 		mapboxgl.accessToken = 'pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA';
-
 		var monitorMap = new mapboxgl.Map({
 			container: mapContainer,
 			zoom: 8,
@@ -72,7 +71,8 @@ var MapContainer = React.createBackboneClass({
 		monitorMap.addControl(nav, 'top-right');
 		monitorMap.on('load', function () {
 			self.setState({
-				map: monitorMap
+				map: monitorMap,
+				mapContainer: mapContainer
 			}, self.initMapLayer);
 		});
 	},
@@ -91,6 +91,8 @@ var MapContainer = React.createBackboneClass({
 		 * animate
 		 */
 		requestAnimationFrame(self.animate);
+
+		$(window).trigger('resize');
 	},
 	registerTopic: function (monitorMap) {
 		var self = this;
@@ -151,9 +153,10 @@ var MapContainer = React.createBackboneClass({
 		})
 		this.subscribe('Global.Window.Resize', size => {
 			if (self.state.mapContainer) {
-				console.log(`${TAG} window resize width: ${size.width} height: ${size.height}`);
-				self.state.mapContainer.style.width = `${size.width}px`;
-				self.state.mapContainer.style.height = `${size.height}px`;
+				$('.mapbox-wrapper').width(`${size.width}px`);
+				let mapHeight = size.height - $('.title-bar').outerHeight() - $('.section-header').outerHeight() - $('.map-toolbar').outerHeight() - 30;
+				$('.mapbox-wrapper').height(`${mapHeight}px`);
+				monitorMap.resize();
 			}
 		});
 
@@ -298,32 +301,44 @@ var MapContainer = React.createBackboneClass({
 						'line-cap': 'round',
 					},
 					paint: {
-						'line-color': {
-							property: 'userColor',
-							type: 'identity',
-						},
-						'line-width': 8
+						// 'line-color': {
+						// 	property: 'userColor',
+						// 	type: 'identity',
+						// },
+						'line-color': 'black',
+						'line-width': {
+							stops:[
+								[10, 1],
+								[20, 4]
+							]
+						}
 					}
 				});
-				monitorMap.addLayer({
-					id: `boundary-submap-shadow-layer`,
-					type: 'line',
-					source: `boundary-submap`,
-					layout: {
-						'line-join': 'round',
-						'line-cap': 'round',
-					},
-					paint: {
-						'line-color': {
-							property: 'userColor',
-							type: 'identity',
-						},
-						'line-width': 4,
-						'line-blur': 4,
-						'line-offset': 4,
-						'line-opacity': 0.75,
-					}
-				});
+				// monitorMap.addLayer({
+				// 	id: `boundary-submap-shadow-layer`,
+				// 	type: 'line',
+				// 	source: `boundary-submap`,
+				// 	layout: {
+				// 		'line-join': 'round',
+				// 		'line-cap': 'round',
+				// 	},
+				// 	paint: {
+				// 		// 'line-color': {
+				// 		// 	property: 'userColor',
+				// 		// 	type: 'identity',
+				// 		// },
+				// 		'line-color': 'black',
+				// 		'line-width': {
+				// 			stops:[
+				// 				[10, 2],
+				// 				[20, 4]
+				// 			]
+				// 		},
+				// 		'line-blur': 4,
+				// 		'line-offset': 4,
+				// 		'line-opacity': 0.25,
+				// 	}
+				// });
 				each(data, feature => {
 					each(feature.geometry.coordinates, latlngGroup => {
 						each(latlngGroup, latlng=>{
@@ -355,18 +370,27 @@ var MapContainer = React.createBackboneClass({
 				monitorMap.addLayer({
 					id: `boundary-dmap-finished-layer`,
 					type: 'fill',
-					filter: ["all", ["==", "$type", "Polygon"],
+					filter: [
+						"all", 
+						["==", "$type", "Polygon"],
 						["==", "IsFinished", true]
 					],
 					source: `boundary-dmap`,
 					paint: {
-						'fill-pattern': 'bg-red-x'
+						// 'fill-pattern': 'bg-red-x',
+						'fill-color': {
+							property: 'userColor',
+							type: 'identity',
+						},
+						'fill-opacity': 0.25,
 					}
-				});
+				}, 'ferry');
 				monitorMap.addLayer({
 					id: `boundary-dmap-layer`,
 					type: 'fill',
-					filter: ["all", ["==", "$type", "Polygon"],
+					filter: [
+						"all", 
+						["==", "$type", "Polygon"],
 						["==", "IsFinished", false]
 					],
 					source: `boundary-dmap`,
@@ -375,7 +399,7 @@ var MapContainer = React.createBackboneClass({
 							property: 'userColor',
 							type: 'identity',
 						},
-						'fill-opacity': 0.75,
+						'fill-opacity': 0.25,
 					}
 				}, 'ferry');
 				monitorMap.addLayer({
@@ -384,12 +408,18 @@ var MapContainer = React.createBackboneClass({
 					filter: ["==", "$type", "Polygon"],
 					source: `boundary-dmap`,
 					paint: {
-						'line-color': {
-							property: 'userColor',
-							type: 'identity',
+						// 'line-color': {
+						// 	property: 'userColor',
+						// 	type: 'identity',
+						// },
+						'line-color': 'black',
+						'line-width': {
+							stops:[
+								[10, 1],
+								[20, 4]
+							]
 						},
-						'line-width': 4,
-						'line-offset': 2,
+						// 'line-offset': 2,
 						'line-opacity': 0.75,
 					}
 				});
@@ -404,7 +434,7 @@ var MapContainer = React.createBackboneClass({
 						"text-size": {
 							stops: [
 								[12, 8],
-								[20, 22]
+								[20, 26]
 							]
 						}
 					},
@@ -562,14 +592,16 @@ var MapContainer = React.createBackboneClass({
 					'paint': {
 						'circle-radius': {
 							stops: [
-								[10, 2],
+								[4, 2],
 								[20, 8]
 							]
 						},
 						'circle-color': {
 							property: 'userColor',
 							type: 'identity',
-						}
+						},
+						'circle-stroke-width': 1,
+						'circle-stroke-color': 'black'
 					}
 				});
 			} else {
@@ -708,7 +740,7 @@ var MapContainer = React.createBackboneClass({
 	render: function () {
 		return (
 			<div className="mapbox-wrapper">
-				<div className="mapbox-container" ref={this.onInit} style={{'minHeight': '640px'}}></div>
+				<div className="mapbox-container" ref={this.onInit} style={{width: '100%', height: '100%'}}></div>
 				<div className='map-overlay'>
 					<div className="mapboxgl-ctrl-top-left">
 						<div className="mapboxgl-ctrl mapboxgl-ctrl-group">
@@ -839,6 +871,7 @@ export default React.createBackboneClass({
 					task: task,
 					displayGtus: displayGtus
 				});
+				$(window).trigger('resize');
 			});
 
 		});
@@ -1070,7 +1103,7 @@ export default React.createBackboneClass({
 		}
 
 		return (
-			<div>
+			<div className="map-toolbar">
 				<div className="section row gtu-monitor">
 					<div className="small-12 columns">
 						<div className="row">
@@ -1266,10 +1299,10 @@ export default React.createBackboneClass({
 		});
 		return (
 			<div className="campaign-monitor">
-				<div className="section row">
+				<div className="section row expanded">
 					<div className="small-12 columns">
 						<div className="section-header">
-							<div className="row">
+							<div className="row expanded">
 								<div className="small-10 column">
 									<nav aria-label="You are here:" role="navigation">
 									  	<ul className="breadcrumbs">
