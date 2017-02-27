@@ -20,7 +20,8 @@ import {
 	extend,
 	startsWith,
 	keys,
-	head
+	head,
+	concat
 } from 'lodash';
 
 import d3 from 'd3';
@@ -50,7 +51,7 @@ var MapContainer = React.createBackboneClass({
 			gtuTrackLayer: {},
 			gtuLocationLayer: null,
 			displayGtus: [],
-			showOutOfBoundaryGtu: false,
+			showOutOfBoundaryGtu: true,
 			drawMode: 'marker',
 			taskBounds: {},
 			mapCache: {},
@@ -116,21 +117,21 @@ var MapContainer = React.createBackboneClass({
 			self.setState({
 				drawMode: mode
 			}, () => {
-				self.drawGtu();
+				// self.drawGtu();
 			});
 		});
 		this.subscribe('Campaign.Monitor.ShowOutOfBoundaryGtu', boolean => {
 			self.setState({
 				showOutOfBoundaryGtu: boolean
 			}, () => {
-				self.drawGtu();
+				self.setGtuPointsFilter();
 			});
 		});
 		this.subscribe('Campaign.Monitor.SwitchGtu', gtus => {
 			self.setState({
 				displayGtus: gtus
 			}, () => {
-				self.drawGtu();
+				self.setGtuPointsFilter();
 			});
 		});
 		this.subscribe('Campaign.Monitor.LocatGtu', gtuId => {
@@ -150,7 +151,7 @@ var MapContainer = React.createBackboneClass({
 			self.reload();
 		});
 		this.subscribe('Campaign.Monitor.Redraw.FinishedTaskBoundary', taskId => {
-			self.redrawBoundary(taskId);
+			self.drawBoundary();
 		})
 		this.subscribe('Global.Window.Resize', size => {
 			if (self.state.mapContainer) {
@@ -167,7 +168,7 @@ var MapContainer = React.createBackboneClass({
 			self.state.popup && self.state.popup.remove();
 		});
 
-		monitorMap.on('click', function(e){
+		monitorMap.on('click', function (e) {
 			self.onTaskAreaClickHandler.call(self, e);
 		});
 	},
@@ -316,7 +317,7 @@ var MapContainer = React.createBackboneClass({
 						}
 					}
 				});
-				
+
 				each(data, feature => {
 					each(feature.geometry.coordinates, latlngGroup => {
 						each(latlngGroup, latlng => {
@@ -474,18 +475,17 @@ var MapContainer = React.createBackboneClass({
 		var feature = head(monitorMap.queryRenderedFeatures(e.point, {
 			layers: ['boundary-dmap-layer', 'boundary-dmap-finished-layer']
 		}));
-		if(feature){
+		if (feature) {
 			var task = JSON.parse(feature.properties.Task);
 			var popContent = this.buildTaskPopup(task);
 			this.state.popup && this.state.popup.remove();
 			this.state.popup = new mapboxgl.Popup({
-				closeButton: false,
-				anchor: 'top'
-			}).setLngLat(e.lngLat)
-			.setHTML(popContent)
-			.addTo(monitorMap);
+					closeButton: false,
+					anchor: 'top'
+				}).setLngLat(e.lngLat)
+				.setHTML(popContent)
+				.addTo(monitorMap);
 		}
-		
 	},
 	reload: function () {
 		if (!this.state.task || this.state.reloading) {
@@ -529,8 +529,10 @@ var MapContainer = React.createBackboneClass({
 			return;
 		}
 		var gtus = task.get('dmap').get('Gtu');
-		this.drawGtuPoints(gtus);
+
 		this.drawGtuLocation(gtus);
+
+		this.drawGtuPoints(gtus);
 	},
 	updateGtu: function () {
 		// setLatLngs
@@ -542,54 +544,69 @@ var MapContainer = React.createBackboneClass({
 			return;
 		}
 		var taskId = this.state.task.get('Id');
+		let geoJson = {
+			type: "FeatureCollection",
+			features: []
+		};
 		each(gtus, data => {
-			let gtuId = data.points[0].Id;
-			let geoJson = {
-				'type': 'Feature',
-				'geometry': {
-					'type': 'MultiPoint',
-					'coordinates': map(data.points, latlng => {
-						return [latlng.lng, latlng.lat]
-					})
-				},
-				properties: {
-					userColor: data.color
-				},
-			};
-			var source = monitorMap.getSource(`gut-marker-${taskId}-${gtuId}-source`);
-			if (source == null) {
-				monitorMap.addSource(`gut-marker-${taskId}-${gtuId}-source`, {
-					'type': 'geojson',
-					'data': geoJson
-				});
-				monitorMap.addLayer({
-					'id': `gut-marker-${taskId}-${gtuId}-layer`,
-					'type': 'circle',
-					'source': `gut-marker-${taskId}-${gtuId}-source`,
-					'paint': {
-						'circle-radius': {
-							stops: [
-								[4, 2],
-								[20, 8]
-							]
-						},
-						'circle-color': {
-							property: 'userColor',
-							type: 'identity',
-						},
-						'circle-stroke-width': 1,
-						'circle-stroke-color': 'black'
+			each(data.points, latlng => {
+				geoJson.features.push({
+					"type": "Feature",
+					"properties": {
+						userColor: data.color,
+						GtuId: latlng.Id,
+						Out: latlng.out
+					},
+					"geometry": {
+						"type": "Point",
+						"coordinates": [latlng.lng, latlng.lat]
 					}
 				});
-			} else {
-				source.setData(geoJson);
-			}
-			if (indexOf(this.state.displayGtus, gtuId) == -1) {
-				monitorMap.setLayoutProperty(`gut-marker-${taskId}-${gtuId}-layer`, 'visibility', 'none');
-			} else {
-				monitorMap.setLayoutProperty(`gut-marker-${taskId}-${gtuId}-layer`, 'visibility', 'visible');
-			}
+			});
 		});
+		var source = monitorMap.getSource(`gut-marker-source`);
+		if (source == null) {
+			monitorMap.addSource(`gut-marker-source`, {
+				'type': 'geojson',
+				'data': geoJson
+			});
+			monitorMap.addLayer({
+				'id': `gut-marker-layer`,
+				'type': 'circle',
+				'source': `gut-marker-source`,
+				'paint': {
+					'circle-radius': {
+						stops: [
+							[4, 2],
+							[20, 8]
+						]
+					},
+					'circle-color': {
+						property: 'userColor',
+						type: 'identity',
+					},
+					'circle-stroke-width': 1,
+					'circle-stroke-color': 'black'
+				}
+			}, "GTU-LastLocation-Walker-Icon-Layer");
+		} else {
+			source.setData(geoJson);
+		}
+		this.setGtuPointsFilter();
+	},
+	setGtuPointsFilter: function(){
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			return;
+		}
+		var filter = ['all'];
+		if(!this.state.showOutOfBoundaryGtu){
+			filter.push(['==', 'Out', false]);
+		}
+		if(this.state.displayGtus && this.state.displayGtus.length > 0){
+			filter.push(concat(['in', 'GtuId'], this.state.displayGtus));
+		}
+		monitorMap.setFilter('gut-marker-layer', filter);
 	},
 	drawGtuTrack: function (gtus) {
 		// each(this.state.gtuMarkerLayer, layer => {
