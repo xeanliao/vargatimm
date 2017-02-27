@@ -1,11 +1,13 @@
 @import "core";
 @import "framework";
 
-// @import url(https://fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic);
+@import url('//fonts.googleapis.com/css?family=Ubuntu:400,300,300italic,400italic,500,500italic,700,700italic');
+@import url('//fonts.googleapis.com/css?family=Ubuntu+Mono:400,700');
 @import "util/_unit";
 
 @import "campaign-monitor";
 @import "map";
+@import "button";
 
 html, body {
     font-family: 'Ubuntu', verdana, arial, sans-serif;
@@ -657,13 +659,18 @@ $A3LeftRightMargin: 0.5in;
     }
 
     .button {
-        color: #2199e8;
+        color: #000 !important;
         background: transparent;
-        padding: 5px 10px;
+        padding: 5px 2px;
         margin-bottom: 10px;
-        min-width: 120px;
-        text-align: left !important;
-        font-weight: 600;
+        min-width: 80px;
+        font-family: 'Ubuntu Mono', monospace;
+        font-size: 16px;
+        font-weight: 700;
+    
+        i{
+            margin-right: 4px;
+        }
 
         &.active {
             box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25) !important;
@@ -675,8 +682,7 @@ $A3LeftRightMargin: 0.5in;
 
     .button.offline {
         color: #a7a7a7;
-        font-weight: 400;
-        opacity: 0.35;
+        opacity: 0.65;
 
         i {
             opacity: 1;

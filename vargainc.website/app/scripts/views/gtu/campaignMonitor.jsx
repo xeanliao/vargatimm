@@ -1138,7 +1138,7 @@ export default React.createBackboneClass({
 		var typeIcon = null,
 			alertIcon = null,
 			deleteIcon = null,
-			buttonClass = 'button text-left',
+			buttonClass = 'button text-left btn-gtu',
 			taskIsStopped = this.state.activeTask.get('Status') == 1,
 			isActive = indexOf(this.state.displayGtus, gtu.get('Id')) > -1,
 			gtuIcon = null;
@@ -1176,7 +1176,7 @@ export default React.createBackboneClass({
 				<button className={buttonClass} style={{'backgroundColor': isActive ? gtu.get('UserColor') : 'transparent'}} onClick={this.onSelectedGTU.bind(null, gtu.get('Id'))}>
 					{deleteIcon}
 					{gtuIcon}
-					&nbsp;&nbsp;<span>{gtu.get('ShortUniqueID')}</span>&nbsp;&nbsp;
+					<span>{gtu.get('ShortUniqueID')}</span>
 					{alertIcon}
 				</button>
 				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
