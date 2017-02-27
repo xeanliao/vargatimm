@@ -307,7 +307,7 @@ var MapContainer = React.createBackboneClass({
 						// },
 						'line-color': 'black',
 						'line-width': {
-							stops:[
+							stops: [
 								[10, 1],
 								[20, 4]
 							]
@@ -341,8 +341,8 @@ var MapContainer = React.createBackboneClass({
 				// });
 				each(data, feature => {
 					each(feature.geometry.coordinates, latlngGroup => {
-						each(latlngGroup, latlng=>{
-							campaignBounds.extend([latlng[0], latlng[1]])	
+						each(latlngGroup, latlng => {
+							campaignBounds.extend([latlng[0], latlng[1]])
 						});
 					});
 				})
@@ -371,8 +371,7 @@ var MapContainer = React.createBackboneClass({
 					id: `boundary-dmap-finished-layer`,
 					type: 'fill',
 					filter: [
-						"all", 
-						["==", "$type", "Polygon"],
+						"all", ["==", "$type", "Polygon"],
 						["==", "IsFinished", true]
 					],
 					source: `boundary-dmap`,
@@ -389,8 +388,7 @@ var MapContainer = React.createBackboneClass({
 					id: `boundary-dmap-layer`,
 					type: 'fill',
 					filter: [
-						"all", 
-						["==", "$type", "Polygon"],
+						"all", ["==", "$type", "Polygon"],
 						["==", "IsFinished", false]
 					],
 					source: `boundary-dmap`,
@@ -414,7 +412,7 @@ var MapContainer = React.createBackboneClass({
 						// },
 						'line-color': 'black',
 						'line-width': {
-							stops:[
+							stops: [
 								[10, 1],
 								[20, 4]
 							]
@@ -438,8 +436,7 @@ var MapContainer = React.createBackboneClass({
 							]
 						}
 					},
-					paint: {
-					}
+					paint: {}
 				});
 			});
 		}
@@ -695,18 +692,21 @@ var MapContainer = React.createBackboneClass({
 		if (!monitorMap) {
 			return;
 		}
-		var feature = head(monitorMap.querySourceFeatures('boundary-dmap', {
-			filter: ["==", "TaskId", taskId]
-		}));
-		if (feature) {
-			let taskBounds = new mapboxgl.LngLatBounds();
-			each(feature.geometry.coordinates, latlngGroup=>{
-				each(latlngGroup, latlng=>{
-					taskBounds.extend([latlng[0], latlng[1]]);	
-				});				
-			});
-			monitorMap.fitBounds(taskBounds)
-		}
+		monitorMap.setZoom(10);
+		setTimeout(() => {
+			var feature = head(monitorMap.querySourceFeatures('boundary-dmap', {
+				filter: ["==", "TaskId", taskId]
+			}));
+			if (feature) {
+				let taskBounds = new mapboxgl.LngLatBounds();
+				each(feature.geometry.coordinates, latlngGroup => {
+					each(latlngGroup, latlng => {
+						taskBounds.extend([latlng[0], latlng[1]]);
+					});
+				});
+				monitorMap.fitBounds(taskBounds)
+			}
+		}, 200);
 	},
 	clearTask: function () {
 		each(gtuMarkerLayer, layer => {
