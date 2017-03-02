@@ -21,7 +21,9 @@ import {
 	startsWith,
 	keys,
 	head,
-	concat
+	concat,
+	clone,
+	get
 } from 'lodash';
 
 import d3 from 'd3';
@@ -56,7 +58,8 @@ var MapContainer = React.createBackboneClass({
 			taskBounds: {},
 			mapCache: {},
 			animations: {},
-			popup: null
+			popup: null,
+			gtuMarkerFilter: ['all']
 		}
 	},
 	onInit: function (mapContainer) {
@@ -145,7 +148,7 @@ var MapContainer = React.createBackboneClass({
 			}
 		});
 		this.subscribe('Campaign.Monitor.CenterToTask', () => {
-			self.flyToTask(self.state.task.get('Id'));
+			self.flyToTask(self.state.task.get('Id'), true);
 		});
 		this.subscribe('Campaign.Monitor.Reload', () => {
 			self.reload();
@@ -180,7 +183,7 @@ var MapContainer = React.createBackboneClass({
 		var self = this;
 		time = parseInt(time);
 		Promise.all(map(this.state.animations, fn => {
-			return fn.call(monitorMap, time);
+			return fn.call(self, monitorMap, time);
 		})).then(() => {
 			requestAnimationFrame(self.animate);
 		});
@@ -534,9 +537,6 @@ var MapContainer = React.createBackboneClass({
 
 		this.drawGtuPoints(gtus);
 	},
-	updateGtu: function () {
-		// setLatLngs
-	},
 	drawGtuPoints: function (gtus) {
 		var self = this;
 		var monitorMap = this.state.map;
@@ -544,18 +544,20 @@ var MapContainer = React.createBackboneClass({
 			return;
 		}
 		var taskId = this.state.task.get('Id');
+		var gtuCount = {};
 		let geoJson = {
 			type: "FeatureCollection",
 			features: []
 		};
 		each(gtus, data => {
-			each(data.points, latlng => {
+			each(data.points, (latlng, index) => {
 				geoJson.features.push({
 					"type": "Feature",
 					"properties": {
 						userColor: data.color,
 						GtuId: latlng.Id,
-						Out: latlng.out
+						Out: latlng.out,
+						Serial: index % 2
 					},
 					"geometry": {
 						"type": "Point",
@@ -563,6 +565,7 @@ var MapContainer = React.createBackboneClass({
 					}
 				});
 			});
+			gtuCount[data.points[0].Id] = data.points.length;
 		});
 		var source = monitorMap.getSource(`gut-marker-source`);
 		if (source == null) {
@@ -589,31 +592,34 @@ var MapContainer = React.createBackboneClass({
 					'circle-stroke-color': 'black'
 				}
 			}, "GTU-LastLocation-Walker-Icon-Layer");
+
+			this.state.animations['gut-marker-layer-animation'] = function (monitorMap, time) {
+				var filter = clone(this.state.gtuMarkerFilter);
+				filter.push(['==', 'Serial', parseInt(time / 600) % 2]);
+				monitorMap.setFilter('gut-marker-layer', filter);
+			};
 		} else {
 			source.setData(geoJson);
 		}
 		this.setGtuPointsFilter();
 	},
-	setGtuPointsFilter: function(){
+	setGtuPointsFilter: function () {
 		var monitorMap = this.state.map;
 		if (!monitorMap) {
 			return;
 		}
 		var filter = ['all'];
-		if(!this.state.showOutOfBoundaryGtu){
+		if (!this.state.showOutOfBoundaryGtu) {
 			filter.push(['==', 'Out', false]);
 		}
-		if(this.state.displayGtus && this.state.displayGtus.length > 0){
-			filter.push(concat(['in', 'GtuId'], this.state.displayGtus));
-		}
-		monitorMap.setFilter('gut-marker-layer', filter);
-	},
-	drawGtuTrack: function (gtus) {
-		// each(this.state.gtuMarkerLayer, layer => {
-		// 	layer.eachLayer(marker => {
 
-		// 	});
-		// });
+		filter.push(concat(['in', 'GtuId'], this.state.displayGtus));
+
+		this.setState({
+			gtuMarkerFilter: filter
+		}, () => {
+			monitorMap.setFilter('gut-marker-layer', filter);
+		});
 	},
 	drawGtuLocation: function (gtus) {
 		var monitorMap = this.state.map;
@@ -663,7 +669,8 @@ var MapContainer = React.createBackboneClass({
 				"type": "symbol",
 				"layout": {
 					"icon-image": "walker",
-					"icon-size": 0.5
+					"icon-size": 0.75,
+					"icon-allow-overlap": true
 				},
 				"paint": {}
 			});
@@ -676,7 +683,8 @@ var MapContainer = React.createBackboneClass({
 				"type": "symbol",
 				"layout": {
 					"icon-image": "truck",
-					"icon-size": 0.5
+					"icon-size": 0.75,
+					"icon-allow-overlap": true
 				},
 				"paint": {}
 			});
@@ -684,26 +692,33 @@ var MapContainer = React.createBackboneClass({
 			source.setData(geoJson);
 		}
 	},
-	flyToTask: function (taskId) {
+	flyToTask: function (taskId, keepZoom) {
 		var monitorMap = this.state.map;
 		if (!monitorMap) {
 			return;
 		}
-		monitorMap.setZoom(10);
-		setTimeout(() => {
-			var feature = head(monitorMap.querySourceFeatures('boundary-dmap', {
-				filter: ["==", "TaskId", taskId]
-			}));
-			if (feature) {
-				let taskBounds = new mapboxgl.LngLatBounds();
-				each(feature.geometry.coordinates, latlngGroup => {
-					each(latlngGroup, latlng => {
-						taskBounds.extend([latlng[0], latlng[1]]);
-					});
+		var taskSource = monitorMap.getSource('boundary-dmap');
+		var feature = head(filter(taskSource._data.features, o => {
+			return get(o, 'properties.TaskId') == taskId && get(o, 'geometry.type') == 'Polygon';
+		}));
+		if (feature) {
+			let taskBounds = new mapboxgl.LngLatBounds();
+			each(feature.geometry.coordinates, latlngGroup => {
+				each(latlngGroup, latlng => {
+					taskBounds.extend([latlng[0], latlng[1]]);
 				});
+			});
+			if (!keepZoom) {
 				monitorMap.fitBounds(taskBounds)
+			} else {
+				var mapZoom = monitorMap.getZoom();
+				monitorMap.flyTo({
+					center: taskBounds.getCenter(),
+					zoom: mapZoom
+				});
 			}
-		}, 200);
+
+		}
 	},
 	clearTask: function () {
 		each(gtuMarkerLayer, layer => {
@@ -730,9 +745,6 @@ var MapContainer = React.createBackboneClass({
 		map.off('style.load', this.initMapLayer);
 		map.on('style.load', this.initMapLayer);
 		map.setStyle('http://timm.vargainc.com/map/' + style + '.json?v9');
-	},
-	repaint: function () {
-		this.drawBoundary();
 	},
 	render: function () {
 		return (
@@ -793,7 +805,8 @@ export default React.createBackboneClass({
 	getInitialState: function () {
 		return {
 			activeTask: null,
-			displayGtus: []
+			displayGtus: [],
+			ShowOutOfBoundaryGtu: true
 		}
 	},
 	componentDidMount: function () {
