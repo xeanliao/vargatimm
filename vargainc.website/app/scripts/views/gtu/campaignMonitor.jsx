@@ -54,12 +54,14 @@ var MapContainer = React.createBackboneClass({
 			gtuLocationLayer: null,
 			displayGtus: [],
 			showOutOfBoundaryGtu: true,
-			drawMode: 'marker',
 			taskBounds: {},
 			mapCache: {},
 			animations: {},
 			popup: null,
-			gtuMarkerFilter: ['all']
+			gtuMarkerFilter: ['all'],
+			trackBeginTime: 0,
+			gtuCount: {},
+			displayMode: 'cover'
 		}
 	},
 	onInit: function (mapContainer) {
@@ -107,7 +109,9 @@ var MapContainer = React.createBackboneClass({
 		this.subscribe('Campaign.Monitor.DrawGtu', data => {
 			self.setState({
 				task: data.task,
-				displayGtus: data.displayGtus
+				displayGtus: data.displayGtus,
+				displayMode: data.displayMode,
+				trackBeginTime: null
 			}, () => {
 				self.drawGtu();
 				window.clearInterval(self.state.reloadTimeout);
@@ -116,11 +120,10 @@ var MapContainer = React.createBackboneClass({
 				});
 			});
 		});
-		this.subscribe('Campaign.Monitor.DrawMode', mode => {
+		this.subscribe('Campaign.Monitor.DisplayMode', mode => {
 			self.setState({
-				drawMode: mode
-			}, () => {
-				// self.drawGtu();
+				displayMode: mode,
+				trackBeginTime: null
 			});
 		});
 		this.subscribe('Campaign.Monitor.ShowOutOfBoundaryGtu', boolean => {
@@ -132,7 +135,8 @@ var MapContainer = React.createBackboneClass({
 		});
 		this.subscribe('Campaign.Monitor.SwitchGtu', gtus => {
 			self.setState({
-				displayGtus: gtus
+				displayGtus: gtus,
+				trackBeginTime: null
 			}, () => {
 				self.setGtuPointsFilter();
 			});
@@ -544,7 +548,6 @@ var MapContainer = React.createBackboneClass({
 			return;
 		}
 		var taskId = this.state.task.get('Id');
-		var gtuCount = {};
 		let geoJson = {
 			type: "FeatureCollection",
 			features: []
@@ -557,7 +560,7 @@ var MapContainer = React.createBackboneClass({
 						userColor: data.color,
 						GtuId: latlng.Id,
 						Out: latlng.out,
-						Serial: index % 2
+						Serial: index
 					},
 					"geometry": {
 						"type": "Point",
@@ -565,7 +568,7 @@ var MapContainer = React.createBackboneClass({
 					}
 				});
 			});
-			gtuCount[data.points[0].Id] = data.points.length;
+			self.state.gtuCount[data.points[0].Id] = data.points.length;
 		});
 		var source = monitorMap.getSource(`gut-marker-source`);
 		if (source == null) {
@@ -594,9 +597,16 @@ var MapContainer = React.createBackboneClass({
 			}, "GTU-LastLocation-Walker-Icon-Layer");
 
 			this.state.animations['gut-marker-layer-animation'] = function (monitorMap, time) {
-				var filter = clone(this.state.gtuMarkerFilter);
-				filter.push(['==', 'Serial', parseInt(time / 600) % 2]);
-				monitorMap.setFilter('gut-marker-layer', filter);
+				if (this.state.trackBeginTime != null && this.state.displayMode != 'cover') {
+					var filter = clone(this.state.gtuMarkerFilter);
+					let currentTime = time - this.state.trackBeginTime;
+					let gtu = head(this.state.displayGtus);
+					let maxSerial = this.state.gtuCount[gtu] || 0;
+					filter.push(['<', 'Serial', parseInt(currentTime / 600) % maxSerial]);
+					monitorMap.setFilter('gut-marker-layer', filter);
+				} else {
+					this.state.trackBeginTime = time;
+				}
 			};
 		} else {
 			source.setData(geoJson);
@@ -605,6 +615,7 @@ var MapContainer = React.createBackboneClass({
 	},
 	setGtuPointsFilter: function () {
 		var monitorMap = this.state.map;
+		var self = this;
 		if (!monitorMap) {
 			return;
 		}
@@ -618,7 +629,9 @@ var MapContainer = React.createBackboneClass({
 		this.setState({
 			gtuMarkerFilter: filter
 		}, () => {
-			monitorMap.setFilter('gut-marker-layer', filter);
+			if (self.state.displayMode == 'cover') {
+				monitorMap.setFilter('gut-marker-layer', filter);
+			}
 		});
 	},
 	drawGtuLocation: function (gtus) {
@@ -806,7 +819,8 @@ export default React.createBackboneClass({
 		return {
 			activeTask: null,
 			displayGtus: [],
-			ShowOutOfBoundaryGtu: true
+			ShowOutOfBoundaryGtu: true,
+			displayMode: 'cover'
 		}
 	},
 	componentDidMount: function () {
@@ -873,13 +887,15 @@ export default React.createBackboneClass({
 				return gtu.points && gtu.points.length > 0 ? gtu.points[0].Id : null;
 			});
 			self.setState({
-				activeTask: task,
-				displayGtus: displayGtus
+				'activeTask': task,
+				'displayGtus': displayGtus,
+				'displayMode': 'cover'
 			}, () => {
 				self.publish('Campaign.Monitor.ZoomToTask', task.get('Id'));
 				self.publish('Campaign.Monitor.DrawGtu', {
-					task: task,
-					displayGtus: displayGtus
+					'task': task,
+					'displayGtus': displayGtus,
+					'displayMode': 'cover'
 				});
 				$(window).trigger('resize');
 			});
@@ -928,8 +944,16 @@ export default React.createBackboneClass({
 		this.setState({
 			displayMode: mode
 		}, () => {
-			self.publish('Campaign.Monitor.DrawMode', mode);
+			self.publish('Campaign.Monitor.DisplayMode', mode);
 		});
+		if (mode != 'marker') {
+			var displayGtus = [head(this.state.displayGtus)];
+			this.setState({
+				displayGtus: displayGtus
+			}, () => {
+				self.publish('Campaign.Monitor.SwitchGtu', displayGtus);
+			})
+		}
 	},
 	onSwitchShowOutOfBoundaryGtu: function () {
 		var self = this;
@@ -983,7 +1007,13 @@ export default React.createBackboneClass({
 	},
 	onSelectedGTU: function (gtuId) {
 		var self = this;
-		let displayGtus = xor(this.state.displayGtus, [gtuId]);
+		var displayGtus;
+		if (this.state.displayMode == 'track') {
+			displayGtus = [gtuId];
+		} else {
+			displayGtus = xor(this.state.displayGtus, [gtuId]);
+		}
+
 		this.setState({
 			displayGtus: displayGtus
 		}, () => {
@@ -1279,10 +1309,16 @@ export default React.createBackboneClass({
 								&nbsp;<span>Edit</span>
 							</a>
 						</li>
-						<li>
-							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'marker')}>
+						<li className={`${this.state.displayMode == 'cover' ? 'hide': ''}`}>
+							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'cover')}>
 								<i className="fa fa-map"></i>
 								&nbsp;<span>Show Coverage</span>
+							</a>
+						</li>
+						<li className={`${this.state.displayMode == 'track' ? 'hide': ''}`}>
+							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'track')}>
+								<i className="fa fa-map-o"></i>
+								&nbsp;<span>Track Path</span>
 							</a>
 						</li>
 						<li>
