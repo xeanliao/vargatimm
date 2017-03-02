@@ -70,6 +70,7 @@ var MapContainer = React.createBackboneClass({
 		var monitorMap = new mapboxgl.Map({
 			container: mapContainer,
 			zoom: 8,
+			maxZoom: 21,
 			center: [-73.987378, 40.744556],
 			style: 'http://timm.vargainc.com/map/street.json',
 		});
@@ -77,6 +78,47 @@ var MapContainer = React.createBackboneClass({
 		var nav = new mapboxgl.NavigationControl();
 		monitorMap.addControl(nav, 'top-right');
 		monitorMap.on('load', function () {
+			monitorMap.addSource('google-road-tiles', {
+				"type": "raster",
+				"tiles": [
+					"http://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+					"http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+					"http://mt2.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+					"http://mt3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+				],
+				"tileSize": 256
+			});
+			monitorMap.addSource('google-satellite-tiles', {
+				"type": "raster",
+				"tiles": [
+					"http://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+					"http://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+					"http://mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+					"http://mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+				],
+				"tileSize": 256
+			});
+			monitorMap.addLayer({
+				"id": "google-road-tiles-layer",
+				"type": "raster",
+				"source": "google-road-tiles",
+				"minzoom": 0,
+				"maxzoom": 21,
+				"layout": {
+					"visibility": "visible"
+				}
+			}, 'landcover_snow');
+			monitorMap.addLayer({
+				"id": "google-satellite-tiles-layer",
+				"type": "raster",
+				"source": "google-satellite-tiles",
+				"minzoom": 0,
+				"maxzoom": 21,
+				"layout": {
+					"visibility": "none"
+				}
+			}, 'landcover_snow');
+
 			self.setState({
 				map: monitorMap,
 				mapContainer: mapContainer
@@ -88,6 +130,9 @@ var MapContainer = React.createBackboneClass({
 		var self = this;
 		each(monitorMap.style._layers, (v, k) => {
 			console.log(k);
+			if (!startsWith(k, 'google')) {
+				monitorMap.removeLayer(k);
+			}
 		});
 
 		this.loadBoundary().then(function () {
@@ -750,14 +795,22 @@ var MapContainer = React.createBackboneClass({
 	 * mapbox://styles/mapbox/satellite-streets-v9
 	 */
 	switchMapStyle: function (style) {
-		var map = this.state.map;
-		if (!map) {
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
 			return;
 		}
 		var self = this;
-		map.off('style.load', this.initMapLayer);
-		map.on('style.load', this.initMapLayer);
-		map.setStyle('http://timm.vargainc.com/map/' + style + '.json?v9');
+		// map.off('style.load', this.initMapLayer);
+		// map.on('style.load', this.initMapLayer);
+		// map.setStyle('http://timm.vargainc.com/map/' + style + '.json?v9');
+		if (style == 'streets') {
+			monitorMap.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible');
+			monitorMap.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none');
+		}else{
+			monitorMap.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none');
+			monitorMap.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible');
+		}
+
 	},
 	render: function () {
 		return (
