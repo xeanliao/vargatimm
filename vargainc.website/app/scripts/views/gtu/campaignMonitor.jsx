@@ -61,7 +61,8 @@ var MapContainer = React.createBackboneClass({
 			gtuMarkerFilter: ['all'],
 			trackBeginTime: 0,
 			gtuCount: {},
-			displayMode: 'cover'
+			displayMode: 'cover',
+			showAllDMap: false
 		}
 	},
 	onInit: function (mapContainer) {
@@ -70,7 +71,7 @@ var MapContainer = React.createBackboneClass({
 		var monitorMap = new mapboxgl.Map({
 			container: mapContainer,
 			zoom: 8,
-			maxZoom: 21,
+			maxZoom: 20,
 			center: [-73.987378, 40.744556],
 			style: 'http://timm.vargainc.com/map/street.json',
 		});
@@ -178,6 +179,13 @@ var MapContainer = React.createBackboneClass({
 				self.setGtuPointsFilter();
 			});
 		});
+		this.subscribe('Campaign.Monitor.ShowAllDMap', boolean => {
+			self.setState({
+				showAllDMap: boolean
+			}, () => {
+				self.setDMapFilter();
+			});
+		});
 		this.subscribe('Campaign.Monitor.SwitchGtu', gtus => {
 			self.setState({
 				displayGtus: gtus,
@@ -204,6 +212,7 @@ var MapContainer = React.createBackboneClass({
 		});
 		this.subscribe('Campaign.Monitor.Redraw.FinishedTaskBoundary', taskId => {
 			self.drawBoundary();
+			self.setDMapFilter();
 		})
 		this.subscribe('Global.Window.Resize', size => {
 			if (self.state.mapContainer) {
@@ -437,10 +446,6 @@ var MapContainer = React.createBackboneClass({
 					filter: ["==", "$type", "Polygon"],
 					source: `boundary-dmap`,
 					paint: {
-						// 'line-color': {
-						// 	property: 'userColor',
-						// 	type: 'identity',
-						// },
 						'line-color': 'black',
 						'line-width': {
 							stops: [
@@ -448,7 +453,6 @@ var MapContainer = React.createBackboneClass({
 								[20, 4]
 							]
 						},
-						// 'line-offset': 2,
 						'line-opacity': 0.75,
 					}
 				});
@@ -479,6 +483,52 @@ var MapContainer = React.createBackboneClass({
 			self.publish('hideLoading');
 			console.timeEnd("draw boundary");
 		});
+	},
+	setDMapFilter: function () {
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			console.error('map is not ready');
+			return;
+		}
+		var activeTaskId = this.state.task ? this.state.task.get('Id') : null;
+		if (!this.state.showAllDMap && activeTaskId) {
+			monitorMap.setFilter('boundary-dmap-finished-layer', [
+				"all", ["==", "$type", "Polygon"],
+				["==", "IsFinished", true],
+				["==", "TaskId", activeTaskId]
+			]);
+			monitorMap.setFilter('boundary-dmap-layer', [
+				"all", ["==", "$type", "Polygon"],
+				["==", "IsFinished", false],
+				["==", "TaskId", activeTaskId]
+			]);
+			monitorMap.setFilter('boundary-dmap-line-layer', [
+				"all", ["==", "$type", "Polygon"],
+				["==", "TaskId", activeTaskId]
+			]);
+			monitorMap.setFilter('boundary-dmap-label-layer', [
+				"all", ["==", "$type", "Point"],
+				["==", "TaskId", activeTaskId]
+			]);
+			monitorMap.setLayoutProperty('boundary-submap-layer', 'visibility', 'none');
+			boundary-submap-layer
+		}else{
+			monitorMap.setFilter('boundary-dmap-finished-layer', [
+				"all", ["==", "$type", "Polygon"],
+				["==", "IsFinished", true],
+			]);
+			monitorMap.setFilter('boundary-dmap-layer', [
+				"all", ["==", "$type", "Polygon"],
+				["==", "IsFinished", false],
+			]);
+			monitorMap.setFilter('boundary-dmap-line-layer', [
+				"all", ["==", "$type", "Polygon"],
+			]);
+			monitorMap.setFilter('boundary-dmap-label-layer', [
+				"all", ["==", "$type", "Point"],
+			]);
+			monitorMap.setLayoutProperty('boundary-submap-layer', 'visibility', 'visible');
+		}
 	},
 	buildTaskPopup: function (task) {
 		var self = this;
@@ -647,7 +697,7 @@ var MapContainer = React.createBackboneClass({
 					let currentTime = time - this.state.trackBeginTime;
 					let gtu = head(this.state.displayGtus);
 					let maxSerial = this.state.gtuCount[gtu] || 0;
-					filter.push(['<', 'Serial', parseInt(currentTime / 600) % maxSerial]);
+					filter.push(['<', 'Serial', parseInt(currentTime / 100) % maxSerial]);
 					monitorMap.setFilter('gut-marker-layer', filter);
 				} else {
 					this.state.trackBeginTime = time;
@@ -727,7 +777,7 @@ var MapContainer = React.createBackboneClass({
 				"type": "symbol",
 				"layout": {
 					"icon-image": "walker",
-					"icon-size": 0.75,
+					"icon-size": 0.45,
 					"icon-allow-overlap": true
 				},
 				"paint": {}
@@ -741,7 +791,7 @@ var MapContainer = React.createBackboneClass({
 				"type": "symbol",
 				"layout": {
 					"icon-image": "truck",
-					"icon-size": 0.75,
+					"icon-size": 0.45,
 					"icon-allow-overlap": true
 				},
 				"paint": {}
@@ -806,11 +856,10 @@ var MapContainer = React.createBackboneClass({
 		if (style == 'streets') {
 			monitorMap.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible');
 			monitorMap.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none');
-		}else{
+		} else {
 			monitorMap.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none');
 			monitorMap.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible');
 		}
-
 	},
 	render: function () {
 		return (
@@ -873,7 +922,8 @@ export default React.createBackboneClass({
 			activeTask: null,
 			displayGtus: [],
 			ShowOutOfBoundaryGtu: true,
-			displayMode: 'cover'
+			displayMode: 'cover',
+			showAllDMap: false
 		}
 	},
 	componentDidMount: function () {
@@ -950,6 +1000,7 @@ export default React.createBackboneClass({
 					'displayGtus': displayGtus,
 					'displayMode': 'cover'
 				});
+				self.publish('Campaign.Monitor.ShowAllDMap', self.state.showAllDMap);
 				$(window).trigger('resize');
 			});
 
@@ -1015,6 +1066,14 @@ export default React.createBackboneClass({
 			ShowOutOfBoundaryGtu: showOutOfBoundaryGtu,
 		}, () => {
 			self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', showOutOfBoundaryGtu);
+		});
+	},
+	onSwitchShowAllDMap: function (bool) {
+		var self = this;
+		this.setState({
+			showAllDMap: bool,
+		}, () => {
+			self.publish('Campaign.Monitor.ShowAllDMap', bool);
 		});
 	},
 	onAddEmployee: function () {
@@ -1360,6 +1419,18 @@ export default React.createBackboneClass({
 							<a href="javascript:;" onClick={this.onEdit.bind(this, taskId)}>
 								<i className="fa fa-edit"></i>
 								&nbsp;<span>Edit</span>
+							</a>
+						</li>
+						<li className={this.state.showAllDMap ? 'hide' : ''}>
+							<a href="javascript:;" onClick={this.onSwitchShowAllDMap.bind(this, true)}>
+								<i className="fa fa-th-large"></i>
+								&nbsp;<span>Show Other DMap</span>
+							</a>
+						</li>
+						<li className={this.state.showAllDMap ? '' : 'hide'}>
+							<a href="javascript:;" onClick={this.onSwitchShowAllDMap.bind(this, false)}>
+								<i className="fa fa-square-o"></i>
+								&nbsp;<span>Hide Other DMap</span>
 							</a>
 						</li>
 						<li className={`${this.state.displayMode == 'cover' ? 'hide': ''}`}>
