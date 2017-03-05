@@ -23,7 +23,9 @@ import {
 	head,
 	concat,
 	clone,
-	get
+	get,
+	trim,
+	isFunction
 } from 'lodash';
 
 import d3 from 'd3';
@@ -34,6 +36,7 @@ import GtuCollection from 'collections/gtu';
 import UserCollection from 'collections/user';
 import UserModel from 'models/user';
 import TaskModel from 'models/task';
+import GeoCollection from 'collections/geo';
 
 import BaseView from 'views/base';
 import AssignView from 'views/gtu/assign';
@@ -41,7 +44,141 @@ import EmployeeView from 'views/user/employee';
 import EditView from 'views/monitor/edit';
 
 const TAG = '[CAMPAIGN-MONITOR]';
-
+var GeoControl = React.createBackboneClass({
+	mixins: [BaseView],
+	getInitialState: function () {
+		return {
+			inputText: '',
+			placeHolder: 'Please input Address or Zip code here',
+			activeItem: null
+		}
+	},
+	onInputChange: function (event) {
+		var self = this;
+		let geocode = trim(event.target.value);
+		this.setState({
+			inputText: geocode
+		}, () => {
+			if (geocode.length > 0) {
+				var promiseQuery = null;
+				if (/\d+/.test(geocode)) {
+					promiseQuery = self.getCollection().fetchByZipcode(geocode);
+				} else {
+					promiseQuery = self.getCollection().fetchByAddress(geocode);
+				}
+				promiseQuery.then(geoJson => {
+					self.publish('Campaign.Monitor.GeoResult', geoJson);
+				});
+			}
+		})
+	},
+	onInputKeyUp: function (event) {
+		var results = this.getCollection() || [];
+		if (results.length == 0) {
+			return;
+		}
+		switch (event.key) {
+		case 'ArrowUp':
+			var index = results.indexOf(this.state.activeItem);
+			index--;
+			index = Math.max(0, index);
+			this.onSelectItem(results.at(index));
+			event.preventDefault();
+			event.stopPropagation();
+			break;
+		case 'ArrowDown':
+			var index = results.indexOf(this.state.activeItem);
+			index++;
+			index = Math.min(index, results.length - 1);
+			this.onSelectItem(results.at(index));
+			event.preventDefault();
+			event.stopPropagation();
+			break;
+		case 'Enter':
+			var activeItem = null;
+			if (this.state.activeItem == null) {
+				activeItem = results.at(0);
+			} else {
+				activeItem = this.state.activeItem;
+			}
+			this.onSelectItem(activeItem, this.clearUp);
+			event.preventDefault();
+			event.stopPropagation();
+			break;
+		}
+	},
+	onSelectItem: function (item, callback) {
+		if (item) {
+			var self = this;
+			this.setState({
+				activeItem: item
+			}, () => {
+				this.publish('Campaign.Monitor.FlyToLocation', item.get('latlng'));
+				if (isFunction(callback)) {
+					callback.call(self);
+				}
+			});
+		}
+	},
+	clearUp: function () {
+		var self = this;
+		var placeHolder = '';
+		if (this.state.activeItem) {
+			placeHolder = this.state.activeItem.get('text');
+		}
+		this.setState({
+			activeItem: null,
+			inputText: '',
+			placeHolder: placeHolder
+		}, () => {
+			self.getCollection().reset();
+			$(window).focus();
+			self.publish('Campaign.Monitor.GeoResult', {
+				type: 'FeatureCollection',
+				features: []
+			});
+		});
+	},
+	stopClearUp: function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+	},
+	render: function () {
+		var self = this;
+		var results = this.getCollection() || [];
+		var geoClass = classNames("geocode", {
+			active: results.length > 0
+		});
+		return (
+			<div className={geoClass} onKeyUp={this.onInputKeyUp} onClick={this.stopClearUp}>
+				<input type="text" value={this.state.inputText} onKeyUp={this.onInputKeyUp} onChange={this.onInputChange} placeholder={this.state.placeHolder} />
+				<ul className="accordion">
+					{results.map((item, index)=>{
+						let itemClass = classNames('accordion-item', {
+							active: self.state.activeItem == item
+						});
+						return (
+							<li key={item.get('id')} className={itemClass} onClick={self.onSelectItem.bind(self, item)}>
+								<i className="fa fa-stop"></i>
+								<span>{index + 1}</span>
+								&nbsp;{item.get('text')}
+							</li>
+						);
+					})}
+				</ul>
+			</div>
+		);
+	},
+	componentWillUnmount: function () {
+		$(window).off('click.geo');
+	},
+	componentDidMount: function () {
+		var self = this;
+		$(window).on('click.geo', () => {
+			self.clearUp();
+		});
+	}
+});
 var MapContainer = React.createBackboneClass({
 	mixins: [BaseView],
 	shouldComponentUpdate: function () {
@@ -67,7 +204,7 @@ var MapContainer = React.createBackboneClass({
 	},
 	onInit: function (mapContainer) {
 		var self = this;
-		mapboxgl.accessToken = 'pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA';
+		mapboxgl.accessToken = MapboxToken;
 		var monitorMap = new mapboxgl.Map({
 			container: mapContainer,
 			zoom: 8,
@@ -135,7 +272,7 @@ var MapContainer = React.createBackboneClass({
 				monitorMap.removeLayer(k);
 			}
 		});
-
+		this.addGeoLayer();
 		this.loadBoundary().then(function () {
 			return self.drawBoundary();
 		});
@@ -149,8 +286,14 @@ var MapContainer = React.createBackboneClass({
 	},
 	registerTopic: function (monitorMap) {
 		var self = this;
+		this.subscribe('Campaign.Monitor.GeoResult', data => {
+			monitorMap.getSource('geo-source').setData(data);
+		});
 		this.subscribe('Campaign.Monitor.ZoomToTask', taskId => {
 			self.flyToTask(taskId);
+		});
+		this.subscribe('Campaign.Monitor.FlyToLocation', latlng => {
+			self.flyToLocation(latlng);
 		});
 		this.subscribe('Campaign.Monitor.DrawGtu', data => {
 			self.setState({
@@ -245,6 +388,34 @@ var MapContainer = React.createBackboneClass({
 		})).then(() => {
 			requestAnimationFrame(self.animate);
 		});
+	},
+	addGeoLayer: function () {
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			console.error('map is not ready');
+			return;
+		}
+		monitorMap.addSource('geo-source', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		monitorMap.addLayer({
+			id: 'geo-layer',
+			source: 'geo-source',
+			type: 'symbol',
+			layout: {
+				'icon-allow-overlap': true,
+				'icon-image': 'za-provincial-2',
+				'icon-size': 2,
+				'text-field': '{serial}'
+			},
+			paint: {
+				'text-color': '#ffffff'
+			}
+		})
 	},
 	loadBoundary: function () {
 		console.time("load boundary");
@@ -511,8 +682,8 @@ var MapContainer = React.createBackboneClass({
 				["==", "TaskId", activeTaskId]
 			]);
 			monitorMap.setLayoutProperty('boundary-submap-layer', 'visibility', 'none');
-			boundary-submap-layer
-		}else{
+			boundary - submap - layer
+		} else {
 			monitorMap.setFilter('boundary-dmap-finished-layer', [
 				"all", ["==", "$type", "Polygon"],
 				["==", "IsFinished", true],
@@ -828,6 +999,17 @@ var MapContainer = React.createBackboneClass({
 
 		}
 	},
+	flyToLocation: function (latlng) {
+		var monitorMap = this.state.map;
+		if (!monitorMap) {
+			return;
+		}
+		var mapZoom = monitorMap.getZoom();
+		monitorMap.flyTo({
+			center: latlng,
+			zoom: mapZoom
+		});
+	},
 	clearTask: function () {
 		each(gtuMarkerLayer, layer => {
 			layer && layer.remove && layer.remove();
@@ -872,6 +1054,9 @@ var MapContainer = React.createBackboneClass({
 							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-satellite" onClick={this.switchMapStyle.bind(this, "satellite")}></button>
 						</div>
 					</div>
+				</div>
+				<div className="map-top-center">
+					<GeoControl collection={this.props.geo} />
 				</div>
 			</div>
 		);
@@ -1491,7 +1676,7 @@ export default React.createBackboneClass({
 				    </div>
 		        </div>
 		        {this.renderActiveTask()}
-				<MapContainer model={this.getModel()} onSwitchActiveTask={this.onSwitchActiveTask} />
+				<MapContainer model={this.getModel()} geo={this.props.geo} onSwitchActiveTask={this.onSwitchActiveTask} />
 				<ImportFiles tasks={tasks} />
 			</div>
 		);

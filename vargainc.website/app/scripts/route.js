@@ -127,7 +127,9 @@ export default Backbone.Router.extend({
 	campaignMonitorAction: function (campaignId) {
 		var View = require('views/gtu/campaignMonitor').default;
 		var Model = require('models/campaign').default;
+		var GeoCollection = require('collections/geo').default;
 		var campaignWithTaskModel = new Model();
+		var geoCollection = new GeoCollection();
 		campaignWithTaskModel.loadWithAllTask(campaignId).then(() => {
 			Topic.publish({
 				channel: 'View',
@@ -136,6 +138,7 @@ export default Backbone.Router.extend({
 					view: View,
 					params: {
 						model: campaignWithTaskModel,
+						geo : geoCollection
 					},
 					options: {
 						showMenu: false,

@@ -142,7 +142,8 @@ module.exports = function (grunt) {
 						'process.env': {
 							'NODE_ENV': JSON.stringify('production') // This has effect on the react lib size
 						},
-						DEBUG: JSON.stringify(false)
+						DEBUG: JSON.stringify(false),
+						MapboxToken: JSON.stringify("pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA"),
 					})
 				]
 			}
@@ -400,7 +401,8 @@ module.exports = function (grunt) {
 					plugins: [
 						new webpack.HotModuleReplacementPlugin(),
 						new webpack.DefinePlugin({
-							DEBUG: JSON.stringify(true)
+							DEBUG: JSON.stringify(true),
+							MapboxToken: JSON.stringify("pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA"),
 						}),
 					],
 					watch: true,
