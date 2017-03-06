@@ -1042,6 +1042,7 @@ var MapContainer = React.createBackboneClass({
 			monitorMap.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none');
 			monitorMap.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible');
 		}
+
 	},
 	render: function () {
 		return (
@@ -1050,7 +1051,7 @@ var MapContainer = React.createBackboneClass({
 				<div className='map-overlay'>
 					<div className="mapboxgl-ctrl-top-left">
 						<div className="mapboxgl-ctrl mapboxgl-ctrl-group">
-							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-stree" onClick={this.switchMapStyle.bind(this, "street")}></button>
+							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-stree" onClick={this.switchMapStyle.bind(this, "streets")}></button>
 							<button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-satellite" onClick={this.switchMapStyle.bind(this, "satellite")}></button>
 						</div>
 					</div>
