@@ -67,7 +67,7 @@ export default Backbone.Collection.extend({
 					features: []
 				};
 
-				each(result.features, item => {
+				each(result.features, (item, index) => {
 					models.push({
 						id: item.id,
 						place: item.place_name,

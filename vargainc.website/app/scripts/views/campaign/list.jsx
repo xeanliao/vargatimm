@@ -17,6 +17,7 @@ import $ from 'jquery';
 import BaseView from 'views/base';
 import CampaignRow from './row';
 import EditView from './edit';
+import Model from 'models/campaign';
 
 export default React.createBackboneClass({
 	mixins: [BaseView],
@@ -45,8 +46,10 @@ export default React.createBackboneClass({
 		$("#campaign-filter-ddl-ClientName, #campaign-filter-ddl-ClientCode, #campaign-filter-ddl-Date, #campaign-filter-ddl-AreaDescription").foundation();
 	},
 	onNew: function () {
-		this.publish('showDialog', EditView, {
-			model: new Model()
+		var model = new Model();
+		var view = <EditView model={model} />
+		this.publish('showDialog', {
+			view: view
 		});
 	},
 	onOrderBy: function (field, reactObj, reactId, e) {

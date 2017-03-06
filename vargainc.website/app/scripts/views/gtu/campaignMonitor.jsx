@@ -57,7 +57,7 @@ var GeoControl = React.createBackboneClass({
 		var self = this;
 		let geocode = trim(event.target.value);
 		this.setState({
-			inputText: geocode
+			inputText: event.target.value
 		}, () => {
 			if (geocode.length > 0) {
 				var promiseQuery = null;
@@ -101,7 +101,7 @@ var GeoControl = React.createBackboneClass({
 			} else {
 				activeItem = this.state.activeItem;
 			}
-			this.onSelectItem(activeItem, this.clearUp);
+			this.onSelectItem(activeItem);
 			event.preventDefault();
 			event.stopPropagation();
 			break;
