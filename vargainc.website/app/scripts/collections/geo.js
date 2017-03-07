@@ -17,7 +17,6 @@ export default Backbone.Collection.extend({
 				data: {
 					country: 'us',
 					types: 'postcode',
-					autocomplete: true,
 					access_token: MapboxToken
 				}
 			}).then(result => {
@@ -56,8 +55,6 @@ export default Backbone.Collection.extend({
 				method: 'GET',
 				data: {
 					country: 'us',
-					types: 'address', //address
-					autocomplete: true,
 					access_token: MapboxToken
 				}
 			}).then(result => {

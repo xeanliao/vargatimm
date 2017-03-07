@@ -50,18 +50,18 @@ var GeoControl = React.createBackboneClass({
 		return {
 			inputText: '',
 			placeHolder: 'Please input Address or Zip code here',
-			activeItem: null
+			activeItem: null,
+			searchTimeout: null
 		}
 	},
-	onInputChange: function (event) {
+	search: function () {
+		clearTimeout(this.state.searchTimeout);
 		var self = this;
-		let geocode = trim(event.target.value);
-		this.setState({
-			inputText: event.target.value
-		}, () => {
+		this.state.searchTimeout = setTimeout(() => {
+			var geocode = trim(self.state.inputText);
 			if (geocode.length > 0) {
 				var promiseQuery = null;
-				if (/\d+/.test(geocode)) {
+				if (/^\d+$/.test(geocode)) {
 					promiseQuery = self.getCollection().fetchByZipcode(geocode);
 				} else {
 					promiseQuery = self.getCollection().fetchByAddress(geocode);
@@ -70,6 +70,14 @@ var GeoControl = React.createBackboneClass({
 					self.publish('Campaign.Monitor.GeoResult', geoJson);
 				});
 			}
+		}, 500);
+	},
+	onInputChange: function (event) {
+		var self = this;
+		this.setState({
+			inputText: event.target.value
+		}, () => {
+			self.search();
 		})
 	},
 	onInputKeyUp: function (event) {
@@ -111,7 +119,8 @@ var GeoControl = React.createBackboneClass({
 		if (item) {
 			var self = this;
 			this.setState({
-				activeItem: item
+				activeItem: item,
+				inputText: item.get('place')
 			}, () => {
 				this.publish('Campaign.Monitor.FlyToLocation', item.get('latlng'));
 				if (isFunction(callback)) {
@@ -147,7 +156,7 @@ var GeoControl = React.createBackboneClass({
 		var self = this;
 		var results = this.getCollection() || [];
 		var geoClass = classNames("geocode", {
-			active: results.length > 0
+			active: results.length > 1
 		});
 		return (
 			<div className={geoClass} onKeyUp={this.onInputKeyUp} onClick={this.stopClearUp}>
@@ -161,7 +170,7 @@ var GeoControl = React.createBackboneClass({
 							<li key={item.get('id')} className={itemClass} onClick={self.onSelectItem.bind(self, item)}>
 								<i className="fa fa-stop"></i>
 								<span>{index + 1}</span>
-								&nbsp;{item.get('text')}
+								&nbsp;{item.get('place')}
 							</li>
 						);
 					})}
@@ -186,6 +195,7 @@ var MapContainer = React.createBackboneClass({
 	},
 	getInitialState: function () {
 		return {
+			tasks: [],
 			gtuMarkerLayer: {},
 			gtuTrackLayer: {},
 			gtuLocationLayer: null,
@@ -245,7 +255,7 @@ var MapContainer = React.createBackboneClass({
 				"layout": {
 					"visibility": "visible"
 				}
-			}, 'landcover_snow');
+			});
 			monitorMap.addLayer({
 				"id": "google-satellite-tiles-layer",
 				"type": "raster",
@@ -255,7 +265,7 @@ var MapContainer = React.createBackboneClass({
 				"layout": {
 					"visibility": "none"
 				}
-			}, 'landcover_snow');
+			});
 
 			self.setState({
 				map: monitorMap,
@@ -266,14 +276,8 @@ var MapContainer = React.createBackboneClass({
 	initMapLayer: function () {
 		var monitorMap = this.state.map;
 		var self = this;
-		each(monitorMap.style._layers, (v, k) => {
-			console.log(k);
-			if (!startsWith(k, 'google')) {
-				monitorMap.removeLayer(k);
-			}
-		});
 		this.addGeoLayer();
-		this.loadBoundary().then(function () {
+		this.loadBoundary().delay(500).then(function () {
 			return self.drawBoundary();
 		});
 
@@ -297,7 +301,7 @@ var MapContainer = React.createBackboneClass({
 		});
 		this.subscribe('Campaign.Monitor.DrawGtu', data => {
 			self.setState({
-				task: data.task,
+				tasks: data.tasks,
 				displayGtus: data.displayGtus,
 				displayMode: data.displayMode,
 				trackBeginTime: null
@@ -348,7 +352,7 @@ var MapContainer = React.createBackboneClass({
 			}
 		});
 		this.subscribe('Campaign.Monitor.CenterToTask', () => {
-			self.flyToTask(self.state.task.get('Id'), true);
+			self.flyToTask(head(self.state.tasks).get('Id'), true);
 		});
 		this.subscribe('Campaign.Monitor.Reload', () => {
 			self.reload();
@@ -370,7 +374,21 @@ var MapContainer = React.createBackboneClass({
 			var taskId = $(this).attr("id");
 			self.publish("Map.Popup.SetActiveTask", taskId);
 			self.state.popup && self.state.popup.remove();
+			return false;
 		});
+
+		this.on('click.map.popup', '.btnMergeTask', function () {
+			var taskId = $(this).attr("id");
+			self.publish("Map.Popup.MergeTask", taskId);
+			self.state.popup && self.state.popup.remove();
+			return false;
+		});
+		this.on('click.map.popup', '.btnAbortMergeTask', function () {
+			self.publish("Map.Popup.AbortMergeTask");
+			self.state.popup && self.state.popup.remove();
+			return false;
+		});
+
 
 		monitorMap.on('click', function (e) {
 			self.onTaskAreaClickHandler.call(self, e);
@@ -499,6 +517,7 @@ var MapContainer = React.createBackboneClass({
 		]).then(() => {
 			self.publish('hideLoading');
 			console.timeEnd("load boundary");
+			return Promise.resolve();
 		});
 	},
 	drawBoundary: function () {
@@ -523,7 +542,7 @@ var MapContainer = React.createBackboneClass({
 			return Promise.all(map(submaps, submapId => {
 				return localStorage.getItem(`boundary-submap-${submapId}`);
 			})).then(data => {
-				var geoData = {
+				let geoData = {
 					"type": "FeatureCollection",
 					"features": data
 				};
@@ -558,10 +577,10 @@ var MapContainer = React.createBackboneClass({
 					});
 				})
 				return Promise.resolve();
-			})
+			});
 		}
 		var drawDMapPromise = function () {
-			var geoData = {
+			let geoData = {
 				"type": "FeatureCollection",
 				"features": []
 			};
@@ -594,7 +613,7 @@ var MapContainer = React.createBackboneClass({
 						},
 						'fill-opacity': 0.55,
 					}
-				}, 'ferry');
+				});
 				monitorMap.addLayer({
 					id: `boundary-dmap-layer`,
 					type: 'fill',
@@ -610,7 +629,7 @@ var MapContainer = React.createBackboneClass({
 						},
 						'fill-opacity': 0.25,
 					}
-				}, 'ferry');
+				});
 				monitorMap.addLayer({
 					id: `boundary-dmap-line-layer`,
 					type: 'line',
@@ -644,6 +663,7 @@ var MapContainer = React.createBackboneClass({
 					},
 					paint: {}
 				});
+				return Promise.resolve();
 			});
 		}
 		return Promise.all([
@@ -661,7 +681,7 @@ var MapContainer = React.createBackboneClass({
 			console.error('map is not ready');
 			return;
 		}
-		var activeTaskId = this.state.task ? this.state.task.get('Id') : null;
+		var activeTaskId = this.state.tasks ? head(this.state.tasks).get('Id') : null;
 		if (!this.state.showAllDMap && activeTaskId) {
 			monitorMap.setFilter('boundary-dmap-finished-layer', [
 				"all", ["==", "$type", "Polygon"],
@@ -705,9 +725,38 @@ var MapContainer = React.createBackboneClass({
 		var self = this;
 		var taskStatus = null;
 		var setActiveButton = null;
+		var mergeTaskButton = null;
 		var isFinished = task.IsFinished;
 		if (isFinished) {
 			taskStatus = [<span key={'finished'}>FINISHED</span>];
+			if (self.state.tasks.length == 0) {
+				mergeTaskButton = (
+					<div className="small-7 small-centered columns">
+						<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
+							<button id={task.Id} className="button btnMergeTask">Merge From Here</button>
+						</div>
+					</div>
+				);
+			} else if (self.state.tasks.length == 1) {
+				mergeTaskButton = (
+					<div className="small-10 small-centered columns">
+						<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
+							<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
+							<button id={task.Id} className="button btnMergeTask">Merge Preview</button>
+						</div>
+					</div>
+				);
+			} else {
+				mergeTaskButton = (
+					<div className="small-10 small-centered columns">
+						<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
+							<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
+							<button id={task.Id} className="button btnMergeTaskDone">Confirm Merge</button>
+						</div>
+					</div>
+				);
+			}
+
 		} else {
 			setActiveButton = (
 				<div className="small-8 align-center columns">
@@ -738,6 +787,7 @@ var MapContainer = React.createBackboneClass({
 				<div className="small-7 columns">{task.Name}</div>
 				<div className="small-5 columns text-right">{taskStatus}</div>
 				{setActiveButton}
+				{mergeTaskButton}
 			</div>
 		);
 
@@ -761,7 +811,7 @@ var MapContainer = React.createBackboneClass({
 		}
 	},
 	reload: function () {
-		if (!this.state.task || this.state.reloading) {
+		if (!this.state.tasks || this.state.reloading) {
 			return;
 		}
 
@@ -770,18 +820,20 @@ var MapContainer = React.createBackboneClass({
 			this.setState({
 				reloading: true
 			}, () => {
-				var task = self.state.task,
-					dmap = task.get('dmap'),
-					gtus = task.get('gtuList');
+				var promiseQuery = [];
+				each(self.state.tasks, task => {
+					var dmap = task.get('dmap'),
+						gtus = task.get('gtuList');
+					promiseQuery.push(dmap.updateGtuAfterTime(null, {
+						quite: true
+					}));
+					promiseQuery.push(gtus.fetchGtuLocation(task.get('Id'), {
+						quite: true
+					}));
+				});
 
-				Promise.all([
-					dmap.updateGtuAfterTime(null, {
-						quite: true
-					}),
-					gtus.fetchGtuLocation(task.get('Id'), {
-						quite: true
-					})
-				]).then(() => {
+
+				Promise.all(promiseQuery).then(() => {
 					self.setState({
 						reloading: false
 					}, () => {
@@ -789,19 +841,23 @@ var MapContainer = React.createBackboneClass({
 					});
 				}).catch(() => {
 					return reject(new Error('unkown error in reload'));
-				})
+				});
 			});
 		}).then(() => {
 			self.drawGtu();
+			return Promise.resolve();
 		})
 	},
 	drawGtu: function () {
 		var map = this.state.map;
-		var task = this.state.task;
-		if (!map || !task) {
+		var tasks = this.state.tasks;
+		if (!map || !tasks) {
 			return;
 		}
-		var gtus = task.get('dmap').get('Gtu');
+		var gtus = [];
+		each(tasks, task => {
+			gtus = concat(gtus, task.get('dmap').get('Gtu'));
+		});
 
 		this.drawGtuLocation(gtus);
 
@@ -813,7 +869,7 @@ var MapContainer = React.createBackboneClass({
 		if (!monitorMap) {
 			return;
 		}
-		var taskId = this.state.task.get('Id');
+		// var taskId = this.state.task.get('Id');
 		let geoJson = {
 			type: "FeatureCollection",
 			features: []
@@ -889,9 +945,9 @@ var MapContainer = React.createBackboneClass({
 		if (!this.state.showOutOfBoundaryGtu) {
 			filter.push(['==', 'Out', false]);
 		}
-
-		filter.push(concat(['in', 'GtuId'], this.state.displayGtus));
-
+		if (this.state.displayGtus.length > 0) {
+			filter.push(concat(['in', 'GtuId'], this.state.displayGtus));
+		}
 		this.setState({
 			gtuMarkerFilter: filter
 		}, () => {
@@ -905,71 +961,71 @@ var MapContainer = React.createBackboneClass({
 		if (!monitorMap) {
 			return;
 		}
-		var self = this;
-		let taskIsStopped = this.state.task.get('Status') == 1,
-			gtuList = this.state.task.get('gtuList').where(function (gtu) {
-				return gtu.get('Location') != null;
-			});
-		var geoJson = {
-			type: 'FeatureCollection',
-			features: map(gtuList, gtu => {
-				let latlng = gtu.get('Location');
-				if (!latlng || !latlng.lat || !latlng.lng) {
-					return null;
-				}
-				return {
-					type: 'Feature',
-					geometry: {
-						type: 'Point',
-						coordinates: [latlng.lng, latlng.lat]
-					},
-					properties: {
-						userColor: '#ff0000',
-						role: gtu.get('Role'),
-						gtuId: gtu.get('Id'),
-						outOfBoundary: gtu.get('OutOfBoundary'),
-						visiable: taskIsStopped ? gtu.get('WithData') : gtu.get('IsAssign') || gtu.get('WithData'),
-					}
-				}
-			})
-		};
-		var source = monitorMap.getSource(`GTU-LastLocation`);
-		if (source == null) {
-			monitorMap.addSource(`GTU-LastLocation`, {
-				"type": 'geojson',
-				"data": geoJson
-			});
-			monitorMap.addLayer({
-				"filter": [
-					"all", ["==", "role", "Walker"]
-				],
-				"id": `GTU-LastLocation-Walker-Icon-Layer`,
-				"source": 'GTU-LastLocation',
-				"type": "symbol",
-				"layout": {
-					"icon-image": "walker",
-					"icon-size": 0.45,
-					"icon-allow-overlap": true
-				},
-				"paint": {}
-			});
-			monitorMap.addLayer({
-				"filter": [
-					"all", ["!=", "role", "Walker"]
-				],
-				"id": `GTU-LastLocation-Trunk-Icon-Layer`,
-				"source": 'GTU-LastLocation',
-				"type": "symbol",
-				"layout": {
-					"icon-image": "truck",
-					"icon-size": 0.45,
-					"icon-allow-overlap": true
-				},
-				"paint": {}
-			});
-		} else {
-			source.setData(geoJson);
-		}
+		// var self = this;
+		// let taskIsStopped = this.state.task.get('Status') == 1,
+		// 	gtuList = this.state.task.get('gtuList').where(function (gtu) {
+		// 		return gtu.get('Location') != null;
+		// 	});
+		// var geoJson = {
+		// 	type: 'FeatureCollection',
+		// 	features: map(gtuList, gtu => {
+		// 		let latlng = gtu.get('Location');
+		// 		if (!latlng || !latlng.lat || !latlng.lng) {
+		// 			return null;
+		// 		}
+		// 		return {
+		// 			type: 'Feature',
+		// 			geometry: {
+		// 				type: 'Point',
+		// 				coordinates: [latlng.lng, latlng.lat]
+		// 			},
+		// 			properties: {
+		// 				userColor: '#ff0000',
+		// 				role: gtu.get('Role'),
+		// 				gtuId: gtu.get('Id'),
+		// 				outOfBoundary: gtu.get('OutOfBoundary'),
+		// 				visiable: taskIsStopped ? gtu.get('WithData') : gtu.get('IsAssign') || gtu.get('WithData'),
+		// 			}
+		// 		}
+		// 	})
+		// };
+		// var source = monitorMap.getSource(`GTU-LastLocation`);
+		// if (source == null) {
+		// 	monitorMap.addSource(`GTU-LastLocation`, {
+		// 		"type": 'geojson',
+		// 		"data": geoJson
+		// 	});
+		// 	monitorMap.addLayer({
+		// 		"filter": [
+		// 			"all", ["==", "role", "Walker"]
+		// 		],
+		// 		"id": `GTU-LastLocation-Walker-Icon-Layer`,
+		// 		"source": 'GTU-LastLocation',
+		// 		"type": "symbol",
+		// 		"layout": {
+		// 			"icon-image": "walker",
+		// 			"icon-size": 0.45,
+		// 			"icon-allow-overlap": true
+		// 		},
+		// 		"paint": {}
+		// 	});
+		// 	monitorMap.addLayer({
+		// 		"filter": [
+		// 			"all", ["!=", "role", "Walker"]
+		// 		],
+		// 		"id": `GTU-LastLocation-Trunk-Icon-Layer`,
+		// 		"source": 'GTU-LastLocation',
+		// 		"type": "symbol",
+		// 		"layout": {
+		// 			"icon-image": "truck",
+		// 			"icon-size": 0.45,
+		// 			"icon-allow-overlap": true
+		// 		},
+		// 		"paint": {}
+		// 	});
+		// } else {
+		// 	source.setData(geoJson);
+		// }
 	},
 	flyToTask: function (taskId, keepZoom) {
 		var monitorMap = this.state.map;
@@ -1042,7 +1098,6 @@ var MapContainer = React.createBackboneClass({
 			monitorMap.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none');
 			monitorMap.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible');
 		}
-
 	},
 	render: function () {
 		return (
@@ -1107,9 +1162,10 @@ export default React.createBackboneClass({
 		return {
 			activeTask: null,
 			displayGtus: [],
-			ShowOutOfBoundaryGtu: true,
+			showOutOfBoundaryGtu: true,
 			displayMode: 'cover',
-			showAllDMap: false
+			showAllDMap: false,
+			mergeTasks: []
 		}
 	},
 	componentDidMount: function () {
@@ -1128,6 +1184,34 @@ export default React.createBackboneClass({
 			}
 		});
 
+		this.subscribe('Map.Popup.MergeTask', taskId => {
+			var model = self.getModel();
+			var tasks = model && model.get('Tasks');
+			if (tasks && tasks.size && tasks.size() > 0) {
+				var currentTask = find(tasks.models, i => {
+					return i.get('Id') == taskId;
+				});
+				if (currentTask) {
+					self.state.mergeTasks.push(currentTask);
+					self.onMergeTask.call(self, currentTask);
+				}
+			}
+		});
+		this.subscribe('Map.Popup.AbortMergeTask', () => {
+			self.setState({
+				mergeTasks: []
+			}, () => {
+				self.publish('Campaign.Monitor.DrawGtu', {
+					'tasks': [],
+					'displayGtus': [],
+					'displayMode': self.state.displayMode
+				});
+				self.publish('Campaign.Monitor.ShowAllDMap', self.state.showAllDMap);
+				self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', self.state.showOutOfBoundaryGtu);
+			});
+		});
+
+
 		this.on('click.import.task', '.btnImportTask', function (evt) {
 			evt.preventDefault();
 			evt.stopPropagation();
@@ -1143,9 +1227,7 @@ export default React.createBackboneClass({
 	showTask: function (task) {
 		this.publish('Campaign.Monitor.ZoomToTask', task);
 	},
-	onSwitchActiveTask: function (task) {
-		var self = this;
-		this.publish('clearTask');
+	loadTask: function (task) {
 		var taskDMap = new DMap({
 			CampaignId: task.get('CampaignId'),
 			SubMapId: task.get('SubMapId'),
@@ -1168,28 +1250,60 @@ export default React.createBackboneClass({
 		return Promise.all([trackQuery, locationQuery]).then(() => {
 			task.set('dmap', taskDMap);
 			task.set('gtuList', gtu);
-			/**
-			 * set all gtu as default display
-			 */
-			var displayGtus = taskDMap.get('Gtu') || [];
-			displayGtus = map(displayGtus, gtu => {
-				return gtu.points && gtu.points.length > 0 ? gtu.points[0].Id : null;
-			});
-			self.setState({
-				'activeTask': task,
-				'displayGtus': displayGtus,
-				'displayMode': 'cover'
-			}, () => {
-				self.publish('Campaign.Monitor.ZoomToTask', task.get('Id'));
-				self.publish('Campaign.Monitor.DrawGtu', {
-					'task': task,
+			return Promise.resolve();
+		});
+	},
+	onSwitchActiveTask: function (task) {
+		var self = this;
+		this.loadTask(task).then(() => {
+			return new Promise((resolve, reject) => {
+				var taskDMap = task.get('dmap');
+				/**
+				 * set all gtu as default display
+				 */
+				var displayGtus = taskDMap.get('Gtu') || [];
+				displayGtus = map(displayGtus, gtu => {
+					return gtu.points && gtu.points.length > 0 ? gtu.points[0].Id : null;
+				});
+				self.setState({
+					'activeTask': task,
 					'displayGtus': displayGtus,
 					'displayMode': 'cover'
+				}, () => {
+					self.publish('Campaign.Monitor.ZoomToTask', task.get('Id'));
+					self.publish('Campaign.Monitor.DrawGtu', {
+						'tasks': [task],
+						'displayGtus': displayGtus,
+						'displayMode': 'cover'
+					});
+					self.publish('Campaign.Monitor.ShowAllDMap', self.state.showAllDMap);
+					$(window).trigger('resize');
+					return resolve();
 				});
-				self.publish('Campaign.Monitor.ShowAllDMap', self.state.showAllDMap);
-				$(window).trigger('resize');
 			});
-
+		});
+	},
+	onMergeTask: function () {
+		var self = this;
+		return Promise.all(map(this.state.mergeTasks, task => {
+			return self.loadTask(task);
+		})).then(() => {
+			var displayGtus = [];
+			each(self.state.mergeTasks, task => {
+				var gtus = task.get('dmap').get('Gtu');
+				each(gtus, gtu => {
+					gtu.points && gtu.points.length > 0 && displayGtus.push(gtu.points[0].Id);
+				});
+			});
+			self.publish('Campaign.Monitor.DrawGtu', {
+				'tasks': this.state.mergeTasks,
+				'displayGtus': displayGtus,
+				'displayMode': 'cover'
+			});
+			self.publish('Campaign.Monitor.ShowAllDMap', true);
+			self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', true);
+			$(window).trigger('resize');
+			return Promise.resolve();
 		});
 	},
 	onOpenDropDown: function (evt) {
@@ -1247,9 +1361,9 @@ export default React.createBackboneClass({
 	},
 	onSwitchShowOutOfBoundaryGtu: function () {
 		var self = this;
-		var showOutOfBoundaryGtu = !this.state.ShowOutOfBoundaryGtu;
+		var showOutOfBoundaryGtu = !this.state.showOutOfBoundaryGtu;
 		this.setState({
-			ShowOutOfBoundaryGtu: showOutOfBoundaryGtu,
+			showOutOfBoundaryGtu: showOutOfBoundaryGtu,
 		}, () => {
 			self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', showOutOfBoundaryGtu);
 		});
