@@ -663,6 +663,69 @@ var MapContainer = React.createBackboneClass({
 					},
 					paint: {}
 				});
+				/**
+				 * merge layers
+				 */
+				monitorMap.addLayer({
+					id: `boundary-dmap-merge-source-layer`,
+					type: 'line',
+					filter: [
+						"all", ["==", "$type", "Polygon"],
+					],
+					source: `boundary-dmap`,
+					layout: {
+						visibility: "none"
+					},
+					paint: {
+						'line-color': ' #3498db',
+						'line-width': 6
+					}
+				});
+				monitorMap.addLayer({
+					id: `boundary-dmap-merge-source-fill-layer`,
+					type: 'fill',
+					filter: [
+						"all", ["==", "$type", "Polygon"],
+					],
+					source: `boundary-dmap`,
+					layout: {
+						visibility: "none"
+					},
+					paint: {
+						'fill-color': ' #3498db',
+						'fill-opacity': 0.25
+					}
+				});
+				monitorMap.addLayer({
+					id: `boundary-dmap-merge-target-layer`,
+					type: 'line',
+					filter: [
+						"all", ["==", "$type", "Polygon"],
+					],
+					source: `boundary-dmap`,
+					layout: {
+						visibility: "none"
+					},
+					paint: {
+						'line-color': '#c0392b',
+						'line-width': 6
+					}
+				});
+				monitorMap.addLayer({
+					id: `boundary-dmap-merge-target-fill-layer`,
+					type: 'fill',
+					filter: [
+						"all", ["==", "$type", "Polygon"],
+					],
+					source: `boundary-dmap`,
+					layout: {
+						visibility: "none"
+					},
+					paint: {
+						'fill-color': '#c0392b',
+						'fill-opacity': 0.25
+					}
+				});
 				return Promise.resolve();
 			});
 		}
@@ -681,7 +744,9 @@ var MapContainer = React.createBackboneClass({
 			console.error('map is not ready');
 			return;
 		}
-		var activeTaskId = this.state.tasks ? head(this.state.tasks).get('Id') : null;
+		var activeTask = head(this.state.tasks);
+		var activeTaskId = activeTask ? activeTask.get('Id') : null;
+
 		if (!this.state.showAllDMap && activeTaskId) {
 			monitorMap.setFilter('boundary-dmap-finished-layer', [
 				"all", ["==", "$type", "Polygon"],
@@ -719,6 +784,41 @@ var MapContainer = React.createBackboneClass({
 				"all", ["==", "$type", "Point"],
 			]);
 			monitorMap.setLayoutProperty('boundary-submap-layer', 'visibility', 'visible');
+		}
+
+		var displayTasks = map(this.state.tasks, task => {
+			return task.get('Id');
+		});
+		if (displayTasks.length > 1) {
+			monitorMap.setFilter('boundary-dmap-finished-layer', [
+				"all", ["==", "$type", "Polygon"],
+				["==", "IsFinished", true],
+				concat(["!in", "TaskId"], displayTasks)
+			]);
+			each(['boundary-dmap-merge-source-layer', 'boundary-dmap-merge-source-fill-layer'], layer => {
+				monitorMap.setFilter(layer, [
+					"all", ["==", "$type", "Polygon"],
+					["==", "TaskId", displayTasks[0]]
+				]);
+				monitorMap.setLayoutProperty(layer, 'visibility', 'visible');
+			});
+			each(['boundary-dmap-merge-target-layer', 'boundary-dmap-merge-target-fill-layer'], layer => {
+				monitorMap.setFilter(layer, [
+					"all", ["==", "$type", "Polygon"],
+					["==", "TaskId", displayTasks[1]]
+				]);
+				monitorMap.setLayoutProperty(layer, 'visibility', 'visible');
+			});
+		} else {
+			monitorMap.setFilter('boundary-dmap-finished-layer', [
+				"all", ["==", "$type", "Polygon"],
+				["==", "IsFinished", true]
+			]);
+			each(['boundary-dmap-merge-source-layer', 'boundary-dmap-merge-source-fill-layer',
+				'boundary-dmap-merge-target-layer', 'boundary-dmap-merge-target-fill-layer'
+			], layer => {
+				monitorMap.setLayoutProperty(layer, 'visibility', 'none');
+			});
 		}
 	},
 	buildTaskPopup: function (task) {
@@ -796,7 +896,12 @@ var MapContainer = React.createBackboneClass({
 	onTaskAreaClickHandler: function (e) {
 		var monitorMap = this.state.map;
 		var feature = head(monitorMap.queryRenderedFeatures(e.point, {
-			layers: ['boundary-dmap-layer', 'boundary-dmap-finished-layer']
+			layers: [
+				'boundary-dmap-layer',
+				'boundary-dmap-finished-layer',
+				'boundary-dmap-merge-source-fill-layer',
+				'boundary-dmap-merge-target-fill-layer'
+			]
 		}));
 		if (feature) {
 			var task = JSON.parse(feature.properties.Task);

@@ -187,12 +187,12 @@ table .select2-container { margin: 0; }
 .mapbox-wrapper .map-overlay { z-index: 1; }
 .mapbox-wrapper .map-overlay.topleft { position: absolute; left: 10px; top: 10px; }
 .mapbox-wrapper .map-top-center { position: absolute; width: 80%; left: 50%; margin-left: -40%; top: 5px; }
-.mapbox-wrapper .geocode { margin: 0 auto; max-width: 480px; }
+.mapbox-wrapper .geocode { margin: 0 auto; max-width: 640px; }
 .mapbox-wrapper .geocode input { max-width: 320px; margin: 0 auto; text-align: center; opacity: 0.45; margin-bottom: 0; }
-.mapbox-wrapper .geocode input:focus { opacity: 1; text-align: left; border-radius: 0px; max-width: 480px; }
+.mapbox-wrapper .geocode input:focus { opacity: 1; text-align: left; border-radius: 0px; max-width: 640px; }
 .mapbox-wrapper .geocode i { transform: rotateZ(45deg); color: #339933; position: relative; }
 .mapbox-wrapper .geocode span { position: relative; left: -9px; top: -2px; width: 10px; color: #fff; text-align: left; font-size: 10px; font-weight: 800; }
-.mapbox-wrapper .geocode.active input { opacity: 1; text-align: left; border-radius: 0px; max-width: 480px; }
+.mapbox-wrapper .geocode.active input { opacity: 1; text-align: left; border-radius: 0px; max-width: 640px; }
 .mapbox-wrapper .geocode.active .accordion { border: 1px solid #cacaca; border-top: none; }
 .mapbox-wrapper .geocode .accordion-item { padding: 0.25rem 0.5rem; }
 .mapbox-wrapper .geocode .accordion-item:hover, .mapbox-wrapper .geocode .accordion-item.active { background: #B2D7FE; color: black; }
