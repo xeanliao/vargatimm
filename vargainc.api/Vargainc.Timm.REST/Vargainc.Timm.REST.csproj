@@ -224,6 +224,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\api-release.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\Timm.REST.pubxml" />
   </ItemGroup>
   <ItemGroup />
