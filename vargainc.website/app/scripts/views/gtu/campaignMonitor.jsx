@@ -21,11 +21,13 @@ import {
 	startsWith,
 	keys,
 	head,
+	last,
 	concat,
 	clone,
 	get,
 	trim,
-	isFunction
+	isFunction,
+	includes
 } from 'lodash';
 
 import d3 from 'd3';
@@ -388,6 +390,12 @@ var MapContainer = React.createBackboneClass({
 			self.state.popup && self.state.popup.remove();
 			return false;
 		});
+		this.on('click.map.popup', '.btnMergeTaskDone', function () {
+			self.publish("Map.Popup.ConfirmMergeTask");
+			self.state.popup && self.state.popup.remove();
+			return false;
+		});
+
 
 
 		monitorMap.on('click', function (e) {
@@ -827,6 +835,9 @@ var MapContainer = React.createBackboneClass({
 		var setActiveButton = null;
 		var mergeTaskButton = null;
 		var isFinished = task.IsFinished;
+		var mergeTaskIdArray = map(self.state.tasks, task=>{
+			return task.get('Id');
+		});
 		if (isFinished) {
 			taskStatus = [<span key={'finished'}>FINISHED</span>];
 			if (self.state.tasks.length == 0) {
@@ -838,23 +849,44 @@ var MapContainer = React.createBackboneClass({
 					</div>
 				);
 			} else if (self.state.tasks.length == 1) {
-				mergeTaskButton = (
-					<div className="small-10 small-centered columns">
-						<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
-							<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
-							<button id={task.Id} className="button btnMergeTask">Merge Preview</button>
+				if (includes(mergeTaskIdArray, task.Id)) {
+					mergeTaskButton = (
+						<div className="small-7 small-centered columns">
+							<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
+								<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
+							</div>
 						</div>
-					</div>
-				);
+					);
+				} else {
+					mergeTaskButton = (
+						<div className="small-10 small-centered columns">
+							<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
+								<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
+								<button id={task.Id} className="button btnMergeTask">Merge Preview</button>
+							</div>
+						</div>
+					);
+				}
+
 			} else {
-				mergeTaskButton = (
-					<div className="small-10 small-centered columns">
-						<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
-							<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
-							<button id={task.Id} className="button btnMergeTaskDone">Confirm Merge</button>
+				if (includes(mergeTaskIdArray, task.Id)) {
+					mergeTaskButton = (
+						<div className="small-10 small-centered columns">
+							<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
+								<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
+								<button id={task.Id} className="button btnMergeTaskDone">Confirm Merge</button>
+							</div>
 						</div>
-					</div>
-				);
+					);
+				} else {
+					mergeTaskButton = (
+						<div className="small-7 small-centered columns">
+							<div className="button-group stacked-for-small" style={{marginTop: "20px"}}>
+								<button id={task.Id} className="button btnAbortMergeTask">Abort Merge</button>
+							</div>
+						</div>
+					);
+				}
 			}
 
 		} else {
@@ -1315,14 +1347,26 @@ export default React.createBackboneClass({
 				self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', self.state.showOutOfBoundaryGtu);
 			});
 		});
-
+		this.subscribe('Map.Popup.ConfirmMergeTask', tasks => {
+			var model = self.getModel();
+			var tasks = model && model.get('Tasks');
+			if (tasks && tasks.size && self.state.mergeTasks.length == 2) {
+				var sourceTask = head(self.state.mergeTasks);
+				var targetTask = last(self.state.mergeTasks);
+				targetTask.mergeFrom(sourceTask.get('Id')).then(()=>{
+					self.state.mergeTasks = [];
+					self.state.mergeTasks.push(targetTask);
+					self.onMergeTask.call(self, targetTask);
+				});
+			}
+		});
 
 		this.on('click.import.task', '.btnImportTask', function (evt) {
 			evt.preventDefault();
 			evt.stopPropagation();
 			var taskId = $(this).attr('id');
 			$("#upload-file-" + taskId).click();
-		})
+		});
 
 		this.subscribe('Global.Window.Click', () => {
 			self.onCloseDropDown();
