@@ -159,6 +159,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="debug.html" />
     <Content Include="images\Blue-legend.png" />
     <Content Include="images\direction-legend.jpg" />
     <Content Include="images\Green-legend.png" />

@@ -485,7 +485,7 @@ namespace Vargainc.Timm.REST.Controllers
             var query = from task in db.Tasks
                         join mapping in db.TaskGtuInfoMappings on task.Id equals mapping.TaskId
                         join gtu in db.GtuInfos on mapping.Id equals gtu.TaskgtuinfoId
-                        where task.DistributionMapId == dmapId && gtu.nCellID < 2 && (lastTime == null || gtu.dtReceivedTime > lastTime)
+                        where task.DistributionMapId == dmapId && gtu.nCellID != 2 && (lastTime == null || gtu.dtReceivedTime > lastTime)
                         orderby task.Id, mapping.GTUId, gtu.Id
                         select new
                         {

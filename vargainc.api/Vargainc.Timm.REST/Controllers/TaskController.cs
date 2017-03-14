@@ -12,6 +12,8 @@ using System.Net.Http;
 using System.IO;
 using EntityFramework.Extensions;
 
+using NetTopologySuite.Geometries;
+
 using Vargainc.Timm.EF;
 using Vargainc.Timm.REST.ViewModel.ControlCenter;
 using Vargainc.Timm.Extentions;
@@ -293,7 +295,7 @@ namespace Vargainc.Timm.REST.Controllers
                 newDots.Add(new Models.GtuInfo {
                     dtReceivedTime = item.Date,
                     dtSendTime = item.Date,
-                    //0-original ,1-added ,2-removed
+                    //0-original ,1-added ,2-removed, 3-merged
                     nCellID = 1,
                     dwLatitude = item.Location.Latitude,
                     dwLongitude = item.Location.Longitude,
@@ -400,6 +402,110 @@ namespace Vargainc.Timm.REST.Controllers
 
             await db.SaveChangesAsync();
             return Json(new { success = true, status = 1 });
+        }
+
+        [Route("merge/{originalTaskId}/to/{targetTaskId}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> Merge(int originalTaskId, int targetTaskId)
+        {
+            var originalTask = await db.Tasks.FindAsync(originalTaskId);
+            var targetTask = await db.Tasks.FindAsync(targetTaskId);
+            if(originalTask == null || targetTask == null)
+            {
+                return Json(new { success = false, error = "task is not exists!" });
+            }
+
+            var originalTaskStatus = originalTask.TaskTimes.OrderByDescending(i => i.Id).FirstOrDefault();
+            var targetTaskStatus = targetTask.TaskTimes.OrderByDescending(i => i.Id).FirstOrDefault();
+
+            if(originalTaskStatus == null || targetTaskStatus == null || originalTaskStatus.TimeType != 1 || targetTaskStatus.TimeType != 1)
+            {
+                return Json(new { success = false, error = "you must stop task first!" });
+            }
+
+            var targetDMapLocations = db.DistributionMaps
+                .FirstOrDefault(i => i.Id == targetTask.DistributionMapId)
+                .DistributionMapCoordinates
+                .OrderBy(i => i.Id)
+                .Select(i => new GeoAPI.Geometries.Coordinate
+                {
+                    X = i.Longitude.Value,
+                    Y = i.Latitude.Value
+                }).ToList();
+            //close polygon
+            targetDMapLocations.Add(targetDMapLocations[0]);
+            var dmapLineRing = new LinearRing(targetDMapLocations.ToArray());
+            var dmapPolygon = new Polygon(dmapLineRing);
+            dmapPolygon.Buffer(0);
+
+            
+            var needMergeGtu = new List<Models.GtuInfo>();
+            var targetMapping = targetTask.TaskGtuInfoMappings.ToList();
+            Dictionary<string, int> mapping = new Dictionary<string, int>();
+            foreach(var item in targetMapping)
+            {
+                if (!mapping.ContainsKey(item.GTU.UniqueID))
+                {
+                    mapping.Add(item.GTU.UniqueID, item.Id.Value);
+                }
+            }
+            var originalGtus = originalTask.TaskGtuInfoMappings.SelectMany(i => i.GtuInfos).OrderBy(i => i.GtuUniqueID).ToList();
+            foreach (var gtu in originalGtus)
+            {
+                var point = new Point(gtu.dwLongitude ?? 0, gtu.dwLatitude ?? 0);
+                if (dmapPolygon.Contains(point))
+                {
+                    int? taskGtuInfoId = null;
+                    if (mapping.ContainsKey(gtu.Code))
+                    {
+                        taskGtuInfoId = mapping[gtu.Code];
+                    }
+                    else
+                    {
+                        var newMapping = db.TaskGtuInfoMappings.Create();
+                        newMapping.GTUId = gtu.TaskGtuInfoMapping.GTUId;
+                        newMapping.TaskId = targetTask.Id;
+                        newMapping.UserColor = gtu.TaskGtuInfoMapping.UserColor;
+                        db.TaskGtuInfoMappings.Add(newMapping);
+                        await db.SaveChangesAsync();
+                        taskGtuInfoId = newMapping.Id;
+                        mapping.Add(gtu.Code, newMapping.Id.Value);
+                    }
+                    needMergeGtu.Add(new Models.GtuInfo
+                    {
+                        TaskgtuinfoId = taskGtuInfoId,
+                        dtReceivedTime = gtu.dtReceivedTime,
+                        dtSendTime = gtu.dtSendTime,
+                        //0-original ,1-added ,2-removed, 3-merged
+                        nCellID = 3,
+                        dwLatitude = gtu.dwLatitude,
+                        dwLongitude = gtu.dwLongitude,
+                        dwSpeed = gtu.dwSpeed,
+                        nHeading = gtu.nHeading,
+                        sIPAddress = gtu.sIPAddress,
+                        nAreaCode = gtu.nAreaCode,
+                        nNetworkCode = gtu.nNetworkCode,
+                        nGPSFix = gtu.nGPSFix,
+                        nAccuracy = gtu.nAccuracy,
+                        nCount = gtu.nCount,
+                        nLocationID = gtu.nLocationID,
+                        sVersion = gtu.sVersion,
+                        dwAltitude = gtu.dwAltitude,
+                        PowerInfo = gtu.PowerInfo,
+                        Code = gtu.Code,
+                        Status = gtu.Status,
+                        Distance = gtu.Distance,
+                        GtuUniqueID = gtu.GtuUniqueID
+                    });
+                }
+            }
+            db.GtuInfos.AddRange(needMergeGtu);
+            await db.SaveChangesAsync();
+            return Json(new
+            {
+                success = true
+            });
+
         }
 
         protected override void Dispose(bool disposing)
