@@ -343,12 +343,15 @@ var MapContainer = React.createBackboneClass({
 			});
 		});
 		this.subscribe('Campaign.Monitor.LocatGtu', gtuId => {
-			var feature = head(monitorMap.querySourceFeatures('GTU-LastLocation', {
-				filter: ["==", "gtuId", gtuId]
-			}));
-			if (feature) {
-				monitorMap.flyTo({
-					center: [feature.geometry.coordinates[0], feature.geometry.coordinates[1]]
+			var source = monitorMap.getSource('GTU-LastLocation');
+			if (source) {
+				each(source._data.features, feature => {
+					if (get(feature, 'properties.gtuId') == gtuId) {
+						monitorMap.flyTo({
+							center: [feature.geometry.coordinates[0], feature.geometry.coordinates[1]]
+						});
+						return false;
+					}
 				});
 			}
 		});
@@ -1070,71 +1073,73 @@ var MapContainer = React.createBackboneClass({
 		if (!monitorMap) {
 			return;
 		}
-		// var self = this;
-		// let taskIsStopped = this.state.task.get('Status') == 1,
-		// 	gtuList = this.state.task.get('gtuList').where(function (gtu) {
-		// 		return gtu.get('Location') != null;
-		// 	});
-		// var geoJson = {
-		// 	type: 'FeatureCollection',
-		// 	features: map(gtuList, gtu => {
-		// 		let latlng = gtu.get('Location');
-		// 		if (!latlng || !latlng.lat || !latlng.lng) {
-		// 			return null;
-		// 		}
-		// 		return {
-		// 			type: 'Feature',
-		// 			geometry: {
-		// 				type: 'Point',
-		// 				coordinates: [latlng.lng, latlng.lat]
-		// 			},
-		// 			properties: {
-		// 				userColor: '#ff0000',
-		// 				role: gtu.get('Role'),
-		// 				gtuId: gtu.get('Id'),
-		// 				outOfBoundary: gtu.get('OutOfBoundary'),
-		// 				visiable: taskIsStopped ? gtu.get('WithData') : gtu.get('IsAssign') || gtu.get('WithData'),
-		// 			}
-		// 		}
-		// 	})
-		// };
-		// var source = monitorMap.getSource(`GTU-LastLocation`);
-		// if (source == null) {
-		// 	monitorMap.addSource(`GTU-LastLocation`, {
-		// 		"type": 'geojson',
-		// 		"data": geoJson
-		// 	});
-		// 	monitorMap.addLayer({
-		// 		"filter": [
-		// 			"all", ["==", "role", "Walker"]
-		// 		],
-		// 		"id": `GTU-LastLocation-Walker-Icon-Layer`,
-		// 		"source": 'GTU-LastLocation',
-		// 		"type": "symbol",
-		// 		"layout": {
-		// 			"icon-image": "walker",
-		// 			"icon-size": 0.45,
-		// 			"icon-allow-overlap": true
-		// 		},
-		// 		"paint": {}
-		// 	});
-		// 	monitorMap.addLayer({
-		// 		"filter": [
-		// 			"all", ["!=", "role", "Walker"]
-		// 		],
-		// 		"id": `GTU-LastLocation-Trunk-Icon-Layer`,
-		// 		"source": 'GTU-LastLocation',
-		// 		"type": "symbol",
-		// 		"layout": {
-		// 			"icon-image": "truck",
-		// 			"icon-size": 0.45,
-		// 			"icon-allow-overlap": true
-		// 		},
-		// 		"paint": {}
-		// 	});
-		// } else {
-		// 	source.setData(geoJson);
-		// }
+		var self = this;
+		let gtuList = [];
+		each(this.state.tasks, task => {
+			task.get('gtuList').each(function (gtu) {
+				if (gtu.get('Location') != null) {
+					gtuList.push(gtu);
+				}
+			});
+		})
+		var geoJson = {
+			type: 'FeatureCollection',
+			features: map(gtuList, gtu => {
+				let latlng = gtu.get('Location');
+				if (!latlng || !latlng.lat || !latlng.lng) {
+					return null;
+				}
+				return {
+					type: 'Feature',
+					geometry: {
+						type: 'Point',
+						coordinates: [latlng.lng, latlng.lat]
+					},
+					properties: {
+						userColor: '#ff0000',
+						role: gtu.get('Role'),
+						gtuId: gtu.get('Id')
+					}
+				}
+			})
+		};
+		var source = monitorMap.getSource(`GTU-LastLocation`);
+		if (source == null) {
+			monitorMap.addSource(`GTU-LastLocation`, {
+				"type": 'geojson',
+				"data": geoJson
+			});
+			monitorMap.addLayer({
+				"filter": [
+					"all", ["==", "role", "Walker"]
+				],
+				"id": `GTU-LastLocation-Walker-Icon-Layer`,
+				"source": 'GTU-LastLocation',
+				"type": "symbol",
+				"layout": {
+					"icon-image": "walker",
+					"icon-size": 0.45,
+					"icon-allow-overlap": true
+				},
+				"paint": {}
+			});
+			monitorMap.addLayer({
+				"filter": [
+					"all", ["!=", "role", "Walker"]
+				],
+				"id": `GTU-LastLocation-Trunk-Icon-Layer`,
+				"source": 'GTU-LastLocation',
+				"type": "symbol",
+				"layout": {
+					"icon-image": "truck",
+					"icon-size": 0.45,
+					"icon-allow-overlap": true
+				},
+				"paint": {}
+			});
+		} else {
+			source.setData(geoJson);
+		}
 	},
 	flyToTask: function (taskId, keepZoom) {
 		var monitorMap = this.state.map;
