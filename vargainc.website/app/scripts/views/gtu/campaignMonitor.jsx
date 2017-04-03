@@ -457,7 +457,7 @@ var MapContainer = React.createBackboneClass({
 		var loadSubmapBoundaryPromise = function () {
 			return Promise.each(submaps, submapId => {
 				return localStorage.getItem(`boundary-submap-${submapId}`).then(result => {
-					if (result) {
+					if (false) {
 						return Promise.resolve();
 					} else {
 						return $.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`).then(response => {
@@ -487,7 +487,7 @@ var MapContainer = React.createBackboneClass({
 		var loadDMapBoundaryPromise = function () {
 			return Promise.each(tasks.models, task => {
 				return localStorage.getItem(`boundary-dmap-${task.get('DMapId')}`).then(result => {
-					if (result) {
+					if (false) {
 						return Promise.resolve();
 					} else {
 						let url = `../api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`;
@@ -1705,9 +1705,9 @@ export default React.createBackboneClass({
 
 		return (
 			<div className="map-toolbar">
-				<div className="section row gtu-monitor">
+				<div className="section row gtu-monitor expanded">
 					<div className="small-12 columns">
-						<div className="row">
+						<div className="row expanded">
 							<div className="small-12 medium-5 large-3 columns">
 								{this.renderTaskController(activeTask)}
 							</div>
@@ -1725,7 +1725,7 @@ export default React.createBackboneClass({
 						</div>
 					</div>
 				</div>
-				<div className="row gtu">
+				<div className="row gtu expanded">
 					<div className="small-12 columns">
 						{map(gtuList, function(gtu) {
 							return self.renderGtu(gtu);

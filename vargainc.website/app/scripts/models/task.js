@@ -61,11 +61,11 @@ export default Backbone.Model.extend({
         xhr.send(fd);
     },
     addGtuDots: function (dots, opts) {
-
         var model = this;
         var options = {
             url: model.urlRoot + '/' + model.get('Id') + '/dots/',
             method: 'POST',
+            data: dots,
             data: $.param({
                 '': dots
             })
