@@ -279,9 +279,7 @@ var MapContainer = React.createBackboneClass({
 		var monitorMap = this.state.map;
 		var self = this;
 		this.addGeoLayer();
-		this.loadBoundary().delay(500).then(function () {
-			return self.drawBoundary();
-		});
+		this.drawBoundary();
 
 		/**
 		 * animate
@@ -443,89 +441,47 @@ var MapContainer = React.createBackboneClass({
 			}
 		})
 	},
-	loadBoundary: function () {
-		console.time("load boundary");
-		this.publish('showLoading');
-		var self = this,
-			model = this.getModel(),
-			campaignId = model.get('Id'),
-			tasks = model.get('Tasks'),
-			submapTasks = groupBy(tasks.models, t => {
-				return t.get('SubMapId')
-			}),
-			submaps = keys(submapTasks);
-		var loadSubmapBoundaryPromise = function () {
-			return Promise.each(submaps, submapId => {
-				return localStorage.getItem(`boundary-submap-${submapId}`).then(result => {
-					if (false) {
-						return Promise.resolve();
-					} else {
-						return $.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`).then(response => {
-							let data = {
-								type: 'Feature',
-								properties: {
-									userColor: `rgb(${response.color.r}, ${response.color.g}, ${response.color.b})`
-								},
-								geometry: {
-									type: 'Polygon',
-									coordinates: [map(response.boundary, i => {
-										return [i.lng, i.lat]
-									})]
-								}
-							};
-							let center = turfCentroid(data);
-							center.properties = data.properties;
-							return Promise.all([
-								localStorage.setItem(`boundary-submap-${submapId}`, data),
-								localStorage.setItem(`boundary-submap-${submapId}-center`, center),
-							]);
-						});
-					}
-				});
-			});
-		}
-		var loadDMapBoundaryPromise = function () {
-			return Promise.each(tasks.models, task => {
-				return localStorage.getItem(`boundary-dmap-${task.get('DMapId')}`).then(result => {
-					if (false) {
-						return Promise.resolve();
-					} else {
-						let url = `../api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`;
-						$.getJSON(url).then(response => {
-							var data = {
-								type: 'Feature',
-								properties: {
-									userColor: `rgb(${response.color.r}, ${response.color.g}, ${response.color.b})`,
-									Name: task.get('Name'),
-									IsFinished: task.get('IsFinished'),
-									TaskId: task.get('Id'),
-									Task: task.toJSON()
-								},
-								geometry: {
-									type: 'Polygon',
-									coordinates: [map(response.boundary, i => {
-										return [i.lng, i.lat]
-									})]
-								},
-							};
-							let center = turfCentroid(data);
-							center.properties = data.properties;
-							return Promise.all([
-								localStorage.setItem(`boundary-dmap-${task.get('DMapId')}`, data),
-								localStorage.setItem(`boundary-dmap-${task.get('DMapId')}-center`, center),
-							]);
-						});
-					}
-				});
-			});
-		}
-		return Promise.all([
-			loadSubmapBoundaryPromise(),
-			loadDMapBoundaryPromise()
-		]).then(() => {
-			self.publish('hideLoading');
-			console.timeEnd("load boundary");
-			return Promise.resolve();
+	loadSubmapBoundary: function (campaignId, submapId) {
+		return $.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`).then(response => {
+			let data = {
+				type: 'Feature',
+				properties: {
+					userColor: `rgb(${response.color.r}, ${response.color.g}, ${response.color.b})`
+				},
+				geometry: {
+					type: 'Polygon',
+					coordinates: [map(response.boundary, i => {
+						return [i.lng, i.lat]
+					})]
+				}
+			};
+			let center = turfCentroid(data);
+			center.properties = data.properties;
+			return Promise.resolve([data, center]);
+		});
+	},
+	loadDMapBoundary: function (task) {
+		let url = `../api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`;
+		return $.getJSON(url).then(response => {
+			var data = {
+				type: 'Feature',
+				properties: {
+					userColor: `rgb(${response.color.r}, ${response.color.g}, ${response.color.b})`,
+					Name: task.get('Name'),
+					IsFinished: task.get('IsFinished'),
+					TaskId: task.get('Id'),
+					Task: task.toJSON()
+				},
+				geometry: {
+					type: 'Polygon',
+					coordinates: [map(response.boundary, i => {
+						return [i.lng, i.lat]
+					})]
+				},
+			};
+			let center = turfCentroid(data);
+			center.properties = data.properties;
+			return Promise.resolve([data, center]);
 		});
 	},
 	drawBoundary: function () {
@@ -548,15 +504,24 @@ var MapContainer = React.createBackboneClass({
 		var campaignBounds = new mapboxgl.LngLatBounds();
 		var drawSubmapPromise = function () {
 			return Promise.all(map(submaps, submapId => {
-				return localStorage.getItem(`boundary-submap-${submapId}`);
+				return self.loadSubmapBoundary(campaignId, submapId)
 			})).then(data => {
-				let geoData = {
-					"type": "FeatureCollection",
-					"features": data
-				};
+				let features = [];
+				each(data, d=>{
+					features.push(d[0]);
+					features.push(d[1]);
+					each(d[0].geometry.coordinates, latlngGroup => {
+						each(latlngGroup, latlng => {
+							campaignBounds.extend([latlng[0], latlng[1]])
+						});
+					});
+				});
 				monitorMap.addSource(`boundary-submap`, {
 					type: 'geojson',
-					data: geoData
+					data: {
+						"type": "FeatureCollection",
+						"features": features
+					}
 				});
 				monitorMap.addLayer({
 					id: `boundary-submap-layer`,
@@ -576,34 +541,24 @@ var MapContainer = React.createBackboneClass({
 						}
 					}
 				});
-
-				each(data, feature => {
-					each(feature.geometry.coordinates, latlngGroup => {
-						each(latlngGroup, latlng => {
-							campaignBounds.extend([latlng[0], latlng[1]])
-						});
-					});
-				})
 				return Promise.resolve();
 			});
 		}
 		var drawDMapPromise = function () {
-			let geoData = {
-				"type": "FeatureCollection",
-				"features": []
-			};
 			return Promise.all(map(tasks.models, task => {
-				return Promise.all([
-					localStorage.getItem(`boundary-dmap-${task.get('DMapId')}`),
-					localStorage.getItem(`boundary-dmap-${task.get('DMapId')}-center`)
-				]).then(result => {
-					geoData.features.push(result[0]);
-					geoData.features.push(result[1]);
+				return self.loadDMapBoundary(task)
+			})).then(data => {
+				let features = [];
+				each(data, d=>{
+					features.push(d[0]);
+					features.push(d[1]);
 				});
-			})).then(() => {
 				monitorMap.addSource(`boundary-dmap`, {
 					type: 'geojson',
-					data: geoData
+					data: {
+						"type": "FeatureCollection",
+						"features": features
+					}
 				});
 				monitorMap.addLayer({
 					id: `boundary-dmap-finished-layer`,
@@ -835,7 +790,7 @@ var MapContainer = React.createBackboneClass({
 		var setActiveButton = null;
 		var mergeTaskButton = null;
 		var isFinished = task.IsFinished;
-		var mergeTaskIdArray = map(self.state.tasks, task=>{
+		var mergeTaskIdArray = map(self.state.tasks, task => {
 			return task.get('Id');
 		});
 		if (isFinished) {
@@ -1353,7 +1308,7 @@ export default React.createBackboneClass({
 			if (tasks && tasks.size && self.state.mergeTasks.length == 2) {
 				var sourceTask = head(self.state.mergeTasks);
 				var targetTask = last(self.state.mergeTasks);
-				targetTask.mergeFrom(sourceTask.get('Id')).then(()=>{
+				targetTask.mergeFrom(sourceTask.get('Id')).then(() => {
 					self.state.mergeTasks = [];
 					self.state.mergeTasks.push(targetTask);
 					self.onMergeTask.call(self, targetTask);
