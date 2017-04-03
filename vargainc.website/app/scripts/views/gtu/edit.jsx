@@ -45,6 +45,10 @@ export var MapContainer = React.createClass({
 			self.drawGtu();
 			self.drawCustomGtu();
 		});
+
+		this.subscribe('Map.Draw.Recenter', latlng => {
+			self.recenter();
+		});
 	},
 	onInit: function (mapContainer) {
 		if (mapContainer == null) {
@@ -150,6 +154,7 @@ export var MapContainer = React.createClass({
 		$(window).trigger('resize');
 	},
 	drawBoundary: function () {
+		var self = this;
 		var monitorMap = this.state.map;
 		if (!monitorMap) {
 			console.error('map is not ready');
@@ -209,8 +214,22 @@ export var MapContainer = React.createClass({
 			}
 		});
 		monitorMap.fitBounds(dmapBounds);
-		this.publish('hideLoading');
-		console.timeEnd("draw boundary");
+		this.setState({
+			dmapBounds: dmapBounds
+		}, () => {
+			self.publish('hideLoading');
+			console.timeEnd("draw boundary");
+		});
+	},
+	recenter: function () {
+		if (!this.state.map || !this.state.dmapBounds) {
+			return;
+		}
+		var mapZoom = this.state.map.getZoom();
+		this.state.map.flyTo({
+			center: this.state.dmapBounds.getCenter(),
+			zoom: mapZoom
+		});
 	},
 	drawGtu: function () {
 		let monitorMap = this.state.map;
@@ -488,7 +507,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onReCenter: function () {
-		this.publish
+		this.publish('Map.Draw.Recenter');
 	},
 	render: function () {
 		let self = this;
