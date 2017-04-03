@@ -25,6 +25,7 @@ import {
 	concat,
 	clone,
 	get,
+	set,
 	trim,
 	isFunction,
 	includes
@@ -358,7 +359,24 @@ var MapContainer = React.createBackboneClass({
 			self.reload();
 		});
 		this.subscribe('Campaign.Monitor.Redraw.FinishedTaskBoundary', taskId => {
-			self.drawBoundary();
+			/**
+			 * update dmap layer source
+			 */
+			var source = self.state.map.getSource('boundary-dmap');
+			if (source) {
+				let updateSource = map(source._data.features, feature => {
+					if (get(feature, 'properties.TaskId') == taskId) {
+						set(feature, 'properties.IsFinished', true);
+						let task = get(feature, 'properties.Task');
+						set(task, 'properties.Task.IsFinished', true);
+					}
+					return feature;
+				});
+				source.setData({
+					"type": "FeatureCollection",
+					"features": updateSource
+				});
+			}
 			self.setDMapFilter();
 		})
 		this.subscribe('Global.Window.Resize', size => {
@@ -507,7 +525,7 @@ var MapContainer = React.createBackboneClass({
 				return self.loadSubmapBoundary(campaignId, submapId)
 			})).then(data => {
 				let features = [];
-				each(data, d=>{
+				each(data, d => {
 					features.push(d[0]);
 					features.push(d[1]);
 					each(d[0].geometry.coordinates, latlngGroup => {
@@ -549,7 +567,7 @@ var MapContainer = React.createBackboneClass({
 				return self.loadDMapBoundary(task)
 			})).then(data => {
 				let features = [];
-				each(data, d=>{
+				each(data, d => {
 					features.push(d[0]);
 					features.push(d[1]);
 				});
@@ -730,7 +748,6 @@ var MapContainer = React.createBackboneClass({
 				["==", "TaskId", activeTaskId]
 			]);
 			monitorMap.setLayoutProperty('boundary-submap-layer', 'visibility', 'none');
-			boundary - submap - layer
 		} else {
 			monitorMap.setFilter('boundary-dmap-finished-layer', [
 				"all", ["==", "$type", "Polygon"],
@@ -1742,20 +1759,23 @@ export default React.createBackboneClass({
 		);
 	},
 	renderTaskController: function (task) {
+		let finishClass = classNames('button', {
+			hide: task.get('IsFinished')
+		})
 		switch (task.get('Status')) {
 		case 0: //started
 			return (
 				<div>
 					<button className="button" onClick={this.onPause.bind(this, task)}><i className="fa fa-pause"></i>Pause</button>
 					<button className="button" onClick={this.onStop.bind(this, task)}><i className="fa fa-stop"></i>Stop</button>
-					<button className="button" onClick={this.onFinished.bind(this, task.get('Id'))}><i className="fa fa-check"></i>Finish</button>
+					<button className={finishClass} onClick={this.onFinished.bind(this, task.get('Id'))}><i className="fa fa-check"></i>Finish</button>
 				</div>
 			);
 			break;
 		case 1: //stoped
 			return (
 				<div>
-					<button className="button" onClick={this.onFinished.bind(this, task.get('Id'))}><i className="fa fa-check"></i>Finish</button>
+					<button className={finishClass} onClick={this.onFinished.bind(this, task.get('Id'))}><i className="fa fa-check"></i>Finish</button>
 				</div>
 			);
 			break;
@@ -1764,7 +1784,7 @@ export default React.createBackboneClass({
 				<div>
 					<button className="button" onClick={this.onStart.bind(this, task)}><i className="fa fa-play"></i>Start</button>
 					<button className="button" onClick={this.onStop.bind(this, task)}><i className="fa fa-stop"></i>Stop</button>
-					<button className="button" onClick={this.onFinished.bind(this, task.get('Id'))}><i className="fa fa-check"></i>Finish</button>
+					<button className={finishClass} onClick={this.onFinished.bind(this, task.get('Id'))}><i className="fa fa-check"></i>Finish</button>
 				</div>
 			);
 			break;
