@@ -125,7 +125,7 @@ export default Backbone.Router.extend({
 		});
 	},
 	campaignMonitorAction: function (campaignId) {
-		var View = require('views/gtu/campaignMonitor').default;
+		var View = require('views/campaignMonitor/driver').default;
 		var Model = require('models/campaign').default;
 		var GeoCollection = require('collections/geo').default;
 		var campaignWithTaskModel = new Model();
