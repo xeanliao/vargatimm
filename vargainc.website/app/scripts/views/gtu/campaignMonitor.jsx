@@ -1615,7 +1615,6 @@ export default React.createBackboneClass({
 			tasks = model && model.get('Tasks') ? model.get('Tasks').models : [];
 
 		tasks = filter(tasks, t => {
-			return true;
 			return !t.get('IsFinished');
 		});
 		var parentClass = classNames({
@@ -1642,6 +1641,7 @@ export default React.createBackboneClass({
 			});
 			return (
 				<select ref={this.initSelect2} data-placeholder="Select an task">
+					<option key="task-ddl-option-placeholder"></option>
 					{map(tasks, t=>{
 						return (
 							<option key={`task-ddl-option-${t.get('Id')}`} value={t.get('Id')}>{t.get('Name')}</option>
