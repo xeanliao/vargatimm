@@ -31,7 +31,7 @@ import {
 	includes
 } from 'lodash';
 
-import d3 from 'd3';
+import 'select2';
 
 import GTUCollection from 'collections/gtu';
 import DMap from 'models/print/dmap';
@@ -292,7 +292,8 @@ var MapContainer = React.createBackboneClass({
 	registerTopic: function (monitorMap) {
 		var self = this;
 		this.subscribe('Campaign.Monitor.GeoResult', data => {
-			monitorMap.getSource('geo-source').setData(data);
+			let source = monitorMap.getSource('geo-source');
+			source && source.setData(data);
 		});
 		this.subscribe('Campaign.Monitor.ZoomToTask', taskId => {
 			self.flyToTask(taskId);
@@ -640,8 +641,8 @@ var MapContainer = React.createBackboneClass({
 						"text-field": "{Name}",
 						"text-size": {
 							stops: [
-								[12, 8],
-								[20, 26]
+								[12, 16],
+								[20, 36]
 							]
 						}
 					},
@@ -1350,6 +1351,21 @@ export default React.createBackboneClass({
 			self.onCloseMoreMenu();
 		});
 	},
+	initSelect2: function(el){
+		var self = this;
+		if(el){
+			$(el).select2();
+			$(document).on('select2:select', e=>{
+				let taskId = get(e, 'params.data.id');
+				let model = self.getModel();
+				let tasks = model.get('Tasks');
+				if(tasks.get){
+					let task = tasks.get(taskId);
+					self.onSwitchActiveTask.call(self, task);	
+				}
+			});
+		}
+	},
 	showTask: function (task) {
 		this.publish('Campaign.Monitor.ZoomToTask', task);
 	},
@@ -1625,23 +1641,32 @@ export default React.createBackboneClass({
 				'js-dropdown-active': this.state.taskDropdownActive,
 			});
 			return (
-				<ul className="dropdown menu float-right">
-					<li className={parentClass}>
-						<a href="javascript:;" onClick={this.onOpenDropDown}>Switch Active Task</a>
-						<div style={{'minWidth': '768px'}} className={menuClass} onClick={this.onCloseDropDown}>
-							{map(tasks, t=>{
-								return (
-									<div className="column" key={t.get('Id')}>
-										<a href="javascript:;" style={{width: '100%'}} className="button row-button text-left" onClick={self.onSwitchActiveTask.bind(self, t)}>
-											{t.get('Name')}
-										</a>
-									</div>
-								);
-							})}
-						</div>
-					</li>
-				</ul>
+				<select ref={this.initSelect2} data-placeholder="Select an task">
+					{map(tasks, t=>{
+						return (
+							<option key={`task-ddl-option-${t.get('Id')}`} value={t.get('Id')}>{t.get('Name')}</option>
+						);
+					})}
+				</select>
 			);
+			// return (
+			// 	<ul className="dropdown menu float-right">
+			// 		<li className={parentClass}>
+			// 			<a href="javascript:;" onClick={this.onOpenDropDown}>Switch Active Task</a>
+			// 			<div style={{'minWidth': '768px'}} className={menuClass} onClick={this.onCloseDropDown}>
+			// 				{map(tasks, t=>{
+			// 					return (
+			// 						<div className="column" key={t.get('Id')}>
+			// 							<a href="javascript:;" style={{width: '100%'}} className="button row-button text-left" onClick={self.onSwitchActiveTask.bind(self, t)}>
+			// 								{t.get('Name')}
+			// 							</a>
+			// 						</div>
+			// 					);
+			// 				})}
+			// 			</div>
+			// 		</li>
+			// 	</ul>
+			// );
 		}
 		return (
 			<ul className="dropdown menu float-right">

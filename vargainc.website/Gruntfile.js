@@ -58,6 +58,7 @@ module.exports = function (grunt) {
 					'node_modules/foundation-sites/scss',
 					'node_modules/foundation-datepicker/scss',
 					'node_modules/motion-ui/src/',
+					'node_modules/select2/scss/',
 				],
 				compass: true,
 				quiet: true
@@ -365,6 +366,7 @@ module.exports = function (grunt) {
 									'./node_modules/foundation-sites/scss',
 									'./node_modules/foundation-datepicker/scss',
 									'./node_modules/motion-ui/src/',
+									'node_modules/select2/scss/',
 								];
 								loadPath = lodash.map(loadPath, function (item) {
 									return 'includePaths[]=' + path.resolve(item)
