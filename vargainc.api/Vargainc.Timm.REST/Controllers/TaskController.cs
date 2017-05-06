@@ -453,7 +453,7 @@ namespace Vargainc.Timm.REST.Controllers
             foreach (var gtu in originalGtus)
             {
                 var point = new Point(gtu.dwLongitude ?? 0, gtu.dwLatitude ?? 0);
-                if (dmapPolygon.Contains(point))
+                if (gtu.nCellID != 2 && dmapPolygon.Contains(point))
                 {
                     int? taskGtuInfoId = null;
                     if (mapping.ContainsKey(gtu.Code))
