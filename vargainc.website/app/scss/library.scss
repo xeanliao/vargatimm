@@ -3,7 +3,13 @@
 @import 'settings';
 @import 'foundation';
 @import 'motion-ui';
-
+//begin select 2
+@import 'core';
+//fix select2 style
+.select2-container input{
+	height: 1.75rem !important;
+}
+//end select2
 @include foundation-everything($flex: false);
 
 @import 'foundation-datepicker'

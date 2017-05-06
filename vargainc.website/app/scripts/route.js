@@ -9,6 +9,7 @@ export default Backbone.Router.extend({
 		'distribution': 'distributionAction',
 		'monitor': 'monitorAction',
 		'campaign/:campaignId/monitor': 'campaignMonitorAction',
+		'driver/:campaignId': 'driverMonitorAction',
 		'report': 'reportAction',
 		'report/:taskId': 'reportAction',
 		'admin': 'adminAction',
@@ -124,8 +125,8 @@ export default Backbone.Router.extend({
 			});
 		});
 	},
-	campaignMonitorAction: function (campaignId) {
-		var View = require('views/gtu/campaignMonitor').default;
+	driverMonitorAction: function (campaignId) {
+		var View = require('views/campaignMonitor/driver').default;
 		var Model = require('models/campaign').default;
 		var GeoCollection = require('collections/geo').default;
 		var campaignWithTaskModel = new Model();
@@ -138,7 +139,33 @@ export default Backbone.Router.extend({
 					view: View,
 					params: {
 						model: campaignWithTaskModel,
-						geo : geoCollection
+						geo: geoCollection
+					},
+					options: {
+						showMenu: false,
+						showUser: true,
+						showSearch: false,
+						pageTitle: 'GTU Campaign Monitor'
+					}
+				}
+			});
+		});
+	},
+	campaignMonitorAction: function (campaignId) {
+		var View = require('views/campaignMonitor/admin').default;
+		var Model = require('models/campaign').default;
+		var GeoCollection = require('collections/geo').default;
+		var campaignWithTaskModel = new Model();
+		var geoCollection = new GeoCollection();
+		campaignWithTaskModel.loadWithAllTask(campaignId).then(() => {
+			Topic.publish({
+				channel: 'View',
+				topic: 'loadView',
+				data: {
+					view: View,
+					params: {
+						model: campaignWithTaskModel,
+						geo: geoCollection
 					},
 					options: {
 						showMenu: false,

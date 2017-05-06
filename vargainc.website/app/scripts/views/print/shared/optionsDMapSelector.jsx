@@ -13,7 +13,7 @@ export default React.createBackboneClass({
 	onSelectAll: function (e) {
 		var collection = this.getCollection(),
 			value = e.currentTarget.checked;
-		each(collection, function (item) {
+		collection.each(function (item) {
 			item.set('Selected', value);
 		});
 		this.forceUpdate();

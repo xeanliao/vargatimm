@@ -113,7 +113,7 @@ export default {
 					view: arguments[1]
 				}
 			}
-		} else if (arguments.length > 1 && isString(arguments[0])) {
+		} else if (arguments.length > 1 && !isFunction(arguments[0])) {
 			opt = {
 				channel: 'View',
 				topic: arguments[0],

@@ -61,11 +61,11 @@ export default Backbone.Model.extend({
         xhr.send(fd);
     },
     addGtuDots: function (dots, opts) {
-
         var model = this;
         var options = {
             url: model.urlRoot + '/' + model.get('Id') + '/dots/',
             method: 'POST',
+            data: dots,
             data: $.param({
                 '': dots
             })
@@ -146,5 +146,19 @@ export default Backbone.Model.extend({
         options = extend(opts, options);
 
         return (this.sync || Backbone.sync).call(this, 'update', this, options);
+    },
+    mergeFrom: function(taskId){
+        var model = this,
+            options = {
+                url: `${model.urlRoot}/merge/${taskId}/to/${model.get('Id')}`,
+                method: 'GET'
+            };
+
+        return (this.sync || Backbone.sync).call(this, '', this, options).then((result) => {
+            if (result && result.success) {
+                return Promise.resolve();
+            }
+            return Promise.reject();
+        });
     }
 });
