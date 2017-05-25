@@ -45,7 +45,7 @@ export default React.createBackboneClass({
 
 		$("#monitor-filter-ddl-ClientName, #monitor-filter-ddl-ClientCode, #monitor-filter-ddl-Date, #monitor-filter-ddl-AreaDescription").foundation();
 	},
-	onOrderBy: function (field, reactObj, reactId, e) {
+	onOrderBy: function (field, e) {
 		e.preventDefault();
 		e.stopPropagation();
 

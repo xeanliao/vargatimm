@@ -29,7 +29,8 @@ export default React.createBackboneClass({
 			pageTitle: 'TIMM System',
 			showMenu: null,
 			showSearch: null,
-			showUser: null
+			showUser: null,
+			fullTextSearchTimeout: null
 		}
 	},
 	componentDidMount: function () {
@@ -144,7 +145,17 @@ export default React.createBackboneClass({
 		$('iframe').height($(window).height());
 	},
 	fullTextSearch: function (e) {
-		this.publish('search', e.currentTarget.value);
+		var self = this;
+		clearTimeout(this.state.fullTextSearchTimeout);
+		var searchKey = e.currentTarget.value;
+		this.state.fullTextSearchTimeout = setTimeout(function () {
+			self.publish({
+				channel: 'View',
+				topic: 'search',
+				data: searchKey
+			});
+		}, 500);
+
 	},
 	menuSwitch: function () {
 		this.refs.sideMenu && this.refs.sideMenu.switch();

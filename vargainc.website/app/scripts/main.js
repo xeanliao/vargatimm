@@ -4,7 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Topic from 'postal';
 import {
-	isFunction
+	isFunction,
+	startsWith
 } from 'lodash';
 import AppRouter from 'route';
 import UserModel from 'models/user';
@@ -53,7 +54,7 @@ Backbone.sync = function (method, model, options) {
 var appRouter = new AppRouter;
 var userModel = new UserModel();
 userModel.fetchCurrentUser().then(function (isSuccess) {
-	if(!isSuccess){
+	if(!isSuccess && !startsWith(window.location.hash, '#driver')){
 		window.location = '../login.html';
 		return Promise.reject();
 	}
