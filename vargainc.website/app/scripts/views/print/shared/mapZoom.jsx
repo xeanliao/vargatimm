@@ -70,16 +70,16 @@ export default React.createClass({
 
 		var boundary = this.props.boundary,
 			fillColor = this.props.color,
-			mapBounds = new google.maps.LatLngBounds();
-		polygon = new google.maps.Polygon({
-			paths: boundary,
-			strokeColor: '#000',
-			strokeOpacity: 1,
-			strokeWeight: 6,
-			fillColor: fillColor,
-			fillOpacity: 0.1,
-			map: googleMap
-		});
+			mapBounds = new google.maps.LatLngBounds(),
+			polygon = new google.maps.Polygon({
+				paths: boundary,
+				strokeColor: '#000',
+				strokeOpacity: 1,
+				strokeWeight: 6,
+				fillColor: fillColor,
+				fillOpacity: 0.1,
+				map: googleMap
+			});
 		googleItems.push(polygon);
 		each(boundary, function (i) {
 			var point = new google.maps.LatLng(i.lat, i.lng);
@@ -127,16 +127,16 @@ export default React.createClass({
 		var googleMap = this.getGoogleMap(),
 			boundary = this.props.boundary,
 			fillColor = this.props.color,
-			mapBounds = new google.maps.LatLngBounds();
-		polygon = new google.maps.Polygon({
-			paths: boundary,
-			strokeColor: '#000',
-			strokeOpacity: 1,
-			strokeWeight: 6,
-			fillColor: fillColor,
-			fillOpacity: 0.1,
-			map: googleMap
-		});
+			mapBounds = new google.maps.LatLngBounds(),
+			polygon = new google.maps.Polygon({
+				paths: boundary,
+				strokeColor: '#000',
+				strokeOpacity: 1,
+				strokeWeight: 6,
+				fillColor: fillColor,
+				fillOpacity: 0.1,
+				map: googleMap
+			});
 		googleItems.push(polygon);
 		each(boundary, function (i) {
 			var point = new google.maps.LatLng(i.lat, i.lng);

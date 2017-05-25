@@ -12,4 +12,12 @@
 //end select2
 @include foundation-everything($flex: false);
 
-@import 'foundation-datepicker'
+@import 'foundation-datepicker';
+//fix foundation reveal-overlay issue
+.reveal-overlay{
+	background: none;
+	pointer-events: none;
+}
+.reveal{
+	pointer-events: all;
+}
