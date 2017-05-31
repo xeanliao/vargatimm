@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Vargainc.Timm.Extentions;
+using Vargainc.Timm.REST.Controllers;
 
 namespace Vargainc.Timm.REST.Helper
 {
@@ -23,9 +25,17 @@ namespace Vargainc.Timm.REST.Helper
                 {
                     value = value.DesDecrypt();
                     int.TryParse(value, out fixedValue);
+                    var taskIsStop = TaskController.CheckTaskIsStop(fixedValue);
+                    if (!taskIsStop)
+                    {
+                        actionContext.RequestContext.RouteData.Values["taskId"] = fixedValue;
+                        actionContext.ActionArguments["taskId"] = fixedValue;
+                    }
+                    else
+                    {
+                        actionContext.Response = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                    }
                 }
-                actionContext.RequestContext.RouteData.Values["taskId"] = fixedValue;
-                actionContext.ActionArguments["taskId"] = fixedValue;
             }
             return base.OnActionExecutingAsync(actionContext, cancellationToken);
         }

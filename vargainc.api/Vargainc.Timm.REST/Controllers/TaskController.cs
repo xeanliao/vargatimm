@@ -26,6 +26,19 @@ namespace Vargainc.Timm.REST.Controllers
     {
         private TimmContext db = new TimmContext();
 
+        public static bool CheckTaskIsStop(int taskId)
+        {
+            using(var db = new TimmContext())
+            {
+                var task = db.Tasks.Find(taskId);
+                if(task == null)
+                {
+                    return true;
+                }
+                return task.Status == 1;
+            }
+        } 
+
         [Route("{taskId}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetById(int taskId)
