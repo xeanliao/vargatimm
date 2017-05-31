@@ -898,7 +898,7 @@ export default React.createBackboneClass({
 					let maxSerial = this.state.gtuCount[gtu] || 0;
 					let currentSerial = parseInt(currentTime / 100);
 					if(currentSerial > maxSerial){
-						self.state.animations['gut-marker-layer-animation'] = null;
+						delete self.state.animations['gut-marker-layer-animation'];
 						return;
 					}
 					filter.push(['<', 'Serial', currentSerial % maxSerial]);
