@@ -210,6 +210,14 @@ export default React.createBackboneClass({
 						monitorMap.flyTo({
 							center: [feature.geometry.coordinates[0], feature.geometry.coordinates[1]]
 						});
+						//show pop up
+						self.state.popup && self.state.popup.remove();
+						self.state.popup = new mapboxgl.Popup({
+								closeButton: true,
+								anchor: 'top'
+							}).setLngLat([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
+							.setHTML(gtuId)
+							.addTo(monitorMap);
 						return false;
 					}
 				});
@@ -897,7 +905,7 @@ export default React.createBackboneClass({
 					let gtu = head(this.state.displayGtus);
 					let maxSerial = this.state.gtuCount[gtu] || 0;
 					let currentSerial = parseInt(currentTime / 100);
-					if(currentSerial > maxSerial){
+					if (currentSerial > maxSerial) {
 						delete self.state.animations['gut-marker-layer-animation'];
 						return;
 					}
@@ -1044,6 +1052,8 @@ export default React.createBackboneClass({
 			center: latlng,
 			zoom: mapZoom
 		});
+
+
 	},
 	clearTask: function () {
 		each(gtuMarkerLayer, layer => {
