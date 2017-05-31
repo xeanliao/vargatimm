@@ -81,7 +81,8 @@ export default React.createBackboneClass({
 			zoom: 8,
 			maxZoom: 20,
 			center: [-73.987378, 40.744556],
-			style: 'http://timm.vargainc.com/map/street.json',
+			sprite: "//timm.vargainc.com/map/sprite.json",
+			style: '//timm.vargainc.com/map/street.json',
 		});
 		self.registerTopic(monitorMap);
 		var nav = new mapboxgl.NavigationControl();
@@ -888,14 +889,19 @@ export default React.createBackboneClass({
 					'circle-stroke-color': 'black'
 				}
 			}, "GTU-LastLocation-Walker-Icon-Layer");
-
+			var self = this;
 			this.state.animations['gut-marker-layer-animation'] = function (monitorMap, time) {
 				if (this.state.trackBeginTime != null && this.state.displayMode != 'cover') {
 					var filter = clone(this.state.gtuMarkerFilter);
 					let currentTime = time - this.state.trackBeginTime;
 					let gtu = head(this.state.displayGtus);
 					let maxSerial = this.state.gtuCount[gtu] || 0;
-					filter.push(['<', 'Serial', parseInt(currentTime / 100) % maxSerial]);
+					let currentSerial = parseInt(currentTime / 100);
+					if(currentSerial > maxSerial){
+						self.state.animations['gut-marker-layer-animation'] = null;
+						return;
+					}
+					filter.push(['<', 'Serial', currentSerial % maxSerial]);
 					monitorMap.setFilter('gut-marker-layer', filter);
 				} else {
 					this.state.trackBeginTime = time;

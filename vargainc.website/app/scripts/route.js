@@ -131,7 +131,10 @@ export default Backbone.Router.extend({
 		var GeoCollection = require('collections/geo').default;
 		var campaignWithTaskModel = new Model();
 		var geoCollection = new GeoCollection();
-		campaignWithTaskModel.loadWithAllTask(campaignId).then(() => {
+		campaignWithTaskModel.loadWithAllTask(campaignId).then(()=>{
+			let have
+			campaignWithTaskModel.each(i=>{})
+		}).then(() => {
 			Topic.publish({
 				channel: 'View',
 				topic: 'loadView',
