@@ -81,7 +81,6 @@ export default React.createBackboneClass({
 			zoom: 8,
 			maxZoom: 20,
 			center: [-73.987378, 40.744556],
-			sprite: "//timm.vargainc.com/map/sprite.json",
 			style: '//timm.vargainc.com/map/street.json',
 		});
 		self.registerTopic(monitorMap);
