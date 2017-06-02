@@ -178,7 +178,11 @@ export default React.createBackboneClass({
 			self.setState({
 				displayMode: mode,
 				trackBeginTime: null
-			});
+			}, ()=>{
+				if(mode == 'track'){
+					self.animateGtuPath();
+				}
+			})
 		});
 		this.subscribe('Campaign.Monitor.ShowOutOfBoundaryGtu', boolean => {
 			self.setState({
@@ -879,7 +883,7 @@ export default React.createBackboneClass({
 				'data': geoJson
 			});
 			monitorMap.addLayer({
-				'id': `gut-marker-layer`,
+				'id': `gtu-marker-layer`,
 				'type': 'circle',
 				'source': `gut-marker-source`,
 				'paint': {
@@ -897,28 +901,32 @@ export default React.createBackboneClass({
 					'circle-stroke-color': 'black'
 				}
 			}, "GTU-LastLocation-Walker-Icon-Layer");
-			var self = this;
-			this.state.animations['gut-marker-layer-animation'] = function (monitorMap, time) {
-				if (this.state.trackBeginTime != null && this.state.displayMode != 'cover') {
-					var filter = clone(this.state.gtuMarkerFilter);
-					let currentTime = time - this.state.trackBeginTime;
-					let gtu = head(this.state.displayGtus);
-					let maxSerial = this.state.gtuCount[gtu] || 0;
-					let currentSerial = parseInt(currentTime / 100);
-					if (currentSerial > maxSerial) {
-						delete self.state.animations['gut-marker-layer-animation'];
-						return;
-					}
-					filter.push(['<', 'Serial', currentSerial % maxSerial]);
-					monitorMap.setFilter('gut-marker-layer', filter);
-				} else {
-					this.state.trackBeginTime = time;
-				}
-			};
 		} else {
 			source.setData(geoJson);
 		}
 		this.setGtuPointsFilter();
+	},
+	animateGtuPath: function () {
+		var self = this;
+		this.state.animations['gtu-marker-layer-animation'] = function (monitorMap, time) {
+			if (this.state.trackBeginTime != null && this.state.displayMode != 'cover') {
+				var filter = clone(this.state.gtuMarkerFilter);
+				let currentTime = time - this.state.trackBeginTime;
+				let gtu = head(this.state.displayGtus);
+				let maxSerial = this.state.gtuCount[gtu] || 0;
+				let currentSerial = parseInt(currentTime / 100);
+				if (currentSerial > maxSerial) {
+					filter.push(['<=', 'Serial', maxSerial]);
+					monitorMap.setFilter('gtu-marker-layer', filter);
+					delete self.state.animations['gtu-marker-layer-animation'];
+					return;
+				}
+				filter.push(['<', 'Serial', currentSerial % maxSerial]);
+				monitorMap.setFilter('gtu-marker-layer', filter);
+			} else {
+				this.state.trackBeginTime = time;
+			}
+		};
 	},
 	setGtuPointsFilter: function () {
 		var monitorMap = this.state.map;
@@ -937,7 +945,7 @@ export default React.createBackboneClass({
 			gtuMarkerFilter: filter
 		}, () => {
 			if (self.state.displayMode == 'cover') {
-				monitorMap.setFilter('gut-marker-layer', filter);
+				monitorMap.setFilter('gtu-marker-layer', filter);
 			}
 		});
 	},
@@ -1053,8 +1061,6 @@ export default React.createBackboneClass({
 			center: latlng,
 			zoom: mapZoom
 		});
-
-
 	},
 	clearTask: function () {
 		each(gtuMarkerLayer, layer => {
