@@ -214,9 +214,9 @@ export default React.createBackboneClass({
 						self.state.popup && self.state.popup.remove();
 						self.state.popup = new mapboxgl.Popup({
 								closeButton: true,
-								anchor: 'top'
+								anchor: 'bottom'
 							}).setLngLat([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
-							.setHTML(gtuId)
+							.setHTML(get(feature, 'properties.displayName'))
 							.addTo(monitorMap);
 						return false;
 					}
@@ -971,7 +971,8 @@ export default React.createBackboneClass({
 					properties: {
 						userColor: '#ff0000',
 						role: gtu.get('Role'),
-						gtuId: gtu.get('Id')
+						gtuId: gtu.get('Id'),
+						displayName: gtu.get('ShortUniqueID')
 					}
 				}
 			})
