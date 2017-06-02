@@ -1013,7 +1013,7 @@ export default React.createBackboneClass({
 				"layout": {
 					"icon-image": "truck",
 					"icon-size": 0.75,
-					"icon-offset": "0,-5"
+					"icon-offset": "0,-5",
 					"icon-allow-overlap": true
 				},
 				"paint": {}
