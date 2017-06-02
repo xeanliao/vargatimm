@@ -91,7 +91,7 @@
             "url": "mapbox://mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7"
         }
     },
-    "sprite": "http://timm.vargainc.com/map/sprite.json",
+    "sprite": "http://timm.vargainc.com/map/sprite",
     "version": 8,
     "visibility": "public"
 }

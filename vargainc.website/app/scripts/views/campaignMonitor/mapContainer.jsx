@@ -889,7 +889,7 @@ export default React.createBackboneClass({
 					'circle-radius': {
 						stops: [
 							[4, 2],
-							[20, 8]
+							[20, 6]
 						]
 					},
 					'circle-color': {
@@ -937,9 +937,7 @@ export default React.createBackboneClass({
 		if (!this.state.showOutOfBoundaryGtu) {
 			filter.push(['==', 'Out', false]);
 		}
-		if (this.state.displayGtus.length > 0) {
-			filter.push(concat(['in', 'GtuId'], this.state.displayGtus));
-		}
+		filter.push(concat(['in', 'GtuId'], this.state.displayGtus));
 		this.setState({
 			gtuMarkerFilter: filter
 		}, () => {
@@ -999,7 +997,8 @@ export default React.createBackboneClass({
 				"type": "symbol",
 				"layout": {
 					"icon-image": "walker",
-					"icon-size": 0.45,
+					"icon-size": 0.75,
+					"icon-offset": "0,-5"
 					"icon-allow-overlap": true
 				},
 				"paint": {}
@@ -1013,7 +1012,8 @@ export default React.createBackboneClass({
 				"type": "symbol",
 				"layout": {
 					"icon-image": "truck",
-					"icon-size": 0.45,
+					"icon-size": 0.75,
+					"icon-offset": "0,-5"
 					"icon-allow-overlap": true
 				},
 				"paint": {}
