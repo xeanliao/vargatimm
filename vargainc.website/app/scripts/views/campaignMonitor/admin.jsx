@@ -648,13 +648,13 @@ export default React.createBackboneClass({
 								&nbsp;<span>Hide Other DMap</span>
 							</a>
 						</li>
-						<li className={`${this.state.displayMode == 'cover' ? 'hide': ''}`}>
+						<li>
 							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'cover')}>
 								<i className="fa fa-map"></i>
 								&nbsp;<span>Show Coverage</span>
 							</a>
 						</li>
-						<li className={`${this.state.displayMode == 'track' ? 'hide': ''}`}>
+						<li>
 							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'track')}>
 								<i className="fa fa-map-o"></i>
 								&nbsp;<span>Track Path</span>
