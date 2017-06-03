@@ -217,7 +217,8 @@ export default React.createBackboneClass({
 						self.state.popup && self.state.popup.remove();
 						self.state.popup = new mapboxgl.Popup({
 								closeButton: true,
-								anchor: 'bottom'
+								anchor: 'bottom',
+								offset: 15
 							}).setLngLat([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
 							.setHTML(get(feature, 'properties.displayName'))
 							.addTo(monitorMap);
