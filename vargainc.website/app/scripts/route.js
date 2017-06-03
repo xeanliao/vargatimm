@@ -131,26 +131,52 @@ export default Backbone.Router.extend({
 		var GeoCollection = require('collections/geo').default;
 		var campaignWithTaskModel = new Model();
 		var geoCollection = new GeoCollection();
-		campaignWithTaskModel.loadWithAllTask(campaignId).then(()=>{
-			let have
-			campaignWithTaskModel.each(i=>{})
-		}).then(() => {
-			Topic.publish({
-				channel: 'View',
-				topic: 'loadView',
-				data: {
-					view: View,
-					params: {
-						model: campaignWithTaskModel,
-						geo: geoCollection
-					},
-					options: {
-						showMenu: false,
-						showUser: true,
-						showSearch: false,
-						pageTitle: 'GTU Campaign Monitor'
+		campaignWithTaskModel.loadWithAllTask(campaignId).then(() => {
+			return new Promise((resolve, reject) => {
+				let isTaskAllFinished = true;
+				campaignWithTaskModel.get('Tasks').each(t => {
+					if (t.get('IsFinished') == false) {
+						isTaskAllFinished = false;
+						return false;
 					}
+				});
+				isTaskAllFinished = true;
+				if (isTaskAllFinished) {
+					throw new OperationalError('task is closed');
 				}
+			}).then(() => {
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							model: campaignWithTaskModel,
+							geo: geoCollection
+						},
+						options: {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'GTU Campaign Monitor'
+						}
+					}
+				});
+			}).catch(e => {
+				let errorView = require('views/campaignMonitor/taskStopMessagePage').default;
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: errorView,
+						options: {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'GTU Campaign Monitor'
+						}
+					}
+				});
 			});
 		});
 	},
