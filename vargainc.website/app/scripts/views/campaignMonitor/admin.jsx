@@ -388,6 +388,12 @@ export default React.createBackboneClass({
 	onOpenUploadFile: function (taskId) {
 		$("#upload-file-" + taskId).click();
 	},
+	onShowUrlForDriver: function(){
+		let model = this.getModel();
+		let campaignId = model.get('Id');
+
+		this.alert(`http://${window.location.host}${window.location.pathname}#driver/${campaignId}`);
+	},
 	renderTaskDropdown: function () {
 		var self = this,
 			model = this.getModel(),
@@ -409,26 +415,6 @@ export default React.createBackboneClass({
 			'vertical': true,
 			'js-dropdown-active': this.state.taskDropdownActive,
 		});
-		if (tasks.length > 10) {
-			menuClass = classNames('section row collapse small-up-2 medium-up-3 large-up-4', {
-				'menu': true,
-				'submenu': true,
-				'is-dropdown-submenu': true,
-				'first-sub': true,
-				'vertical': true,
-				'js-dropdown-active': this.state.taskDropdownActive,
-			});
-			return (
-				<select ref={this.initSelect2} data-placeholder="Select an task">
-					<option key="task-ddl-option-placeholder"></option>
-					{map(tasks, t=>{
-						return (
-							<option key={`task-ddl-option-${t.get('Id')}`} value={t.get('Id')}>{t.get('Name')}</option>
-						);
-					})}
-				</select>
-			);
-		}
 		return (
 			<ul className="dropdown menu float-right">
 				<li className={parentClass}>
@@ -664,6 +650,12 @@ export default React.createBackboneClass({
 							<a href="javascript:;" onClick={this.onSwitchShowOutOfBoundaryGtu}>
 								<i className={!this.state.ShowOutOfBoundaryGtu ? 'fa fa-compress' : 'fa fa-expand'}></i>
 								&nbsp;<span>{!this.state.ShowOutOfBoundaryGtu ? 'Show Out of Bounds' : 'Hide Out of Bounds'}</span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:;" onClick={this.onShowUrlForDriver}>
+								<i className='fa fa-external-link-square'></i>
+								&nbsp;<span>URL for driver</span>
 							</a>
 						</li>
 					</ul>

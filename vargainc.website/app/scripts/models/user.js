@@ -24,9 +24,8 @@ export default Backbone.Model.extend({
                 type: 'GET'
             };
         extend(options, opts);
-
-        return (this.sync || Backbone.sync).call(this, 'read', this, options).then((result) => {
-            return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
+            return (this.sync || Backbone.sync).call(this, 'read', this, options).then((result) => {
                 if (result && result.success) {
                     model.set(result.data);
                     return resolve(true);

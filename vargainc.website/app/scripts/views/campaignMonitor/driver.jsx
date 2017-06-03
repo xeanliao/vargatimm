@@ -374,26 +374,6 @@ export default React.createBackboneClass({
 			'vertical': true,
 			'js-dropdown-active': this.state.taskDropdownActive,
 		});
-		if (tasks.length > 10) {
-			menuClass = classNames('section row collapse small-up-2 medium-up-3 large-up-4', {
-				'menu': true,
-				'submenu': true,
-				'is-dropdown-submenu': true,
-				'first-sub': true,
-				'vertical': true,
-				'js-dropdown-active': this.state.taskDropdownActive,
-			});
-			return (
-				<select ref={this.initSelect2} data-placeholder="Select an task">
-					<option key="task-ddl-option-placeholder"></option>
-					{map(tasks, t=>{
-						return (
-							<option key={`task-ddl-option-${t.get('Id')}`} value={t.get('Id')}>{t.get('Name')}</option>
-						);
-					})}
-				</select>
-			);
-		}
 		return (
 			<ul className="dropdown menu float-right">
 				<li className={parentClass}>
