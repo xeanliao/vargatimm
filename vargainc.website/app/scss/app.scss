@@ -677,13 +677,13 @@ $A3LeftRightMargin: 0.5in;
 
         &.active {
             box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25) !important;
-            opacity: 0.75;
+            opacity: 1;
         }
     }
 
     .button.offline {
         color: #a7a7a7;
-        opacity: 0.65;
+        opacity: 0.35;
 
         i {
             opacity: 1;

@@ -481,12 +481,11 @@ export default React.createBackboneClass({
 			<span className="group" key={gtu.get('Id')}>
 				<button className={buttonClass} style={{'backgroundColor': isActive ? gtu.get('UserColor') : 'transparent'}} onClick={this.onSelectedGTU.bind(null, gtu.get('Id'))}>
 					{deleteIcon}
-					{gtuIcon}
 					<span>{gtu.get('ShortUniqueID')}</span>
 					{alertIcon}
 				</button>
 				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
-					<i className="location fa fa-crosshairs" style={{color:'black', 'backgroundColor': gtu.get('UserColor')}}></i>
+					{gtuIcon}
 				</button>
 			</span>
 		);
