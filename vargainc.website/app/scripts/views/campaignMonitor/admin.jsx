@@ -529,8 +529,7 @@ export default React.createBackboneClass({
 					<span>{gtu.get('ShortUniqueID')}</span>
 					{alertIcon}
 				</button>
-				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
-					
+				<button className="button location text-center" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
 					{gtuIcon}
 				</button>
 			</span>
