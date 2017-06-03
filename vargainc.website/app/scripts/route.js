@@ -143,6 +143,7 @@ export default Backbone.Router.extend({
 				if (isTaskAllFinished) {
 					throw new OperationalError('task is closed');
 				}
+				return resolve();
 			}).then(() => {
 				Topic.publish({
 					channel: 'View',
