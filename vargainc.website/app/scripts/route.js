@@ -140,7 +140,6 @@ export default Backbone.Router.extend({
 						return false;
 					}
 				});
-				isTaskAllFinished = true;
 				if (isTaskAllFinished) {
 					throw new OperationalError('task is closed');
 				}
