@@ -118,6 +118,10 @@ export default React.createBackboneClass({
 			}
 		});
 
+		this.subscribe('GTU.Assigned', ()=>{
+			this.publish('Campaign.Monitor.Reload');
+		});
+
 		this.on('click.import.task', '.btnImportTask', function (evt) {
 			evt.preventDefault();
 			evt.stopPropagation();
