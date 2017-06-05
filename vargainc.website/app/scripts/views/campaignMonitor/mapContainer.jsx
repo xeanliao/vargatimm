@@ -999,7 +999,7 @@ export default React.createBackboneClass({
 				"layout": {
 					"icon-image": "walker",
 					"icon-size": 0.75,
-					"icon-offset": [0,-5],
+					"icon-offset": [-2,-25],
 					"icon-allow-overlap": true
 				},
 				"paint": {}
@@ -1014,7 +1014,7 @@ export default React.createBackboneClass({
 				"layout": {
 					"icon-image": "truck",
 					"icon-size": 0.75,
-					"icon-offset": [0,-5],
+					"icon-offset": [-2,-25],
 					"icon-allow-overlap": true
 				},
 				"paint": {}
