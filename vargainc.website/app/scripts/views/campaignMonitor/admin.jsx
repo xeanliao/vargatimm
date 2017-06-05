@@ -311,7 +311,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onAssign: function () {
-		var gtu = this.state.activeTask.get('gtu'),
+		var gtu = this.state.activeTask.get('gtuList'),
 			taskId = this.state.activeTask.get('Id'),
 			user = new UserCollection(),
 			self = this;
