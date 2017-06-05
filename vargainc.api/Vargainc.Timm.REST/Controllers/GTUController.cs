@@ -11,6 +11,7 @@ using Vargainc.Timm.Models;
 using NetTopologySuite.Geometries;
 using Vargainc.Timm.Extentions;
 using System.Data.Common;
+using System.Configuration;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -19,6 +20,8 @@ namespace Vargainc.Timm.REST.Controllers
     public class GTUController : ApiController
     {
         private TimmContext db = new TimmContext();
+
+        private static string GTUTimeoutCheckTime = ConfigurationManager.AppSettings["GtuOfflineInterval"];
 
         [Route("task/{taskId}")]
         [HttpGet]
@@ -100,8 +103,12 @@ namespace Vargainc.Timm.REST.Controllers
                 }
             }
 
-
-            var checkTime = DateTime.Now.AddMinutes(-5);
+            int time;
+            if (!int.TryParse(GTUTimeoutCheckTime, out time))
+            {
+                time = 1 * 60;
+            }
+            var checkTime = DateTime.Now.AddSeconds(-1 * time);
             var onlineRecord = await db.GtuInfos
                 .Where(i => i.dtReceivedTime >= checkTime)
                 .OrderByDescending(i => i.dtReceivedTime).ThenBy(i => i.GtuUniqueID)
