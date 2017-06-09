@@ -158,7 +158,7 @@ export default React.createBackboneClass({
 		});
 	},
 	componentDidUpdate: function (prevProps, prevState) {
-		if (this.state.dialogView && Foundation) {
+		if ((this.state.dialogView || this.state.dialogModalView) && Foundation) {
 			$('.reveal').foundation();
 			var dialogSize = this.state.dialogSize;
 			// $(document).off('open.zf.reveal.mainView');
@@ -186,7 +186,6 @@ export default React.createBackboneClass({
 				data: searchKey
 			});
 		}, 500);
-
 	},
 	menuSwitch: function () {
 		this.refs.sideMenu && this.refs.sideMenu.switch();
