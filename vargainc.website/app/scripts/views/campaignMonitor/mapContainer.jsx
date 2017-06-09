@@ -818,6 +818,7 @@ export default React.createBackboneClass({
 
 
 				Promise.all(promiseQuery).then(() => {
+					self.publish('Map.GTU.Update');
 					self.setState({
 						reloading: false
 					}, () => {
