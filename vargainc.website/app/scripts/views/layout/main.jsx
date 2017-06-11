@@ -158,20 +158,19 @@ export default React.createBackboneClass({
 		});
 	},
 	componentDidUpdate: function (prevProps, prevState) {
-		if ((this.state.dialogView || this.state.dialogModalView) && Foundation) {
-			$('.reveal').foundation();
-			var dialogSize = this.state.dialogSize;
-			// $(document).off('open.zf.reveal.mainView');
-			// $(document).one('open.zf.reveal.mainView', function () {
-			// 	console.log('open.zf.reveal.mainView');
-			// 	$('.reveal-overlay').css({
-			// 		display: dialogSize == 'full' ? 'none' : 'block'
-			// 	});
-			// });
-			$('.reveal').foundation('open');
+		if (this.state.dialogView && Foundation) {
+			$('.dialog').foundation();
+			$('.dialog').foundation('open');
 		} else {
-			$('.reveal').foundation();
-			$('.reveal').foundation('close');
+			$('.dialog').foundation();
+			$('.dialog').foundation('close');
+		}
+		if (this.state.dialogModalView && Foundation) {
+			$('.dialogModal').foundation();
+			$('.dialogModal').foundation('open');
+		} else {
+			$('.dialogModal').foundation();
+			$('.dialogModal').foundation('close');
 		}
 		$('iframe').height($(window).height());
 	},
@@ -250,11 +249,11 @@ export default React.createBackboneClass({
 		var model = this.getModel();
 		var mainView = this.getMainView();
 		var dialogView = this.getDialogView(this.state.dialogView, this.state.dialogParams, this.onCloseDialog);
-		var dialogClass = classNames(`reveal ${this.state.dialogSize} ${this.state.dialogCustomClass}`, {
+		var dialogClass = classNames(`reveal dialog ${this.state.dialogSize} ${this.state.dialogCustomClass}`, {
 			hide: dialogView == null
 		});
 		var dialogModalView = this.getDialogView(this.state.dialogModalView, this.state.dialogModalParams, this.onCloseDialogModal);
-		var dialogModalClass = classNames(`reveal ${this.state.dialogModalSize} ${this.state.dialogModalCustomClass}`, {
+		var dialogModalClass = classNames(`reveal dialogModal ${this.state.dialogModalSize} ${this.state.dialogModalCustomClass}`, {
 			hide: dialogModalView == null
 		});
 
