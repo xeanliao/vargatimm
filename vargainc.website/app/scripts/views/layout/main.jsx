@@ -158,9 +158,11 @@ export default React.createBackboneClass({
 		});
 	},
 	componentDidUpdate: function (prevProps, prevState) {
+		var haveOpenModal = false;
 		if (this.state.dialogView && Foundation) {
 			$('.dialog').foundation();
 			$('.dialog').foundation('open');
+			haveOpenModal = true;
 		} else {
 			$('.dialog').foundation();
 			$('.dialog').foundation('close');
@@ -168,9 +170,14 @@ export default React.createBackboneClass({
 		if (this.state.dialogModalView && Foundation) {
 			$('.dialogModal').foundation();
 			$('.dialogModal').foundation('open');
+			haveOpenModal = true;
 		} else {
 			$('.dialogModal').foundation();
 			$('.dialogModal').foundation('close');
+		}
+
+		if(!haveOpenModal){
+			$('body').removeClass('is-reveal-open');
 		}
 		$('iframe').height($(window).height());
 	},
