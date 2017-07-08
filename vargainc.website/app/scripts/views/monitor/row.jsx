@@ -34,7 +34,9 @@ export default React.createBackboneClass({
 		var self = this,
 			model = this.getModel();
 		this.confirm('Are you sure you want to delete all selected Tasks?').then(() => {
-			self.publish('showDialog', DismissView);
+			self.publish('showDialog', {
+				view: DismissView
+			});
 			self.unsubscribe('monitor/dismiss');
 			self.subscribe('monitor/dismiss', function (user) {
 				model.dismissToDMap(user, {

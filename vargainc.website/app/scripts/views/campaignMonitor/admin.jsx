@@ -392,7 +392,12 @@ export default React.createBackboneClass({
 			self = this;
 
 		model.fetch().then(function () {
-			self.publish('showDialog', EditView, model);
+			self.publish('showDialog', {
+				view: EditView,
+				params: {
+					model: model
+				}
+			});
 		});
 	},
 	onOpenUploadFile: function (taskId) {

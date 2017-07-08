@@ -428,7 +428,7 @@ export default React.createBackboneClass({
 			infowindow.setContent(gtu.get('ShortUniqueID'));
 			infowindow.open(googleMap, marker);
 		} else {
-			this.publish('showDialog', 'No Data');
+			this.alert('showDialog', 'No Data');
 		}
 	},
 	onAssign: function () {
@@ -454,9 +454,12 @@ export default React.createBackboneClass({
 		var user = new UserCollection(),
 			self = this;
 		user.fetchCompany().done(function () {
-			self.publish('showDialog', EmployeeView, {
-				model: new UserModel(),
-				company: user
+			self.publish('showDialog', {
+				view: EmployeeView,
+				params: {
+					model: new UserModel(),
+					company: user
+				}
 			});
 		});
 	},
@@ -491,12 +494,12 @@ export default React.createBackboneClass({
 		});
 	},
 	onCopyShareLink: function () {
-		var location = window.location,
-			path = location.pathname.substr(1);
-		firstPath = location.pathname.substr(0, path.indexOf('/') + 1),
-			task = this.props.task.get('PublicUrl'),
-			address = location.protocol + '//' + window.location.host + firstPath + '/monitor/#' + task;
-		this.publish('showDialog', address);
+		var location = window.location;
+		var	path = location.pathname.substr(1);
+		var	firstPath = location.pathname.substr(0, path.indexOf('/') + 1);
+		var	task = this.props.task.get('PublicUrl');
+		var	address = location.protocol + '//' + window.location.host + firstPath + '/monitor/#' + task;
+		this.alert(address);
 	},
 	onOpenMoreMenu: function (e) {
 		e.preventDefault();
