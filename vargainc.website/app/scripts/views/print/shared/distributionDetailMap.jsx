@@ -31,7 +31,7 @@ export default React.createBackboneClass({
 	scrollToPage: function () {
 		var model = this.getModel(),
 			height = $(this.refs.page).position().top;
-		$('.off-canvas-wrapper-inner').stop().animate({
+		$('body').stop().animate({
 			scrollTop: height
 		}, 600);
 	},
