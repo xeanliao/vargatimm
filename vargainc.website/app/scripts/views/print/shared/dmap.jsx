@@ -206,7 +206,7 @@ export default React.createBackboneClass({
 		}
 
 		return (
-			<div className="page" ref="page">
+			<div key={`DMAP-${model.get('DMapId')}`} className="page" ref="page">
 				<div className="row">
   					<div className="small-12 columns text-center title">DM MAP {model.get('DMapId')}({model.get('Name')})</div>
 				</div>

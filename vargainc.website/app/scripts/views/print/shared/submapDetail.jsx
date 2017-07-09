@@ -49,7 +49,7 @@ export default React.createBackboneClass({
 								<tbody>
 								{croutes.map(function(item, index){
 									return (
-										<tr key={item.Name}>
+										<tr key={`${item.Name}-${index}`}>
 										<td>{index}</td>
 										<td>{item.Name}</td>
 										<td>{Numeral(item.TotalHouseHold).format('0,0')}</td>
