@@ -490,7 +490,7 @@ namespace Vargainc.Timm.REST.Controllers
                         dtReceivedTime = gtu.dtReceivedTime,
                         dtSendTime = gtu.dtSendTime,
                         //0-original ,1-added ,2-removed, 3-merged
-                        nCellID = 3,
+                        nCellID = 1,
                         dwLatitude = gtu.dwLatitude,
                         dwLongitude = gtu.dwLongitude,
                         dwSpeed = gtu.dwSpeed,
