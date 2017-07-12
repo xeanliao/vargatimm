@@ -2,6 +2,7 @@ import Backbone from 'backbone';
 import React from 'react';
 import 'react.backbone';
 import $ from 'jquery';
+import classNames from 'classnames';
 import BaseView from 'views/base';
 import MenuView from 'views/layout/menu';
 import UserView from 'views/layout/user';
@@ -25,11 +26,16 @@ export default React.createBackboneClass({
 			dialogParams: null,
 			dialogSize: 'small',
 			dialogCustomClass: '',
+			dialogModalView: null,
+			dialogModalParams: null,
+			dialogModalSize: 'small',
+			dialogModalCustomClass: '',
 			loading: false,
 			pageTitle: 'TIMM System',
 			showMenu: null,
 			showSearch: null,
-			showUser: null
+			showUser: null,
+			fullTextSearchTimeout: null
 		}
 	},
 	componentDidMount: function () {
@@ -78,7 +84,33 @@ export default React.createBackboneClass({
 					dialogCustomClass: null,
 				});
 			}
+		});
 
+		/**
+		 * show a dialog
+		 * @param  {React} view
+		 * @param  {Backbone.Collection} or Backbone.Model} params
+		 * @param  {size: {String} size Foundation Reveal Size Value: tiny, small, large, full} options
+		 */
+		this.subscribe('showDialogModal', function (data) {
+			if (data) {
+				self.setState({
+					dialogModalView: data.view,
+					dialogModalParams: data.params,
+				});
+				var options = data.options;
+				self.setState({
+					dialogModalSize: has(options, 'size') ? options.size : 'small',
+					dialogModalCustomClass: has(options, 'customClass') ? options.customClass : ''
+				});
+			} else {
+				self.setState({
+					dialogModalView: null,
+					dialogModalParams: null,
+					dialogModalSize: null,
+					dialogModalCustomClass: null,
+				});
+			}
 		});
 
 		/**
@@ -126,25 +158,40 @@ export default React.createBackboneClass({
 		});
 	},
 	componentDidUpdate: function (prevProps, prevState) {
+		var haveOpenModal = false;
 		if (this.state.dialogView && Foundation) {
-			$('.reveal').foundation();
-			var dialogSize = this.state.dialogSize;
-			// $(document).off('open.zf.reveal.mainView');
-			// $(document).one('open.zf.reveal.mainView', function () {
-			// 	console.log('open.zf.reveal.mainView');
-			// 	$('.reveal-overlay').css({
-			// 		display: dialogSize == 'full' ? 'none' : 'block'
-			// 	});
-			// });
-			$('.reveal').foundation('open');
+			$('.dialog').foundation();
+			$('.dialog').foundation('open');
+			haveOpenModal = true;
 		} else {
-			$('.reveal').foundation();
-			$('.reveal').foundation('close');
+			$('.dialog').foundation();
+			$('.dialog').foundation('close');
+		}
+		if (this.state.dialogModalView && Foundation) {
+			$('.dialogModal').foundation();
+			$('.dialogModal').foundation('open');
+			haveOpenModal = true;
+		} else {
+			$('.dialogModal').foundation();
+			$('.dialogModal').foundation('close');
+		}
+
+		if(!haveOpenModal){
+			$('body').removeClass('is-reveal-open');
 		}
 		$('iframe').height($(window).height());
 	},
 	fullTextSearch: function (e) {
-		this.publish('search', e.currentTarget.value);
+		var self = this;
+		clearTimeout(this.state.fullTextSearchTimeout);
+		var searchKey = e.currentTarget.value;
+		this.state.fullTextSearchTimeout = setTimeout(function () {
+			self.publish({
+				channel: 'View',
+				topic: 'search',
+				data: searchKey
+			});
+		}, 500);
 	},
 	menuSwitch: function () {
 		this.refs.sideMenu && this.refs.sideMenu.switch();
@@ -166,13 +213,16 @@ export default React.createBackboneClass({
 	onCloseDialog: function () {
 		this.publish('showDialog');
 	},
+	onCloseDialogModal: function () {
+		this.publish('showDialogModal');
+	},
 	/**
 	 * build dialog view
 	 */
-	getDialogView: function () {
-		if (this.state.dialogView) {
-			if (isString(this.state.dialogView)) {
-				var content = this.state.dialogView;
+	getDialogView: function (view, viewParams, closeHandle) {
+		if (view) {
+			if (isString(view)) {
+				var content = view;
 				return (
 					<div className="row">
 						<div className="small-12 columns">
@@ -182,19 +232,19 @@ export default React.createBackboneClass({
 						</div>
 						<div className="small-12 columns">
 							<div className="button-group float-right">
-								<a href="javascript:;" className="button tiny" onClick={this.onCloseDialog}>Okay</a>
+								<a href="javascript:;" className="button tiny" onClick={closeHandle}>Okay</a>
 							</div>
 						</div>
-						<button onClick={this.onCloseDialog} className="close-button" data-close aria-label="Close reveal" type="button">
+						<button onClick={closeHandle} className="close-button" data-close aria-label="Close reveal" type="button">
 					    	<span aria-hidden="true">&times;</span>
 					  	</button>
 					</div>
 				);
-			} else if (React.isValidElement(this.state.dialogView)) {
-				return this.state.dialogView;
+			} else if (React.isValidElement(view)) {
+				return view;
 			} else {
-				var DialogView = React.createFactory(this.state.dialogView),
-					params = extend(this.state.dialogParams, {
+				var DialogView = React.createFactory(view),
+					params = extend(viewParams, {
 						ref: "DialogView"
 					});
 				return DialogView(params);
@@ -203,10 +253,16 @@ export default React.createBackboneClass({
 		return null;
 	},
 	render: function () {
-		var model = this.getModel(),
-			mainView = this.getMainView(),
-			dialogView = this.getDialogView();
-
+		var model = this.getModel();
+		var mainView = this.getMainView();
+		var dialogView = this.getDialogView(this.state.dialogView, this.state.dialogParams, this.onCloseDialog);
+		var dialogClass = classNames(`reveal dialog ${this.state.dialogSize} ${this.state.dialogCustomClass}`, {
+			hide: dialogView == null
+		});
+		var dialogModalView = this.getDialogView(this.state.dialogModalView, this.state.dialogModalParams, this.onCloseDialogModal);
+		var dialogModalClass = classNames(`reveal dialogModal ${this.state.dialogModalSize} ${this.state.dialogModalCustomClass}`, {
+			hide: dialogModalView == null
+		});
 
 		if (this.state.showMenu === true) {
 			var mainMenuClassName = 'left-menu';
@@ -249,8 +305,12 @@ export default React.createBackboneClass({
 						<div id="google-map" className="google-map"></div>
 					</div>
 				</div>
-				<div key='dialog' className={'reveal ' + this.state.dialogSize + ' ' + this.state.dialogCustomClass} data-reveal data-options="closeOnClick: false; closeOnEsc: false;">
+				<div key='dialog' className={dialogClass} data-reveal data-options="closeOnClick: false; closeOnEsc: false;">
 					{dialogView}
+				</div>
+
+				<div key='dialogModal' className={dialogModalClass} data-reveal data-options="closeOnClick: false; closeOnEsc: false;">
+					{dialogModalView}
 				</div>
 
 				<div className="overlayer" style={{'display': loadingDisplay}}>

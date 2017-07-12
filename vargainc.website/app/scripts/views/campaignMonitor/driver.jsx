@@ -91,6 +91,7 @@ export default React.createBackboneClass({
 				}
 			}
 		});
+
 		this.subscribe('Map.Popup.AbortMergeTask', () => {
 			self.setState({
 				mergeTasks: []
@@ -104,6 +105,7 @@ export default React.createBackboneClass({
 				self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', self.state.showOutOfBoundaryGtu);
 			});
 		});
+
 		this.subscribe('Map.Popup.ConfirmMergeTask', tasks => {
 			var model = self.getModel();
 			var tasks = model && model.get('Tasks');
@@ -124,7 +126,11 @@ export default React.createBackboneClass({
 			var taskId = $(this).attr('id');
 			$("#upload-file-" + taskId).click();
 		});
-
+		
+		this.subscribe('Map.GTU.Update', () => {
+			self.forceUpdate();
+		});
+		
 		this.subscribe('Global.Window.Click', () => {
 			self.onCloseDropDown();
 			self.onCloseMoreMenu();
@@ -374,26 +380,6 @@ export default React.createBackboneClass({
 			'vertical': true,
 			'js-dropdown-active': this.state.taskDropdownActive,
 		});
-		if (tasks.length > 10) {
-			menuClass = classNames('section row collapse small-up-2 medium-up-3 large-up-4', {
-				'menu': true,
-				'submenu': true,
-				'is-dropdown-submenu': true,
-				'first-sub': true,
-				'vertical': true,
-				'js-dropdown-active': this.state.taskDropdownActive,
-			});
-			return (
-				<select ref={this.initSelect2} data-placeholder="Select an task">
-					<option key="task-ddl-option-placeholder"></option>
-					{map(tasks, t=>{
-						return (
-							<option key={`task-ddl-option-${t.get('Id')}`} value={t.get('Id')}>{t.get('Name')}</option>
-						);
-					})}
-				</select>
-			);
-		}
 		return (
 			<ul className="dropdown menu float-right">
 				<li className={parentClass}>
@@ -501,12 +487,11 @@ export default React.createBackboneClass({
 			<span className="group" key={gtu.get('Id')}>
 				<button className={buttonClass} style={{'backgroundColor': isActive ? gtu.get('UserColor') : 'transparent'}} onClick={this.onSelectedGTU.bind(null, gtu.get('Id'))}>
 					{deleteIcon}
-					{gtuIcon}
 					<span>{gtu.get('ShortUniqueID')}</span>
 					{alertIcon}
 				</button>
-				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
-					<i className="location fa fa-crosshairs" style={{color:'black', 'backgroundColor': gtu.get('UserColor')}}></i>
+				<button className="button location text-center" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
+					{gtuIcon}
 				</button>
 			</span>
 		);

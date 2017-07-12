@@ -15,7 +15,7 @@ export default React.createBackboneClass({
 	onSearch: function () {
 		var url = 'http://timm.vargainc.com/' + this.refs.sourceUrl.value + '/api/campaign';
 		if (_.isEmpty(url)) {
-			this.publish('showDialog', 'Please input source url');
+			this.alert('Please input source url');
 			return;
 		}
 		var self = this,
@@ -46,7 +46,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onImportFailed: function () {
-		this.publish('showDialog', 'copy campaign failed. please contact us!');
+		this.alert('copy campaign failed. please contact us!');
 	},
 	onImport: function (campaignId) {
 		console.log(campaignId);
@@ -56,7 +56,7 @@ export default React.createBackboneClass({
 		$.getJSON(exportUrl).then((campaign) => {
 			return $.post(importUrl, campaign).then((response) => {
 				if (response && response.success) {
-					self.publish('showDialog', 'copy success. please refresh control center!');
+					self.alert('copy success. please refresh control center!');
 					return Promise.resolve();
 				}
 				return Promise.reject(new Error('server method failed'));

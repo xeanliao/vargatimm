@@ -671,19 +671,15 @@ $A3LeftRightMargin: 0.5in;
         font-size: 16px;
         font-weight: 700;
 
-        i {
-            margin-right: 4px;
-        }
-
         &.active {
             box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25) !important;
-            opacity: 0.75;
+            opacity: 1;
         }
     }
 
     .button.offline {
         color: #a7a7a7;
-        opacity: 0.65;
+        opacity: 0.35;
 
         i {
             opacity: 1;
@@ -752,7 +748,7 @@ $A3LeftRightMargin: 0.5in;
 
 .google-map-pop {
     background: transparent;
-    pointer-events: none;
+    pointer-events: none !important;
     margin-top: 0px !important;
     top: 0px !important;
 }

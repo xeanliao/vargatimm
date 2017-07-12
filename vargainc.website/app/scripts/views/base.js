@@ -144,11 +144,11 @@ export default {
 		var self = this;
 		return new Promise((resolve, reject) => {
 			var cancel = function () {
-				self.publish('showDialog');
+				self.publish('showDialogModal');
 				reject(new Error('user cancel'));
 			};
 			var okay = function () {
-				self.publish('showDialog');
+				self.publish('showDialogModal');
 				resolve();
 			}
 			if (isString(content)) {
@@ -177,7 +177,7 @@ export default {
 				  	</button>
 				</div>
 			);
-			self.publish('showDialog', {
+			self.publish('showDialogModal', {
 				view: view
 			});
 		});
@@ -191,7 +191,7 @@ export default {
 			});
 		}
 		var closeDialog = function () {
-			self.publish('showDialog');
+			self.publish('showDialogModal');
 		};
 		var view = (
 			<div className="row">
@@ -210,7 +210,7 @@ export default {
 				  	</button>
 				</div>
 		);
-		this.publish('showDialog', {
+		this.publish('showDialogModal', {
 			view: view
 		});
 	}

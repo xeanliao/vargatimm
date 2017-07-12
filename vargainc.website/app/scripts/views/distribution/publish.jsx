@@ -30,7 +30,7 @@ export default React.createBackboneClass({
 	render: function () {
 		return (
 			<div>
-				<h5>Campaign Publish</h5>
+				<h5>Distribution Map Publish</h5>
 				<span>Assign to</span>
 				<AdminUserList onSelect={this.onUserSelected} onDbSelect={this.onDbUserSelected} group="monitor" />
 				<div className="float-right">

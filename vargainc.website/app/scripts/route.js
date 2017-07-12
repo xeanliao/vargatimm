@@ -132,22 +132,51 @@ export default Backbone.Router.extend({
 		var campaignWithTaskModel = new Model();
 		var geoCollection = new GeoCollection();
 		campaignWithTaskModel.loadWithAllTask(campaignId).then(() => {
-			Topic.publish({
-				channel: 'View',
-				topic: 'loadView',
-				data: {
-					view: View,
-					params: {
-						model: campaignWithTaskModel,
-						geo: geoCollection
-					},
-					options: {
-						showMenu: false,
-						showUser: true,
-						showSearch: false,
-						pageTitle: 'GTU Campaign Monitor'
+			return new Promise((resolve, reject) => {
+				let isTaskAllFinished = true;
+				campaignWithTaskModel.get('Tasks').each(t => {
+					if (t.get('IsFinished') == false) {
+						isTaskAllFinished = false;
+						return false;
 					}
+				});
+				if (isTaskAllFinished) {
+					throw new OperationalError('task is closed');
 				}
+				return resolve();
+			}).then(() => {
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: View,
+						params: {
+							model: campaignWithTaskModel,
+							geo: geoCollection
+						},
+						options: {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'GTU Campaign Monitor'
+						}
+					}
+				});
+			}).catch(e => {
+				let errorView = require('views/campaignMonitor/taskStopMessagePage').default;
+				Topic.publish({
+					channel: 'View',
+					topic: 'loadView',
+					data: {
+						view: errorView,
+						options: {
+							showMenu: false,
+							showUser: false,
+							showSearch: false,
+							pageTitle: 'GTU Campaign Monitor'
+						}
+					}
+				});
 			});
 		});
 	},

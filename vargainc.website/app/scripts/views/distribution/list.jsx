@@ -43,7 +43,7 @@ export default React.createBackboneClass({
 
 		$("#distribution-filter-ddl-ClientName, #distribution-filter-ddl-ClientCode, #distribution-filter-ddl-Date, #distribution-filter-ddl-AreaDescription").foundation();
 	},
-	onOrderBy: function (field, reactObj, reactId, e) {
+	onOrderBy: function (field, e) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (this.state.orderByFiled == field) {
@@ -159,10 +159,10 @@ export default React.createBackboneClass({
 		}
 		if (this.state.search) {
 			var keyword = this.state.search.toLowerCase(),
-				values = null;
+				modelValue = null;
 			dataSource = filter(dataSource, function (i) {
-				values = values(i.attributes);
-				return some(values, function (i) {
+				modelValue = values(i.attributes);
+				return some(modelValue, function (i) {
 					var dateCheck = moment(i, moment.ISO_8601);
 					if (dateCheck.isValid()) {
 						return dateCheck.format("MMM DD YYYY MMM DD, YYYY YYYY-MM-DD MM/DD/YYYY YYYY MM MMM DD").toLowerCase().indexOf(keyword) > -1;

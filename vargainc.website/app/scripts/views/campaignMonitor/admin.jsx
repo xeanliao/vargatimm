@@ -91,6 +91,7 @@ export default React.createBackboneClass({
 				}
 			}
 		});
+
 		this.subscribe('Map.Popup.AbortMergeTask', () => {
 			self.setState({
 				mergeTasks: []
@@ -104,6 +105,7 @@ export default React.createBackboneClass({
 				self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', self.state.showOutOfBoundaryGtu);
 			});
 		});
+
 		this.subscribe('Map.Popup.ConfirmMergeTask', tasks => {
 			var model = self.getModel();
 			var tasks = model && model.get('Tasks');
@@ -118,11 +120,19 @@ export default React.createBackboneClass({
 			}
 		});
 
+		this.subscribe('GTU.Assigned', ()=>{
+			this.publish('Campaign.Monitor.Reload');
+		});
+
 		this.on('click.import.task', '.btnImportTask', function (evt) {
 			evt.preventDefault();
 			evt.stopPropagation();
 			var taskId = $(this).attr('id');
 			$("#upload-file-" + taskId).click();
+		});
+
+		this.subscribe('Map.GTU.Update', () => {
+			self.forceUpdate();
 		});
 
 		this.subscribe('Global.Window.Click', () => {
@@ -311,7 +321,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onAssign: function () {
-		var gtu = this.state.activeTask.get('gtu'),
+		var gtu = this.state.activeTask.get('gtuList'),
 			taskId = this.state.activeTask.get('Id'),
 			user = new UserCollection(),
 			self = this;
@@ -382,11 +392,22 @@ export default React.createBackboneClass({
 			self = this;
 
 		model.fetch().then(function () {
-			self.publish('showDialog', EditView, model);
+			self.publish('showDialog', {
+				view: EditView,
+				params: {
+					model: model
+				}
+			});
 		});
 	},
 	onOpenUploadFile: function (taskId) {
 		$("#upload-file-" + taskId).click();
+	},
+	onShowUrlForDriver: function(){
+		let model = this.getModel();
+		let campaignId = model.get('Id');
+
+		this.alert(`http://${window.location.host}${window.location.pathname}#driver/${campaignId}`);
 	},
 	renderTaskDropdown: function () {
 		var self = this,
@@ -409,26 +430,6 @@ export default React.createBackboneClass({
 			'vertical': true,
 			'js-dropdown-active': this.state.taskDropdownActive,
 		});
-		if (tasks.length > 10) {
-			menuClass = classNames('section row collapse small-up-2 medium-up-3 large-up-4', {
-				'menu': true,
-				'submenu': true,
-				'is-dropdown-submenu': true,
-				'first-sub': true,
-				'vertical': true,
-				'js-dropdown-active': this.state.taskDropdownActive,
-			});
-			return (
-				<select ref={this.initSelect2} data-placeholder="Select an task">
-					<option key="task-ddl-option-placeholder"></option>
-					{map(tasks, t=>{
-						return (
-							<option key={`task-ddl-option-${t.get('Id')}`} value={t.get('Id')}>{t.get('Name')}</option>
-						);
-					})}
-				</select>
-			);
-		}
 		return (
 			<ul className="dropdown menu float-right">
 				<li className={parentClass}>
@@ -539,12 +540,12 @@ export default React.createBackboneClass({
 			<span className="group" key={gtu.get('Id')}>
 				<button className={buttonClass} style={{'backgroundColor': isActive ? gtu.get('UserColor') : 'transparent'}} onClick={this.onSelectedGTU.bind(null, gtu.get('Id'))}>
 					{deleteIcon}
-					{gtuIcon}
+					
 					<span>{gtu.get('ShortUniqueID')}</span>
 					{alertIcon}
 				</button>
-				<button className="button location" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
-					<i className="location fa fa-crosshairs" style={{color:'black', 'backgroundColor': gtu.get('UserColor')}}></i>
+				<button className="button location text-center" onClick={this.onGotoGTU.bind(null, gtu.get('Id'))} style={{'backgroundColor': gtu.get('UserColor')}}>
+					{gtuIcon}
 				</button>
 			</span>
 		);
@@ -648,13 +649,13 @@ export default React.createBackboneClass({
 								&nbsp;<span>Hide Other DMap</span>
 							</a>
 						</li>
-						<li className={`${this.state.displayMode == 'cover' ? 'hide': ''}`}>
+						<li>
 							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'cover')}>
 								<i className="fa fa-map"></i>
 								&nbsp;<span>Show Coverage</span>
 							</a>
 						</li>
-						<li className={`${this.state.displayMode == 'track' ? 'hide': ''}`}>
+						<li>
 							<a href="javascript:;" onClick={this.onSwitchDisplayMode.bind(this, 'track')}>
 								<i className="fa fa-map-o"></i>
 								&nbsp;<span>Track Path</span>
@@ -664,6 +665,12 @@ export default React.createBackboneClass({
 							<a href="javascript:;" onClick={this.onSwitchShowOutOfBoundaryGtu}>
 								<i className={!this.state.ShowOutOfBoundaryGtu ? 'fa fa-compress' : 'fa fa-expand'}></i>
 								&nbsp;<span>{!this.state.ShowOutOfBoundaryGtu ? 'Show Out of Bounds' : 'Hide Out of Bounds'}</span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:;" onClick={this.onShowUrlForDriver}>
+								<i className='fa fa-external-link-square'></i>
+								&nbsp;<span>URL for driver</span>
 							</a>
 						</li>
 					</ul>

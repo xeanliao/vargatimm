@@ -58,6 +58,7 @@ export default React.createBackboneClass({
 			self.setState({
 				editId: null
 			});
+			self.publish('GTU.Assigned');
 		});
 	},
 	onCacnel: function () {

@@ -133,8 +133,8 @@ export default React.createBackboneClass({
 				<div className="row">
 					<div className="small-12 columns text-center">
 						<div className="button-group print-toolbar">
-							<button onClick={this.onOpenOptions}><i className="fa fa-cog"></i>Options</button>
-							<button onClick={this.onPrint}><i className="fa fa-print"></i>Print</button>
+							<button className="button" onClick={this.onOpenOptions}><i className="fa fa-cog"></i>Options</button>
+							<button className="button" onClick={this.onPrint}><i className="fa fa-print"></i>Print</button>
 						</div>
 					</div>
 				</div>
