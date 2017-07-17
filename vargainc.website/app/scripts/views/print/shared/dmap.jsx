@@ -110,6 +110,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onCreateDetailMap: function (rectBounds) {
+		var self = this;
 		var model = this.getModel(),
 			collection = model.collection,
 			detailModel = model.clone(),
@@ -147,7 +148,10 @@ export default React.createBackboneClass({
 			at: modelIndex + 1
 		});
 		this.publish('showDialog');
-		this.publish('print.map.imageloaded');
+		setTimeout(function(){
+			self.publish('print.map.imageloaded');
+		}, 500);
+		
 	},
 	getExportParamters: function () {
 		var model = this.getModel();
