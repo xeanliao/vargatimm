@@ -55,8 +55,10 @@ export default React.createBackboneClass({
 		this.subscribe('print.map.imageloaded', function () {
 			some(collecton.models, function (page) {
 				var currentPage = self.refs[page.get('key')];
-				currentPage && currentPage.state && !currentPage.state.imageLoaded && currentPage.state.imageLoading === false && currentPage.loadImage && currentPage.loadImage();
-				return currentPage && currentPage.loadImage ? !currentPage.state.imageLoaded : false;
+				if(currentPage && currentPage.state && !currentPage.state.imageLoaded && currentPage.state.imageLoading === false && currentPage.loadImage){
+					currentPage.loadImage();	
+					return true;
+				}
 			});
 		});
 		this.subscribe('print.map.options.changed', this.onApplyOptions);

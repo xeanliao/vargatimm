@@ -68,6 +68,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onReloadImage: function () {
+		e.stopPropagation();
 		this.setState({
 			imageLoaded: null,
 			imageLoading: false
