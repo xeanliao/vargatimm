@@ -84,6 +84,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onApplyOptions: function (options) {
+		var self = this;
 		//check need reload images
 		var compareProperty = [
 				'suppressNDAInCampaign',
@@ -105,9 +106,11 @@ export default React.createBackboneClass({
 		}
 		this.setState({
 			options: options
+		}, ()=>{
+			self.publish("showDialog");
+			self.publish('print.map.imageloaded');	
 		});
-		this.publish("showDialog");
-		this.publish('print.map.imageloaded');
+		
 	},
 	onPrint: function () {
 		var collecton = this.getCollection(),
