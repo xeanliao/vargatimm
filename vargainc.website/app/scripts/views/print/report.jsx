@@ -55,8 +55,10 @@ export default React.createBackboneClass({
 		this.subscribe('print.map.imageloaded', function () {
 			some(collecton.models, function (page) {
 				var currentPage = self.refs[page.get('key')];
-				currentPage && currentPage.state && !currentPage.state.imageLoaded && currentPage.state.imageLoading === false && currentPage.loadImage && currentPage.loadImage();
-				return currentPage && currentPage.loadImage ? !currentPage.state.imageLoaded : false;
+				if(currentPage && currentPage.state && !currentPage.state.imageLoaded && currentPage.state.imageLoading === false && currentPage.loadImage){
+					currentPage.loadImage();	
+					return true;
+				}
 			});
 		});
 		this.subscribe('print.map.options.changed', this.onApplyOptions);
@@ -82,6 +84,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onApplyOptions: function (options) {
+		var self = this;
 		//check need reload images
 		var compareProperty = [
 				'suppressNDAInCampaign',
@@ -103,9 +106,11 @@ export default React.createBackboneClass({
 		}
 		this.setState({
 			options: options
+		}, ()=>{
+			self.publish("showDialog");
+			self.publish('print.map.imageloaded');	
 		});
-		this.publish("showDialog");
-		this.publish('print.map.imageloaded');
+		
 	},
 	onPrint: function () {
 		var collecton = this.getCollection(),
