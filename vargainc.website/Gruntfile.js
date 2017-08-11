@@ -436,6 +436,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('default', ['debug']);
 	grunt.registerTask('dev', ['webpack-dev-server']);
 	grunt.registerTask('release', ['clean', 'bower', 'copy:bower', 'copy:dist', 'copy:vendor', 'useminPrepare', 'concurrent:dist',
-		'concat', 'uglify', 'cssmin', 'filerev', 'usemin', 'rename:release', 'compress', 'shell'
+		'concat', 'uglify', 'cssmin', 'filerev', 'usemin', 'rename:release', 'compress'
 	]);
 };
