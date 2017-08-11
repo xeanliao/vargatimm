@@ -13,4 +13,7 @@ shp2pgsql -I -s 4326 Varga_Final_Q1_2017.shp geolocation | psql -U postgres -d t
 ```
 
 3. setup tiles server
-https://github.com/tilezen/vector-datasource/wiki/Mapzen-Vector-Tile-Service
+use [tilestrata](https://github.com/naturalatlas/tilestrata) base [tilestrata-postgismvt
+](https://github.com/Stezii/tilestrata-postgismvt) plugin as our croutes tiles server
+
+3.1 we need extend postgis sql functions by [postgis-vt-util](https://github.com/mapbox/postgis-vt-util)

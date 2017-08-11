@@ -1,0 +1,15 @@
+{
+  "name": "vargainc.geo",
+  "version": "1.0.0",
+  "description": "vargainc timm tiles server base postgis on postgress sql",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ghostuz@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "tilestrata": "^2.0.5",
+    "tilestrata-postgismvt": "0.0.3"
+  }
+}
