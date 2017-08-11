@@ -1,1 +1,37 @@
-{"flag":{"width":64,"height":64,"x":0,"y":0,"pixelRatio":1},"marker":{"width":64,"height":64,"x":64,"y":0,"pixelRatio":1},"star":{"width":64,"height":64,"x":0,"y":64,"pixelRatio":1},"truck":{"width":64,"height":64,"x":64,"y":64,"pixelRatio":1},"walker":{"width":64,"height":64,"x":128,"y":0,"pixelRatio":1}}
+{
+  "flag": {
+    "height": 64,
+    "pixelRatio": 1,
+    "width": 64,
+    "x": 0,
+    "y": 0
+  },
+  "marker": {
+    "height": 64,
+    "pixelRatio": 1,
+    "width": 64,
+    "x": 64,
+    "y": 0
+  },
+  "star": {
+    "height": 64,
+    "pixelRatio": 1,
+    "width": 64,
+    "x": 0,
+    "y": 64
+  },
+  "truck": {
+    "height": 64,
+    "pixelRatio": 1,
+    "width": 64,
+    "x": 64,
+    "y": 64
+  },
+  "walker": {
+    "height": 64,
+    "pixelRatio": 1,
+    "width": 64,
+    "x": 128,
+    "y": 0
+  }
+}
