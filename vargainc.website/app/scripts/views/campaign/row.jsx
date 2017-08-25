@@ -67,8 +67,9 @@ export default React.createBackboneClass({
 		var model = this.getModel(),
 			self = this;
 
-		this.publish('showDialog', <PublishView />);
-
+		self.publish('showDialog', {
+			view: <PublishView />
+		});
 		this.unsubscribe('campaign/publish');
 		this.subscribe('campaign/publish', function (user) {
 			model.publishToDMap(user).then(result => {

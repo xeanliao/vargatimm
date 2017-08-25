@@ -748,7 +748,7 @@ $A3LeftRightMargin: 0.5in;
 
 .google-map-pop {
     background: transparent;
-    pointer-events: none;
+    pointer-events: none !important;
     margin-top: 0px !important;
     top: 0px !important;
 }

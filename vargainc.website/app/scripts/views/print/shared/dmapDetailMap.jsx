@@ -27,7 +27,7 @@ export default React.createBackboneClass({
 	scrollToPage: function () {
 		var model = this.getModel(),
 			height = $(this.refs.page).position().top;
-		$('.off-canvas-wrapper-inner').stop().animate({
+		$('body').stop().animate({
 			scrollTop: height
 		}, 600);
 	},
@@ -68,6 +68,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onReloadImage: function () {
+		e.stopPropagation();
 		this.setState({
 			imageLoaded: null,
 			imageLoading: false

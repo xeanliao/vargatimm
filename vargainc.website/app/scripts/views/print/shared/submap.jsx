@@ -22,7 +22,7 @@ export default React.createBackboneClass({
 	scrollToPage: function () {
 		var model = this.getModel(),
 			height = $(this.refs.page).position().top;
-		$('.off-canvas-wrapper-inner').stop().animate({
+		$('body').stop().animate({
 			scrollTop: height
 		}, 600);
 	},
@@ -206,7 +206,7 @@ export default React.createBackboneClass({
 		}
 
 		return (
-			<div className="page submap" ref="page">
+			<div key={`SUBMAP-${model.get('SubMapId')}`} className="page submap" ref="page">
 				<div className="row">
   					<div className="small-12 columns text-center title">SUB MAP {model.get('OrderId')}({model.get('Name')})</div>
 				</div>

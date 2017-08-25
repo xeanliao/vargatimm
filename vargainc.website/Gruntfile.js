@@ -316,6 +316,12 @@ module.exports = function (grunt) {
 		},
 		'webpack-dev-server': {
 			options: {
+				proxy: {//http://timm.vargainc.com/dev/api/user/login?username=admin&password=newpass
+					'/api/**': {
+						target: 'http://timm.vargainc.com',
+						pathRewrite: {'^/api/' : '/dev/api/'}
+					}
+				},
 				webpack: {
 					cache: true,
 					entry: {

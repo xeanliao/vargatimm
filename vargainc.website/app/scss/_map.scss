@@ -1,7 +1,7 @@
 @import "util/_unit";
 
 .mapbox-wrapper {
-    z-index: 0;
+    z-index: 00;
     position: relative;
 
     .mapbox-container {
@@ -115,4 +115,8 @@
     canvas{
         cursor: crosshair;
     }
+}
+
+#google-map-wrapper{
+    z-index: 100;
 }

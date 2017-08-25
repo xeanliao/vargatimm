@@ -91,6 +91,7 @@ export default React.createBackboneClass({
 				}
 			}
 		});
+
 		this.subscribe('Map.Popup.AbortMergeTask', () => {
 			self.setState({
 				mergeTasks: []
@@ -104,6 +105,7 @@ export default React.createBackboneClass({
 				self.publish('Campaign.Monitor.ShowOutOfBoundaryGtu', self.state.showOutOfBoundaryGtu);
 			});
 		});
+
 		this.subscribe('Map.Popup.ConfirmMergeTask', tasks => {
 			var model = self.getModel();
 			var tasks = model && model.get('Tasks');
@@ -124,7 +126,11 @@ export default React.createBackboneClass({
 			var taskId = $(this).attr('id');
 			$("#upload-file-" + taskId).click();
 		});
-
+		
+		this.subscribe('Map.GTU.Update', () => {
+			self.forceUpdate();
+		});
+		
 		this.subscribe('Global.Window.Click', () => {
 			self.onCloseDropDown();
 			self.onCloseMoreMenu();

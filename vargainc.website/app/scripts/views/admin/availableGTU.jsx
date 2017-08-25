@@ -110,7 +110,7 @@ export default React.createBackboneClass({
 				self.showGTUInfo(marker);
 			}, 1000);
 		} else {
-			this.publish('showDialog', "You searched GTU do not find the last position");
+			this.alert("You searched GTU do not find the last position");
 		}
 	},
 	componentWillUnmount: function () {

@@ -27,7 +27,7 @@ export default React.createBackboneClass({
 	scrollToPage: function () {
 		var model = this.getModel(),
 			height = $(this.refs.page).position().top;
-		$('.off-canvas-wrapper-inner').stop().animate({
+		$('body').stop().animate({
 			scrollTop: height
 		}, 600);
 	},
@@ -110,6 +110,7 @@ export default React.createBackboneClass({
 		});
 	},
 	onCreateDetailMap: function (rectBounds) {
+		var self = this;
 		var model = this.getModel(),
 			collection = model.collection,
 			detailModel = model.clone(),
@@ -147,7 +148,10 @@ export default React.createBackboneClass({
 			at: modelIndex + 1
 		});
 		this.publish('showDialog');
-		this.publish('print.map.imageloaded');
+		setTimeout(function(){
+			self.publish('print.map.imageloaded');
+		}, 500);
+		
 	},
 	getExportParamters: function () {
 		var model = this.getModel();
@@ -206,7 +210,7 @@ export default React.createBackboneClass({
 		}
 
 		return (
-			<div className="page" ref="page">
+			<div key={`DMAP-${model.get('DMapId')}`} className="page" ref="page">
 				<div className="row">
   					<div className="small-12 columns text-center title">DM MAP {model.get('DMapId')}({model.get('Name')})</div>
 				</div>
