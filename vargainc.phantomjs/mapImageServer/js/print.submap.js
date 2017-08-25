@@ -150,9 +150,6 @@ function checkMapType(params, result) {
 }
 
 function getColorByPenetration(colors, percent) {
-    if(!percent){
-        percent = 0;
-    }
     var defaultColors = [{
             color: 'rgb(0, 0, 255)',
             opacity: 0.6
