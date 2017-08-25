@@ -172,6 +172,9 @@ function getColorByPenetration(colors, percent) {
         min = 0,
         colors = [0].concat(colors),
         fixedPercent = parseInt(percent * 100);
+    if(!percent){
+        return defaultColors[0];
+    }
     colors.push(100);
     fixedPercent = Math.max(0, fixedPercent);
     fixedPercent = Math.min(fixedPercent, 100);
