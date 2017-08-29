@@ -111,7 +111,7 @@ namespace Vargainc.Timm.REST.Controllers
                     s.OrderId,
                     TotalHouseHold = s.Total ?? 0 + s.TotalAdjustment ?? 0,
                     TargetHouseHold = s.Penetration ?? 0 + s.CountAdjustment ?? 0,
-                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 1.0,
+                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 0.0,
                     s.ColorR,
                     s.ColorG,
                     s.ColorB,
@@ -136,7 +136,7 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 totalHouseHold = submaps.Sum(i => i.TotalHouseHold);
                 targetHouseHold = submaps.Sum(i => i.TargetHouseHold);
-                penetration = (totalHouseHold ?? 0) > 0 ? (float)(targetHouseHold ?? 0) / (float)(totalHouseHold ?? 0) : 1;
+                penetration = (totalHouseHold ?? 0) > 0 ? (float)(targetHouseHold ?? 0) / (float)(totalHouseHold ?? 0) : 0;
             }
             return Json(new
             {
@@ -218,7 +218,7 @@ namespace Vargainc.Timm.REST.Controllers
                     s.OrderId,
                     TotalHouseHold = s.Total ?? 0 + s.TotalAdjustment ?? 0,
                     TargetHouseHold = s.Penetration ?? 0 + s.CountAdjustment ?? 0,
-                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 1.0,
+                    Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 0.0,
                     s.ColorR,
                     s.ColorG,
                     s.ColorB,
