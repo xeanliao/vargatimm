@@ -21,6 +21,9 @@ export default React.createBackboneClass({
 			imageLoading: false
 		};
 	},
+	componentDidMount: function () {
+		this.publish('print.map.imageloaded');
+	},
 	preloadImage: function (imageAddress) {
 		var def = $.Deferred();
 		$(new Image()).one('load', function () {

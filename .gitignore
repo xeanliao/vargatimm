@@ -256,3 +256,5 @@ _Pvt_Extensions
 **/*.sublime-workspace
 
 .scripts_cache
+
+**/*.tar.gz

@@ -110,7 +110,6 @@ export default React.createBackboneClass({
 			self.publish("showDialog");
 			self.publish('print.map.imageloaded');	
 		});
-		
 	},
 	onPrint: function () {
 		var collecton = this.getCollection(),

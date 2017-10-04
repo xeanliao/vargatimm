@@ -114,7 +114,10 @@ export default React.createBackboneClass({
 			at: modelIndex + 1
 		});
 		this.publish('showDialog');
-		this.publish('print.map.imageloaded');
+		var self = this;
+		setTimeout(function(){
+			self.publish('print.map.imageloaded');
+		}, 500);
 	},
 	onShowEditDialog: function () {
 		var model = this.getModel(),

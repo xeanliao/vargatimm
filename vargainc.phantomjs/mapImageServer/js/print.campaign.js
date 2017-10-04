@@ -22,9 +22,9 @@ function begin(params) {
     console.log('begin');
     tryReadyCount++;
     if (window.mapIsReady == true) {
-        setTimeout(function(){
+        setTimeout(function () {
             loadMap(params);
-        }, 2000);        
+        }, 2000);
     } else if (tryReadyCount > 5 * 60) {
         callback('wait map ready timeout');
     } else {
@@ -169,27 +169,28 @@ function checkMapType(params, result) {
 
 function getColorByPenetration(colors, percent) {
     var defaultColors = [{
-            color: 'rgb(0, 0, 255)',
-            opacity: 0.6
-        }, {
-            color: 'rgb(0, 255, 0)',
-            opacity: 0.6
-        }, {
-            color: 'rgb(255, 255, 0)',
-            opacity: 0.6
-        }, {
-            color: 'rgb(255, 150, 0)',
-            opacity: 0.69
-        }, {
-            color: 'rgb(187, 0, 0)',
-            opacity: 0.6
-        }],
-        min = 0,
-        colors = [0].concat(colors),
-        fixedPercent = parseInt(percent * 100);
-    if(!percent){
+        color: 'rgb(0, 0, 255)',
+        opacity: 0.6
+    }, {
+        color: 'rgb(0, 255, 0)',
+        opacity: 0.6
+    }, {
+        color: 'rgb(255, 255, 0)',
+        opacity: 0.6
+    }, {
+        color: 'rgb(255, 150, 0)',
+        opacity: 0.69
+    }, {
+        color: 'rgb(187, 0, 0)',
+        opacity: 0.6
+    }];
+    if (!percent) {
         return defaultColors[0];
     }
+    var min = 0;
+    var colors = [0].concat(colors);
+    var fixedPercent = parseInt(percent * 100);
+
     colors.push(100);
     fixedPercent = Math.max(0, fixedPercent);
     fixedPercent = Math.min(fixedPercent, 100);
@@ -341,9 +342,10 @@ function draw(params, result) {
 }
 
 var finallyCutdown = 5;
+
 function prepareScreenshot() {
     console.log('cutdown', finallyCutdown);
-    if(--finallyCutdown <= 0){
+    if (--finallyCutdown <= 0) {
         console.log('mission completed');
         $("#map").css("background", "transparent");
         $("#map").children(':first-child').css("background", "transparent");
@@ -353,7 +355,7 @@ function prepareScreenshot() {
             success: true,
             status: 'finished'
         });
-    }else{
+    } else {
         setTimeout(prepareScreenshot, 1000);
     }
 }

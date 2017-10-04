@@ -121,7 +121,7 @@ module.exports = function (grunt) {
 				hot: false
 			},
 			'dist': {
-				devtool: false,
+				devtool: 'source-map',
 				entry: {
 					app: '<%= app %>/scripts/main',
 					vendor: (function () {
@@ -318,8 +318,8 @@ module.exports = function (grunt) {
 			options: {
 				proxy: {//http://timm.vargainc.com/dev/api/user/login?username=admin&password=newpass
 					'/api/**': {
-						target: 'http://timm.vargainc.com',
-						pathRewrite: {'^/api/' : '/dev/api/'}
+						target: 'http://timm.vargainc.com/',
+						pathRewrite: {'^/api/' : '/preview/api/'}
 					}
 				},
 				webpack: {
