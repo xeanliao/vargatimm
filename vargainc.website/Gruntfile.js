@@ -222,6 +222,7 @@ module.exports = function (grunt) {
 		},
 		uglify: {
 			options: {
+				sourceMap: true,
 				mangle: true,
 				preserveComments: false,
 				report: 'min',
