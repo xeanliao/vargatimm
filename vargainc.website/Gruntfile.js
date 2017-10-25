@@ -223,20 +223,14 @@ module.exports = function (grunt) {
 		uglify: {
 			options: {
 				sourceMap: true,
-				mangle: true,
+				beautify: true,
+				mangle: false,
+				compress: false,
+				// mangle: true,
+				// compress: false,
 				preserveComments: false,
 				report: 'min',
 				// ASCIIOnly: true,
-				compress: {
-					sequences: true,
-					dead_code: true,
-					conditionals: true,
-					booleans: true,
-					unused: true,
-					if_return: true,
-					join_vars: true,
-					drop_console: true,
-				}
 			}
 		},
 		filerev: {
@@ -317,10 +311,10 @@ module.exports = function (grunt) {
 		},
 		'webpack-dev-server': {
 			options: {
-				proxy: {//http://timm.vargainc.com/dev/api/user/login?username=admin&password=newpass
+				proxy: { //http://timm.vargainc.com/dev/api/user/login?username=admin&password=newpass
 					'/api/**': {
 						target: 'http://timm.vargainc.com/',
-						pathRewrite: {'^/api/' : '/preview/api/'}
+						pathRewrite: { '^/api/': '/preview/api/' }
 					}
 				},
 				webpack: {
@@ -428,7 +422,7 @@ module.exports = function (grunt) {
 					debug: true
 				},
 				host: '0.0.0.0',
-				port: 8082
+				port: 8082,
 			}
 		},
 	});
