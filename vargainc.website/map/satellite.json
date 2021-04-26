@@ -101,7 +101,7 @@
             "url": "mapbox://mapbox.satellite"
         }
     },
-    "sprite": "http://timm.vargainc.com/map/sprite_satellite",
+    "sprite": "//timm.vargainc.com/map/sprite_satellite",
     "version": 8,
     "visibility": "public"
 }

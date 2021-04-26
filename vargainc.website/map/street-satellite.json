@@ -11302,7 +11302,7 @@
             "url": "mapbox://mapbox.satellite"
         }
     },
-    "sprite": "http://timm.vargainc.com/map/sprite_street",
+    "sprite": "//timm.vargainc.com/map/sprite_street",
     "version": 8,
     "visibility": "public"
 }

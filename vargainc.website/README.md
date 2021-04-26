@@ -1,10 +1,14 @@
 ##New Control Center for Vargainc Timm
 This is base Backbone + React for the all new front-end application.
 
+### Important
+MUST USE NODE v8.17.0
+
 ###Prepare
 1. Make sure you have installed Node.js Browser and Grunt
-2. run `npm install` and `bower install`
-3. run `grunt watch` when you begin work
+2. run `npm install`
+3. run `npm run watch` when you begin work
+4. run `npm run release` for release
 
 ###Others
 1. we have replace underscore by lodash see more [here](https://lodash.com/docs)

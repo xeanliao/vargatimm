@@ -2,14 +2,21 @@
   "name": "vargainc_front-end_application",
   "description": "",
   "version": "0.0.1",
+  "engines": {
+    "node": "=8.17.0"
+  },
   "homepage": "",
   "author": {
     "name": "steve.yin",
     "email": "ghostuz@outlook.com"
   },
+  "scripts": {
+    "watch": "grunt watch",
+    "release": "grunt release"
+  },
   "repository": {
     "type": "git",
-    "url": "https://d2xstudio.visualstudio.com/DefaultCollection/_git/vargainc"
+    "url": "https://github.com/xeanliao/vargatimm"
   },
   "dependencies": {
     "@turf/turf": "3.10.3",
@@ -62,18 +69,18 @@
     "grunt-contrib-cssmin": "^1.0.2",
     "grunt-contrib-imagemin": "^1.0.1",
     "grunt-contrib-rename": "0.0.3",
-    "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-eslint": "^19.0.0",
     "grunt-filerev": "^2.3.1",
     "grunt-nodemon": "^0.4.2",
+    "grunt-sass": "^3.1.0",
     "grunt-shell": "^2.1.0",
     "grunt-svgmin": "^4.0.0",
     "grunt-usemin": "^3.1.1",
     "grunt-webpack": "^1.0.14",
     "json-loader": "^0.5.4",
     "load-grunt-tasks": "^3.5.2",
-    "node-sass": "^4.1.1",
+    "node-sass": "^4.14.1",
     "npm": "^4.0.5",
     "raw-loader": "^0.5.1",
     "react-hot-loader": "^1.3.0",

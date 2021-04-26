@@ -90,20 +90,20 @@ export default React.createBackboneClass({
 			monitorMap.addSource('google-road-tiles', {
 				"type": "raster",
 				"tiles": [
-					"http://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-					"http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-					"http://mt2.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-					"http://mt3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+					"//mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+					"//mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+					"//mt2.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+					"//mt3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
 				],
 				"tileSize": 256
 			});
 			monitorMap.addSource('google-satellite-tiles', {
 				"type": "raster",
 				"tiles": [
-					"http://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-					"http://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-					"http://mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-					"http://mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+					"//mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+					"//mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+					"//mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+					"//mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
 				],
 				"tileSize": 256
 			});
@@ -1087,7 +1087,7 @@ export default React.createBackboneClass({
 		var self = this;
 		// map.off('style.load', this.initMapLayer);
 		// map.on('style.load', this.initMapLayer);
-		// map.setStyle('http://timm.vargainc.com/map/' + style + '.json?v9');
+		// map.setStyle('//timm.vargainc.com/map/' + style + '.json?v9');
 		if (style == 'streets') {
 			monitorMap.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible');
 			monitorMap.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none');
