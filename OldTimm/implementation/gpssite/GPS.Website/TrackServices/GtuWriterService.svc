@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="GPS.Website.TrackServices.GtuWriterService" CodeBehind="GtuWriterService.svc.cs" %>

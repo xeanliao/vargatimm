@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.PremiumCRoute, GPS.DomainLayer" table="PremiumCRoutes" lazy="true" >
+    <id name="Id" column="Id"/>
+    <property name="APT_COUNT" column="APT_COUNT" />
+    <property name="BUSINESS_COUNT" column="BUSINESS_COUNT" />
+    <property name="COUNTY" column="COUNTY" />
+    <property name="CROUTE" column="CROUTE" />
+    <property name="Description" column="Description" />
+    <property name="FIPSSTCO" column="FIPSSTCO" />
+    <property name="Code" column="GEOCODE" />
+    <property name="HOME_COUNT" column="HOME_COUNT" />
+    <property name="IsEnabled" column="IsEnabled" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="OTotal" column="OTotal" />
+    <property name="STATE" column="STATE" />
+    <property name="STATE_FIPS" column="STATE_FIPS" />
+    <property name="TOTAL_COUNT" column="TOTAL_COUNT" />
+    <property name="ZIP" column="ZIP" />
+    <property name="ZIP_NAME" column="ZIP_NAME" />
+    <property name="PartCount" column="PartCount" />
+    <property name="IsInnerShape" column="IsInnerShape" />
+    <property name="IsInnerRing" column="IsInnerRing" />
+    <bag name="PremiumCRouteBoxMappings" table="PremiumCRouteBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="PreminumCRouteId" />
+      <one-to-many class="GPS.DomainLayer.Entities.PremiumCRouteBoxMapping, GPS.DomainLayer" />
+    </bag>
+    <bag name="PremiumCRouteCoordinates" table="PremiumCRouteCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="PreminumCRouteId" />
+      <one-to-many class="GPS.DomainLayer.Entities.PremiumCRouteCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="PremiumCRouteSelectMappings" table="PremiumCRouteSelectMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="PremiumCRouteId" />
+      <one-to-many class="GPS.DomainLayer.Entities.PremiumCRouteSelectMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

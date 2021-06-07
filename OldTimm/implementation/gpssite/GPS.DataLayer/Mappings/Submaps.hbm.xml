@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.SubMap, GPS.DomainLayer" table="SubMaps" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <!--<property name="CampaignId" column="CampaignId" />-->
+      <many-to-one name="Campaign" column="CampaignId" class="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" />
+    <property name="ColorB" column="ColorB" />
+    <property name="ColorG" column="ColorG" />
+    <property name="ColorR" column="ColorR" />
+    <property name="ColorString" column="ColorString" />
+    <property name="Name" column="Name" />
+    <property name="OrderId" column="OrderId" />
+    <property name="Penetration" column="Penetration" />
+    <property name="Percentage" column="Percentage" />
+    <property name="Total" column="Total" />
+    <property name="TotalAdjustment" column="TotalAdjustment" />
+    <property name="CountAdjustment" column="CountAdjustment" />
+    <bag name="SubMapRecords" table="SubMapRecords" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="SubMapId" />
+      <one-to-many class="GPS.DomainLayer.Entities.SubMapRecord, GPS.DomainLayer" />
+    </bag>
+    <bag name="SubMapCoordinates" table="SubMapCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="SubMapId" />
+      <one-to-many class="GPS.DomainLayer.Entities.SubMapCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="DistributionMaps" table="DistributionMaps" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="SubMapId" />
+      <one-to-many class="GPS.DomainLayer.Entities.DistributionMap, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

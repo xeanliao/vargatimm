@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.ThreeZipBoxMapping, GPS.DomainLayer" table="ThreeZipBoxMappings" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="BoxId" column="BoxId" />
+    <many-to-one name="ThreeZipArea"
+                 column="ThreeZipAreaId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.ThreeZipArea, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

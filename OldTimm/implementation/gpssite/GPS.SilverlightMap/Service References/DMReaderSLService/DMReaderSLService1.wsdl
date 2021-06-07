@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="TIMM.Website.SilverlightServices" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" targetNamespace="TIMM.Website.SilverlightServices" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="TIMM.Website.SilverlightServices/Imports">
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd0" namespace="TIMM.Website.SilverlightServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd2" namespace="TIMM.Website.DistributionMapServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd3" namespace="TIMM.Website.TransferObjects" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd5" namespace="TIMM.Website.TaskServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd6" namespace="TIMM.Website.TrackServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd7" namespace="TIMM.Website.AreaServices" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="DMReaderSLService_GetDistributionMapsById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDistributionMapsById" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetDistributionMapsById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDistributionMapsByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetDistributionMapsObjectById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDistributionMapsObjectById" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetDistributionMapsObjectById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDistributionMapsObjectByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetCustomAreaByBox_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCustomAreaByBox" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetCustomAreaByBox_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCustomAreaByBoxResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetCustomAreaObjectByBox_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCustomAreaObjectByBox" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetCustomAreaObjectByBox_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCustomAreaObjectByBoxResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetTask_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetTask" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetTask_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetTaskResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetTaskObject_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetTaskObject" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetTaskObject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetTaskObjectResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetGtuUserNameDic_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetGtuUserNameDic" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetGtuUserNameDic_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetGtuUserNameDicResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetGtuInfoListByTaskId_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetGtuInfoListByTaskId" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetGtuInfoListByTaskId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetGtuInfoListByTaskIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetMAddressListByTaskId_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetMAddressListByTaskId" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetMAddressListByTaskId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetMAddressListByTaskIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetMAddressCOListByTaskId_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetMAddressCOListByTaskId" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_GetMAddressCOListByTaskId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetMAddressCOListByTaskIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_AddTaskTime_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddTaskTime" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_AddTaskTime_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddTaskTimeResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_UpdateTaskObject_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateTaskObject" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_UpdateTaskObject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateTaskObjectResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_UpdateTask_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateTask" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_UpdateTask_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateTaskResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_getUserNameByUserId_InputMessage">
+    <wsdl:part name="parameters" element="tns:getUserNameByUserId" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_getUserNameByUserId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getUserNameByUserIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_loadHistoryDotToLayerThread_InputMessage">
+    <wsdl:part name="parameters" element="tns:loadHistoryDotToLayerThread" />
+  </wsdl:message>
+  <wsdl:message name="DMReaderSLService_loadHistoryDotToLayerThread_OutputMessage">
+    <wsdl:part name="parameters" element="tns:loadHistoryDotToLayerThreadResponse" />
+  </wsdl:message>
+  <wsdl:portType name="DMReaderSLService">
+    <wsdl:operation name="GetDistributionMapsById">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetDistributionMapsById" message="tns:DMReaderSLService_GetDistributionMapsById_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetDistributionMapsByIdResponse" message="tns:DMReaderSLService_GetDistributionMapsById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDistributionMapsObjectById">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetDistributionMapsObjectById" message="tns:DMReaderSLService_GetDistributionMapsObjectById_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetDistributionMapsObjectByIdResponse" message="tns:DMReaderSLService_GetDistributionMapsObjectById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomAreaByBox">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetCustomAreaByBox" message="tns:DMReaderSLService_GetCustomAreaByBox_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetCustomAreaByBoxResponse" message="tns:DMReaderSLService_GetCustomAreaByBox_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomAreaObjectByBox">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetCustomAreaObjectByBox" message="tns:DMReaderSLService_GetCustomAreaObjectByBox_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetCustomAreaObjectByBoxResponse" message="tns:DMReaderSLService_GetCustomAreaObjectByBox_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTask">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetTask" message="tns:DMReaderSLService_GetTask_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetTaskResponse" message="tns:DMReaderSLService_GetTask_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTaskObject">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetTaskObject" message="tns:DMReaderSLService_GetTaskObject_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetTaskObjectResponse" message="tns:DMReaderSLService_GetTaskObject_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGtuUserNameDic">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetGtuUserNameDic" message="tns:DMReaderSLService_GetGtuUserNameDic_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetGtuUserNameDicResponse" message="tns:DMReaderSLService_GetGtuUserNameDic_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGtuInfoListByTaskId">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetGtuInfoListByTaskId" message="tns:DMReaderSLService_GetGtuInfoListByTaskId_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetGtuInfoListByTaskIdResponse" message="tns:DMReaderSLService_GetGtuInfoListByTaskId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMAddressListByTaskId">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetMAddressListByTaskId" message="tns:DMReaderSLService_GetMAddressListByTaskId_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetMAddressListByTaskIdResponse" message="tns:DMReaderSLService_GetMAddressListByTaskId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMAddressCOListByTaskId">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetMAddressCOListByTaskId" message="tns:DMReaderSLService_GetMAddressCOListByTaskId_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/GetMAddressCOListByTaskIdResponse" message="tns:DMReaderSLService_GetMAddressCOListByTaskId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddTaskTime">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/AddTaskTime" message="tns:DMReaderSLService_AddTaskTime_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/AddTaskTimeResponse" message="tns:DMReaderSLService_AddTaskTime_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTaskObject">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/UpdateTaskObject" message="tns:DMReaderSLService_UpdateTaskObject_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/UpdateTaskObjectResponse" message="tns:DMReaderSLService_UpdateTaskObject_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTask">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/UpdateTask" message="tns:DMReaderSLService_UpdateTask_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/UpdateTaskResponse" message="tns:DMReaderSLService_UpdateTask_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getUserNameByUserId">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/getUserNameByUserId" message="tns:DMReaderSLService_getUserNameByUserId_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/getUserNameByUserIdResponse" message="tns:DMReaderSLService_getUserNameByUserId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="loadHistoryDotToLayerThread">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/loadHistoryDotToLayerThread" message="tns:DMReaderSLService_loadHistoryDotToLayerThread_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/DMReaderSLService/loadHistoryDotToLayerThreadResponse" message="tns:DMReaderSLService_loadHistoryDotToLayerThread_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

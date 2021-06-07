@@ -1,0 +1,371 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9409B074-8631-4294-B965-22DCD7B430DD}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GPS.Tool</RootNamespace>
+    <AssemblyName>GPSTool</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <ManifestCertificateThumbprint>FF9D9ABFB9D1DEED6C8DF024DC19DFEF77405819</ManifestCertificateThumbprint>
+    <ManifestKeyFile>GPS.Tool_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>true</SignManifests>
+    <PublishUrl>C:\Documents and Settings\admin\Desktop\tool\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <CreateWebPageOnPublish>false</CreateWebPageOnPublish>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release20100121-17.28\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FileHelpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\integration\libraries\FileHelpers\Binaries\DotNet 2.0\FileHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Logging, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Practices.ObjectBuilder2, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AreaBusiness\CBSABusiness.cs" />
+    <Compile Include="AreaBusiness\ThreeZipBusiness.cs" />
+    <Compile Include="AreaBusiness\TRKAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\BGAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\CountyAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\ElementarySchoolAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\FiveZipAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\SecondarySchoolAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\SLDHouseAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\SLDSenateAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\UnifiedSchoolAreaBusiness.cs" />
+    <Compile Include="AreaBusiness\UrbanAreaBusiness.cs" />
+    <Compile Include="Data\Area.cs">
+      <DependentUpon>Area.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Area.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Area.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Data\AreaDataContext.cs" />
+    <Compile Include="Data\BGAreaCoordRepository.cs" />
+    <Compile Include="Data\BGAreaRepository.cs" />
+    <Compile Include="Data\CBSABoxMappingRepository.cs" />
+    <Compile Include="Data\CBSARepository.cs" />
+    <Compile Include="Data\CBSACoordRepository.cs" />
+    <Compile Include="Data\CountyAreaBoxMappingRepository.cs" />
+    <Compile Include="Data\CountyRepository.cs" />
+    <Compile Include="Data\ElementarySchoolAreaBoxMappingRepository.cs" />
+    <Compile Include="Data\LowerHouseAreaBoxMappingRepository.cs" />
+    <Compile Include="Data\PremiumAreas.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PremiumAreas.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PremiumAreasDataContext.cs" />
+    <Compile Include="Data\SecondarySchoolAreaBoxMappingRepository.cs" />
+    <Compile Include="Data\SelectMapping.cs">
+      <DependentUpon>SelectMapping.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Data\SelectMapping.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SelectMapping.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Data\SenateAreaBoxMappingRepository.cs" />
+    <Compile Include="Data\ThreeZipCoordinateRepository.cs" />
+    <Compile Include="Data\DataFactory.cs" />
+    <Compile Include="Data\FiveZipAreaCoordRepository.cs.cs" />
+    <Compile Include="Data\FiveZipAreaRepository.cs" />
+    <Compile Include="Data\ICoordinate.cs" />
+    <Compile Include="Data\SecondarySchoolAreaRepository.cs" />
+    <Compile Include="Data\ElementarySchoolAreaRepository.cs" />
+    <Compile Include="Data\ElementarySchoolAreaCoordRepository.cs" />
+    <Compile Include="Data\LowerHouseAreaRepository.cs" />
+    <Compile Include="Data\LowerHouseAreaCoordRepository.cs" />
+    <Compile Include="Data\SecondarySchoolAreaCoordRepository.cs" />
+    <Compile Include="Data\SenateAreaRepository.cs" />
+    <Compile Include="Data\CountyAreaRepository.cs" />
+    <Compile Include="Data\CountyAreaCoordRepository.cs" />
+    <Compile Include="Data\ThreeZipAreaRepository.cs" />
+    <Compile Include="Data\TRKAreaCoordinateRepository.cs" />
+    <Compile Include="Data\TRKAreaRepository.cs" />
+    <Compile Include="Data\UnifiedSchoolAreaBoxMappingRepository.cs" />
+    <Compile Include="Data\UrbanAreaBoxMappingRepository.cs" />
+    <Compile Include="FixData\FiveZipFixer.cs" />
+    <Compile Include="FixData\Fixer.cs" />
+    <Compile Include="FixData\FixerFactory.cs" />
+    <Compile Include="FixData\FixTables.cs" />
+    <Compile Include="FixData\PremiumCRouteFixer.cs" />
+    <Compile Include="FixInner\FiveZipInnerFixer..cs" />
+    <Compile Include="FixInner\FixerInner.cs" />
+    <Compile Include="FixInner\FixerInnerFactory.cs" />
+    <Compile Include="FixInner\FixInnerTables.cs" />
+    <Compile Include="Data\GeoUtil.cs" />
+    <Compile Include="FixInner\PremiumCRouteInnerFixer.cs" />
+    <Compile Include="Data\Types.cs" />
+    <Compile Include="frmFix.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFix.Designer.cs">
+      <DependentUpon>frmFix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmFixInner.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFixInner.Designer.cs">
+      <DependentUpon>frmFixInner.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMakeMapping.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMakeMapping.Designer.cs">
+      <DependentUpon>frmMakeMapping.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmSelectMapping.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSelectMapping.Designer.cs">
+      <DependentUpon>frmSelectMapping.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Data\DbfReader.cs" />
+    <Compile Include="Data\ODBCHelper.cs" />
+    <Compile Include="Data\SenateAreaCoordRepository.cs" />
+    <Compile Include="Data\UnifiedSchoolAreaCoordinateRepository.cs" />
+    <Compile Include="Data\UnifiedSchoolAreaRepository.cs" />
+    <Compile Include="Data\UrbanAreaCoordinateRepository.cs" />
+    <Compile Include="Data\UrbanAreaRepository.cs" />
+    <Compile Include="ImportData.Designer.cs">
+      <DependentUpon>ImportData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Import\BgAreaController.cs.cs" />
+    <Compile Include="Import\CBSAController.cs" />
+    <Compile Include="Import\CBSAImporter.cs" />
+    <Compile Include="Import\Classification.cs" />
+    <Compile Include="Import\CountyAreaController.cs" />
+    <Compile Include="Data\ShpReader.cs" />
+    <Compile Include="Import\CountyController.cs" />
+    <Compile Include="Import\CRouteController.cs" />
+    <Compile Include="Import\ElementarySchoolAreaController.cs" />
+    <Compile Include="Import\FiveZipAreaController.cs" />
+    <Compile Include="Import\FiveZipImporter.cs" />
+    <Compile Include="Import\ImportControllerFactory.cs" />
+    <Compile Include="Import\ImportResultType.cs" />
+    <Compile Include="Import\ReadArea.cs" />
+    <Compile Include="Import\Reader\CBSAReader.cs" />
+    <Compile Include="Import\Reader\CRouteReader.cs" />
+    <Compile Include="Import\Reader\DbfReader.cs" />
+    <Compile Include="Import\Reader\FiveZipReader.cs" />
+    <Compile Include="Import\Reader\ImportReader.cs" />
+    <Compile Include="Import\Reader\ShapeReader.cs" />
+    <Compile Include="Import\Reader\ShpReader.cs" />
+    <Compile Include="Import\Reader\ZIPReader.cs" />
+    <Compile Include="Import\SecondarySchoolAreaController.cs" />
+    <Compile Include="Import\SLDHouseAreaController.cs" />
+    <Compile Include="Import\SLDSenateAreaController.cs" />
+    <Compile Include="Import\SLDUnifiedSchoolController.cs" />
+    <Compile Include="Import\StructThreadParamter.cs" />
+    <Compile Include="Import\ImportAreaController.cs" />
+    <Compile Include="Import\ThreeZipAreaController.cs" />
+    <Compile Include="Import\TrkAreaController.cs" />
+    <Compile Include="Import\UrbanAreaController.cs" />
+    <Compile Include="Import\ZIP4Controller.cs" />
+    <Compile Include="Import\ZIPController.cs" />
+    <Compile Include="Mapping\Maker\CountyAreaBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\BlockGroupBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\BlockGroupMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\CBSABoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\ElementarySchoolBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\FiveZipBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\BlockGroupSelectMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\LowerHousrBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\MetropolitanCoreAreaBlockGroupMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\PreminumCRouteBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\PreminumZipBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\SecondarySchoolBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\ThreeZipBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\TractBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\UnifiedSchoolBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\UpperSenateBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\UrbanAreaBlockGroupMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\UrbanAreaBoxMappingMaker.cs" />
+    <Compile Include="Mapping\Maker\UrbanAreaZipCodeMappingMaker.cs" />
+    <Compile Include="Mapping\MappingMaker.cs" />
+    <Compile Include="Mapping\MappingMakerFactory.cs" />
+    <Compile Include="Mapping\MappingRecorder.cs" />
+    <Compile Include="Mapping\MappingTables.cs" />
+    <Compile Include="Mapping\Maker\MetropolitanCoreAreaZipCodeMappingMaker.cs" />
+    <Compile Include="Mapping\ShapeMethods.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Data\Area.dbml.layout">
+      <DependentUpon>Area.dbml</DependentUpon>
+    </None>
+    <None Include="Data\PremiumAreas.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>PremiumAreas.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Data\SelectMapping.dbml.layout">
+      <DependentUpon>SelectMapping.dbml</DependentUpon>
+    </None>
+    <None Include="Data\PremiumAreas.dbml.layout">
+      <DependentUpon>PremiumAreas.dbml</DependentUpon>
+    </None>
+    <EmbeddedResource Include="frmFix.resx">
+      <DependentUpon>frmFix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFixInner.resx">
+      <DependentUpon>frmFixInner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMakeMapping.resx">
+      <DependentUpon>frmMakeMapping.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSelectMapping.resx">
+      <DependentUpon>frmSelectMapping.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportData.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ImportData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="App.config" />
+    <None Include="Data\Area.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>Area.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Data\SelectMapping.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>SelectMapping.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ExternalConnectionStrings.config" />
+    <None Include="GPS.Tool_TemporaryKey.pfx" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="SelectMapping\BlockGroupSelectMappingMaker.cs" />
+    <Compile Include="SelectMapping\Maker.cs" />
+    <Compile Include="SelectMapping\PremiumCRouteSelectMappingMaker.cs" />
+    <Compile Include="SelectMapping\SelectMappingMakerFactory.cs" />
+    <Compile Include="SelectMapping\SelectMappingTables.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\Microsoft.Practices.EnterpriseLibrary.Common.dll" />
+    <Content Include="lib\Microsoft.Practices.EnterpriseLibrary.Logging.dll" />
+    <Content Include="lib\Microsoft.Practices.ObjectBuilder2.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

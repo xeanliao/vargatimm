@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GPS.DataLayer.DataInfrastructure.Implementations.BulkRepositoryFactory" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="71.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAQAAAAAAAAQEAAEAgAAAAAAAAIAA=</HashCode>
+      <FileName>DataInfrastructure\Implementations\BulkRepositoryFactory.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GPS.DataLayer.DataInfrastructure.Implementations.NHibernateBasedBulkWorkSpace" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="73" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAgEAABAAAAAAA=</HashCode>
+      <FileName>DataInfrastructure\Implementations\NHibernateBasedBulkWorkSpace.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GPS.DataLayer.DataInfrastructure.Implementations.NHibernateBasedTransaction" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="74.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAABACAAACA=</HashCode>
+      <FileName>DataInfrastructure\Implementations\NHibernateBasedTransaction.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GPS.DataLayer.DataInfrastructure.Implementations.NHibernateBasedWorkSpace" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="76.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAABAAABIAAAEAAAAIAgAAABkAARAAA=</HashCode>
+      <FileName>DataInfrastructure\Implementations\NHibernateBasedWorkSpace.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GPS.DataLayer.DataInfrastructure.Implementations.NHibernateHelper" Collapsed="true">
+    <Position X="71.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAABAAQAAAAAAAAAAAAQAAAAAAEAAAA=</HashCode>
+      <FileName>DataInfrastructure\Implementations\NHibernateHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GPS.DataLayer.DataInfrastructure.Implementations.RepositoryFactory" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="73" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAACACAUaAgQAAAABGBCCRBAAEBABAAgCGAAQAAAQAA=</HashCode>
+      <FileName>DataInfrastructure\Implementations\RepositoryFactory.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GPS.DataLayer.WorkSpaceManager" Collapsed="true">
+    <Position X="73" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAgAAIAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>DataInfrastructure\WorkSpaceManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GPS.DataLayer.AddressRepository" Collapsed="true">
+    <Position X="35" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAEAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\AddressRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.BlockGroupRepository" Collapsed="true">
+    <Position X="44" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAIAEAAAIAAAQAAAAAAACAAAAAIAAAABAA=</HashCode>
+      <FileName>RepositoryImplementations\BlockGroupRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.CampaignBackupRepository" Collapsed="true">
+    <Position X="53" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CampaignBackupRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.CampaignClassificationRepository" Collapsed="true">
+    <Position X="62" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAABAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CampaignClassificationRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.CampaignPercentageColorRepository" Collapsed="true">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CampaignPercentageColorRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.CampaignRecordRepository" Collapsed="true">
+    <Position X="12.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAEAAAAAAAgAABAAAAAgAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CampaignRecordRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.CampaignRepository" Collapsed="true">
+    <Position X="21.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAUAAAgAAAIAAAJACAABACAAAAEAAEAABAAAAAChAAA=</HashCode>
+      <FileName>RepositoryImplementations\CampaignRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.SameDayComparer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="74.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CampaignRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GPS.DataLayer.CbsaBoxMappingRepository" Collapsed="true">
+    <Position X="37.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CbsaBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.CountyAreaBoxMappingRepository" Collapsed="true">
+    <Position X="46.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAgAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CountyAreaBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.CustomAreaRepository" Collapsed="true">
+    <Position X="55.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAACAAAQACAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\CustomAreaRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.DistributionJobRepository" Collapsed="true">
+    <Position X="64.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAABAAAAAAIAQIAAAAAAAAAAAAAAAAIIAAA=</HashCode>
+      <FileName>RepositoryImplementations\DistributionJobRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.DistributionMapRepository" Collapsed="true">
+    <Position X="5.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAABABBAAAAAAAAIAAAAAAAAAAAAI=</HashCode>
+      <FileName>RepositoryImplementations\DistributionMapRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.ElementarySchoolBoxMappingRepository" Collapsed="true">
+    <Position X="14.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\ElementarySchoolBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.FiveZipRepository" Collapsed="true">
+    <Position X="23.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEQAAEAAAAAAEAAABEAAAAAAAAAACAQAAAAAICEAAA=</HashCode>
+      <FileName>RepositoryImplementations\FiveZipRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.GroupRepository" Collapsed="true">
+    <Position X="30.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgAAQEAACBAABAABA=</HashCode>
+      <FileName>RepositoryImplementations\GroupRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.GtuRepository" Collapsed="true">
+    <Position X="39.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAACAAAAAAAAAAEIAgAAAAAAAEAACAAAQAAA=</HashCode>
+      <FileName>RepositoryImplementations\GtuRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.LowerHouseBoxMappingRepository" Collapsed="true">
+    <Position X="48.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\LowerHouseBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.NdAddressRepository" Collapsed="true">
+    <Position X="57.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAQABAAAAAAAAEAA=</HashCode>
+      <FileName>RepositoryImplementations\NdAddressRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.PremiumCRouteRepository" Collapsed="true">
+    <Position X="66.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAQAAAAIAAACEAAAAAAAAEAAAAAACQAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\PremiumCRouteRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.PrivilegeRepository" Collapsed="true">
+    <Position X="8" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\PrivilegeRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RadiusRepository" Collapsed="true">
+    <Position X="17" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>RepositoryImplementations\RadiusRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryBase" Collapsed="true">
+    <Position X="36" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAEAAAAQAAAAAAAAAAAAAAgEAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>RepositoryImplementations\RepositoryBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.SecondarySchoolBoxMappingRepository" Collapsed="true">
+    <Position X="32.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\SecondarySchoolBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.SubMapRepository" Collapsed="true">
+    <Position X="41.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\SubMapRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.ThreeZipRepository" Collapsed="true">
+    <Position X="50.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAEAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\ThreeZipRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.TractRepository" Collapsed="true">
+    <Position X="59.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAAAAAAAUAAAAAAAABAAAAAACAAACAIAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\TractRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.UnifiedSchoolBoxMappingRepository" Collapsed="true">
+    <Position X="68.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\UnifiedSchoolBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.UpperSenateBoxMappingRepository" Collapsed="true">
+    <Position X="10.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\UpperSenateBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.UrbanBoxMappingRepository" Collapsed="true">
+    <Position X="19.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\UrbanBoxMappingRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.UserRepository" Collapsed="true">
+    <Position X="26" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ogAIAEAAAEBiAAAEAAGoAUAiQQAAEIAhMAAAAAEgIAQ=</HashCode>
+      <FileName>RepositoryImplementations\UserRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.Properties.Settings" Collapsed="true">
+    <Position X="71.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAIAIAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryImplementations.BulkRepository.BulkCampaignBGRepository" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEACIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\BulkRepository\BulkCampaignBGRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryImplementations.BulkRepository.BulkCampaignCRouteRepository" Collapsed="true">
+    <Position X="5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>RepositoryImplementations\BulkRepository\BulkCampaignCRouteRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryImplementations.BulkRepository.BulkDistributionMapCoordinateRepository" Collapsed="true">
+    <Position X="7.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\BulkRepository\BulkDistributionMapCoordinateRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryImplementations.BulkRepository.BulkRadiusRecordRepository" Collapsed="true">
+    <Position X="9.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAABAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\BulkRepository\BulkRadiusRecordRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryImplementations.BulkRepository.BulkRepositoryBase" Collapsed="true">
+    <Position X="5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\BulkRepository\BulkRepositoryBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryImplementations.BulkRepository.BulkSubMapCoordinateRepository" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\BulkRepository\BulkSubMapCoordinateRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.RepositoryImplementations.TaskRepository" Collapsed="true">
+    <Position X="28.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQDBAAAAAABAAABAAAABEgBAAASADEAAABAAAAAA=</HashCode>
+      <FileName>RepositoryImplementations\TaskRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GPS.DataLayer.SequenceGenerators.SequenceGenerator" Collapsed="true">
+    <Position X="76.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAEAAAAA=</HashCode>
+      <FileName>SequenceGenerators\SequenceGenerator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="GPS.DataLayer.DataInfrastructure.IBulkRepositoryFactory" Collapsed="true">
+    <Position X="71.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAQAAAEAAAAAACAAAIAA=</HashCode>
+      <FileName>DataInfrastructure\IBulkRepositoryFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GPS.DataLayer.DataInfrastructure.IBulkWorkSpace" Collapsed="true">
+    <Position X="73" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataInfrastructure\IBulkWorkSpace.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GPS.DataLayer.DataInfrastructure.IRepositoryFactory" Collapsed="true">
+    <Position X="74.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAACACAUaAgQAAAABGBCCRBAAEBABAAgCGAAQAAAQAA=</HashCode>
+      <FileName>DataInfrastructure\IRepositoryFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GPS.DataLayer.DataInfrastructure.ITransaction" Collapsed="true">
+    <Position X="76.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataInfrastructure\ITransaction.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GPS.DataLayer.IWorkSpace" Collapsed="true">
+    <Position X="71.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAEgBAAAAAABAAAAAAIQAAAAAAEAAAAAAAADAAAA=</HashCode>
+      <FileName>DataInfrastructure\IWorkspace.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

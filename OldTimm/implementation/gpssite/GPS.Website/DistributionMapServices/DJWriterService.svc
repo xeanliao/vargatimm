@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="GPS.Website.DistributionMapServices.DJWriterService" CodeBehind="DJWriterService.svc.cs" %>

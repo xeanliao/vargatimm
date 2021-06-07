@@ -1,0 +1,142 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+VisualStudioVersion = 10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26BBF631-5D06-42C9-B8AA-8F39EA1B29B0}"
+	ProjectSection(SolutionItems) = preProject
+		GPS.vsmdi = GPS.vsmdi
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+		..\TIMM.GPS\Library\System.ComponentModel.DataAnnotations.dll = ..\TIMM.GPS\Library\System.ComponentModel.DataAnnotations.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.Data.DataForm.Toolkit.dll = ..\TIMM.GPS\Library\System.Windows.Controls.Data.DataForm.Toolkit.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.Data.Toolkit.dll = ..\TIMM.GPS\Library\System.Windows.Controls.Data.Toolkit.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.DataVisualization.Toolkit.dll = ..\TIMM.GPS\Library\System.Windows.Controls.DataVisualization.Toolkit.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.Input.Toolkit.dll = ..\TIMM.GPS\Library\System.Windows.Controls.Input.Toolkit.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.Layout.Toolkit.dll = ..\TIMM.GPS\Library\System.Windows.Controls.Layout.Toolkit.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.Theming.Toolkit.dll = ..\TIMM.GPS\Library\System.Windows.Controls.Theming.Toolkit.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.Toolkit.dll = ..\TIMM.GPS\Library\System.Windows.Controls.Toolkit.dll
+		..\TIMM.GPS\Library\System.Windows.Controls.Toolkit.Internals.dll = ..\TIMM.GPS\Library\System.Windows.Controls.Toolkit.Internals.dll
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E1EE14AC-1F73-410D-86A4-69FD32AFA16F}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.Website", "GPS.Website\GPS.Website.csproj", "{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DomainLayer", "GPS.DomainLayer\GPS.DomainLayer.csproj", "{8FC5044C-AC61-4886-966B-B097CBF8183B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DataLayer", "GPS.DataLayer\GPS.DataLayer.csproj", "{B9C454DE-9834-4632-882B-7189B09DE3F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.Web", "GPS.Web\GPS.Web.csproj", "{856C0DF6-DE40-43CB-8947-E23DE205BF3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DomainLayer.Testing", "GPS.DomainLayer.Testing\GPS.DomainLayer.Testing.csproj", "{3BC7748F-C6B0-41C3-952E-11C1CB9134E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DomainLayer.Area", "GPS.DomainLayer.Area\GPS.DomainLayer.Area.csproj", "{00C7CD27-D14E-499A-9B99-A1F18D101FEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DomainLayer.Security", "GPS.DomainLayer.Security\GPS.DomainLayer.Security.csproj", "{E6197B6D-0ABF-48AA-B4BA-A929E23FE755}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.Utilities", "GPS.Utilities\GPS.Utilities.csproj", "{0EF83599-99BE-4E9B-87C3-E1C3A0A5C5C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DataLayer.Test", "GPS.DataLayer.Test\GPS.DataLayer.Test.csproj", "{96374BCD-C57B-44B2-84C0-93A6311562AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DomainLayer.Distribution", "GPS.DomainLayer.Distribution\GPS.DomainLayer.Distribution.csproj", "{66643B61-04E8-472B-B096-024B0AEB55F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DomainLayer.Distribution.Testing", "GPS.DomainLayer.Distribution.Testing\GPS.DomainLayer.Distribution.Testing.csproj", "{B9682F8A-48F6-498D-AA51-894F23A8B5AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.ArbitraryUniqueCodeManager", "GPS.ArbitraryUniqueCodeManager\GPS.ArbitraryUniqueCodeManager.csproj", "{4F636F97-F5AE-40D8-A064-140EA55E911D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.DomainLayer.Campaign", "GPS.DomainLayer.Campaign\GPS.DomainLayer.Campaign.csproj", "{BDBB2696-3F0D-4E30-BE6A-9FE20FD22BF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.SilverlightMap", "GPS.SilverlightMap\GPS.SilverlightMap.csproj", "{CAF3C039-D306-4A59-B128-67478631A7C9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5} = {AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWeb", "TestWeb\TestWeb.csproj", "{8A5A3B6E-2249-4370-9B01-5646FB832BEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.SilverMonitor", "GPS.SilverMonitor\GPS.SilverMonitor.csproj", "{402B99B3-8CD4-47D3-B6AA-0D89B248D453}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5} = {AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FC5044C-AC61-4886-966B-B097CBF8183B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FC5044C-AC61-4886-966B-B097CBF8183B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FC5044C-AC61-4886-966B-B097CBF8183B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FC5044C-AC61-4886-966B-B097CBF8183B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9C454DE-9834-4632-882B-7189B09DE3F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9C454DE-9834-4632-882B-7189B09DE3F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9C454DE-9834-4632-882B-7189B09DE3F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9C454DE-9834-4632-882B-7189B09DE3F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{856C0DF6-DE40-43CB-8947-E23DE205BF3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{856C0DF6-DE40-43CB-8947-E23DE205BF3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{856C0DF6-DE40-43CB-8947-E23DE205BF3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{856C0DF6-DE40-43CB-8947-E23DE205BF3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BC7748F-C6B0-41C3-952E-11C1CB9134E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BC7748F-C6B0-41C3-952E-11C1CB9134E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BC7748F-C6B0-41C3-952E-11C1CB9134E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BC7748F-C6B0-41C3-952E-11C1CB9134E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00C7CD27-D14E-499A-9B99-A1F18D101FEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00C7CD27-D14E-499A-9B99-A1F18D101FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00C7CD27-D14E-499A-9B99-A1F18D101FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00C7CD27-D14E-499A-9B99-A1F18D101FEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6197B6D-0ABF-48AA-B4BA-A929E23FE755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6197B6D-0ABF-48AA-B4BA-A929E23FE755}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6197B6D-0ABF-48AA-B4BA-A929E23FE755}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6197B6D-0ABF-48AA-B4BA-A929E23FE755}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EF83599-99BE-4E9B-87C3-E1C3A0A5C5C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EF83599-99BE-4E9B-87C3-E1C3A0A5C5C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EF83599-99BE-4E9B-87C3-E1C3A0A5C5C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EF83599-99BE-4E9B-87C3-E1C3A0A5C5C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96374BCD-C57B-44B2-84C0-93A6311562AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96374BCD-C57B-44B2-84C0-93A6311562AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96374BCD-C57B-44B2-84C0-93A6311562AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96374BCD-C57B-44B2-84C0-93A6311562AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66643B61-04E8-472B-B096-024B0AEB55F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66643B61-04E8-472B-B096-024B0AEB55F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66643B61-04E8-472B-B096-024B0AEB55F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66643B61-04E8-472B-B096-024B0AEB55F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9682F8A-48F6-498D-AA51-894F23A8B5AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9682F8A-48F6-498D-AA51-894F23A8B5AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9682F8A-48F6-498D-AA51-894F23A8B5AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9682F8A-48F6-498D-AA51-894F23A8B5AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F636F97-F5AE-40D8-A064-140EA55E911D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F636F97-F5AE-40D8-A064-140EA55E911D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F636F97-F5AE-40D8-A064-140EA55E911D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F636F97-F5AE-40D8-A064-140EA55E911D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDBB2696-3F0D-4E30-BE6A-9FE20FD22BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDBB2696-3F0D-4E30-BE6A-9FE20FD22BF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDBB2696-3F0D-4E30-BE6A-9FE20FD22BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDBB2696-3F0D-4E30-BE6A-9FE20FD22BF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAF3C039-D306-4A59-B128-67478631A7C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAF3C039-D306-4A59-B128-67478631A7C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAF3C039-D306-4A59-B128-67478631A7C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAF3C039-D306-4A59-B128-67478631A7C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A5A3B6E-2249-4370-9B01-5646FB832BEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A5A3B6E-2249-4370-9B01-5646FB832BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A5A3B6E-2249-4370-9B01-5646FB832BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A5A3B6E-2249-4370-9B01-5646FB832BEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{402B99B3-8CD4-47D3-B6AA-0D89B248D453}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{402B99B3-8CD4-47D3-B6AA-0D89B248D453}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{402B99B3-8CD4-47D3-B6AA-0D89B248D453}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{402B99B3-8CD4-47D3-B6AA-0D89B248D453}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = GPS.vsmdi
+	EndGlobalSection
+EndGlobal

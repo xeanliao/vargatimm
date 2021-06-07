@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToDistributionJob, GPS.Website" source="GPS.DomainLayer.Entities.DistributionJob, GPS.DomainLayer">
+    <member name="Id" nullValue="0" />
+    <member name="Name" nullValue="String.Empty" />
+    <member name="Campaign" nullValue="null" />
+    <member name="DistributionMaps" nullValue="null" />
+    <member name="DriverAssignments" nullValue="null" />
+    <member name="AuditorAssignment" nullValue="null" />
+    <member name="WalkerAssignments" nullValue="null" />
+  </class>
+</otis-mapping>

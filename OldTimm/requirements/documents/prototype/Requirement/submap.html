@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Sub Map(Prototype)</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link type="text/css" href="themes/base/ui.all.css" rel="stylesheet" />
+
+    <style type="text/css">
+    a { color:white; font-weight:bold; }
+    a:hover {color:yellow;}
+    #submap_list div {
+    	padding:4px;
+    	font-size:12px;
+    	border-top:solid 1px #dddddd;
+    	border-bottom:solid 1px #dddddd;
+    	margin-top:-1px;
+    	white-space:nowrap;
+    }
+    .selected {background:#22ccff;}
+    #submap_list {height:258px;overflow:auto;}
+    #submap_list div:hover { background:#22ccff;cursor:pointer;}
+    #submap_create_form {position:absolute;right:-2px;top:-2px;width:172px;height:auto;background:#00a6cc;color:#454545;font-size:12px;border:solid 2px #00a6aa;padding:4px;}
+    #submap_info {color:red;font-size:12px;background:#ffff88;padding:4px;border-bottom:solid 1px #dddddd;}
+    #submap_toolbar {background:#22ccff;border-top:solid 1px white;color:white;font-size:12px;text-align:right;padding:4px;}
+    #submap_toolbar a {font-weight:normal;padding:4px 2px 4px 2px;}
+    #submap_toolbar_2 {font-size:12px;padding:4px;border-bottom:solid 1px #dddddd;}
+    .hidden {display:none;}
+    .tune-button { 
+    	display:inline-block;
+    	border:solid 0px red;
+    	color:transparent;
+    	margin:0px;
+    	padding:0px 2px -2px 2px;
+    	overflow:hidden;
+    	text-decoration:none;
+    	font-size:10px;}
+    
+    .title {border:solid 1px #00a6cc; padding:10px; font-size:20px;background:#ffffcc;}
+    td {border:solid 1px #00a6cc;padding:10px;}
+    </style>
+
+    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us"></script>
+    <script type="text/javascript" src="js/jquery-1.3.2.js"></script>
+	<script type="text/javascript" src="js/ui/ui.core.js"></script>
+	<script type="text/javascript" src="js/ui/ui.slider.js"></script>
+    <script type="text/javascript" src="js/aspectjs.js"></script>
+	<script type="text/javascript" src="js/submap_map.js"></script>
+	<script type="text/javascript" src="js/submap_model.js"></script>
+	<script type="text/javascript" src="js/submap_dao.js"></script>
+	<script type="text/javascript" src="js/circle.js"></script>
+	<script type="text/javascript" src="js/submap_view.js"></script>
+	<script type="text/javascript" src="js/submap_controller.js"></script>
+	<script type="text/javascript" src="js/plug.js"></script>
+	<script type="text/javascript" src="js/submap_debug.js"></script>
+    </head>
+    <body onload="GetMap();">
+    	<div style="padding:20px;background:#ffffcc;color:#454545;width:940px;">
+    		This prototype demonstrates how Sub Maps are created and edited. Please also see below for some <a href="#notes" style="color:blue;">notes</a>.
+    	</div>
+    	<div style="padding:20px;background:#00a6cc;color:white;width:940px;">
+    		To create sub maps, you need to 
+    		<a href="javascript:void(0)" 
+    			onclick="javascript:on_load_addresses()" 
+    			style="border:solid 1px white;padding:10px;text-decoration:none;background:#980000">Load Addresses</a>
+    	</div><br />
+      	<div id='myMap' style="position:absolute; top:140px; width:790px; height:600px;"></div>
+        <div style="border: solid 2px #00a6aa;position:absolute;left:805px;top:140px;width:180px;padding:0px;line-height:30px;">
+        	<span style="background:#0096ff;display:block;padding:6px;color:white;">Lower Classifications</span>
+            <input id="cb_3zips" type="checkbox" onclick="javascript: load_3zips(this.checked)" /><label for="cb_3zips">3ZIP</label><br />
+            <input id="cb_5zips" type="checkbox" onclick="javascript: load_5zips(this.checked);" /><label for="cb_5zips">5ZIP</label><br />
+            <input id="cb_trks" type="checkbox" onclick="javascript: load_trks(this.checked);" /><label for="cb_trks">TRKs</label><br />
+            <input id="cb_bgs" type="checkbox" onclick="javascript: load_bgs(this.checked);" /><label for="cb_bgs">BGs</label>
+        </div>
+        <div style="border: solid 2px #00a6aa;position:absolute;left:805px;top:320px;width:180px;padding:0px;line-height:30px;">
+        	<span style="background:#0096ff;display:block;padding:6px;color:white;">Sub Maps</span>
+        	<div id="submap_toolbar">
+        		<!--
+        		<a href="javascript:void(0)"  onclick="javascript:on_create_submap()">New</a>&nbsp;|&nbsp;
+        		-->
+        		<a href="javascript:void(0)"  onclick="javascript:on_edit_submap()">Edit</a>&nbsp;|&nbsp;
+        		<a href="javascript:void(0)"  onclick="javascript:on_delete_submap()">Delete</a>
+        	</div>
+        	<div id="submap_toolbar_2">
+        		<input id="cb_boundary" type="checkbox" onclick="javascript:on_show_boundary()" /><label for="cb_boundary">Boundary</label>
+        	</div>
+        	<div id="submap_info">
+        		Total:&nbsp;<span id="total"></span>&nbsp;&nbsp;&nbsp;&nbsp;Pen:&nbsp;<span id="pen"></span>
+        	</div>
+        	<div id="submap_list">
+        	</div>
+			<div id="submap_create_form" class="hidden">
+				<div>
+					<span style="display:block;padding:0px 0px 4px 0px;color:white;">Sub Map Title:</span>
+					<input id="submap_title" type="text" style="width:170px;border:none;height:24px;padding-top:4px;font-size:16px;" />
+				</div>
+				<div>
+					<span style="padding:4px 0px 0px 0px;margin:0px;color:white;display:inline-block;width:76px;">Center Lat:</span>
+					<span id="submap_lat" style="padding:0px 2px 4px 0px;margin:0px;color:white;display:inline-block;width:55px;text-align:right;"></span>
+					<a href="javascript:void(0)" class="tune-button" onclick="javascript:on_increase_center_lat()"><img src="tune-up.png" style="width:12px;height:12px;border:none;margin:0px;" /></a>
+					<a href="javascript:void(0)" class="tune-button" onclick="javascript:on_decrease_center_lat()"><img src="tune-down.png" style="width:12px;height:12px;border:none;margin:0px;" /></a>
+				</div>
+				<div>
+					<span style="padding:0px 0px 4px 0px;margin:0px;color:white;display:inline-block;width:76px;">Center Lon:</span>
+					<span id="submap_lon" style="padding:0px 2px 4px 0px;margin:0px;color:white;display:inline-block;width:55px;text-align:right;"></span>
+					<a href="javascript:void(0)" class="tune-button" onclick="javascript:on_increase_center_lon()"><img src="tune-up.png" style="width:12px;height:12px;border:none;margin:0px;" /></a>
+					<a href="javascript:void(0)" class="tune-button" onclick="javascript:on_decrease_center_lon()"><img src="tune-down.png" style="width:12px;height:12px;border:none;margin:0px;" /></a>
+					<a id="pick_button" href="javascript:void(0)" onclick="javascript:on_pick_a_center()" style="text-decoration:none;border:solid 1px white; padding:4px; background:#980000;">Pick a Center</a>
+				</div>
+				<span style="padding:4px 0px 4px 0px;color:white;display:inline-block;width:80px;">Radius(KM):&nbsp;</span>
+				<span id="radius" style="padding:0px 2px 4px 0px;margin:0px;color:white;display:inline-block;width:48px;text-align:right;"></span>
+				<div id="slider" style="margin:0px;"></div>
+				<div style="padding:10px 0px 4px 0px;"><a href="javascript:void(0)" onclick="javascript:on_save_submap()" style="text-decoration:none;border:solid 1px white; padding:4px; background:#980000;">Save</a></div>
+			</div>
+        </div>
+        <div id="notes" style="position:absolute;left:0px;top:750px;width:978px;padding:10px;">
+        	<p class="title">Notes for Addresses</p>
+        	<p>The user can load Addresses stored in a CSV file so that center points for sub maps 
+        	of a campaign can be determined by the system. Optionally, a radius can also be specified
+        	for each of these center points.</p>
+        	<p>Each record in the CSV file should have the following format:</p>
+        	<table cellspacing="0" cellpadding="0" rules="all">
+        	    <tr>
+        	        <td><i>street address</i>
+        	        </td>
+        	        <td><i>radius in KM</i>
+        	        </td>
+        	    </tr>
+        	</table>
+        	<p>Please note the <i>radius in KM</i> is optional, although the <i>street address</i> is required.
+        	If no <i>radius in KM</i> is specified for a <i>street address</i>, the system will use default radius for 
+        	that <i>street address</i>. Each <i>street address</i> should be able to identify a unique address in US.</p>
+        	<p>The following is an example of the CSV file.</p>
+        	<table cellspacing="0" cellpadding="0" rules="all">
+        	    <tr>
+        	        <td>3300 Vine St Ste 40, Hays, KS</td>
+        	        <td>20</td>
+        	    </tr>
+        	    <tr>
+        	        <td>3606 Cimarron Plz Ste 280, Hastings, NE</td>
+        	        <td>&nbsp;</td>
+        	    </tr>
+        	    <tr>
+        	        <td>408 N D St, Fairfield, NE</td>
+        	        <td>5</td>
+        	    </tr>
+        	</table>
+        </div>
+   </body>
+</html>

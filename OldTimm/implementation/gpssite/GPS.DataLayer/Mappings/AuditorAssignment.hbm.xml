@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.AuditorAssignment, GPS.DomainLayer" table="Auditors" lazy="true">
+    <id name="_id" column="Id" access="field" />
+    <property name="_djRole" column="DjRole" access="field" />
+    <property name="_fullName" column="FullName" access="field" not-null="true" />
+    <many-to-one name="_user"
+                 access="field"
+                 column="UserId"
+                 not-null="false"
+                 class="GPS.DomainLayer.Entities.User, GPS.DomainLayer" />
+    <many-to-one name="_gtu"
+                 access="field"
+                 column="GtuId"
+                 not-null="false"
+                 class="GPS.DomainLayer.Entities.Gtu, GPS.DomainLayer" />
+    <many-to-one name="_distributionJob"
+                 access="field"
+                 column="DistributionJobId"
+                 not-null="false"
+                 class="GPS.DomainLayer.Entities.DistributionJob, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

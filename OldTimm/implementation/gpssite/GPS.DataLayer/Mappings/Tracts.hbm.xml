@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.Tract, GPS.DomainLayer" table="Tracts" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Code" column="Code" />
+    <property name="CountyCode" column="CountyCode" />
+    <property name ="ArbitraryUniqueCode" />
+    <property name="Description" column="Description" />
+    <property name="IsEnabled" column="IsEnabled" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="LSAD" column="LSAD" />
+    <property name="LSADTrans" column="LSADTrans" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="Name" column="Name" />
+    <property name="OTotal" column="OTotal" />
+    <property name="StateCode" column="StateCode" />
+    <bag name="TractBoxMappings" table="TractBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="TractId" />
+      <one-to-many class="GPS.DomainLayer.Entities.TractBoxMapping, GPS.DomainLayer" />
+    </bag>
+    <bag name="TractCoordinates" table="TractCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="TractId" />
+      <one-to-many class="GPS.DomainLayer.Entities.TractCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="BlockGroupSelectMappings" table="BlockGroupSelectMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="TractId" />
+      <one-to-many class="GPS.DomainLayer.Entities.BlockGroupSelectMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

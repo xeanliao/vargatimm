@@ -1,0 +1,42 @@
+﻿<configuration>
+    <system.serviceModel>
+        <bindings>
+            <basicHttpBinding>
+                <binding name="BasicHttpBinding_DMReaderSLService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+                <binding name="BasicHttpBinding_IGTUQueryService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647" />
+                <binding name="BasicHttpBinding_IGeocodeService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+                <binding name="BasicHttpBinding_LocationService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+            </basicHttpBinding>
+            <customBinding>
+                <binding name="CustomBinding_IGeocodeService">
+                    <binaryMessageEncoding />
+                    <httpTransport maxReceivedMessageSize="2147483647" maxBufferSize="2147483647" />
+                </binding>
+            </customBinding>
+        </bindings>
+        <client>
+            <endpoint address="http://www.vargainc.com:8800/GTUService/GTUQuery/"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_IGTUQueryService"
+                contract="GTUService.IGTUQueryService" name="BasicHttpBinding_IGTUQueryService" />
+            <endpoint address="http://localhost:3970/SilverlightServices/DMReaderSLService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_DMReaderSLService"
+                contract="DMReaderSLService.DMReaderSLService" name="BasicHttpBinding_DMReaderSLService" />
+            <endpoint address="http://dev.virtualearth.net/webservices/v1/geocodeservice/GeocodeService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_IGeocodeService"
+                contract="GeocodeService.IGeocodeService" name="BasicHttpBinding_IGeocodeService" />
+            <endpoint address="http://www.vargainc.com:9000/timm201110b/SilverlightServices/LocationService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_LocationService"
+                contract="LocationService.LocationService" name="BasicHttpBinding_LocationService" />
+        </client>
+    </system.serviceModel>
+</configuration>

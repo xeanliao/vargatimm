@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.DistributionMap, GPS.DomainLayer" table="DistributionMaps" lazy="true" >
+    <id name="Id" column="Id" >
+      <generator class="native" />
+    </id>
+    <property name="Name" column="Name" />
+    <property name="SubMapId" column="SubMapId" />
+    <property name="ColorB" column="ColorB" />
+    <property name="ColorG" column="ColorG" />
+    <property name="ColorR" column="ColorR" />
+    <property name="ColorString" column="ColorString" />
+    <property name="Penetration" column="Penetration" />
+    <property name="Percentage" column="Percentage" />
+    <property name="Total" column="Total" />
+    <property name="TotalAdjustment" column="TotalAdjustment" />
+    <property name="CountAdjustment" column="CountAdjustment" />
+    <bag name="DistributionMapRecords" table="DistributionMapRecords" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="DistributionMapId" />
+      <one-to-many class="GPS.DomainLayer.Entities.DistributionMapRecords,GPS.DomainLayer" />
+    </bag>
+    <bag name="DistributionMapCoordinates" table="DistributionMapCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="DistributionMapId" />
+      <one-to-many class="GPS.DomainLayer.Entities.DistributionMapCoordinate, GPS.DomainLayer" />
+    </bag>
+
+    <bag name="Tasks" table="task" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="DmId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Task, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="SelectMapping">
+  <DataContextMoniker Name="/SelectMappingDataContext" />
+  <nestedChildShapes>
+    <classShape Id="7b6144f4-837d-4fb0-a8fb-a2e489fd4626" absoluteBounds="3.625, 1.125, 2.25, 1.5891951497395831">
+      <DataClassMoniker Name="/SelectMappingDataContext/BlockGroupSelectMapping" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1cd5afdb-4031-4c3e-8fad-70ec0202adcd" absoluteBounds="3.64, 1.585, 2.2199999999999998, 1.0291951497395833" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="8c41dce2-0aaf-4f01-a61f-6eea23dc740a" absoluteBounds="1.125, 1.25, 2.25, 1.4248478190104168">
+      <DataClassMoniker Name="/SelectMappingDataContext/PremiumCRouteSelectMapping" />
+      <nestedChildShapes>
+        <elementListCompartment Id="038abcc9-7f0b-433f-b464-736daf3c461a" absoluteBounds="1.14, 1.71, 2.2199999999999998, 0.86484781901041674" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E991DEB2-701C-4A09-B4BB-B1E115D06AE8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TIMM.Jobs</RootNamespace>
+    <AssemblyName>TIMM.Jobs</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.ActiveRecord">
+      <HintPath>..\..\gpssite\Lib\Castle.ActiveRecord.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.ActiveRecord.Linq">
+      <HintPath>..\..\gpssite\Lib\Castle.ActiveRecord.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\2.0\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=2.1.2.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\gpssite\Lib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.ByteCode.Castle, Version=2.1.2.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\gpssite\Lib\NHibernate.ByteCode.Castle.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Linq, Version=1.1.0.1001, Culture=neutral, PublicKeyToken=444cf6a87fdab271, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\gpssite\Lib\NHibernate.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Search, Version=2.0.0.1001, Culture=neutral, PublicKeyToken=b02813437f591915, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\gpssite\Lib\NHibernate.Search.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\ThreadSafeList.cs" />
+    <Compile Include="FileListener.cs" />
+    <Compile Include="NonDeliverableAddresses\ParseNonDeliverableAddressesJob.cs" />
+    <Compile Include="NonDeliverableAddresses\ResultAddress.cs" />
+    <Compile Include="NonDeliverableAddresses\ResultAddressEventArgs.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\gpssite\GPS.DataLayer\GPS.DataLayer.csproj">
+      <Project>{B9C454DE-9834-4632-882B-7189B09DE3F1}</Project>
+      <Name>GPS.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\gpssite\GPS.DomainLayer.Area\GPS.DomainLayer.Area.csproj">
+      <Project>{00C7CD27-D14E-499A-9B99-A1F18D101FEA}</Project>
+      <Name>GPS.DomainLayer.Area</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\gpssite\GPS.DomainLayer\GPS.DomainLayer.csproj">
+      <Project>{8FC5044C-AC61-4886-966B-B097CBF8183B}</Project>
+      <Name>GPS.DomainLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSmtp\OpenSmtp.csproj">
+      <Project>{690A5EE8-EC77-4309-9F66-659A128BAFF0}</Project>
+      <Name>OpenSmtp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Quartz\Quartz.csproj">
+      <Project>{AEF8823B-E45B-4B35-A4D0-C08C1196D017}</Project>
+      <Name>Quartz.2010</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

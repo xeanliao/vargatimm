@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="TIMM.Website.SilverlightServices" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" targetNamespace="TIMM.Website.SilverlightServices" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="TIMM.Website.SilverlightServices/Imports">
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd0" namespace="TIMM.Website.SilverlightServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd2" namespace="TIMM.Website.TransferObjects" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd3" namespace="TIMM.Website.AreaServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd5" namespace="TIMM.Website.DistributionMapServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd6" namespace="TIMM.Website.TaskServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd7" namespace="TIMM.Website.TrackServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd8" namespace="TIMM.Website.UserServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd9" namespace="TIMM.Website.GroupServices" />
+      <xsd:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd10" namespace="http://schemas.datacontract.org/2004/07/GPS.DomainLayer.Enum" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="CampaignReaderSLService_GetCampaignById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCampaignById" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetCampaignById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCampaignByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetCampaignObjectById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCampaignObjectById" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetCampaignObjectById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCampaignObjectByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetCroutesByBoxes_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCroutesByBoxes" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetCroutesByBoxes_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCroutesByBoxesResponse" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetAreaByBoxes_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAreaByBoxes" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetAreaByBoxes_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAreaByBoxesResponse" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetCampaignCRouteAreas_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCampaignCRouteAreas" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetCampaignCRouteAreas_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCampaignCRouteAreasResponse" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetSubMapsById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSubMapsById" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_GetSubMapsById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSubMapsByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_AdjustData_InputMessage">
+    <wsdl:part name="parameters" element="tns:AdjustData" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_AdjustData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AdjustDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_SaveCampaign_InputMessage">
+    <wsdl:part name="parameters" element="tns:SaveCampaign" />
+  </wsdl:message>
+  <wsdl:message name="CampaignReaderSLService_SaveCampaign_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveCampaignResponse" />
+  </wsdl:message>
+  <wsdl:portType name="CampaignReaderSLService">
+    <wsdl:operation name="GetCampaignById">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCampaignById" message="tns:CampaignReaderSLService_GetCampaignById_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCampaignByIdResponse" message="tns:CampaignReaderSLService_GetCampaignById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCampaignObjectById">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCampaignObjectById" message="tns:CampaignReaderSLService_GetCampaignObjectById_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCampaignObjectByIdResponse" message="tns:CampaignReaderSLService_GetCampaignObjectById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCroutesByBoxes">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCroutesByBoxes" message="tns:CampaignReaderSLService_GetCroutesByBoxes_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCroutesByBoxesResponse" message="tns:CampaignReaderSLService_GetCroutesByBoxes_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAreaByBoxes">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetAreaByBoxes" message="tns:CampaignReaderSLService_GetAreaByBoxes_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetAreaByBoxesResponse" message="tns:CampaignReaderSLService_GetAreaByBoxes_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCampaignCRouteAreas">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCampaignCRouteAreas" message="tns:CampaignReaderSLService_GetCampaignCRouteAreas_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetCampaignCRouteAreasResponse" message="tns:CampaignReaderSLService_GetCampaignCRouteAreas_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSubMapsById">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetSubMapsById" message="tns:CampaignReaderSLService_GetSubMapsById_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/GetSubMapsByIdResponse" message="tns:CampaignReaderSLService_GetSubMapsById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AdjustData">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/AdjustData" message="tns:CampaignReaderSLService_AdjustData_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/AdjustDataResponse" message="tns:CampaignReaderSLService_AdjustData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveCampaign">
+      <wsdl:input wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/SaveCampaign" message="tns:CampaignReaderSLService_SaveCampaign_InputMessage" />
+      <wsdl:output wsaw:Action="TIMM.Website.SilverlightServices/CampaignReaderSLService/SaveCampaignResponse" message="tns:CampaignReaderSLService_SaveCampaign_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

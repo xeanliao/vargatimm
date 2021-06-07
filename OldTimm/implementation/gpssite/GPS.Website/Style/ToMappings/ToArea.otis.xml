@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToArea, GPS.Website" source="GPS.DomainLayer.Area.MapArea, GPS.DomainLayer.Area"
+         helper="GPS.Website.TransferObjects.ToArea.Convert">
+    <member name="Id" nullValue="String.Empty" />
+    <member name="Name" nullValue="String.Empty" />
+    <member name="Description" nullValue="String.Empty" />
+    <member name="Latitude" nullValue="0" />
+    <member name="Longitude" nullValue="0" />
+    <member name="IsEnabled" nullValue="false" />
+    <member name="Locations" nullValue="null" />
+  </class>
+</otis-mapping>

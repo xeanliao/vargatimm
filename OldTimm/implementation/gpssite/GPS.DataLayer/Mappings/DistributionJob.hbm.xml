@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.DistributionJob, GPS.DomainLayer" table="DistributionJobs" lazy="true">
+    <id name="_id" column="Id" access="field" >
+      <generator class="native" />
+    </id>
+    <property name="_name" column="Name" access="field" />
+    <many-to-one name="_campaign"
+                 column="CampaignId" 
+                 access="field" 
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" />
+    <bag name="_distributionJobMaps" access="field" table="DistributionJobMaps" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="DistributionJobId" />
+      <one-to-many class="GPS.DomainLayer.Entities.DistributionJobMap, GPS.DomainLayer" />
+    </bag>
+    <bag name="_auditors" access="field" table="Auditors" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="DistributionJobId" />
+      <one-to-many class="GPS.DomainLayer.Entities.AuditorAssignment, GPS.DomainLayer" />
+    </bag>
+    <bag name="_drivers" access="field" table="Drivers" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="DistributionJobId" />
+      <one-to-many class="GPS.DomainLayer.Entities.DriverAssignment, GPS.DomainLayer" />
+    </bag>
+    <bag name="_walkers" access="field" table="Walkers" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="DistributionJobId" />
+      <one-to-many class="GPS.DomainLayer.Entities.WalkerAssignment, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

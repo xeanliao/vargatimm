@@ -1,0 +1,1 @@
+ALTER TABLE taskgtuinfomapping DROP FOREIGN KEY `FK_monitorsettings_2`

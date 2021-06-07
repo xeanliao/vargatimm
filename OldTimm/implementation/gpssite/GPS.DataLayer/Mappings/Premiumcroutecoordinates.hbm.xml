@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.PremiumCRouteCoordinate, GPS.DomainLayer" table="PremiumCRouteCoordinates" lazy="true" >
+    <id name="Id" column="Id"/>
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="PreminumCRouteId" column="PreminumCRouteId" />
+    <property name="ShapeId" column="ShapeId" />
+  </class>
+</hibernate-mapping>

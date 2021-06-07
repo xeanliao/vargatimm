@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.UrbanAreaCoordinate, GPS.DomainLayer" table="UrbanAreaCoordinates" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="UrbanAreaId" column="UrbanAreaId" />
+  </class>
+</hibernate-mapping>

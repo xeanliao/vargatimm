@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.ElementarySchoolAreaCoordinate, GPS.DomainLayer" table="ElementarySchoolAreaCoordinates" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <many-to-one name="ElementarySchoolArea"
+                 column="ElementarySchoolAreaId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.ElementarySchoolArea, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

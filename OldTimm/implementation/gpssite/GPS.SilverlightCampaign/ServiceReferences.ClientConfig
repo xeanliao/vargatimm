@@ -1,0 +1,103 @@
+﻿<!--<configuration>
+    <system.serviceModel>
+        <bindings>
+            <basicHttpBinding>
+                <binding name="BasicHttpBinding_CampaignReaderSLService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+            </basicHttpBinding>
+        </bindings>
+        <client>
+            <endpoint address="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_CampaignReaderSLService"
+                contract="CampaignReaderSLService.CampaignReaderSLService"
+                name="BasicHttpBinding_CampaignReaderSLService" />
+        </client>
+    </system.serviceModel>
+</configuration>-->
+
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <basicHttpBinding>
+        <binding name="BasicHttpBinding_CampaignReaderSLService" closeTimeout="00:10:00"
+          openTimeout="00:10:00" receiveTimeout="00:10:00" sendTimeout="00:10:00"
+          maxBufferSize="2147483647" maxReceivedMessageSize="2147483647">
+          <security mode="None" />
+        </binding>
+      </basicHttpBinding>
+    </bindings>
+    <client>
+      <endpoint address="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc"
+        binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_CampaignReaderSLService"
+        contract="CampaignReaderSLService.CampaignReaderSLService" name="BasicHttpBinding_CampaignReaderSLService" />
+    </client>
+  </system.serviceModel>
+  <Classifications>
+    <Z3 MinZoomLevel="11" MaxZoomLevel="19" BoxLat="25" BoxLon="40" >
+      <FillColor HtmlValue="323232" R="50" G="50" B="50" A="0.2" />
+      <LineColor HtmlValue="00FF00" R="0" G="255" B="0" A="0.2" />
+    </Z3>
+    <Z5 MinZoomLevel="12" MaxZoomLevel="19" BoxLat="10" BoxLon="15" >
+      <FillColor HtmlValue="00FF00" R="0" G="255" B="0" A="0.2" />
+      <LineColor HtmlValue="0000FF" R="0" G="0" B="255" A="0.2" />
+    </Z5>
+    <TRK MinZoomLevel="13" MaxZoomLevel="19" BoxLat="5" BoxLon="7" >
+      <FillColor HtmlValue="969696" R="150" G="150" B="150" A="0.2" />
+      <LineColor HtmlValue="00FF00" R="0" G="255" B="0" A="0.2" />
+    </TRK>
+    <BG MinZoomLevel="13" MaxZoomLevel="19" BoxLat="3" BoxLon="4" >
+      <FillColor HtmlValue="BB0000" R="187" G="0" B="0" A="0.2" />
+      <LineColor HtmlValue="BB0000" R="187" G="0" B="0" A="0.2" />
+    </BG>
+    <CBSA MinZoomLevel="9" MaxZoomLevel="19" BoxLat="100" BoxLon="150" >
+      <FillColor HtmlValue="7FFFD4" R="127" G="255" B="212" A="0.2" />
+      <LineColor HtmlValue="FFFF00" R="255" G="255" B="0" A="0.2" />
+    </CBSA>
+    <Urban MinZoomLevel="9" MaxZoomLevel="19" BoxLat="100" BoxLon="150" >
+      <FillColor HtmlValue="FFFF00" R="255" G="255" B="0" A="0.2" />
+      <LineColor HtmlValue="00FFFF" R="0" G="255" B="255" A="0.2" />
+    </Urban>
+    <County MinZoomLevel="9" MaxZoomLevel="19" BoxLat="100" BoxLon="150" >
+      <FillColor HtmlValue="00FFFF" R="0" G="255" B="255" A="0.2" />
+      <LineColor HtmlValue="7FFF00" R="127" G="255" B="0" A="0.2" />
+    </County>
+    <SLD_Senate MinZoomLevel="10" MaxZoomLevel="19" BoxLat="50" BoxLon="70" >
+      <FillColor HtmlValue="7FFF00" R="127" G="255" B="0" A="0.2" />
+      <LineColor HtmlValue="F75600" R="247" G="86" B="0" A="0.2" />
+    </SLD_Senate>
+    <SLD_House MinZoomLevel="11" MaxZoomLevel="19" BoxLat="25" BoxLon="40" >
+      <FillColor HtmlValue="F75600" R="247" G="86" B="0" A="0.2" />
+      <LineColor HtmlValue="F0FFFF" R="240" G="255" B="255" A="0.2" />
+    </SLD_House>
+    <Voting_District MinZoomLevel="11" MaxZoomLevel="19" BoxLat="10" BoxLon="15" >
+      <FillColor HtmlValue="BB0000" R="187" G="0" B="0" A="0.2" />
+      <LineColor HtmlValue="A020F0" R="160" G="32" B="240" A="0.2" />
+    </Voting_District>
+    <SD_Elem MinZoomLevel="11" MaxZoomLevel="19" BoxLat="10" BoxLon="15" >
+      <FillColor HtmlValue="A020F0" R="160" G="32" B="240" A="0.2" />
+      <LineColor HtmlValue="A52020" R="165" G="42" B="42" A="0.2" />
+    </SD_Elem>
+    <SD_Secondary MinZoomLevel="11" MaxZoomLevel="19" BoxLat="10" BoxLon="15" >
+      <FillColor HtmlValue="A52020" R="165" G="42" B="42" A="0.2" />
+      <LineColor HtmlValue="969696" R="150" G="150" B="150" A="0.2" />
+    </SD_Secondary>
+    <SD_Unified MinZoomLevel="11" MaxZoomLevel="19" BoxLat="25" BoxLon="40" >
+      <FillColor HtmlValue="A020F0" R="160" G="32" B="240" A="0.2" />
+      <LineColor HtmlValue="0000FF" R="0" G="0" B="255" A="0.2" />
+    </SD_Unified>
+    <Custom MinZoomLevel="12" MaxZoomLevel="19" BoxLat="25" BoxLon="40" >
+      <FillColor HtmlValue="BB0000" R="187" G="0" B="0" A="0.2" />
+      <LineColor HtmlValue="BB0000" R="187" G="0" B="0" A="0.2" />
+    </Custom>
+    <Address MinZoomLevel="11" MaxZoomLevel="19" BoxLat="25" BoxLon="40" >
+      <FillColor HtmlValue="BB0000" R="187" G="0" B="0" A="0.2" />
+      <LineColor HtmlValue="BB0000" R="187" G="0" B="0" A="0.2" />
+    </Address>
+    <PremiumCRoute MinZoomLevel="14" MaxZoomLevel="19" BoxLat="2" BoxLon="3" >
+      <FillColor HtmlValue="F996F6" R="249" G="150" B="246" A="0.2" />
+      <LineColor HtmlValue="00FFFF" R="0" G="255" B="255" A="0.2" />
+    </PremiumCRoute>
+  </Classifications>
+</configuration>

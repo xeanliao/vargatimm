@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.SubMapCoordinate, GPS.DomainLayer" table="SubMapCoordinates" lazy="true" >
+    <id name="Id" column ="Id" unsaved-value="0">
+      <generator class="identity"/>
+    </id>
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <!--<property name="SubMapId" column="SubMapId" />-->
+      <many-to-one name="SubMap" column="SubMapId" class="GPS.DomainLayer.Entities.SubMap, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

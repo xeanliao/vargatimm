@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="a4e1cd5f-53c2-4f6d-93dd-39a71506d518" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://74.208.46.157:7800/GTUService/GTUQuery/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="b3c5de30-3cf4-4cd8-81e6-cb65378e4545" SourceId="1" SourceUrl="http://74.208.46.157:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="ff068d50-12fa-464f-bb9f-c0ed845bb28a" SourceId="1" SourceUrl="http://74.208.46.157:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="7e8c8865-c2c9-4bbb-8a76-00a3635d5a52" SourceId="1" SourceUrl="http://74.208.46.157:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="GTUService.TIMM.xsd" MetadataType="Schema" ID="39da5eb4-f81a-467b-bdb3-efcc20d1e002" SourceId="1" SourceUrl="http://74.208.46.157:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="c1d1ba5c-64b4-4ce8-812b-cbaf1c6fc716" SourceId="1" SourceUrl="http://74.208.46.157:7800/GTUService/GTUQuery/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

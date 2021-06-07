@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToPrintAddressRadius, GPS.Website"
+       source="GPS.DomainLayer.Entities.Radiuse, GPS.DomainLayer">
+    <member name="Id" nullValue="0" />
+    <member name="Length" nullValue="0" />
+    <member name="LengthMeasuresId" nullValue="0" />
+    <member name="IsDisplay" nullValue="true" />
+  </class>
+</otis-mapping>

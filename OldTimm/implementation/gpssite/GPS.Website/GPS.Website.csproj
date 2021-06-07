@@ -1,0 +1,1572 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GPS.Website</RootNamespace>
+    <AssemblyName>GPS.Website</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightApplicationList>{CAF3C039-D306-4A59-B128-67478631A7C9}|..\GPS.SilverlightMap\GPS.SilverlightMap.csproj|ClientBin|False,{402B99B3-8CD4-47D3-B6AA-0D89B248D453}|..\GPS.SilverMonitor\GPS.SilverMonitor.csproj|ClientBin|False</SilverlightApplicationList>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkProfile />
+    <UseIISExpress>false</UseIISExpress>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\gpssite\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
+    <PackageAsSingleFile>false</PackageAsSingleFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AjaxControlToolkit, Version=4.1.51116.0, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AjaxControlToolkit.4.1.51116\lib\40\AjaxControlToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="AntiXSSLibrary">
+      <HintPath>..\packages\AjaxControlToolkit.4.1.51116\lib\40\SanitizerProviders\AntiXSSLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.ActiveRecord, Version=2.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle.ActiveRecord.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Components.Validator">
+      <HintPath>..\Lib\Castle.Components.Validator.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.DynamicProxy2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle.DynamicProxy2.dll</HintPath>
+    </Reference>
+    <Reference Include="Cellbi.Lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Cellbi.Lib.dll</HintPath>
+    </Reference>
+    <Reference Include="Dynamic, Version=1.0.0.0, Culture=neutral, PublicKeyToken=68293a411f0cabcc, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicQuery.1.0\lib\35\Dynamic.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=4.3.1.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NewControlCenterBin\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="ephtmltopdf, Version=6.0.0.15153, Culture=neutral, PublicKeyToken=5b5f377bc08a4d32, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\ephtmltopdf.dll</HintPath>
+    </Reference>
+    <Reference Include="FileHelpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\integration\libraries\FileHelpers\Binaries\DotNet 2.0\FileHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="FileHelpers.ExcelStorage, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\integration\libraries\FileHelpers\Binaries\DotNet 2.0\FileHelpers.ExcelStorage.dll</HintPath>
+    </Reference>
+    <Reference Include="GeoAPI, Version=1.6.4448.22541, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.1.6.0\lib\net35\GeoAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlSanitizationLibrary">
+      <HintPath>..\packages\AjaxControlToolkit.4.1.51116\lib\40\SanitizerProviders\HtmlSanitizationLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.CDO, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Interop.CDO.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.Excel, Version=1.3.0.0, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Interop.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\incubating-log4net-1.2.10\log4net-1.2.10\bin\net\2.0\release\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebApi.0.6.0\lib\40-Full\Microsoft.ApplicationServer.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.HttpEnhancements, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebApi.Enhancements.0.6.0\lib\40-Full\Microsoft.ApplicationServer.HttpEnhancements.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Json, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\JsonValue.0.6.0\lib\40\Microsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Net.Http.Formatting, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\HttpClient.0.6.0\lib\40\Microsoft.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
+    <Reference Include="Microsoft.Runtime.Serialization.Internal, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebApi.0.6.0\lib\40-Full\Microsoft.Runtime.Serialization.Internal.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Server.Common, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebApi.0.6.0\lib\40-Full\Microsoft.Server.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceModel.DomainServices.EntityFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\RIAServices.EntityFramework.4.1.60730.0\lib\Net40\Microsoft.ServiceModel.DomainServices.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceModel.Internal, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebApi.0.6.0\lib\40-Full\Microsoft.ServiceModel.Internal.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.2.2.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite, Version=1.12.4448.22555, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.12.0\lib\net35\NetTopologySuite.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.3.5.8\lib\35\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=2.1.2.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.ByteCode.Castle, Version=2.1.2.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NHibernate.ByteCode.Castle.dll</HintPath>
+    </Reference>
+    <Reference Include="org.in2bits.MyXls">
+      <HintPath>..\Lib\org.in2bits.MyXls.dll</HintPath>
+    </Reference>
+    <Reference Include="Otis, Version=0.2.68.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Otis.dll</HintPath>
+    </Reference>
+    <Reference Include="PowerCollections, Version=1.0.4448.22540, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.12.0\lib\net35\PowerCollections.dll</HintPath>
+    </Reference>
+    <Reference Include="SanitizerProviders">
+      <HintPath>..\packages\AjaxControlToolkit.4.1.51116\lib\40\SanitizerProviders\SanitizerProviders.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=3.1.7.1816, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Text.3.1.7\lib\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\HttpClient.0.6.0\lib\40\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel.Activation">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel.Channels">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel.DomainServices.EntityFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\Lib\System.ServiceModel.DomainServices.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\Lib\System.ServiceModel.DomainServices.Hosting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.DomainServices.Hosting.OData, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\Lib\System.ServiceModel.DomainServices.Hosting.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.DomainServices.Server, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\Lib\System.ServiceModel.DomainServices.Server.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Web">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="TIMM.GPS.HttpHandler, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NewControlCenterBin\TIMM.GPS.HttpHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="TIMM.GPS.Model, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NewControlCenterBin\TIMM.GPS.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="TIMM.GPS.RESTService, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NewControlCenterBin\TIMM.GPS.RESTService.dll</HintPath>
+    </Reference>
+    <Reference Include="TIMM.GPS.WebHost">
+      <HintPath>..\Lib\NewControlCenterBin\TIMM.GPS.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="WebActivator, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebActivator.1.5\lib\net40\WebActivator.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ToMappings\AreaRecord.otis.xml" />
+    <Resource Include="ToMappings\Campaign.otis.xml" />
+    <Resource Include="ToMappings\DistributionMap.otis.xml" />
+    <Resource Include="ToMappings\Group.otis.xml" />
+    <Resource Include="ToMappings\Gtu.otis.xml" />
+    <Resource Include="ToMappings\Gtuinfo.otis.xml" />
+    <Resource Include="ToMappings\MonitorAddresses.otis.xml" />
+    <Resource Include="ToMappings\Privilege.otis.xml" />
+    <Resource Include="ToMappings\SubMap.otis.xml" />
+    <Resource Include="ToMappings\Task.otis.xml" />
+    <Resource Include="ToMappings\Taskgtuinfomapping.otis.xml" />
+    <Resource Include="ToMappings\TaskTime.otis.xml" />
+    <Resource Include="ToMappings\ToAddress.otis.xml" />
+    <Resource Include="ToMappings\ToAddressRadius.otis.xml" />
+    <Resource Include="ToMappings\ToArea.otis.xml" />
+    <Resource Include="ToMappings\ToAreaRecord.otis.xml" />
+    <Resource Include="ToMappings\ToAuditor.otis.xml" />
+    <Resource Include="ToMappings\ToBasicCampaignProperties.otis.xml" />
+    <Resource Include="ToMappings\ToCampaign.otis.xml" />
+    <Resource Include="ToMappings\ToCampaignListItem.otis.xml" />
+    <Resource Include="ToMappings\ToCampaignPercentageColor.otis.xml" />
+    <Resource Include="ToMappings\ToCoordinate.otis.xml" />
+    <Resource Include="ToMappings\ToDistributionJob.otis.xml" />
+    <Resource Include="ToMappings\ToDistributionMap.otis.xml" />
+    <Resource Include="ToMappings\ToDriver.otis.xml" />
+    <Resource Include="ToMappings\ToGroup.otis.xml" />
+    <Resource Include="ToMappings\ToGtu.otis.xml" />
+    <Resource Include="ToMappings\ToGtuinfo.otis.xml" />
+    <Resource Include="ToMappings\ToMergeResult.otis.xml" />
+    <Resource Include="ToMappings\ToMonitorAddresses.otis.xml" />
+    <Resource Include="ToMappings\ToPrintAddress.otis.xml" />
+    <Resource Include="ToMappings\ToPrintAddressRadius.otis.xml" />
+    <Resource Include="ToMappings\ToPrintCampaign.otis.xml" />
+    <Resource Include="ToMappings\ToPrintDistributionMap.otis.xml" />
+    <Resource Include="ToMappings\ToPrintSubMap.otis.xml" />
+    <Resource Include="ToMappings\ToPrivilege.otis.xml" />
+    <Resource Include="ToMappings\ToStatusInfo.otis.xml" />
+    <Resource Include="ToMappings\ToSubMap.otis.xml" />
+    <Resource Include="ToMappings\ToTask.otis.xml" />
+    <Resource Include="ToMappings\ToTaskgtuinfomapping.otis.xml" />
+    <Resource Include="ToMappings\ToTaskTime.otis.xml" />
+    <Resource Include="ToMappings\ToUser.otis.xml" />
+    <Resource Include="ToMappings\ToWalker.otis.xml" />
+    <Resource Include="ToMappings\User.otis.xml" />
+    <Content Include="AdminDistributorCompany.aspx" />
+    <Content Include="AdminGtuBagToAuditor.aspx" />
+    <Content Include="AdminGtuToBag.aspx" />
+    <Content Include="AdminGtuToEmployee.aspx" />
+    <Content Include="clientaccesspolicy.xml" />
+    <Content Include="ClientBin\bullet_blue.png" />
+    <Content Include="ClientBin\bullet_green.png" />
+    <Content Include="ClientBin\bullet_orange.png" />
+    <Content Include="ClientBin\bullet_pink.png" />
+    <Content Include="ClientBin\bullet_purple.png" />
+    <Content Include="ClientBin\car.png" />
+    <Content Include="ClientBin\GPS.SilverlightCampaign.xap" />
+    <Content Include="ClientBin\GPS.SilverlightMap.xap" />
+    <Content Include="ClientBin\GPS.SilverMonitor.xap" />
+    <Content Include="ClientBin\star.png" />
+    <Content Include="ClientBin\TIMM.GPS.ControlCenter.xap" />
+    <Content Include="ClientBin\user_green.png" />
+    <Content Include="crossdomain.xml" />
+    <Content Include="DAL\DBScriptView.sql" />
+    <Content Include="Default.aspx" />
+    <Content Include="DrawDot.aspx" />
+    <Content Include="Global.asax" />
+    <Content Include="GtuEvents.aspx" />
+    <Content Include="Images\blank.png" />
+    <Content Include="Images\icons\accept.png" />
+    <Content Include="Images\icons\add.png" />
+    <Content Include="Images\icons\application_view_columns.png" />
+    <Content Include="Images\icons\arrow_down.png" />
+    <Content Include="Images\icons\arrow_left.png" />
+    <Content Include="Images\icons\arrow_right.png" />
+    <Content Include="Images\icons\bullet_arrow_down.png" />
+    <Content Include="Images\icons\bullet_blue.png" />
+    <Content Include="Images\icons\bullet_green.png" />
+    <Content Include="Images\icons\bullet_orange.png" />
+    <Content Include="Images\icons\bullet_pink.png" />
+    <Content Include="Images\icons\bullet_purple.png" />
+    <Content Include="Images\icons\car.png" />
+    <Content Include="Images\icons\car_add.png" />
+    <Content Include="Images\icons\car_delete.png" />
+    <Content Include="Images\icons\control_end.png" />
+    <Content Include="Images\icons\control_pause_blue.png" />
+    <Content Include="Images\icons\control_play_blue.png" />
+    <Content Include="Images\icons\control_stop_blue.png" />
+    <Content Include="Images\icons\cross.png" />
+    <Content Include="Images\icons\delete.png" />
+    <Content Include="Images\icons\error.png" />
+    <Content Include="Images\icons\exclamation.png" />
+    <Content Include="Images\icons\link_add.png" />
+    <Content Include="Images\icons\link_break.png" />
+    <Content Include="Images\icons\picture.png" />
+    <Content Include="Images\icons\resultset_first.png" />
+    <Content Include="Images\icons\resultset_last.png" />
+    <Content Include="Images\icons\resultset_next.png" />
+    <Content Include="Images\icons\resultset_previous.png" />
+    <Content Include="Images\icons\stop.png" />
+    <Content Include="Images\icons\tick.png" />
+    <Content Include="Images\icons\transmit_blue.png" />
+    <Content Include="Images\icons\transmit_go.png" />
+    <Content Include="Images\icons\user_green.png" />
+    <Content Include="Images\icons\user_orange.png" />
+    <Content Include="Images\icons\user_red.png" />
+    <Content Include="Javascript\BingMapsV63ToV8Shim.js" />
+    <Content Include="Monitor.aspx" />
+    <Content Include="NewControlCenter.aspx" />
+    <Content Include="SilverlightServices\LocationService.svc" />
+    <Content Include="TaskMonitor.aspx" />
+    <Content Include="TaskMonitorView.aspx" />
+    <Content Include="TestA.aspx" />
+    <Content Include="UploadImage.aspx" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AdminDistributorCompany.aspx.cs">
+      <DependentUpon>AdminDistributorCompany.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminDistributorCompany.aspx.designer.cs">
+      <DependentUpon>AdminDistributorCompany.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AdminGtuBagToAuditor.aspx.cs">
+      <DependentUpon>AdminGtuBagToAuditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminGtuBagToAuditor.aspx.designer.cs">
+      <DependentUpon>AdminGtuBagToAuditor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AdminGtuToBag.aspx.cs">
+      <DependentUpon>AdminGtuToBag.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminGtuToBag.aspx.designer.cs">
+      <DependentUpon>AdminGtuToBag.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AdminGtuToEmployee.aspx.cs">
+      <DependentUpon>AdminGtuToEmployee.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminGtuToEmployee.aspx.designer.cs">
+      <DependentUpon>AdminGtuToEmployee.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AppFacilities\Assembler.cs" />
+    <Compile Include="AppFacilities\AssemblerConfig.cs" />
+    <Compile Include="AreaServices\AreaReaderService.svc.cs">
+      <DependentUpon>AreaReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="AreaServices\AreaWriterService.svc.cs">
+      <DependentUpon>AreaWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Campaign.aspx.cs">
+      <DependentUpon>Campaign.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Campaign.aspx.designer.cs">
+      <DependentUpon>Campaign.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CampaignServices\CampaignReaderService.svc.cs">
+      <DependentUpon>CampaignReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="CampaignServices\CampaignWriterService.svc.cs">
+      <DependentUpon>CampaignWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="CampaignServices\DataContracts\BasicCampaignProperties.cs" />
+    <Compile Include="CampaignServices\DataContracts\RadiusCheckState.cs" />
+    <Compile Include="ControlCenter.aspx.cs">
+      <DependentUpon>ControlCenter.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlCenter.aspx.designer.cs">
+      <DependentUpon>ControlCenter.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DAL\BingMapUtils.cs" />
+    <Compile Include="DAL\ConfigUtils.cs" />
+    <Compile Include="DAL\Coordinate.cs" />
+    <Compile Include="DAL\DistributorDB.cs" />
+    <Compile Include="DAL\GtuDB.cs" />
+    <Compile Include="DAL\GtuStatusDB.cs" />
+    <Compile Include="DAL\GtuStatusEum.cs" />
+    <Compile Include="DAL\Lookups.cs" />
+    <Compile Include="DAL\MonitorAddressDB.cs" />
+    <Compile Include="DAL\TaskDB.cs" />
+    <Compile Include="DAL\TimmDataModel1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TimmDataModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="DAL\TimmDomainService.cs" />
+    <Compile Include="DAL\TimmDomainService.metadata.cs" />
+    <Compile Include="DAL\TimmGtuDomainService.cs" />
+    <Compile Include="DAL\TimmGtuDomainService.metadata.cs" />
+    <Compile Include="Distance.cs" />
+    <Compile Include="DistanceTest.aspx.cs">
+      <DependentUpon>DistanceTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DistanceTest.aspx.designer.cs">
+      <DependentUpon>DistanceTest.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DrawDot.aspx.cs">
+      <DependentUpon>DrawDot.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DrawDot.aspx.designer.cs">
+      <DependentUpon>DrawDot.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Email.cs" />
+    <Compile Include="ExceptionHandler\JsonGlobalExceptionHandler.cs" />
+    <Compile Include="ExceptionHandler\ServiceGlobalExceptionHandler.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="GtuEvents.aspx.cs">
+      <DependentUpon>GtuEvents.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GtuEvents.aspx.designer.cs">
+      <DependentUpon>GtuEvents.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\CampaignMap.ashx.cs">
+      <DependentUpon>CampaignMap.ashx</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Handler\CampaignMapPrint.ashx.cs">
+      <DependentUpon>CampaignMapPrint.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\ChangeAddressRadius.ashx.cs">
+      <DependentUpon>ChangeAddressRadius.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\DistributionMap.ashx.cs">
+      <DependentUpon>DistributionMap.ashx</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Handler\LoginHandler.ashx.cs">
+      <DependentUpon>LoginHandler.ashx</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Handler\maparea.ashx.cs">
+      <DependentUpon>maparea.ashx</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Handler\mapsettings.ashx.cs">
+      <DependentUpon>mapsettings.ashx</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Handler\PhantomjsPrintHandler.ashx.cs">
+      <DependentUpon>PhantomjsPrintHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\uploadfile.ashx.cs">
+      <DependentUpon>uploadfile.ashx</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Monitor.aspx.cs">
+      <DependentUpon>Monitor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Monitor.aspx.designer.cs">
+      <DependentUpon>Monitor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="NewAddressSL.aspx.cs">
+      <DependentUpon>NewAddressSL.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="NewAddressSL.aspx.designer.cs">
+      <DependentUpon>NewAddressSL.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="NewAddressUpload.aspx.cs">
+      <DependentUpon>NewAddressUpload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="NewAddressUpload.aspx.designer.cs">
+      <DependentUpon>NewAddressUpload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="NewControlCenter.aspx.cs">
+      <DependentUpon>NewControlCenter.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="NewControlCenter.aspx.designer.cs">
+      <DependentUpon>NewControlCenter.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PreLogin.aspx.cs">
+      <DependentUpon>PreLogin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PreLogin.aspx.designer.cs">
+      <DependentUpon>PreLogin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Print\WebUtil.cs" />
+    <Compile Include="ReportsTask.aspx.cs">
+      <DependentUpon>ReportsTask.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ReportsTask.aspx.designer.cs">
+      <DependentUpon>ReportsTask.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Reports.aspx.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Reports.aspx.designer.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OneDMPrintSettings.aspx.cs">
+      <DependentUpon>OneDMPrintSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OneDMPrintSettings.aspx.designer.cs">
+      <DependentUpon>OneDMPrintSettings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Default.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DistributionMap.aspx.cs">
+      <DependentUpon>DistributionMap.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DistributionMap.aspx.designer.cs">
+      <DependentUpon>DistributionMap.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DistributionMapServices\DJReaderService.svc.cs">
+      <DependentUpon>DJReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="DistributionMapServices\DJWriterService.svc.cs">
+      <DependentUpon>DJWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="DistributionMapServices\DMReaderService.svc.cs">
+      <DependentUpon>DMReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="DistributionMapServices\DMWriterService.svc.cs">
+      <DependentUpon>DMWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="DM.Master.cs">
+      <DependentUpon>DM.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DM.Master.designer.cs">
+      <DependentUpon>DM.Master</DependentUpon>
+    </Compile>
+    <Compile Include="DMPrintSettings.aspx.cs">
+      <DependentUpon>DMPrintSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DMPrintSettings.aspx.designer.cs">
+      <DependentUpon>DMPrintSettings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Export.aspx.cs">
+      <DependentUpon>Export.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Export.aspx.designer.cs">
+      <DependentUpon>Export.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Groups.aspx.cs">
+      <DependentUpon>Groups.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Groups.aspx.designer.cs">
+      <DependentUpon>Groups.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GroupServices\GroupReaderService.svc.cs">
+      <DependentUpon>GroupReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="GroupServices\GroupWriterService.svc.cs">
+      <DependentUpon>GroupWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="GtuAdmin.aspx.cs">
+      <DependentUpon>GtuAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GtuAdmin.aspx.designer.cs">
+      <DependentUpon>GtuAdmin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Main.Master.cs">
+      <DependentUpon>Main.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Main.Master.designer.cs">
+      <DependentUpon>Main.Master</DependentUpon>
+    </Compile>
+    <Compile Include="NonDeliverables.aspx.cs">
+      <DependentUpon>NonDeliverables.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="NonDeliverables.aspx.designer.cs">
+      <DependentUpon>NonDeliverables.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintSettings.aspx.cs">
+      <DependentUpon>PrintSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintSettings.aspx.designer.cs">
+      <DependentUpon>PrintSettings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Print\CampaignPrint.aspx.cs">
+      <DependentUpon>CampaignPrint.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Print\CampaignPrint.aspx.designer.cs">
+      <DependentUpon>CampaignPrint.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Print\DMPrint.aspx.cs">
+      <DependentUpon>DMPrint.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Print\DMPrint.aspx.designer.cs">
+      <DependentUpon>DMPrint.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Print\Footer.aspx.cs">
+      <DependentUpon>Footer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Print\Footer.aspx.designer.cs">
+      <DependentUpon>Footer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Print\MapImage.cs" />
+    <Compile Include="Print\OneDMPrint.aspx.cs">
+      <DependentUpon>OneDMPrint.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Print\OneDMPrint.aspx.designer.cs">
+      <DependentUpon>OneDMPrint.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
+    <Compile Include="SilverlightServices\CampaignReaderSLService.svc.cs">
+      <DependentUpon>CampaignReaderSLService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="SilverlightServices\DMReaderSLService.svc.cs">
+      <DependentUpon>DMReaderSLService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="SilverlightServices\LocationService.svc.cs">
+      <DependentUpon>LocationService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="TaskMonitor.aspx.cs">
+      <DependentUpon>TaskMonitor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TaskMonitor.aspx.designer.cs">
+      <DependentUpon>TaskMonitor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TaskMonitorView.aspx.cs">
+      <DependentUpon>TaskMonitorView.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TaskMonitorView.aspx.designer.cs">
+      <DependentUpon>TaskMonitorView.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TaskServices\TaskReaderService.svc.cs">
+      <DependentUpon>TaskReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="TaskServices\TaskWriterService.svc.cs">
+      <DependentUpon>TaskWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="TestA.aspx.cs">
+      <DependentUpon>TestA.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TestA.aspx.designer.cs">
+      <DependentUpon>TestA.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TrackServices\GtuReaderService.svc.cs">
+      <DependentUpon>GtuReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="TrackServices\GtuWriterService.svc.cs">
+      <DependentUpon>GtuWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="TransferObjects\ToMonitorAddresses.cs" />
+    <Compile Include="TransferObjects\ToTaskTime.cs" />
+    <Compile Include="TransferObjects\ToGtuinfo.cs" />
+    <Compile Include="TransferObjects\ToTaskgtuinfomapping.cs" />
+    <Compile Include="TransferObjects\ToTask.cs" />
+    <Compile Include="TransferObjects\ToAdjustData.cs" />
+    <Compile Include="TransferObjects\ToBasicCampaignProperties.cs" />
+    <Compile Include="TransferObjects\ToCampaignListItem.cs" />
+    <Compile Include="TransferObjects\ToCampaignPercentageColor.cs" />
+    <Compile Include="TransferObjects\ToCoordinate.cs" />
+    <Compile Include="TransferObjects\ToGroup.cs" />
+    <Compile Include="TransferObjects\ToMergeResult.cs" />
+    <Compile Include="TransferObjects\ToAddress.cs" />
+    <Compile Include="TransferObjects\ToArea.cs" />
+    <Compile Include="TransferObjects\ToAreaRecord.cs" />
+    <Compile Include="TransferObjects\ToAuditor.cs" />
+    <Compile Include="TransferObjects\ToCampaign.cs" />
+    <Compile Include="TransferObjects\ToDistributionJob.cs" />
+    <Compile Include="TransferObjects\ToDistributionJobMap.cs" />
+    <Compile Include="TransferObjects\ToDistributionMap.cs" />
+    <Compile Include="TransferObjects\ToDriver.cs" />
+    <Compile Include="TransferObjects\ToGtu.cs" />
+    <Compile Include="TransferObjects\ToPrintAddress.cs" />
+    <Compile Include="TransferObjects\ToPrintArea.cs" />
+    <Compile Include="TransferObjects\ToPrintCampaign.cs" />
+    <Compile Include="TransferObjects\ToPrintDistributionMap.cs" />
+    <Compile Include="TransferObjects\ToPrintSubMap.cs" />
+    <Compile Include="TransferObjects\ToPrivilege.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TransferObjects\ToSubMap.cs" />
+    <Compile Include="TransferObjects\ToUser.cs" />
+    <Compile Include="TransferObjects\ToUserRole.cs" />
+    <Compile Include="TransferObjects\ToWalker.cs" />
+    <Compile Include="UploadImage.aspx.cs">
+      <DependentUpon>UploadImage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UploadImage.aspx.designer.cs">
+      <DependentUpon>UploadImage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Users.aspx.cs">
+      <DependentUpon>Users.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Users.aspx.designer.cs">
+      <DependentUpon>Users.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UserServices\UserReaderService.svc.cs">
+      <DependentUpon>UserReaderService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="UserServices\UserWriterService.svc.cs">
+      <DependentUpon>UserWriterService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\BingGeocodeService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\AdminCenter.ascx.cs">
+      <DependentUpon>AdminCenter.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\AdminCenter.ascx.designer.cs">
+      <DependentUpon>AdminCenter.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\AdminGtuToEmployeeControl.ascx.cs">
+      <DependentUpon>AdminGtuToEmployeeControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\AdminGtuToEmployeeControl.ascx.designer.cs">
+      <DependentUpon>AdminGtuToEmployeeControl.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\AssignGTUsToTasks.ascx.cs">
+      <DependentUpon>AssignGTUsToTasks.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\AssignGTUsToTasks.ascx.designer.cs">
+      <DependentUpon>AssignGTUsToTasks.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\CampaignCenter.ascx.cs">
+      <DependentUpon>CampaignCenter.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\CampaignCenter.ascx.designer.cs">
+      <DependentUpon>CampaignCenter.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\CampaignList.ascx.cs">
+      <DependentUpon>CampaignList.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\CampaignList.ascx.designer.cs">
+      <DependentUpon>CampaignList.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Campaign.ascx.cs">
+      <DependentUpon>Campaign.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Campaign.ascx.designer.cs">
+      <DependentUpon>Campaign.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ControlAddEmployee.ascx.cs">
+      <DependentUpon>ControlAddEmployee.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ControlAddEmployee.ascx.designer.cs">
+      <DependentUpon>ControlAddEmployee.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\LoadBlockGroupArea.ascx.cs">
+      <DependentUpon>LoadBlockGroupArea.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\LoadBlockGroupArea.ascx.designer.cs">
+      <DependentUpon>LoadBlockGroupArea.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\LoadCrouteArea.ascx.cs">
+      <DependentUpon>LoadCrouteArea.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\LoadCrouteArea.ascx.designer.cs">
+      <DependentUpon>LoadCrouteArea.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\MonitorTaskGTUs.ascx.cs">
+      <DependentUpon>MonitorTaskGTUs.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\MonitorTaskGTUs.ascx.designer.cs">
+      <DependentUpon>MonitorTaskGTUs.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ReportAuditor.ascx.cs">
+      <DependentUpon>ReportAuditor.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ReportAuditor.ascx.designer.cs">
+      <DependentUpon>ReportAuditor.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ReportDriver.ascx.cs">
+      <DependentUpon>ReportDriver.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ReportDriver.ascx.designer.cs">
+      <DependentUpon>ReportDriver.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ReportDriverTask.ascx.cs">
+      <DependentUpon>ReportDriverTask.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ReportDriverTask.ascx.designer.cs">
+      <DependentUpon>ReportDriverTask.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ReportAuditorTask.ascx.cs">
+      <DependentUpon>ReportAuditorTask.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ReportAuditorTask.ascx.designer.cs">
+      <DependentUpon>ReportAuditorTask.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\PublishToMonitor.ascx.cs">
+      <DependentUpon>PublishToMonitor.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\PublishToMonitor.ascx.designer.cs">
+      <DependentUpon>PublishToMonitor.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ReportWalkerTask.ascx.cs">
+      <DependentUpon>ReportWalkerTask.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ReportWalkerTask.ascx.designer.cs">
+      <DependentUpon>ReportWalkerTask.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ReportCenter.ascx.cs">
+      <DependentUpon>ReportCenter.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ReportCenter.ascx.designer.cs">
+      <DependentUpon>ReportCenter.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\CreateTask.ascx.cs">
+      <DependentUpon>CreateTask.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\CreateTask.ascx.designer.cs">
+      <DependentUpon>CreateTask.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\NoPublishCampaign.ascx.cs">
+      <DependentUpon>NoPublishCampaign.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\NoPublishCampaign.ascx.designer.cs">
+      <DependentUpon>NoPublishCampaign.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ProductivityCenter.ascx.cs">
+      <DependentUpon>ProductivityCenter.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ProductivityCenter.ascx.designer.cs">
+      <DependentUpon>ProductivityCenter.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\PublishCampaign.ascx.cs">
+      <DependentUpon>PublishCampaign.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\PublishCampaign.ascx.designer.cs">
+      <DependentUpon>PublishCampaign.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\CreateCampaign.ascx.cs">
+      <DependentUpon>CreateCampaign.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\CreateCampaign.ascx.designer.cs">
+      <DependentUpon>CreateCampaign.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\CreateSubMap.ascx.cs">
+      <DependentUpon>CreateSubMap.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\CreateSubMap.ascx.designer.cs">
+      <DependentUpon>CreateSubMap.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\DistributionMapCenter.ascx.cs">
+      <DependentUpon>DistributionMapCenter.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\DistributionMapCenter.ascx.designer.cs">
+      <DependentUpon>DistributionMapCenter.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignAuditors.ascx.cs">
+      <DependentUpon>AssignAuditors.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignAuditors.ascx.designer.cs">
+      <DependentUpon>AssignAuditors.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignDrivers.ascx.cs">
+      <DependentUpon>AssignDrivers.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignDrivers.ascx.designer.cs">
+      <DependentUpon>AssignDrivers.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignGtus.ascx.cs">
+      <DependentUpon>AssignGtus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignGtus.ascx.designer.cs">
+      <DependentUpon>AssignGtus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignWalkers.ascx.cs">
+      <DependentUpon>AssignWalkers.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Distribution\AssignWalkers.ascx.designer.cs">
+      <DependentUpon>AssignWalkers.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Distribution\DistributionMap.ascx.cs">
+      <DependentUpon>DistributionMap.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Distribution\DistributionMap.ascx.designer.cs">
+      <DependentUpon>DistributionMap.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Export.ascx.cs">
+      <DependentUpon>Export.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Export.ascx.designer.cs">
+      <DependentUpon>Export.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ImportData.ascx.cs">
+      <DependentUpon>ImportData.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ImportData.ascx.designer.cs">
+      <DependentUpon>ImportData.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\LoadAddresses.ascx.cs">
+      <DependentUpon>LoadAddresses.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\LoadAddresses.ascx.designer.cs">
+      <DependentUpon>LoadAddresses.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\LoadFiveZipArea.ascx.cs">
+      <DependentUpon>LoadFiveZipArea.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\LoadFiveZipArea.ascx.designer.cs">
+      <DependentUpon>LoadFiveZipArea.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\LoadGtus.ascx.cs">
+      <DependentUpon>LoadGtus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\LoadGtus.ascx.designer.cs">
+      <DependentUpon>LoadGtus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\NewAddress.ascx.cs">
+      <DependentUpon>NewAddress.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\NewAddress.ascx.designer.cs">
+      <DependentUpon>NewAddress.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\ReportWalker.ascx.cs">
+      <DependentUpon>ReportWalker.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\ReportWalker.ascx.designer.cs">
+      <DependentUpon>ReportWalker.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\UpLoadImage.ascx.cs">
+      <DependentUpon>UpLoadImage.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\UpLoadImage.ascx.designer.cs">
+      <DependentUpon>UpLoadImage.ascx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GPS.DataLayer\GPS.DataLayer.csproj">
+      <Project>{B9C454DE-9834-4632-882B-7189B09DE3F1}</Project>
+      <Name>GPS.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.DomainLayer.Area\GPS.DomainLayer.Area.csproj">
+      <Project>{00C7CD27-D14E-499A-9B99-A1F18D101FEA}</Project>
+      <Name>GPS.DomainLayer.Area</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.DomainLayer.Campaign\GPS.DomainLayer.Campaign.csproj">
+      <Project>{BDBB2696-3F0D-4E30-BE6A-9FE20FD22BF4}</Project>
+      <Name>GPS.DomainLayer.Campaign</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.DomainLayer.Distribution\GPS.DomainLayer.Distribution.csproj">
+      <Project>{66643B61-04E8-472B-B096-024B0AEB55F3}</Project>
+      <Name>GPS.DomainLayer.Distribution</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.DomainLayer.Security\GPS.DomainLayer.Security.csproj">
+      <Project>{E6197B6D-0ABF-48AA-B4BA-A929E23FE755}</Project>
+      <Name>GPS.DomainLayer.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.DomainLayer\GPS.DomainLayer.csproj">
+      <Project>{8FC5044C-AC61-4886-966B-B097CBF8183B}</Project>
+      <Name>GPS.DomainLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.Utilities\GPS.Utilities.csproj">
+      <Project>{0EF83599-99BE-4E9B-87C3-E1C3A0A5C5C5}</Project>
+      <Name>GPS.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.Web\GPS.Web.csproj">
+      <Project>{856C0DF6-DE40-43CB-8947-E23DE205BF3A}</Project>
+      <Name>GPS.Web</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Campaign.aspx" />
+    <Content Include="Export.aspx" />
+    <Content Include="Images\buttons\remove.png" />
+    <Content Include="Images\header_tall.gif" />
+    <Content Include="Images\j.png" />
+    <Content Include="Images\menu_left.gif" />
+    <Content Include="Images\menu_libg.gif" />
+    <Content Include="Images\menu_right.gif" />
+    <Content Include="Images\menu_tall.gif" />
+    <Content Include="Javascript\jquery-1.3.2-vsdoc.js" />
+    <Content Include="Javascript\jquery-1.3.2.js" />
+    <Content Include="Javascript\jquery-1.3.2.min-vsdoc.js" />
+    <Content Include="Javascript\jquery-1.3.2.min.js" />
+    <Content Include="Main.Master" />
+    <Content Include="Style\all.css" />
+    <Content Include="Style\base.css" />
+    <Content Include="WebControls\AdminGtuToEmployeeControl.ascx" />
+    <Content Include="WebControls\ControlAddEmployee.ascx" />
+    <Content Include="WebControls\Export.ascx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AreaServices\AreaReaderService.svc" />
+    <Content Include="CampaignServices\CampaignReaderService.svc" />
+    <Content Include="CampaignServices\CampaignWriterService.svc" />
+    <Content Include="Caching.config" />
+    <Content Include="Images\boundary\tune-down.png" />
+    <Content Include="Images\boundary\tune-up.png" />
+    <Content Include="Images\direction-legend.png" />
+    <Content Include="Images\logo.JPG" />
+    <Content Include="Images\map.jpg" />
+    <Content Include="Images\nav_select.gif" />
+    <Content Include="Images\norms-logo.png" />
+    <Content Include="Images\pushpins\bg-dot.png" />
+    <Content Include="Images\pushpins\bg-plus.png" />
+    <Content Include="Images\pushpins\bg.png" />
+    <Content Include="Images\logo.png" />
+    <Content Include="Images\pushpins\green-star.png" />
+    <Content Include="Images\pushpins\red-star.png" />
+    <Content Include="Images\pushpins\trk-dot.png" />
+    <Content Include="Images\pushpins\trk-plus.png" />
+    <Content Include="Images\pushpins\trk.png" />
+    <Content Include="Images\pushpins\z3-dot.png" />
+    <Content Include="Images\pushpins\z5-dot.png" />
+    <Content Include="Images\timm-logo-small.png" />
+    <Content Include="Images\timm-logo.png" />
+    <Content Include="Images\vargainc-logo.png" />
+    <Content Include="Images\vecss.gif" />
+    <Content Include="Images\widget-bg.png" />
+    <Content Include="Javascript\ajaxfileupload.js" />
+    <Content Include="Javascript\campaign\gps.campaign.js" />
+    <Content Include="Javascript\campaign\gps.campaign.extend.js" />
+    <Content Include="Javascript\colorpicker.js" />
+    <Content Include="Javascript\colorpicker\colorpicker.js" />
+    <Content Include="Javascript\colorpicker\eye.js" />
+    <Content Include="Javascript\colorpicker\layout.js" />
+    <Content Include="Javascript\colorpicker\utils.js" />
+    <Content Include="Javascript\gps.form.js" />
+    <Content Include="Javascript\gps.js" />
+    <Content Include="Javascript\gps.loading.js" />
+    <Content Include="Javascript\gps.map.exportrecorder.js" />
+    <Content Include="Javascript\gps.map.methods.js" />
+    <Content Include="Javascript\gps.map.objectstore.js" />
+    <Content Include="Javascript\campaign\submap\gps.campaign.submap.js" />
+    <Content Include="Javascript\campaign\submap\gps.campaign.submaparea.js" />
+    <Content Include="Javascript\gps.toolbar.js" />
+    <Content Include="Javascript\jquery.dataTables.min.js" />
+    <Content Include="Javascript\jquery.qtip-1.0.0-rc3.min.js" />
+    <Content Include="Javascript\map\gps.map.area.js" />
+    <Content Include="Javascript\map\gps.map.areabox.js" />
+    <Content Include="Javascript\map\gps.map.mappanel.js" />
+    <Content Include="Javascript\map\gps.mapview.js" />
+    <Content Include="Javascript\campaign\submap\gps.campaign.submappanel.js" />
+    <Content Include="Javascript\campaign\submap\gps.campaign.submapview.js" />
+    <Content Include="Javascript\map\gps.map.settings.js" />
+    <Content Include="Javascript\jquery.layout.js" />
+    <Content Include="Javascript\jquery.ui.all.js" />
+    <Content Include="Javascript\login.js" />
+    <Content Include="Javascript\print\gps.print.js" />
+    <Content Include="Javascript\print\gps.print.map.js" />
+    <Content Include="login.html" />
+    <Content Include="PrintSettings.aspx" />
+    <Content Include="Print\CampaignPrint.aspx" />
+    <Content Include="Print\Footer.aspx" />
+    <Content Include="Style\ColorPicker.css" />
+    <Content Include="Style\contextmenu.css" />
+    <Content Include="Style\images\colorpicker\blank.gif" />
+    <Content Include="Style\images\colorpicker\colorpicker_background.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_hex.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_hsb_b.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_hsb_h.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_hsb_s.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_indic.gif" />
+    <Content Include="Style\images\colorpicker\colorpicker_overlay.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_rgb_b.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_rgb_g.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_rgb_r.png" />
+    <Content Include="Style\images\colorpicker\colorpicker_select.gif" />
+    <Content Include="Style\images\colorpicker\colorpicker_submit.png" />
+    <Content Include="Style\images\colorpicker\custom_background.png" />
+    <Content Include="Style\images\colorpicker\custom_hex.png" />
+    <Content Include="Style\images\colorpicker\custom_hsb_b.png" />
+    <Content Include="Style\images\colorpicker\custom_hsb_h.png" />
+    <Content Include="Style\images\colorpicker\custom_hsb_s.png" />
+    <Content Include="Style\images\colorpicker\custom_indic.gif" />
+    <Content Include="Style\images\colorpicker\custom_rgb_b.png" />
+    <Content Include="Style\images\colorpicker\custom_rgb_g.png" />
+    <Content Include="Style\images\colorpicker\custom_rgb_r.png" />
+    <Content Include="Style\images\colorpicker\custom_submit.png" />
+    <Content Include="Style\images\colorpicker\select.png" />
+    <Content Include="Style\images\colorpicker\select2.png" />
+    <Content Include="Style\images\colorpicker\slider.png" />
+    <Content Include="Style\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Content Include="Style\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Content Include="Style\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Style\images\ui-bg_flat_10_000000_40x100.png" />
+    <Content Include="Style\images\ui-bg_flat_30_cccccc_40x100.png" />
+    <Content Include="Style\images\ui-bg_flat_50_5c5c5c_40x100.png" />
+    <Content Include="Style\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_20_555555_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_40_0078a3_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_40_ffc73d_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Style\images\ui-bg_glass_75_ffffff_1x400.png" />
+    <Content Include="Style\images\ui-bg_gloss-wave_25_333333_500x100.png" />
+    <Content Include="Style\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="Style\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="Style\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Style\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Content Include="Style\images\ui-bg_highlight-soft_80_eeeeee_1x100.png" />
+    <Content Include="Style\images\ui-bg_inset-soft_25_000000_1x100.png" />
+    <Content Include="Style\images\ui-bg_inset-soft_30_f58400_1x100.png" />
+    <Content Include="Style\images\ui-bg_inset-soft_95_fef1ec_1x100.png" />
+    <Content Include="Style\images\ui-icons_222222_256x240.png" />
+    <Content Include="Style\images\ui-icons_228ef1_256x240.png" />
+    <Content Include="Style\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Style\images\ui-icons_454545_256x240.png" />
+    <Content Include="Style\images\ui-icons_4b8e0b_256x240.png" />
+    <Content Include="Style\images\ui-icons_888888_256x240.png" />
+    <Content Include="Style\images\ui-icons_a83300_256x240.png" />
+    <Content Include="Style\images\ui-icons_cccccc_256x240.png" />
+    <Content Include="Style\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Style\images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="Style\images\ui-icons_ffd27a_256x240.png" />
+    <Content Include="Style\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Style\jquery-ui-1.7.2.custom.css" />
+    <Content Include="Javascript\jquery-ui-1.7.2.custom.min.js" />
+    <Content Include="Javascript\_trail.js" />
+    <Content Include="Style\jquery.datatable\css\dataTables_page.css" />
+    <Content Include="Style\jquery.datatable\css\dataTables_table.css" />
+    <Content Include="Style\jquery.datatable\css\dataTables_table_jui.css" />
+    <Content Include="Style\jquery.datatable\images\back_disabled.jpg" />
+    <Content Include="Style\jquery.datatable\images\back_enabled.jpg" />
+    <Content Include="Style\jquery.datatable\images\forward_disabled.jpg" />
+    <Content Include="Style\jquery.datatable\images\forward_enabled.jpg" />
+    <Content Include="Style\jquery.datatable\images\sort_asc.jpg" />
+    <Content Include="Style\jquery.datatable\images\sort_both.jpg" />
+    <Content Include="Style\jquery.datatable\images\sort_desc.jpg" />
+    <Content Include="Style\NewAddress.css" />
+    <Content Include="Style\print.css" />
+    <Content Include="Style\loading.css" />
+    <Content Include="Style\submap.css" />
+    <Content Include="Style\toolbar.css" />
+    <Content Include="Users.aspx" />
+    <Content Include="UserServices\UserReaderService.svc" />
+    <Content Include="UserServices\UserWriterService.svc" />
+    <Content Include="WebControls\CampaignList.ascx" />
+    <Content Include="WebControls\CreateCampaign.ascx" />
+    <Content Include="WebControls\CreateSubMap.ascx" />
+    <Content Include="WebControls\ImportData.ascx" />
+    <Content Include="WebControls\LoadAddresses.ascx" />
+    <Content Include="WebControls\LoadFiveZipArea.ascx" />
+    <Content Include="WebControls\MonitorTaskGTUs.ascx" />
+    <Content Include="WebControls\NewAddress.ascx" />
+    <Content Include="WebControls\UpLoadImage.ascx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AvailableGTUList.aspx" />
+    <Content Include="DistanceTest.aspx" />
+    <Content Include="CampaignSL.aspx" />
+    <Content Include="Files\GtuDots\maddress.PNG" />
+    <Content Include="Files\Images\Address\noview.JPG" />
+    <Content Include="Handler\CampaignMap.ashx" />
+    <Content Include="Handler\DistributionMap.ashx" />
+    <Content Include="Handler\LoginHandler.ashx" />
+    <Content Include="Handler\maparea.ashx" />
+    <Content Include="Handler\mapsettings.ashx" />
+    <Content Include="Handler\uploadfile.ashx" />
+    <Content Include="History.aspx" />
+    <Content Include="Images\pushpins\z5-dotA.png" />
+    <Content Include="NewAddressSL.aspx" />
+    <Content Include="NewAddressUpload.aspx" />
+    <Content Include="PreLogin.aspx" />
+    <Content Include="ReportsTask.aspx" />
+    <Content Include="EditGTU.aspx" />
+    <Content Include="Javascript\report\report.js" />
+    <Content Include="Reports.aspx" />
+    <Content Include="Javascript\print\gps.onedmprint.js" />
+    <Content Include="OneDMPrintSettings.aspx" />
+    <Content Include="DistributionMapServices\DJReaderService.svc" />
+    <Content Include="DistributionMapServices\DJWriterService.svc" />
+    <Content Include="DistributionMapServices\DMReaderService.svc" />
+    <Content Include="DistributionMapServices\DMWriterService.svc" />
+    <Content Include="DM.Master" />
+    <Content Include="Classification.config" />
+    <EntityDeploy Include="DAL\TimmDataModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>TimmDataModel1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="ClientBin\System.ComponentModel.DataAnnotations.zip" />
+    <Content Include="ClientBin\System.ServiceModel.DomainServices.Client.zip" />
+    <Content Include="ClientBin\System.ServiceModel.DomainServices.Client.Web.zip" />
+    <Content Include="ClientBin\System.ServiceModel.Web.Extensions.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Data.DataForm.Toolkit.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Data.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Data.Input.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Data.Toolkit.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.DataVisualization.Toolkit.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.DomainServices.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Input.Toolkit.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Layout.Toolkit.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Navigation.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Theming.Toolkit.zip" />
+    <Content Include="ClientBin\System.Windows.Controls.Toolkit.zip" />
+    <Content Include="ClientBin\System.Windows.Data.zip" />
+    <None Include="Files\ImportFiles\Resources\import_data_template.xlt" />
+    <Content Include="AreaServices\AreaWriterService.svc" />
+    <Content Include="ControlCenter.aspx" />
+    <Content Include="DistributionMap.aspx" />
+    <Content Include="DMPrintSettings.aspx" />
+    <Content Include="Print\OneDMPrint.aspx" />
+    <Content Include="Groups.aspx" />
+    <Content Include="GroupServices\GroupReaderService.svc" />
+    <Content Include="GroupServices\GroupWriterService.svc" />
+    <Content Include="GtuAdmin.aspx" />
+    <Content Include="hibernate.cfg.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Images\controlcenter\2_02.gif" />
+    <Content Include="Images\controlcenter\2_04.gif" />
+    <Content Include="Images\controlcenter\2_07.gif" />
+    <Content Include="Images\controlcenter\2_13.gif" />
+    <Content Include="Images\controlcenter\2_14.gif" />
+    <Content Include="Images\controlcenter\2_15.gif" />
+    <Content Include="Images\controlcenter\2_16.gif" />
+    <Content Include="Images\controlcenter\2_20.gif" />
+    <Content Include="Images\controlcenter\2_24.gif" />
+    <Content Include="Images\controlcenter\2_263.gif" />
+    <Content Include="Images\controlcenter\2_27.gif" />
+    <Content Include="Images\controlcenter\2_29.gif" />
+    <Content Include="Images\controlcenter\2_33.gif" />
+    <Content Include="Images\controlcenter\2_34.gif" />
+    <Content Include="Images\controlcenter\buttonbg-.gif" />
+    <Content Include="Images\controlcenter\buttonbg.gif" />
+    <Content Include="Images\controlcenter\Icon_Admin.png" />
+    <Content Include="Images\controlcenter\Icon_Campaign.png" />
+    <Content Include="Images\controlcenter\Icon_DM.png" />
+    <Content Include="Images\controlcenter\licon.gif" />
+    <Content Include="Images\controlcenter\logout_icn.gif" />
+    <Content Include="Images\controlcenter\maintext_bg.gif" />
+    <Content Include="Images\controlcenter\nav_bg.gif" />
+    <Content Include="Images\controlcenter\spreat.gif" />
+    <Content Include="Images\controlcenter\topmiddle_bg.gif" />
+    <Content Include="Images\pushpins\flag.png" />
+    <Content Include="Javascript\campaign\address\gps.campaign.addresspanel.js" />
+    <Content Include="Javascript\campaign\address\gps.campaign.addressview.js" />
+    <Content Include="Javascript\campaign\gps.campaign.campaigndialog.js" />
+    <Content Include="Javascript\campaign\gps.campaign.extend.address.js" />
+    <Content Include="Javascript\campaign\gps.campaign.extend.data.js" />
+    <Content Include="Javascript\campaign\gps.campaign.mappanel.js" />
+    <Content Include="Javascript\controlcenter\gps.controlcenter.js" />
+    <Content Include="Javascript\distributionjob\distributionjob.js" />
+    <Content Include="Javascript\distributionjob\gps.dj.js" />
+    <Content Include="Javascript\distributionjob\gps.dj.objectstore.js" />
+    <Content Include="Javascript\distributionjob\gps.djpanel.js" />
+    <Content Include="Javascript\distributionjob\gps.djuser.js" />
+    <Content Include="Javascript\distributionjob\gps.djuser.objectstore.js" />
+    <Content Include="Javascript\distributionjob\gps.djview.js" />
+    <Content Include="Javascript\distributionjob\gps.user.js" />
+    <Content Include="Javascript\distributionmap\gps.dm.dmarea.js" />
+    <Content Include="Javascript\distributionmap\gps.dm.js" />
+    <Content Include="Javascript\distributionmap\gps.dm.mappanel.js" />
+    <Content Include="Javascript\distributionmap\gps.dm.objectstore.js" />
+    <Content Include="Javascript\distributionmap\gps.dmdataoperation.js" />
+    <Content Include="Javascript\distributionmap\gps.dmlayout.js" />
+    <Content Include="Javascript\distributionmap\gps.dmpanel.js" />
+    <Content Include="Javascript\distributionmap\gps.dmview.js" />
+    <Content Include="Javascript\distributionmap\gps.submap.js" />
+    <Content Include="Javascript\gps.colors.js" />
+    <Content Include="Javascript\gps.container.js" />
+    <Content Include="Javascript\gps.eventtrigger.js" />
+    <Content Include="Javascript\map\gps.map.arealayer.js" />
+    <Content Include="Javascript\map\gps.map.arearecorder.js" />
+    <Content Include="Javascript\map\gps.map.js" />
+    <Content Include="Javascript\map\gps.map.objectconstructor.js" />
+    <Content Include="Javascript\map\gps.map.mapdrawing.js" />
+    <Content Include="Javascript\map\gps.map.recorder.js" />
+    <Content Include="Javascript\nondeliverables\gps.nd.js" />
+    <Content Include="Javascript\nondeliverables\gps.nd.mappanel.js" />
+    <Content Include="Javascript\nondeliverables\GPS.Nd.NdAreaDialog.js" />
+    <Content Include="Javascript\print\gps.print.color.js" />
+    <Content Include="Javascript\print\gps.print.extend.js" />
+    <Content Include="Javascript\track\track.gtu.js" />
+    <Content Include="Javascript\usermanagement\gps.admin.group.js" />
+    <Content Include="Javascript\usermanagement\gps.admin.user.js" />
+    <Content Include="NonDeliverables.aspx" />
+    <EmbeddedResource Include="Style\ToMappings\Gtuinfo.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\Privilege.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\Task.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\Taskgtuinfomapping.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToCampaign.otis.xml" />
+    <Content Include="Print\DMPrint.aspx" />
+    <Content Include="Silverlight.js" />
+    <Content Include="SilverlightServices\CampaignReaderSLService.svc" />
+    <Content Include="SilverlightServices\DMReaderSLService.svc" />
+    <Content Include="Style\controlcenter.css" />
+    <Content Include="Style\distributionjob.css" />
+    <Content Include="Style\mappanel.css" />
+    <EmbeddedResource Include="Style\ToMappings\ToAddress.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToAddressRadius.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\DistributionMap.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\SubMap.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\Gtu.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\AreaRecord.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToArea.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToDistributionJob.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToDistributionMap.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToGtuinfo.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToPrivilege.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToSubMap.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToTask.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToTaskgtuinfomapping.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToUser.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToAreaRecord.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\User.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToGtu.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToMergeResult.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToDriver.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToAuditor.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToWalker.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToCampaignPercentageColor.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToCoordinate.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToPrintCampaign.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToPrintSubMap.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToCampaignListItem.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToPrintAddress.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToPrintAddressRadius.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToBasicCampaignProperties.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\Campaign.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToPrintDistributionMap.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\Group.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToGroup.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToStatusInfo.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\TaskTime.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\ToTaskTime.otis.xml" />
+    <Content Include="Style\NewMonitorAddress.css" />
+    <Content Include="TaskServices\TaskReaderService.svc" />
+    <Content Include="TaskServices\TaskWriterService.svc" />
+    <EmbeddedResource Include="Style\ToMappings\ToMonitorAddresses.otis.xml" />
+    <EmbeddedResource Include="Style\ToMappings\MonitorAddresses.otis.xml" />
+    <Content Include="TrackServices\GtuReaderService.svc" />
+    <Content Include="TrackServices\GtuWriterService.svc" />
+    <Content Include="WebControls\AdminCenter.ascx" />
+    <Content Include="WebControls\AssignGTUsToTasks.ascx" />
+    <Content Include="WebControls\CampaignCenter.ascx" />
+    <Content Include="WebControls\Campaign.ascx" />
+    <Content Include="WebControls\LoadBlockGroupArea.ascx" />
+    <Content Include="WebControls\LoadCrouteArea.ascx" />
+    <Content Include="WebControls\ReportAuditor.ascx" />
+    <Content Include="WebControls\ReportDriver.ascx" />
+    <Content Include="WebControls\ReportDriverTask.ascx" />
+    <Content Include="WebControls\ReportAuditorTask.ascx" />
+    <Content Include="WebControls\PublishToMonitor.ascx" />
+    <Content Include="WebControls\ReportWalkerTask.ascx" />
+    <Content Include="WebControls\ReportCenter.ascx" />
+    <Content Include="WebControls\CreateTask.ascx" />
+    <Content Include="WebControls\NoPublishCampaign.ascx" />
+    <Content Include="WebControls\ProductivityCenter.ascx" />
+    <Content Include="WebControls\PublishCampaign.ascx" />
+    <Content Include="WebControls\DistributionMapCenter.ascx" />
+    <Content Include="WebControls\Distribution\AssignAuditors.ascx" />
+    <Content Include="WebControls\Distribution\AssignDrivers.ascx" />
+    <Content Include="WebControls\Distribution\AssignGtus.ascx" />
+    <Content Include="WebControls\Distribution\AssignWalkers.ascx" />
+    <Content Include="WebControls\Distribution\DistributionMap.ascx" />
+    <Content Include="WebControls\LoadGtus.ascx" />
+    <Content Include="WebControls\ReportWalker.ascx" />
+    <Content Include="Handler\CampaignMapPrint.ashx" />
+    <Content Include="Handler\ChangeAddressRadius.ashx" />
+    <Content Include="packages.config" />
+    <Content Include="Handler\PhantomjsPrintHandler.ashx" />
+    <None Include="Properties\PublishProfiles\timm.pubxml" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\BingGeocodeService\GeocodeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\BingGeocodeService\GeocodeService.wsdl" />
+    <None Include="Web References\BingGeocodeService\GeocodeService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\BingGeocodeService\GeocodeService1.wsdl" />
+    <None Include="Web References\BingGeocodeService\GeocodeService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\BingGeocodeService\GeocodeService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\BingGeocodeService\GeocodeService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\BingGeocodeService\GeocodeService4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\BingGeocodeService\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Browsers\" />
+    <Folder Include="Files\Log\" />
+    <Folder Include="Files\Print\images\cache\" />
+    <Folder Include="photo\" />
+    <Folder Include="Print\images\cache\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://dev.virtualearth.net/webservices/v1/metadata/geocodeservice/geocodeservice.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\BingGeocodeService\</RelPath>
+      <UpdateFromURL>http://dev.virtualearth.net/webservices/v1/metadata/geocodeservice/geocodeservice.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>GPS_Website_BingGeocodeService_GeocodeService</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>copy $(ProjectDir)\javascript\jquery-1.3.2.js/a + $(ProjectDir)\javascript\jquery.ui.all.js/a + $(ProjectDir)\javascript\jquery.layout.js/a + $(ProjectDir)\javascript\ajaxfileupload.js/a + $(ProjectDir)\javascript\gps.map.js/a + $(ProjectDir)\javascript\gps.map.classificationmanager.js/a + $(ProjectDir)\javascript\gps.map.methods.js/a + $(ProjectDir)\javascript\gps.map.arealayer.js/a + $(ProjectDir)\javascript\gps.map.loader.js/a + $(ProjectDir)\javascript\gps.map.exportrecorder.js/a + $(ProjectDir)\javascript\gps.map.eventtrigger.js/a +  $(ProjectDir)\javascript\gps.map.areabox.js/a + $(ProjectDir)\javascript\gps.map.area.js/a + $(ProjectDir)\javascript\campaign.js/a + $(ProjectDir)\javascript\login.js/a + $(ProjectDir)\javascript\_trail.js/a  $(ProjectDir)\javascript\all.js/a
+</PreBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(SolutionDir)lib\NewControlCenterBin\*.* $(TargetDir)*.* /f /y
+xcopy $(SolutionDir)lib\NewControlCenterXap\*.* $(ProjectDir)ClientBin\*.* /f/y</PostBuildEvent>
+  </PropertyGroup>
+</Project>

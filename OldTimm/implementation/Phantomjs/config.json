@@ -1,0 +1,12 @@
+{
+	"diskCache": true,
+	"loadImages": true,
+	"localToRemoteUrlAccess": true,	
+	// "proxyType": "socks5",
+	// "proxy": "127.0.0.1:8090",
+	"proxyType": "http",
+	"proxy": "127.0.0.1:8888",
+	"webSecurity": false,
+	"sslProtocol": "any",
+	"ignoreSslErrors": true
+}

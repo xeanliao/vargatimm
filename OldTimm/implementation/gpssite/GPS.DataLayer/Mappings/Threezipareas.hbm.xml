@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.ThreeZipArea, GPS.DomainLayer" table="ThreeZipAreas" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Code" column="Code" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="LSAD" column="LSAD" />
+    <property name="LSADTrans" column="LSADTrans" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="Name" column="Name" />
+    <property name="StateCode" column="StateCode" />
+    <property name="HOME_COUNT" column="HOME_COUNT" />
+    <property name="BUSINESS_COUNT" column="BUSINESS_COUNT" />
+    <property name="APT_COUNT" column="APT_COUNT" />
+    <property name="TOTAL_COUNT" column="TOTAL_COUNT" />
+    <bag name="ThreeZipAreaCoordinates" table="ThreeZipAreaCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="ThreeZipAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.ThreeZipAreaCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="ThreeZipBoxMappings" table="ThreeZipBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="ThreeZipAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.ThreeZipBoxMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

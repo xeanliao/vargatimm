@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.Group, GPS.DomainLayer" table="Groups" lazy="true" >
+    <id name="Id" column ="Id" unsaved-value="0">
+      <generator class="identity"/>
+    </id>
+    <property name="Name" column="Name" />
+    <bag name="Users" table="usergroupmappings" >
+      <key column="groupId"/>
+      <many-to-many column="userId" class ="GPS.DomainLayer.Entities.User"/>
+    </bag>
+    <bag name="Privileges" table="groupprivilegemappings" >
+      <key column="GroupId"/>
+      <many-to-many column="PrivilegeId" class ="GPS.DomainLayer.Entities.Privilege"/>
+    </bag>
+  </class>
+</hibernate-mapping>

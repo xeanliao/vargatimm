@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.DomainLayer.Entities.Task, GPS.DomainLayer" source="GPS.Website.TransferObjects.ToTask, GPS.Website"
+         helper="GPS.Website.TransferObjects.ToTask.ConvertBack">
+    <member name="Id" nullValue="0" />
+    <member name="Name" nullValue="String.Empty" />
+    <!--<member name="StartTime" nullValue="DateTime.Now" />
+    <member name="EndTime" nullValue="DateTime.Now" />-->
+    <!--<member name="Date" nullValue="DateTime.Now" />-->
+    <!--<member name="LunchS" nullValue="DateTime.Now" />
+    <member name="LunchE" nullValue="DateTime.Now" />
+    <member name="BreakS" nullValue="DateTime.Now" />
+    <member name="BreakE" nullValue="DateTime.Now" />-->
+    <member name="AuditorId" nullValue="0" />
+    <member name="DmId" />
+    <!--<member name="Taskgtuinfomappings" nullValue="null"/>
+    <member name="Tasktimes" nullValue="null"/>-->
+    <member name="Status" />
+    <member name="Email" nullValue="String.Empty"/>
+    <member name="Telephone" nullValue="String.Empty"/>
+  </class>
+</otis-mapping>

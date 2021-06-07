@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.MonitorAddresses, GPS.DomainLayer" table="MonitorAddresses" lazy="true" >
+    <id name="Id" column="Id" type="Int32">
+      <generator class="native" />
+    </id>
+    <property name="Address1" column="Address" />
+    <property name="DmId" column="DmId" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="OriginalLatitude" column="OriginalLatitude" />
+    <property name="OriginalLongitude" column="OriginalLongitude" />
+    <property name="ZipCode" column="ZipCode" />
+    <property name="Picture" column="Picture" />
+    <!--<bag name="Radiuses" table="Radiuses" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="AddressId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Radiuse, GPS.DomainLayer" />
+    </bag>-->
+  </class>
+</hibernate-mapping>

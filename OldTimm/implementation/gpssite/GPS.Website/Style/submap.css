@@ -1,0 +1,275 @@
+﻿
+#sub-map-panel
+{
+    background-color:Transparent;
+    font-family: Arial, Verdana;
+    font-size: 11px;
+    color: #000;
+    margin: 0px 0;
+    padding: 0px 0px 0px 0px;
+}
+
+#sub-map-panel .menubar
+{
+    background: #94b43d;
+    color: white;
+    font-family: Arial,Verdana;
+    font-size: 11px;
+    font-weight:bold;
+    text-align: right;
+    padding: 6px;
+}
+#sub-map-panel .menubar a
+{
+    padding:0px 4px 0px 4px;
+}
+
+#sub-map-panel .menubar A.selected
+{
+}
+
+
+#sub-map-panel .menubar A.hover
+{
+    color: #FFF;
+    background-color: #3399FF;
+}
+
+#sub-map-panel .menubar A.disabled
+{
+    color: #AAA;
+    cursor: default;
+}
+
+#sub-map-panel .menubar A.hover.disabled
+{
+    background-color: transparent;
+}
+
+#sub-map-panel .submapform
+{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    left: 0px;
+    height: auto;
+    background: #94b43d;
+    color: #000;
+    font-size: 11px;
+    border: solid 2px #94b43d;
+    padding: 4px 4px 10px 4px;
+    display: none;
+}
+
+#sub-map-panel .submapform div
+{
+    margin-top: 10px;
+}
+
+#sub-map-panel .submapform DIV A
+{
+    text-decoration: none;
+    border: solid 1px white;
+    padding: 4px;
+    color:White;
+    background: #444444;
+}
+
+#sub-map-panel .submapform DIV textarea
+{
+    width: 200px;
+    height: 20px;
+    border: none;
+    padding-top: 4px;
+    font-size: 11px;
+}
+
+#sub-map-panel .submapform DIV Input
+{
+    width: 190px;
+    height: 16px;
+    padding-top: 4px;
+    border: none;
+    font-size: 11px;
+}
+
+#sub-map-panel .submapform DIV SPAN
+{
+    display: block;
+    padding: 0px 0px 4px 0px;
+    color: white;
+}
+
+#sub-map-panel .submaplist
+{
+    padding: 4px;
+    font-size: 11px;
+    border-top: solid 1px #dddddd;
+    border-bottom: solid 1px #dddddd;
+    margin-top: -1px;
+    white-space: nowrap;
+}
+
+#sub-map-panel .submaplist div
+{
+    margin: 4px;
+    font-size: 11px;
+    border-left: solid 20px #ffffff;
+    margin-bottom: 10px;
+    padding-left: 4px;
+}
+
+#sub-map-panel .submaplist span
+{
+    font-size: 9px;
+}
+
+#sub-map-panel .submaplist div:hover
+{
+    background: #94b43d;
+    cursor: pointer;
+}
+
+#sub-map-panel .selected
+{
+    background: #94b43d;
+}
+
+#sub-map-panel .submapDMlist
+{
+    padding: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-top: -1px;
+    white-space: nowrap;
+}
+
+#sub-map-panel .submapDMlist div div
+{
+    margin: 4px;
+    font-size: 11px;
+    border-left: solid 20px #ffffff;
+    margin-bottom: 3px;
+    padding-left: 4px;
+}
+
+#sub-map-panel .submapDMlist span
+{
+    font-size: 9px;
+}
+
+#sub-map-panel .submapDMlist .DMlist
+{   
+    margin-left:10px;   
+    white-space: nowrap;
+    
+}
+#map-board{
+    position: absolute; 
+    z-index: 999; 
+    bottom: 35px; 
+    right: 3px; 
+
+    padding: 14px 25px 8px 14px;
+    margin-bottom: 20px;
+    color: #C09853;
+    text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.5);
+    background-color: #FCF8E3;
+    border: 1px solid #FBEED5;
+    border-radius: 4px;
+    /*opacity: 0.75;*/
+}
+#map-board a.close{
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
+    color: #000;
+    text-shadow: 0px 1px 0px #FFF;
+    opacity: 0.2;
+
+    position: absolute;
+    top: 3px;
+    right: 3px;
+
+    text-decoration: none;
+    display: none;
+}
+#map-board a.close:focus {
+    outline: thin dotted #333;
+    outline-offset: -2px;
+}
+#map-board a.button{
+    width: 40px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 9px;
+    text-align: center;
+    padding: 0 5px;
+    margin-left: 5px;
+    display: inline-block;
+    float: right;
+    
+    color: #333;
+    text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.75);
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #F5F5F5;
+    background-image: linear-gradient(to bottom, #FFF, #E6E6E6);
+    background-repeat: repeat-x;
+    border-width: 1px;
+    border-style: solid;
+    -moz-border-top-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    border-image: none;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) #A2A2A2;
+    border-radius: 4px;
+    box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.05);
+}
+#map-board li.on a.button{
+    color: #FFF;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.25);
+    background-color: #FAA732;
+    background-image: linear-gradient(to bottom, #FBB450, #F89406);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+#map-board label {
+    padding-right: 9px;
+    padding-left: 9px;
+    border-radius: 9px;
+
+    display: inline-block;
+    padding: 2px 4px;
+    font-size: 11.844px;
+    font-weight: bold;
+    line-height: 14px;
+    color: #FFF;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: #F89406;
+}
+#map-board ul, #map-board li
+{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+}
+#map-board li{
+    line-height: 25px;
+    height: 25px;
+    font-size: 12px;
+    cursor: pointer;
+}
+#map-board li span{
+    max-width: 180px;
+    overflow: hidden;
+    display: block;
+    float: left;
+}
+#map-board li.hide{
+    display:none;
+}

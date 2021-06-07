@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="GPS.Website.SilverlightServices.CampaignReaderSLService" CodeBehind="CampaignReaderSLService.svc.cs" %>

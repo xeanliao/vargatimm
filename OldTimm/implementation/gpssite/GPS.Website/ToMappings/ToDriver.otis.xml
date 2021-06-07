@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToDriver, GPS.Website" source="GPS.DomainLayer.Entities.DriverAssignment, GPS.DomainLayer"
+         helper="GPS.Website.TransferObjects.ToDriver.Convert">
+    <member name="FullName" nullValue="String.Empty" />
+  </class>
+</otis-mapping>

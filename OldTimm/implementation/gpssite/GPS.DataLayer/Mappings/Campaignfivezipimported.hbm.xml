@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CampaignFiveZipImported, GPS.DomainLayer" table="CampaignFiveZipImported" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Penetration" column="Penetration" />
+    <property name="Total" column="Total" />
+    <property name="PartPercentage" column="PartPercentage" />
+    <property name="IsPartModified" column="IsPartModified" />
+    <many-to-one name="Campaign"
+                 column="CampaignId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" />
+    <many-to-one name="FiveZipArea"
+                 column="FiveZipAreaId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.FiveZipArea, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

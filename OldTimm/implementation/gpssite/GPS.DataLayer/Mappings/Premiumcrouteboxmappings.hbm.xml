@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.PremiumCRouteBoxMapping, GPS.DomainLayer" table="PremiumCRouteBoxMappings" lazy="true" >
+    <id name="Id" type="Int32" column="Id"/>
+    <property name="BoxId" column="BoxId" />
+    <many-to-one name="PremiumCRoute"
+                 column="PreminumCRouteId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.PremiumCRoute, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

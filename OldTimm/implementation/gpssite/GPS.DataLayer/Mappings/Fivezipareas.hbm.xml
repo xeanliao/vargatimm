@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.FiveZipArea, GPS.DomainLayer" table="FiveZipAreas" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Code" column="Code" />
+    <property name="Description" column="Description" />
+    <property name="IsEnabled" column="IsEnabled" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="LSAD" column="LSAD" />
+    <property name="LSADTrans" column="LSADTrans" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="Name" column="Name" />
+    <property name="OTotal" column="OTotal" />
+    <property name="StateCode" column="StateCode" />
+    <property name="PartCount" column="PartCount" />
+    <property name="IsInnerShape" column="IsInnerShape" />
+    <property name="IsInnerRing" column="IsInnerRing" />
+    <property name="HOME_COUNT" column="HOME_COUNT" />
+    <property name="BUSINESS_COUNT" column="BUSINESS_COUNT" />
+    <property name="APT_COUNT" column="APT_COUNT" />
+    <property name="TOTAL_COUNT" column="TOTAL_COUNT" />
+    
+    <bag name="FiveZipAreaCoordinates" table="FiveZipAreaCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="FiveZipAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.FiveZipAreaCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="FiveZipBoxMappings" table="FiveZipBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="FiveZipAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.FiveZipBoxMapping, GPS.DomainLayer" />
+    </bag>
+    <bag name="BlockGroupSelectMappings" table="BlockGroupSelectMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="FiveZipAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.BlockGroupSelectMapping, GPS.DomainLayer" />
+    </bag>
+    <bag name="PremiumCRouteSelectMappings" table="PremiumCRouteSelectMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="FiveZipAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.PremiumCRouteSelectMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

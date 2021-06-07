@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="GTUTrack">
+  <DataContextMoniker Name="/GTUTrackDataContext" />
+  <nestedChildShapes>
+    <classShape Id="ae2e6bbf-48d5-4a86-91cb-272757a0c76c" absoluteBounds="5.25, 3.125, 2, 2.0822371419270831">
+      <DataClassMoniker Name="/GTUTrackDataContext/TrackItem" />
+      <nestedChildShapes>
+        <elementListCompartment Id="30952815-6c12-4790-b1b0-3aae6194e52e" absoluteBounds="5.265, 3.585, 1.9700000000000002, 1.5222371419270833" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

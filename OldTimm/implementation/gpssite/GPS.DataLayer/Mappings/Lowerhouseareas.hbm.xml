@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.LowerHouseArea, GPS.DomainLayer" table="LowerHouseAreas" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Code" column="Code" />
+    <property name="GEO_ID" column="GEO_ID" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="LSAD" column="LSAD" />
+    <property name="LSAD_TRAN" column="LSAD_TRAN" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="Name" column="Name" />
+    <property name="StateCode" column="StateCode" />
+    <bag name="LowerHouseAreaCoordinates" table="LowerHouseAreaCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="LowerHouseAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.LowerHouseAreaCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="LowerHouseAreaBoxMappings" table="LowerHouseAreaBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="LowerHouseAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.LowerHouseAreaBoxMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

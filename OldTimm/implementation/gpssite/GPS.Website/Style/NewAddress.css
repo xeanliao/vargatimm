@@ -1,0 +1,4 @@
+﻿#new-address label {padding-bottom:4px;}
+#new-address label, #new-address input.text { display:block;}
+#new-address input.text { margin-bottom:4px; width:96%; padding: .4em; font-size:11px;}
+#new-address select {margin-bottom:4px;}

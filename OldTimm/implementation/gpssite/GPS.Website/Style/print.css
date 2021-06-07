@@ -1,0 +1,180 @@
+﻿
+body
+{
+	font-family: Sans-Serif, Arial, Verdana;
+	font-size: 11px;
+}
+
+ul
+{
+	list-style: none;
+}
+
+table
+{
+	font-size: 15px;
+	width: 982px;
+}
+
+input
+{
+	font-family: Arial;
+	font-size: 15px;
+	letter-spacing: 1px;
+}
+
+table caption
+{
+	text-transform: uppercase;
+	font-size: 24px;
+	font-weight: bold;
+	padding: 4px;
+	background-color: #94b43d;
+}
+
+.print-ui-layout-north
+{
+	margin: 0;
+	padding: 4px 3px 0px 3px;
+}
+.print-outer-center
+{
+	margin: 4px;
+	padding: 2px 2px 5px 3px;
+	border: none;
+	overflow: hidden;
+}
+
+#print-settings ul
+{
+	list-style: none;
+}
+
+
+#campaign-summary textarea
+{
+	width: 782px;
+	height: 50px;
+}
+
+#campaign-summary .label
+{
+	width: 220px;
+	font-weight: bold;
+	font-size: 13px;
+	vertical-align: top;
+}
+
+#campaign-submaps-summary .label
+{
+	font-weight: bold;
+}
+
+.submap
+{
+	width: 980px;
+}
+
+
+.submaplabel
+{
+	font-weight: bold;
+}
+
+
+.submapitemlabel
+{
+	font-weight: bold;
+}
+
+.map
+{
+	position: relative;
+	width: 980px;
+	height: 980px;
+}
+
+.submapmap
+{
+	position: relative;
+	width: 980px;
+	height: 980px;
+	border-color: Black;
+	border-width: 1px;
+}
+
+.dmmap
+{
+	position: relative;
+	width: 2300px;
+	height: 2300px;
+	border-color: Black;
+	border-width: 1px;
+}
+
+
+.leftlabel
+{
+	width: 200px;
+	font-weight: bold;
+	vertical-align: top;
+}
+
+.toplabel
+{
+	font-weight: bold;
+}
+
+.areaicon
+{
+	font-size: 12px;
+	font-weight: bold;
+	color: Black;
+	background-image: none;
+}
+
+.colorinput
+{
+	border: solid 1px black;
+	position: relative;
+	left: -12px;
+	width: 20px;
+	text-align: center;
+}
+.maptable td
+{
+	border: solid 1px #94b43d;
+}
+.spaceline
+{
+	height: 10px;
+}
+
+#print-new-minimum-criteria
+{
+	display: none;
+	margin: 0;
+	padding-left: 20px;
+	padding-top: 10px;
+}
+
+#targetingmethod1
+{
+	width: 782px;
+}
+
+#targetingmethod2
+{
+	width: 782px;
+}
+
+#print-options-dialog
+{
+	font-size: 11px;
+}
+
+
+#targetingmethod1
+{
+	font-size: 15px;
+}

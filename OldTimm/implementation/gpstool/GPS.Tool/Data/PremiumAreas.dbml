@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="test" Class="PremiumAreasDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=localhost;Initial Catalog=test;Persist Security Info=True;User ID=sa" SettingsObjectName="GPS.Tool.Properties.Settings" SettingsPropertyName="testConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.PremiumZipBoxMappings" Member="PremiumZipBoxMappings">
+    <Type Name="PremiumZipBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PreminumZipId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="PremiumZip_PremiumZipBoxMapping" Member="PremiumZip" ThisKey="PreminumZipId" OtherKey="ID" Type="PremiumZip" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PremiumZipCoordinates" Member="PremiumZipCoordinates">
+    <Type Name="PremiumZipCoordinate">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="PreminumZipId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ShapeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="PremiumZip_PremiumZipCoordinate" Member="PremiumZip" ThisKey="PreminumZipId" OtherKey="ID" Type="PremiumZip" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PremiumCRouteCoordinates" Member="PremiumCRouteCoordinates">
+    <Type Name="PremiumCRouteCoordinate">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="PreminumCRouteId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ShapeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="PremiumCRoute_PremiumCRouteCoordinate" Member="PremiumCRoute" ThisKey="PreminumCRouteId" OtherKey="ID" Type="PremiumCRoute" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PremiumZips" Member="PremiumZips">
+    <Type Name="PremiumZip">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="FIPSSTCO" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="ZIP" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="STATE_FIPS" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="ZIP_NAME" Type="System.String" DbType="NVarChar(32) NOT NULL" CanBeNull="false" />
+      <Column Name="COUNTY" Type="System.String" DbType="NVarChar(32) NOT NULL" CanBeNull="false" />
+      <Column Name="STATE" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="IsEnabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="OTotal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(256)" CanBeNull="true" />
+      <Association Name="PremiumZip_PremiumZipBoxMapping" Member="PremiumZipBoxMappings" ThisKey="ID" OtherKey="PreminumZipId" Type="PremiumZipBoxMapping" />
+      <Association Name="PremiumZip_PremiumZipCoordinate" Member="PremiumZipCoordinates" ThisKey="ID" OtherKey="PreminumZipId" Type="PremiumZipCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PremiumCRouteBoxMappings" Member="PremiumCRouteBoxMappings">
+    <Type Name="PremiumCRouteBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PreminumCRouteId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="PremiumCRoute_PremiumCRouteBoxMapping" Member="PremiumCRoute" ThisKey="PreminumCRouteId" OtherKey="ID" Type="PremiumCRoute" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PremiumCRoutes" Member="PremiumCRoutes">
+    <Type Name="PremiumCRoute">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="FIPSSTCO" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="GEOCODE" Type="System.String" DbType="NVarChar(16) NOT NULL" CanBeNull="false" />
+      <Column Name="ZIP" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="CROUTE" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="STATE_FIPS" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="STATE" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="COUNTY" Type="System.String" DbType="NVarChar(32) NOT NULL" CanBeNull="false" />
+      <Column Name="ZIP_NAME" Type="System.String" DbType="NVarChar(32) NOT NULL" CanBeNull="false" />
+      <Column Name="HOME_COUNT" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BUSINESS_COUNT" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="APT_COUNT" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="TOTAL_COUNT" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="IsEnabled" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OTotal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(256)" CanBeNull="true" />
+      <Column Name="PartCount" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IsInnerShape" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="PremiumCRoute_PremiumCRouteCoordinate" Member="PremiumCRouteCoordinates" ThisKey="ID" OtherKey="PreminumCRouteId" Type="PremiumCRouteCoordinate" />
+      <Association Name="PremiumCRoute_PremiumCRouteBoxMapping" Member="PremiumCRouteBoxMappings" ThisKey="ID" OtherKey="PreminumCRouteId" Type="PremiumCRouteBoxMapping" />
+    </Type>
+  </Table>
+</Database>

@@ -1,0 +1,100 @@
+/* TIMM Control Center CSS Document */
+
+/* body */
+body {font:12px Tahoma;margin:0px;text-align:center;background:#000;padding-top:2px;}
+a:link,a:visited {font-size:12px;text-decoration:none;}
+a:hover{}
+
+/* page control-center-container */
+#control-center-container {width:1225px;margin:0px auto}
+
+/* page header */
+#Header {width:1225px;margin:0 auto;height:158px;background:#FFF}
+
+.topleft {float:left; width:5px;}
+.topmiddle{background-image:url(../Images/controlcenter/topmiddle_bg.gif); width:1217px; height:23px;float:left; }	
+.headertxetleft{font-size:18px; vertical-align:middle; padding-left:10px; float:left;}
+#div-logout{font-size:11px; font-weight:bold; padding-right:10px; float:right; }
+#div-logout img{padding-top:5px;}
+#div-logout span{ padding-top:0px;}
+.topright {float:right ; width:3px;}
+#logo{margin:0 0 0 35px; float:left; position:relative;}
+#div-cclogo-title{margin:56px 0 0 50px; font-size:23px;text-decoration:none;float:left; clear:right}
+#div-cclogo-title span{font-weight:bold; font-size:26px;}
+.titletxet{ text-decoration:none;}
+#nav{width:1225px;margin:0 auto;height:24px}
+.navbg{background-image:url(../Images/controlcenter/nav_bg.gif); width:1225px; height:24px}
+
+/* page body */
+#PageBody {margin: 0; padding-top:100px; padding-bottom:100px; background:#FFF;height:900px; }
+#div-space-top{ width:1225px; height:63px; clear:both;}
+#div-campaign{
+ margin:0;
+ text-align:left;
+ float:left;
+ overflow:hidden}
+ .left {float:left; width:5px;}
+ .middle{float:left; width:317px;}			
+ .left2 {float:left; width:7px;}
+ .midboder{float:left; width:5px; height:260px; background:url(../Images/controlcenter/2_20.gif) repeat-y;}
+ .midboder2{float:left; background-image:url(../Images/controlcenter/maintext_bg.gif);float:left; width:317px; height:260px;}
+ .midboder3{float:left; width:7px; height:260px; background:url(../Images/controlcenter/2_24.gif) repeat-y;}
+ .clear{clear:both}
+ .bottom{float:left; width:5px; height:6px}
+ .bottom2{float:left; width:317px; height:6px}
+ .bottom3{float:left; width:7px; height:6px}
+#div-space-left{ float:left; width:10px; height:5px;}
+ .spacer{float:left;}
+
+ .divcontent{display:block;float:left; text-align:left; width:240px; overflow:hidden}
+ .divcontent2{float:left; text-align:left; width:240px; overflow:hidden; }
+ .boxtitle{padding:25px 0 0 0;font-weight:bold; line-height:50px;font-size:15px; color:#333}
+ .icon{float:left; padding:10px 10px 0px 10px;}
+ .icon img { width: 40px; height: 40px;}
+ .buttonbg{float:right; background-image:url(../Images/controlcenter/buttonbg.gif); width:128px; height:23px; line-height:22px;text-indent:18px; font-family:Verdana, Geneva,; font-size:10px;overflow:hidden; vertical-align:middle; color:#FFF; margin-right:5px; margin-top:20px;}
+ .check{margin:0 0 0 0;float:right; width:196px; height:47px; font-family:Verdana, Geneva, sans-serif; font-size:9px;overflow:hidden;list-style-type:none;list-style-image: url(../Images/controlcenter/licon.gif);}
+ .boxtext{font-family:Verdana, Geneva, sans-serif; font-size:11px;overflow:hidden; list-style-type:none; margin:0px;}
+ #div-Admin{margin:0;text-align:left;}
+ 
+#div-administration-list{float:left; padding-top:10px;}
+#div-administration-list ul{ margin-left:20px; clear:left;  padding-left:0px; padding-top:0px;}
+#div-administration-list ul li{list-style-type:none; font-size:10px; clear:both; list-style-image:url(../Images/controlcenter/licon.gif); font-weight:bold; cursor:pointer;}
+#div-administration-list ul li div{ font-size:9px; color:#A4A3A3; font-style:normal; padding-bottom:5px;}
+
+#div-campaigns-list{float:left; padding-top:10px;}
+ #div-campaigns-list ul{ margin-left:20px; clear:left;  padding-left:0px; padding-top:0px;}
+ #div-campaigns-list ul li{list-style-type:none; font-size:10px; clear:both; list-style-image:url(../Images/controlcenter/licon.gif); padding-bottom:7px; font-weight:bold; cursor:pointer;}
+ .commenttext{font-size:9px; color:#A4A3A3; font-style:normal; padding-bottom:5px;}
+
+/*page footer*/
+#footerline{width:1225px;margin:0 auto;height:1px; background-color:#cccccc;}
+#footer {width:1225px;margin:0 auto;height:340px; background-color:#E1E7F0;}
+
+.div-distribution-map-center-padding { margin-right:100px;margin-bottom:100px; }
+
+#dm-center-campaign-list, #campaign-center-campaign-list,#productivity-center-campaign-list,#campaign-center-report-list
+{
+	border:none;	
+	overflow:auto;
+}
+
+#dm-center-campaign-list { margin-top: 10px; height: 90px;}
+#productivity-center-campaign-list{ margin-top: 10px; height: 90px;}
+#campaign-center-report-list{ margin-top: 10px; height: 90px;}
+#campaign-center-campaign-list{margin-top:10px; height: 92px;}
+
+#dm-center-campaign-list div, #campaign-center-campaign-list div
+{
+	display:block;
+	cursor:pointer;
+	text-decoration: underline;
+	padding: 4px 0px 4px 4px;
+}
+
+#dm-center-campaign-list span:hover, #campaign-center-campaign-list span:hover { color:#94B43D; font-weight:bold; }
+#dm-center-campaign-list span:active, #campaign-center-campaign-list span:active { color:#94B43D; font-weight:bold; }
+
+.control-center-toolbar { padding: 10px 0px 0px 0px;}
+
+.control-center-loading-text { display:block; width:100%; text-align:left; font-size:11px; color:#aaa; display:none; text-decoration:none;}
+.control-center-loading-text-pro { width:100%; text-align:left; font-size:11px; text-decoration:none;}

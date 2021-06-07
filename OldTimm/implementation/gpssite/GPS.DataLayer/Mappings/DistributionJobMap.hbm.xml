@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="GPS.DomainLayer"  namespace="GPS.DomainLayer.Entities">
+  <class name ="DistributionJobMap" table="DistributionJobMaps">
+    <id name="_id" column ="Id" access="field" >
+      <generator class="native" />
+    </id>
+    <many-to-one name="_distributionJob"
+                 access="field"
+                 column="DistributionJobId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.DistributionJob, GPS.DomainLayer" />
+    <many-to-one name="_distributionMap"
+                 access="field"
+                 column="DistributionMapId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.DistributionMap, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

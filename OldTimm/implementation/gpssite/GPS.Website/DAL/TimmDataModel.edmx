@@ -1,0 +1,1410 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="timmModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="timmModelStoreContainer">
+          <EntitySet Name="campaigns" EntityType="timmModel.Store.campaigns" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="companies" EntityType="timmModel.Store.companies" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="customareacoordinates" EntityType="timmModel.Store.customareacoordinates" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="distributionmapcoordinates" EntityType="timmModel.Store.distributionmapcoordinates" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="distributionmaps" EntityType="timmModel.Store.distributionmaps" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="gtubags" EntityType="timmModel.Store.gtubags" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="gtuinfo" EntityType="timmModel.Store.gtuinfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="gtus" EntityType="timmModel.Store.gtus" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="gtustatushistory" EntityType="timmModel.Store.gtustatushistory" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="monitoraddresses" EntityType="timmModel.Store.monitoraddresses" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="ndaddresscoordinates" EntityType="timmModel.Store.ndaddresscoordinates" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="submaps" EntityType="timmModel.Store.submaps" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="task" EntityType="timmModel.Store.task" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="taskgtuinfomapping" EntityType="timmModel.Store.taskgtuinfomapping" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="tasktime" EntityType="timmModel.Store.tasktime" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="users" EntityType="timmModel.Store.users" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="ViewCustomAreaRange" EntityType="timmModel.Store.ViewCustomAreaRange" store:Type="Views" store:Schema="dbo" store:Name="ViewCustomAreaRange">
+            <DefiningQuery>SELECT 
+      [ViewCustomAreaRange].[CustomAreaId] AS [CustomAreaId], 
+      [ViewCustomAreaRange].[MaxLatitude] AS [MaxLatitude], 
+      [ViewCustomAreaRange].[MinLatitude] AS [MinLatitude], 
+      [ViewCustomAreaRange].[MaxLongitude] AS [MaxLongitude], 
+      [ViewCustomAreaRange].[MinLongitude] AS [MinLongitude]
+      FROM [dbo].[ViewCustomAreaRange] AS [ViewCustomAreaRange]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="ViewDistributionRange" EntityType="timmModel.Store.ViewDistributionRange" store:Type="Views" store:Schema="dbo" store:Name="ViewDistributionRange">
+            <DefiningQuery>SELECT 
+      [ViewDistributionRange].[DistributionMapId] AS [DistributionMapId], 
+      [ViewDistributionRange].[MaxLatitude] AS [MaxLatitude], 
+      [ViewDistributionRange].[MinLatitude] AS [MinLatitude], 
+      [ViewDistributionRange].[MaxLongitude] AS [MaxLongitude], 
+      [ViewDistributionRange].[MinLongitude] AS [MinLongitude]
+      FROM [dbo].[ViewDistributionRange] AS [ViewDistributionRange]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="ViewGtuInTask" EntityType="timmModel.Store.ViewGtuInTask" store:Type="Views" store:Schema="dbo" store:Name="ViewGtuInTask">
+            <DefiningQuery>SELECT 
+      [ViewGtuInTask].[GtuID] AS [GtuID], 
+      [ViewGtuInTask].[UniqueID] AS [UniqueID], 
+      [ViewGtuInTask].[UserID] AS [UserID], 
+      [ViewGtuInTask].[FullName] AS [FullName], 
+      [ViewGtuInTask].[CompanyId] AS [CompanyId], 
+      [ViewGtuInTask].[UserRoleID] AS [UserRoleID], 
+      [ViewGtuInTask].[TaskId] AS [TaskId], 
+      [ViewGtuInTask].[TaskGtuID] AS [TaskGtuID], 
+      [ViewGtuInTask].[UserColor] AS [UserColor]
+      FROM [dbo].[ViewGtuInTask] AS [ViewGtuInTask]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="ViewGtuLocation" EntityType="timmModel.Store.ViewGtuLocation" store:Type="Views" store:Schema="dbo" store:Name="ViewGtuLocation">
+            <DefiningQuery>SELECT 
+      [ViewGtuLocation].[Id] AS [Id], 
+      [ViewGtuLocation].[dwLatitude] AS [dwLatitude], 
+      [ViewGtuLocation].[dwLongitude] AS [dwLongitude]
+      FROM [dbo].[ViewGtuLocation] AS [ViewGtuLocation]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="ViewNdAddressRange" EntityType="timmModel.Store.ViewNdAddressRange" store:Type="Views" store:Schema="dbo" store:Name="ViewNdAddressRange">
+            <DefiningQuery>SELECT 
+      [ViewNdAddressRange].[NdAddressId] AS [NdAddressId], 
+      [ViewNdAddressRange].[MaxLatitude] AS [MaxLatitude], 
+      [ViewNdAddressRange].[MinLatitude] AS [MinLatitude], 
+      [ViewNdAddressRange].[MaxLongitude] AS [MaxLongitude], 
+      [ViewNdAddressRange].[MinLongitude] AS [MinLongitude]
+      FROM [dbo].[ViewNdAddressRange] AS [ViewNdAddressRange]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="distributionmapcoordinates$FK_distributionmapcoordinates_1" Association="timmModel.Store.distributionmapcoordinates$FK_distributionmapcoordinates_1">
+            <End Role="distributionmaps" EntitySet="distributionmaps" />
+            <End Role="distributionmapcoordinates" EntitySet="distributionmapcoordinates" />
+          </AssociationSet>
+          <AssociationSet Name="distributionmaps$FK_DistributionMaps_SubMap" Association="timmModel.Store.distributionmaps$FK_DistributionMaps_SubMap">
+            <End Role="submaps" EntitySet="submaps" />
+            <End Role="distributionmaps" EntitySet="distributionmaps" />
+          </AssociationSet>
+          <AssociationSet Name="fk_gtubags_user" Association="timmModel.Store.fk_gtubags_user">
+            <End Role="users" EntitySet="users" />
+            <End Role="gtubags" EntitySet="gtubags" />
+          </AssociationSet>
+          <AssociationSet Name="fk_gtus_gtubags" Association="timmModel.Store.fk_gtus_gtubags">
+            <End Role="gtubags" EntitySet="gtubags" />
+            <End Role="gtus" EntitySet="gtus" />
+          </AssociationSet>
+          <AssociationSet Name="fk_users_companies" Association="timmModel.Store.fk_users_companies">
+            <End Role="companies" EntitySet="companies" />
+            <End Role="users" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="gtuinfo$FK_gtuinfo_1" Association="timmModel.Store.gtuinfo$FK_gtuinfo_1">
+            <End Role="taskgtuinfomapping" EntitySet="taskgtuinfomapping" />
+            <End Role="gtuinfo" EntitySet="gtuinfo" />
+          </AssociationSet>
+          <AssociationSet Name="submaps$FK_SubMaps_Campaign" Association="timmModel.Store.submaps$FK_SubMaps_Campaign">
+            <End Role="campaigns" EntitySet="campaigns" />
+            <End Role="submaps" EntitySet="submaps" />
+          </AssociationSet>
+          <AssociationSet Name="task$FK_monitors_1" Association="timmModel.Store.task$FK_monitors_1">
+            <End Role="distributionmaps" EntitySet="distributionmaps" />
+            <End Role="task" EntitySet="task" />
+          </AssociationSet>
+          <AssociationSet Name="taskgtuinfomapping$FK_taskgtuinfomapping_3" Association="timmModel.Store.taskgtuinfomapping$FK_taskgtuinfomapping_3">
+            <End Role="task" EntitySet="task" />
+            <End Role="taskgtuinfomapping" EntitySet="taskgtuinfomapping" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="campaigns">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Description" Type="nvarchar" Nullable="false" MaxLength="1024" />
+          <Property Name="UserName" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Date" Type="datetime2" Nullable="false" Precision="0" />
+          <Property Name="CustemerName" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Latitude" Type="float" Nullable="false" />
+          <Property Name="Longitude" Type="float" Nullable="false" />
+          <Property Name="ZoomLevel" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="ClientName" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="ContactName" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="ClientCode" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Logo" Type="nvarchar" MaxLength="64" />
+          <Property Name="AreaDescription" Type="nvarchar" Nullable="false" MaxLength="128" />
+          <Property Name="CreatorName" Type="nvarchar" Nullable="false" MaxLength="64" />
+        </EntityType>
+        <EntityType Name="companies">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Address1" Type="nvarchar" MaxLength="255" />
+          <Property Name="Address2" Type="nvarchar" MaxLength="255" />
+          <Property Name="City" Type="nvarchar" MaxLength="50" />
+          <Property Name="State" Type="nvarchar" MaxLength="50" />
+          <Property Name="ZipCode" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="customareacoordinates">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="CustomAreaId" Type="int" Nullable="false" />
+          <Property Name="Latitude" Type="float" Nullable="false" />
+          <Property Name="Longitude" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="distributionmapcoordinates">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="DistributionMapId" Type="int" Nullable="false" />
+          <Property Name="Latitude" Type="float" Nullable="false" />
+          <Property Name="Longitude" Type="float" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6005: The data type 'geometry' is not supported; the column 'polygon' in table 'timm_test.dbo.distributionmaps' was excluded.
+      -->
+        <EntityType Name="distributionmaps">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="SubMapId" Type="int" Nullable="false" />
+          <Property Name="ColorR" Type="int" Nullable="false" />
+          <Property Name="ColorG" Type="int" Nullable="false" />
+          <Property Name="ColorB" Type="int" Nullable="false" />
+          <Property Name="ColorString" Type="nvarchar" Nullable="false" MaxLength="16" />
+          <Property Name="Total" Type="int" Nullable="false" />
+          <Property Name="Penetration" Type="int" Nullable="false" />
+          <Property Name="Percentage" Type="float" Nullable="false" />
+          <Property Name="TotalAdjustment" Type="int" Nullable="false" />
+          <Property Name="CountAdjustment" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="gtubags">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" />
+        </EntityType>
+        <EntityType Name="gtuinfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="dwSpeed" Type="float" />
+          <Property Name="nHeading" Type="int" />
+          <Property Name="dtSendTime" Type="datetime2" Precision="0" />
+          <Property Name="dtReceivedTime" Type="datetime2" Precision="0" />
+          <Property Name="sIPAddress" Type="nvarchar" MaxLength="45" />
+          <Property Name="nAreaCode" Type="int" />
+          <Property Name="nNetworkCode" Type="int" />
+          <Property Name="nCellID" Type="int" />
+          <Property Name="nGPSFix" Type="int" />
+          <Property Name="nAccuracy" Type="int" />
+          <Property Name="nCount" Type="int" />
+          <Property Name="nLocationID" Type="int" />
+          <Property Name="sVersion" Type="nvarchar" MaxLength="45" />
+          <Property Name="dwAltitude" Type="float" />
+          <Property Name="dwLatitude" Type="float" />
+          <Property Name="dwLongitude" Type="float" />
+          <Property Name="PowerInfo" Type="int" />
+          <Property Name="TaskgtuinfoId" Type="int" />
+          <Property Name="Code" Type="nvarchar" MaxLength="100" />
+          <Property Name="Status" Type="int" />
+          <Property Name="Distance" Type="float" />
+          <Property Name="GtuUniqueID" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="gtus">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="UniqueID" Type="nvarchar" MaxLength="50" />
+          <Property Name="ShortUniqueID" Type="nvarchar" MaxLength="6" StoreGeneratedPattern="Computed" />
+          <Property Name="Model" Type="nvarchar" MaxLength="50" />
+          <Property Name="IsEnabled" Type="bit" Nullable="false" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="GTUBagId" Type="int" />
+        </EntityType>
+        <EntityType Name="gtustatushistory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="GTUId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="GTUInfoId" Type="bigint" Nullable="false" />
+          <Property Name="StatusId" Type="int" Nullable="false" />
+          <Property Name="InsertedTime" Type="datetime" Nullable="false" />
+          <Property Name="Point" Type="varchar" MaxLength="100" />
+          <Property Name="ReceiveTime" Type="datetime" />
+        </EntityType>
+        <EntityType Name="monitoraddresses">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TaskID" Type="int" />
+          <Property Name="Address" Type="nvarchar" Nullable="false" MaxLength="256" />
+          <Property Name="ZipCode" Type="nvarchar" Nullable="false" MaxLength="8" />
+          <Property Name="OriginalLatitude" Type="real" Nullable="false" />
+          <Property Name="OriginalLongitude" Type="real" Nullable="false" />
+          <Property Name="Longitude" Type="real" Nullable="false" />
+          <Property Name="Latitude" Type="real" Nullable="false" />
+          <Property Name="DmId" Type="int" Nullable="false" />
+          <Property Name="Picture" Type="nvarchar" MaxLength="64" />
+          <Property Name="Notes" Type="nvarchar" MaxLength="500" />
+          <Property Name="PictureUploadTime" Type="date" />
+        </EntityType>
+        <EntityType Name="ndaddresscoordinates">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="NdAddressId" Type="int" Nullable="false" />
+          <Property Name="Latitude" Type="float" Nullable="false" />
+          <Property Name="Longitude" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="submaps">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="OrderId" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Total" Type="int" Nullable="false" />
+          <Property Name="Penetration" Type="int" Nullable="false" />
+          <Property Name="Percentage" Type="float" Nullable="false" />
+          <Property Name="ColorR" Type="int" Nullable="false" />
+          <Property Name="ColorG" Type="int" Nullable="false" />
+          <Property Name="ColorB" Type="int" Nullable="false" />
+          <Property Name="ColorString" Type="nvarchar" Nullable="false" MaxLength="16" />
+          <Property Name="CampaignId" Type="int" Nullable="false" />
+          <Property Name="TotalAdjustment" Type="int" Nullable="false" />
+          <Property Name="CountAdjustment" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="task">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="45" />
+          <Property Name="Date" Type="date" />
+          <Property Name="DmId" Type="int" Nullable="false" />
+          <Property Name="AuditorId" Type="int" />
+          <Property Name="Status" Type="int" />
+          <Property Name="Email" Type="nvarchar" MaxLength="45" />
+          <Property Name="Telephone" Type="nvarchar" MaxLength="45" />
+        </EntityType>
+        <EntityType Name="taskgtuinfomapping">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TaskId" Type="int" Nullable="false" />
+          <Property Name="GTUId" Type="int" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="UserColor" Type="nvarchar" MaxLength="45" />
+        </EntityType>
+        <EntityType Name="tasktime">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TaskId" Type="int" />
+          <Property Name="Time" Type="datetime2" Precision="0" />
+          <Property Name="TimeType" Type="int" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="UserName" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Password" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="FullName" Type="nvarchar" Nullable="false" MaxLength="128" />
+          <Property Name="UserCode" Type="nvarchar" Nullable="false" MaxLength="64" />
+          <Property Name="Role" Type="int" Nullable="false" />
+          <Property Name="CompanyId" Type="int" />
+          <Property Name="CellPhone" Type="nvarchar" MaxLength="20" />
+          <Property Name="DateOfBirth" Type="datetime" />
+          <Property Name="Picture" Type="nvarchar" MaxLength="64" />
+          <Property Name="Notes" Type="nvarchar(max)" />
+          <Property Name="Email" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'timm_test.dbo.ViewCustomAreaRange' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="ViewCustomAreaRange">
+          <Key>
+            <PropertyRef Name="CustomAreaId" />
+          </Key>
+          <Property Name="CustomAreaId" Type="int" Nullable="false" />
+          <Property Name="MaxLatitude" Type="float" />
+          <Property Name="MinLatitude" Type="float" />
+          <Property Name="MaxLongitude" Type="float" />
+          <Property Name="MinLongitude" Type="float" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'timm_test.dbo.ViewDistributionRange' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="ViewDistributionRange">
+          <Key>
+            <PropertyRef Name="DistributionMapId" />
+          </Key>
+          <Property Name="DistributionMapId" Type="int" Nullable="false" />
+          <Property Name="MaxLatitude" Type="float" />
+          <Property Name="MinLatitude" Type="float" />
+          <Property Name="MaxLongitude" Type="float" />
+          <Property Name="MinLongitude" Type="float" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'timm_test.dbo.ViewGtuInTask' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="ViewGtuInTask">
+          <Key>
+            <PropertyRef Name="GtuID" />
+            <PropertyRef Name="UserID" />
+            <PropertyRef Name="FullName" />
+            <PropertyRef Name="UserRoleID" />
+            <PropertyRef Name="TaskId" />
+            <PropertyRef Name="TaskGtuID" />
+          </Key>
+          <Property Name="GtuID" Type="int" Nullable="false" />
+          <Property Name="UniqueID" Type="nvarchar" MaxLength="6" />
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="FullName" Type="nvarchar" Nullable="false" MaxLength="128" />
+          <Property Name="CompanyId" Type="int" />
+          <Property Name="UserRoleID" Type="int" Nullable="false" />
+          <Property Name="TaskId" Type="int" Nullable="false" />
+          <Property Name="TaskGtuID" Type="int" Nullable="false" />
+          <Property Name="UserColor" Type="nvarchar" MaxLength="45" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'timm_test.dbo.ViewGtuLocation' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="ViewGtuLocation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="dwLatitude" Type="float" />
+          <Property Name="dwLongitude" Type="float" />
+          <Property Name="GTUId" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'timm_test.dbo.ViewNdAddressRange' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="ViewNdAddressRange">
+          <Key>
+            <PropertyRef Name="NdAddressId" />
+          </Key>
+          <Property Name="NdAddressId" Type="int" Nullable="false" />
+          <Property Name="MaxLatitude" Type="float" />
+          <Property Name="MinLatitude" Type="float" />
+          <Property Name="MaxLongitude" Type="float" />
+          <Property Name="MinLongitude" Type="float" />
+        </EntityType>
+        <Association Name="distributionmapcoordinates$FK_distributionmapcoordinates_1">
+          <End Role="distributionmaps" Type="timmModel.Store.distributionmaps" Multiplicity="1" />
+          <End Role="distributionmapcoordinates" Type="timmModel.Store.distributionmapcoordinates" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="distributionmaps">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="distributionmapcoordinates">
+              <PropertyRef Name="DistributionMapId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="distributionmaps$FK_DistributionMaps_SubMap">
+          <End Role="submaps" Type="timmModel.Store.submaps" Multiplicity="1" />
+          <End Role="distributionmaps" Type="timmModel.Store.distributionmaps" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="submaps">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="distributionmaps">
+              <PropertyRef Name="SubMapId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_gtubags_user">
+          <End Role="users" Type="timmModel.Store.users" Multiplicity="0..1" />
+          <End Role="gtubags" Type="timmModel.Store.gtubags" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="gtubags">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_gtus_gtubags">
+          <End Role="gtubags" Type="timmModel.Store.gtubags" Multiplicity="0..1" />
+          <End Role="gtus" Type="timmModel.Store.gtus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="gtubags">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="gtus">
+              <PropertyRef Name="GTUBagId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_users_companies">
+          <End Role="companies" Type="timmModel.Store.companies" Multiplicity="0..1" />
+          <End Role="users" Type="timmModel.Store.users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="companies">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="users">
+              <PropertyRef Name="CompanyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="gtuinfo$FK_gtuinfo_1">
+          <End Role="taskgtuinfomapping" Type="timmModel.Store.taskgtuinfomapping" Multiplicity="0..1" />
+          <End Role="gtuinfo" Type="timmModel.Store.gtuinfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="taskgtuinfomapping">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="gtuinfo">
+              <PropertyRef Name="TaskgtuinfoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="submaps$FK_SubMaps_Campaign">
+          <End Role="campaigns" Type="timmModel.Store.campaigns" Multiplicity="1" />
+          <End Role="submaps" Type="timmModel.Store.submaps" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="campaigns">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="submaps">
+              <PropertyRef Name="CampaignId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="task$FK_monitors_1">
+          <End Role="distributionmaps" Type="timmModel.Store.distributionmaps" Multiplicity="1" />
+          <End Role="task" Type="timmModel.Store.task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="distributionmaps">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="task">
+              <PropertyRef Name="DmId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="taskgtuinfomapping$FK_taskgtuinfomapping_3">
+          <End Role="task" Type="timmModel.Store.task" Multiplicity="1" />
+          <End Role="taskgtuinfomapping" Type="timmModel.Store.taskgtuinfomapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="task">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="taskgtuinfomapping">
+              <PropertyRef Name="TaskId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="GetGtuListByTaskID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TaskID" Type="int" Mode="In" />
+        </Function>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="timmModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="timmEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="distributionmaps" EntityType="timmModel.distributionmap" />
+          <EntitySet Name="distributionmapcoordinates" EntityType="timmModel.distributionmapcoordinate" />
+          <AssociationSet Name="distributionmapcoordinates_FK_distributionmapcoordinates_1" Association="timmModel.distributionmapcoordinates_FK_distributionmapcoordinates_1">
+            <End Role="distributionmap" EntitySet="distributionmaps" />
+            <End Role="distributionmapcoordinate" EntitySet="distributionmapcoordinates" />
+          </AssociationSet>
+          <EntitySet Name="gtubags" EntityType="timmModel.gtubag" />
+          <EntitySet Name="gtus" EntityType="timmModel.gtu" />
+          <AssociationSet Name="fk_gtus_gtubags" Association="timmModel.fk_gtus_gtubags">
+            <End Role="gtubag" EntitySet="gtubags" />
+            <End Role="gtu" EntitySet="gtus" />
+          </AssociationSet>
+          <EntitySet Name="taskgtuinfomappings" EntityType="timmModel.taskgtuinfomapping" />
+          <EntitySet Name="companies" EntityType="timmModel.company" />
+          <EntitySet Name="campaigns" EntityType="timmModel.campaign" />
+          <EntitySet Name="users" EntityType="timmModel.user" />
+          <AssociationSet Name="fk_users_companies" Association="timmModel.fk_users_companies">
+            <End Role="company" EntitySet="companies" />
+            <End Role="user" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="fk_gtubags_user" Association="timmModel.fk_gtubags_user">
+            <End Role="user" EntitySet="users" />
+            <End Role="gtubag" EntitySet="gtubags" />
+          </AssociationSet>
+          <FunctionImport Name="GetGtusbyTaskID" ReturnType="Collection(timmModel.GtuInTask)">
+          <Parameter Name="TaskID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="monitoraddresses" EntityType="timmModel.monitoraddress" />
+          <AssociationSet Name="monitoraddresses_FK_monitoraddresses_1" Association="timmModel.monitoraddresses_FK_monitoraddresses_1">
+            <End Role="distributionmap" EntitySet="distributionmaps" />
+            <End Role="monitoraddress" EntitySet="monitoraddresses" />
+          </AssociationSet>
+          <EntitySet Name="tasks" EntityType="timmModel.task" />
+          <AssociationSet Name="task_FK_monitors_1" Association="timmModel.task_FK_monitors_1">
+            <End Role="distributionmap" EntitySet="distributionmaps" />
+            <End Role="task" EntitySet="tasks" />
+          </AssociationSet>
+          <AssociationSet Name="taskgtuinfomapping_FK_taskgtuinfomapping_3" Association="timmModel.taskgtuinfomapping_FK_taskgtuinfomapping_3">
+            <End Role="task" EntitySet="tasks" />
+            <End Role="taskgtuinfomapping" EntitySet="taskgtuinfomappings" />
+          </AssociationSet>
+          <EntitySet Name="gtuinfoes" EntityType="timmModel.gtuinfo" />
+          <AssociationSet Name="gtuinfo_FK_gtuinfo_1" Association="timmModel.gtuinfo_FK_gtuinfo_1">
+            <End Role="taskgtuinfomapping" EntitySet="taskgtuinfomappings" />
+            <End Role="gtuinfo" EntitySet="gtuinfoes" />
+          </AssociationSet>
+          <EntitySet Name="ViewGtuInTasks" EntityType="timmModel.ViewGtuInTask" />
+          <EntitySet Name="tasktimes" EntityType="timmModel.tasktime" />
+          <EntitySet Name="gtustatushistories" EntityType="timmModel.gtustatushistory" />
+          <EntitySet Name="ndaddresscoordinates" EntityType="timmModel.ndaddresscoordinate" />
+          <EntitySet Name="ViewDistributionRanges" EntityType="timmModel.ViewDistributionRange" />
+          <EntitySet Name="ViewNdAddressRanges" EntityType="timmModel.ViewNdAddressRange" />
+          <EntitySet Name="customareacoordinates" EntityType="timmModel.customareacoordinate" />
+          <EntitySet Name="ViewCustomAreaRanges" EntityType="timmModel.ViewCustomAreaRange" />
+          <EntitySet Name="submaps" EntityType="timmModel.submap" />
+          <AssociationSet Name="submaps_FK_SubMaps_Campaign" Association="timmModel.submaps_FK_SubMaps_Campaign">
+            <End Role="campaign" EntitySet="campaigns" />
+            <End Role="submap" EntitySet="submaps" />
+          </AssociationSet>
+          <AssociationSet Name="distributionmaps_FK_DistributionMaps_SubMap" Association="timmModel.distributionmaps_FK_DistributionMaps_SubMap">
+            <End Role="submap" EntitySet="submaps" />
+            <End Role="distributionmap" EntitySet="distributionmaps" />
+          </AssociationSet>
+          <EntitySet Name="ViewGtuLocations" EntityType="timmModel.ViewGtuLocation" />
+        </EntityContainer>
+        <EntityType Name="distributionmap">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" />
+          <Property Name="SubMapId" Type="Int32" Nullable="false" />
+          <Property Name="ColorR" Type="Int32" Nullable="false" />
+          <Property Name="ColorG" Type="Int32" Nullable="false" />
+          <Property Name="ColorB" Type="Int32" Nullable="false" />
+          <Property Name="ColorString" Type="String" Nullable="false" MaxLength="16" Unicode="false" FixedLength="false" />
+          <Property Name="Total" Type="Int32" Nullable="false" />
+          <Property Name="Penetration" Type="Int32" Nullable="false" />
+          <Property Name="Percentage" Type="Double" Nullable="false" />
+          <Property Name="TotalAdjustment" Type="Int32" Nullable="false" />
+          <Property Name="CountAdjustment" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="distributionmapcoordinates" Relationship="timmModel.distributionmapcoordinates_FK_distributionmapcoordinates_1" FromRole="distributionmap" ToRole="distributionmapcoordinate" />
+          <NavigationProperty Name="monitoraddresses" Relationship="timmModel.monitoraddresses_FK_monitoraddresses_1" FromRole="distributionmap" ToRole="monitoraddress" />
+          <NavigationProperty Name="tasks" Relationship="timmModel.task_FK_monitors_1" FromRole="distributionmap" ToRole="task" />
+          <NavigationProperty Name="submap" Relationship="timmModel.distributionmaps_FK_DistributionMaps_SubMap" FromRole="distributionmap" ToRole="submap" />
+        </EntityType>
+        <EntityType Name="distributionmapcoordinate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="DistributionMapId" Nullable="false" />
+          <Property Type="Double" Name="Latitude" Nullable="false" />
+          <Property Type="Double" Name="Longitude" Nullable="false" />
+          <NavigationProperty Name="distributionmap" Relationship="timmModel.distributionmapcoordinates_FK_distributionmapcoordinates_1" FromRole="distributionmapcoordinate" ToRole="distributionmap" />
+        </EntityType>
+        <Association Name="distributionmapcoordinates_FK_distributionmapcoordinates_1">
+          <End Type="timmModel.distributionmap" Role="distributionmap" Multiplicity="1" />
+          <End Type="timmModel.distributionmapcoordinate" Role="distributionmapcoordinate" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="distributionmap">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="distributionmapcoordinate">
+              <PropertyRef Name="DistributionMapId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="gtubag">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="Int32" Name="UserId" />
+          <NavigationProperty Name="gtus" Relationship="timmModel.fk_gtus_gtubags" FromRole="gtubag" ToRole="gtu" />
+          <NavigationProperty Name="user" Relationship="timmModel.fk_gtubags_user" FromRole="gtubag" ToRole="user" />
+        </EntityType>
+        <EntityType Name="gtu">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="String" Name="UniqueID" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Model" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="IsEnabled" Nullable="false" />
+          <Property Type="Int32" Name="UserId" />
+          <Property Type="Int32" Name="GTUBagId" />
+          <NavigationProperty Name="gtubag" Relationship="timmModel.fk_gtus_gtubags" FromRole="gtu" ToRole="gtubag" />
+          <Property Type="String" Name="ShortUniqueID" MaxLength="6" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <Association Name="fk_gtus_gtubags">
+          <End Type="timmModel.gtubag" Role="gtubag" Multiplicity="0..1" />
+          <End Type="timmModel.gtu" Role="gtu" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="gtubag">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="gtu">
+              <PropertyRef Name="GTUBagId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="taskgtuinfomapping">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="TaskId" Nullable="false" />
+          <Property Type="Int32" Name="GTUId" />
+          <Property Type="Int32" Name="UserId" />
+          <Property Type="String" Name="UserColor" MaxLength="45" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="task" Relationship="timmModel.taskgtuinfomapping_FK_taskgtuinfomapping_3" FromRole="taskgtuinfomapping" ToRole="task" />
+          <NavigationProperty Name="gtuinfoes" Relationship="timmModel.gtuinfo_FK_gtuinfo_1" FromRole="taskgtuinfomapping" ToRole="gtuinfo" />
+        </EntityType>
+        <EntityType Name="company">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Address1" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Address2" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="City" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="State" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="ZipCode" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="users" Relationship="timmModel.fk_users_companies" FromRole="company" ToRole="user" />
+        </EntityType>
+        <EntityType Name="campaign">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Description" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="UserName" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="DateTime" Name="Date" Nullable="false" />
+          <Property Type="String" Name="CustemerName" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="Double" Name="Latitude" Nullable="false" />
+          <Property Type="Double" Name="Longitude" Nullable="false" />
+          <Property Type="Int32" Name="ZoomLevel" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="String" Name="ClientName" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="ContactName" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="ClientCode" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Logo" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="AreaDescription" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="CreatorName" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="submaps" Relationship="timmModel.submaps_FK_SubMaps_Campaign" FromRole="campaign" ToRole="submap" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="UserName" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Password" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="Enabled" Nullable="false" />
+          <Property Type="String" Name="FullName" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="UserCode" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="Role" Nullable="false" />
+          <Property Type="Int32" Name="CompanyId" />
+          <Property Type="String" Name="CellPhone" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Type="DateTime" Name="DateOfBirth" />
+          <Property Type="String" Name="Picture" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Notes" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="company" Relationship="timmModel.fk_users_companies" FromRole="user" ToRole="company" />
+          <NavigationProperty Name="gtubags" Relationship="timmModel.fk_gtubags_user" FromRole="user" ToRole="gtubag" />
+          <Property Type="String" Name="Email" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="fk_users_companies">
+          <End Type="timmModel.company" Role="company" Multiplicity="0..1" />
+          <End Type="timmModel.user" Role="user" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="company">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="user">
+              <PropertyRef Name="CompanyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_gtubags_user">
+          <End Type="timmModel.user" Role="user" Multiplicity="0..1" />
+          <End Type="timmModel.gtubag" Role="gtubag" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="gtubag">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="GtuInTask">
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="String" Name="UniqueID" Nullable="true" MaxLength="50" />
+          <Property Type="Int32" Name="UserID" Nullable="false" />
+          <Property Type="String" Name="FullName" Nullable="false" MaxLength="128" />
+          <Property Type="Int32" Name="CompanyId" Nullable="true" />
+          <Property Type="Int32" Name="UserRoleID" Nullable="false" />
+        </ComplexType>
+        <EntityType Name="monitoraddress">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="String" Name="Address" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="ZipCode" Nullable="false" MaxLength="8" FixedLength="false" Unicode="true" />
+          <Property Type="Single" Name="OriginalLatitude" Nullable="false" />
+          <Property Type="Single" Name="OriginalLongitude" Nullable="false" />
+          <Property Type="Single" Name="Longitude" Nullable="false" />
+          <Property Type="Single" Name="Latitude" Nullable="false" />
+          <Property Type="Int32" Name="DmId" Nullable="false" />
+          <Property Type="String" Name="Picture" MaxLength="64" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="distributionmap" Relationship="timmModel.monitoraddresses_FK_monitoraddresses_1" FromRole="monitoraddress" ToRole="distributionmap" />
+          <Property Type="String" Name="Notes" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="DateTime" Name="PictureUploadTime" />
+          <Property Type="Int32" Name="TaskID" />
+        </EntityType>
+        <Association Name="monitoraddresses_FK_monitoraddresses_1">
+          <End Type="timmModel.distributionmap" Role="distributionmap" Multiplicity="1" />
+          <End Type="timmModel.monitoraddress" Role="monitoraddress" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="distributionmap">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="monitoraddress">
+              <PropertyRef Name="DmId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="task">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="45" FixedLength="false" Unicode="true" />
+          <Property Type="DateTime" Name="Date" />
+          <Property Type="Int32" Name="DmId" Nullable="false" />
+          <Property Type="Int32" Name="AuditorId" />
+          <Property Type="Int32" Name="Status" />
+          <Property Type="String" Name="Email" MaxLength="45" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Telephone" MaxLength="45" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="distributionmap" Relationship="timmModel.task_FK_monitors_1" FromRole="task" ToRole="distributionmap" />
+          <NavigationProperty Name="taskgtuinfomappings" Relationship="timmModel.taskgtuinfomapping_FK_taskgtuinfomapping_3" FromRole="task" ToRole="taskgtuinfomapping" />
+        </EntityType>
+        <Association Name="task_FK_monitors_1">
+          <End Type="timmModel.distributionmap" Role="distributionmap" Multiplicity="1" />
+          <End Type="timmModel.task" Role="task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="distributionmap">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="task">
+              <PropertyRef Name="DmId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="taskgtuinfomapping_FK_taskgtuinfomapping_3">
+          <End Type="timmModel.task" Role="task" Multiplicity="1" />
+          <End Type="timmModel.taskgtuinfomapping" Role="taskgtuinfomapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="task">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="taskgtuinfomapping">
+              <PropertyRef Name="TaskId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="gtuinfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int64" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Double" Name="dwSpeed" />
+          <Property Type="Int32" Name="nHeading" />
+          <Property Type="DateTime" Name="dtSendTime" />
+          <Property Type="DateTime" Name="dtReceivedTime" />
+          <Property Type="String" Name="sIPAddress" MaxLength="45" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="nAreaCode" />
+          <Property Type="Int32" Name="nNetworkCode" />
+          <Property Type="Int32" Name="nCellID" />
+          <Property Type="Int32" Name="nGPSFix" />
+          <Property Type="Int32" Name="nAccuracy" />
+          <Property Type="Int32" Name="nCount" />
+          <Property Type="Int32" Name="nLocationID" />
+          <Property Type="String" Name="sVersion" MaxLength="45" FixedLength="false" Unicode="true" />
+          <Property Type="Double" Name="dwAltitude" />
+          <Property Type="Double" Name="dwLatitude" />
+          <Property Type="Double" Name="dwLongitude" />
+          <Property Type="Int32" Name="PowerInfo" />
+          <Property Type="Int32" Name="TaskgtuinfoId" />
+          <Property Type="String" Name="Code" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="Status" />
+          <Property Type="Double" Name="Distance" />
+          <NavigationProperty Name="taskgtuinfomapping" Relationship="timmModel.gtuinfo_FK_gtuinfo_1" FromRole="gtuinfo" ToRole="taskgtuinfomapping" />
+        </EntityType>
+        <Association Name="gtuinfo_FK_gtuinfo_1">
+          <End Type="timmModel.taskgtuinfomapping" Role="taskgtuinfomapping" Multiplicity="0..1" />
+          <End Type="timmModel.gtuinfo" Role="gtuinfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="taskgtuinfomapping">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="gtuinfo">
+              <PropertyRef Name="TaskgtuinfoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ViewGtuInTask">
+          <Key>
+            <PropertyRef Name="GtuID" />
+            <PropertyRef Name="UserID" />
+            <PropertyRef Name="FullName" />
+            <PropertyRef Name="UserRoleID" />
+            <PropertyRef Name="TaskId" />
+            <PropertyRef Name="TaskGtuID" />
+          </Key>
+          <Property Type="Int32" Name="GtuID" Nullable="false" />
+          <Property Type="String" Name="UniqueID" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="UserID" Nullable="false" />
+          <Property Type="String" Name="FullName" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CompanyId" />
+          <Property Type="Int32" Name="UserRoleID" Nullable="false" />
+          <Property Type="Int32" Name="TaskId" Nullable="false" />
+          <Property Type="Int32" Name="TaskGtuID" Nullable="false" />
+          <Property Type="String" Name="UserColor" MaxLength="45" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="tasktime">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="TaskId" />
+          <Property Type="DateTime" Name="Time" />
+          <Property Type="Int32" Name="TimeType" />
+        </EntityType>
+        <EntityType Name="gtustatushistory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int64" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="GTUId" Nullable="false" />
+          <Property Type="Int32" Name="UserId" />
+          <Property Type="Int64" Name="GTUInfoId" Nullable="false" />
+          <Property Type="Int32" Name="StatusId" Nullable="false" />
+          <Property Type="DateTime" Name="InsertedTime" Nullable="false" />
+          <Property Type="String" Name="Point" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="DateTime" Name="ReceiveTime" />
+        </EntityType>
+        <EntityType Name="ndaddresscoordinate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int64" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="NdAddressId" Nullable="false" />
+          <Property Type="Double" Name="Latitude" Nullable="false" />
+          <Property Type="Double" Name="Longitude" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ViewDistributionRange">
+          <Key>
+            <PropertyRef Name="DistributionMapId" />
+          </Key>
+          <Property Type="Int32" Name="DistributionMapId" Nullable="false" />
+          <Property Type="Double" Name="MaxLatitude" />
+          <Property Type="Double" Name="MinLatitude" />
+          <Property Type="Double" Name="MaxLongitude" />
+          <Property Type="Double" Name="MinLongitude" />
+        </EntityType>
+        <EntityType Name="ViewNdAddressRange">
+          <Key>
+            <PropertyRef Name="NdAddressId" />
+          </Key>
+          <Property Type="Int32" Name="NdAddressId" Nullable="false" />
+          <Property Type="Double" Name="MaxLatitude" />
+          <Property Type="Double" Name="MinLatitude" />
+          <Property Type="Double" Name="MaxLongitude" />
+          <Property Type="Double" Name="MinLongitude" />
+        </EntityType>
+        <EntityType Name="customareacoordinate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="CustomAreaId" Nullable="false" />
+          <Property Type="Double" Name="Latitude" Nullable="false" />
+          <Property Type="Double" Name="Longitude" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ViewCustomAreaRange">
+          <Key>
+            <PropertyRef Name="CustomAreaId" />
+          </Key>
+          <Property Type="Int32" Name="CustomAreaId" Nullable="false" />
+          <Property Type="Double" Name="MaxLatitude" />
+          <Property Type="Double" Name="MinLatitude" />
+          <Property Type="Double" Name="MaxLongitude" />
+          <Property Type="Double" Name="MinLongitude" />
+        </EntityType>
+        <EntityType Name="submap">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="OrderId" Nullable="false" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="Total" Nullable="false" />
+          <Property Type="Int32" Name="Penetration" Nullable="false" />
+          <Property Type="Double" Name="Percentage" Nullable="false" />
+          <Property Type="Int32" Name="ColorR" Nullable="false" />
+          <Property Type="Int32" Name="ColorG" Nullable="false" />
+          <Property Type="Int32" Name="ColorB" Nullable="false" />
+          <Property Type="String" Name="ColorString" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CampaignId" Nullable="false" />
+          <Property Type="Int32" Name="TotalAdjustment" Nullable="false" />
+          <Property Type="Int32" Name="CountAdjustment" Nullable="false" />
+          <NavigationProperty Name="campaign" Relationship="timmModel.submaps_FK_SubMaps_Campaign" FromRole="submap" ToRole="campaign" />
+          <NavigationProperty Name="distributionmaps" Relationship="timmModel.distributionmaps_FK_DistributionMaps_SubMap" FromRole="submap" ToRole="distributionmap" />
+        </EntityType>
+        <Association Name="submaps_FK_SubMaps_Campaign">
+          <End Type="timmModel.campaign" Role="campaign" Multiplicity="1" />
+          <End Type="timmModel.submap" Role="submap" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="campaign">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="submap">
+              <PropertyRef Name="CampaignId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="distributionmaps_FK_DistributionMaps_SubMap">
+          <End Type="timmModel.submap" Role="submap" Multiplicity="1" />
+          <End Type="timmModel.distributionmap" Role="distributionmap" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="submap">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="distributionmap">
+              <PropertyRef Name="SubMapId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ViewGtuLocation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Double" Name="dwLatitude" />
+          <Property Type="Double" Name="dwLongitude" />
+          <Property Type="Int32" Name="GTUId" />
+          <Property Type="Int64" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="timmModelStoreContainer" CdmEntityContainer="timmEntities">
+          <EntitySetMapping Name="distributionmaps"><EntityTypeMapping TypeName="timmModel.distributionmap"><MappingFragment StoreEntitySet="distributionmaps">
+            <ScalarProperty Name="Id" ColumnName="Id" />
+            <ScalarProperty Name="Name" ColumnName="Name" />
+            <ScalarProperty Name="SubMapId" ColumnName="SubMapId" />
+            <ScalarProperty Name="ColorR" ColumnName="ColorR" />
+            <ScalarProperty Name="ColorG" ColumnName="ColorG" />
+            <ScalarProperty Name="ColorB" ColumnName="ColorB" />
+            <ScalarProperty Name="ColorString" ColumnName="ColorString" />
+            <ScalarProperty Name="Total" ColumnName="Total" />
+            <ScalarProperty Name="Penetration" ColumnName="Penetration" />
+            <ScalarProperty Name="Percentage" ColumnName="Percentage" />
+            <ScalarProperty Name="TotalAdjustment" ColumnName="TotalAdjustment" />
+            <ScalarProperty Name="CountAdjustment" ColumnName="CountAdjustment" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="distributionmapcoordinates">
+            <EntityTypeMapping TypeName="timmModel.distributionmapcoordinate">
+              <MappingFragment StoreEntitySet="distributionmapcoordinates">
+                <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+                <ScalarProperty Name="DistributionMapId" ColumnName="DistributionMapId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="gtubags">
+            <EntityTypeMapping TypeName="timmModel.gtubag">
+              <MappingFragment StoreEntitySet="gtubags">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="gtus">
+            <EntityTypeMapping TypeName="timmModel.gtu">
+              <MappingFragment StoreEntitySet="gtus">
+                <ScalarProperty Name="ShortUniqueID" ColumnName="ShortUniqueID" />
+                <ScalarProperty Name="GTUBagId" ColumnName="GTUBagId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="taskgtuinfomappings">
+            <EntityTypeMapping TypeName="timmModel.taskgtuinfomapping">
+              <MappingFragment StoreEntitySet="taskgtuinfomapping">
+                <ScalarProperty Name="UserColor" ColumnName="UserColor" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="GTUId" ColumnName="GTUId" />
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="companies">
+            <EntityTypeMapping TypeName="timmModel.company">
+              <MappingFragment StoreEntitySet="companies">
+                <ScalarProperty Name="ZipCode" ColumnName="ZipCode" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="Address2" ColumnName="Address2" />
+                <ScalarProperty Name="Address1" ColumnName="Address1" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="campaigns">
+            <EntityTypeMapping TypeName="timmModel.campaign">
+              <MappingFragment StoreEntitySet="campaigns">
+                <ScalarProperty Name="CreatorName" ColumnName="CreatorName" />
+                <ScalarProperty Name="AreaDescription" ColumnName="AreaDescription" />
+                <ScalarProperty Name="Logo" ColumnName="Logo" />
+                <ScalarProperty Name="ClientCode" ColumnName="ClientCode" />
+                <ScalarProperty Name="ContactName" ColumnName="ContactName" />
+                <ScalarProperty Name="ClientName" ColumnName="ClientName" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="ZoomLevel" ColumnName="ZoomLevel" />
+                <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+                <ScalarProperty Name="CustemerName" ColumnName="CustemerName" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="timmModel.user">
+              <MappingFragment StoreEntitySet="users">
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="DateOfBirth" ColumnName="DateOfBirth" />
+                <ScalarProperty Name="CellPhone" ColumnName="CellPhone" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="UserCode" ColumnName="UserCode" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetGtusbyTaskID" FunctionName="timmModel.Store.GetGtuListByTaskID">
+          <ResultMapping>
+              <ComplexTypeMapping TypeName="timmModel.GtuInTask">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="UserRoleID" ColumnName="UserRoleID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="monitoraddresses">
+            <EntityTypeMapping TypeName="timmModel.monitoraddress">
+              <MappingFragment StoreEntitySet="monitoraddresses">
+                <ScalarProperty Name="TaskID" ColumnName="TaskID" />
+                <ScalarProperty Name="PictureUploadTime" ColumnName="PictureUploadTime" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="DmId" ColumnName="DmId" />
+                <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+                <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="OriginalLongitude" ColumnName="OriginalLongitude" />
+                <ScalarProperty Name="OriginalLatitude" ColumnName="OriginalLatitude" />
+                <ScalarProperty Name="ZipCode" ColumnName="ZipCode" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tasks">
+            <EntityTypeMapping TypeName="timmModel.task">
+              <MappingFragment StoreEntitySet="task">
+                <ScalarProperty Name="Telephone" ColumnName="Telephone" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="AuditorId" ColumnName="AuditorId" />
+                <ScalarProperty Name="DmId" ColumnName="DmId" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="gtuinfoes">
+            <EntityTypeMapping TypeName="timmModel.gtuinfo">
+              <MappingFragment StoreEntitySet="gtuinfo">
+                <ScalarProperty Name="Distance" ColumnName="Distance" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="TaskgtuinfoId" ColumnName="TaskgtuinfoId" />
+                <ScalarProperty Name="PowerInfo" ColumnName="PowerInfo" />
+                <ScalarProperty Name="dwLongitude" ColumnName="dwLongitude" />
+                <ScalarProperty Name="dwLatitude" ColumnName="dwLatitude" />
+                <ScalarProperty Name="dwAltitude" ColumnName="dwAltitude" />
+                <ScalarProperty Name="sVersion" ColumnName="sVersion" />
+                <ScalarProperty Name="nLocationID" ColumnName="nLocationID" />
+                <ScalarProperty Name="nCount" ColumnName="nCount" />
+                <ScalarProperty Name="nAccuracy" ColumnName="nAccuracy" />
+                <ScalarProperty Name="nGPSFix" ColumnName="nGPSFix" />
+                <ScalarProperty Name="nCellID" ColumnName="nCellID" />
+                <ScalarProperty Name="nNetworkCode" ColumnName="nNetworkCode" />
+                <ScalarProperty Name="nAreaCode" ColumnName="nAreaCode" />
+                <ScalarProperty Name="sIPAddress" ColumnName="sIPAddress" />
+                <ScalarProperty Name="dtReceivedTime" ColumnName="dtReceivedTime" />
+                <ScalarProperty Name="dtSendTime" ColumnName="dtSendTime" />
+                <ScalarProperty Name="nHeading" ColumnName="nHeading" />
+                <ScalarProperty Name="dwSpeed" ColumnName="dwSpeed" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ViewGtuInTasks">
+            <EntityTypeMapping TypeName="timmModel.ViewGtuInTask">
+              <MappingFragment StoreEntitySet="ViewGtuInTask">
+                <ScalarProperty Name="UserColor" ColumnName="UserColor" />
+                <ScalarProperty Name="TaskGtuID" ColumnName="TaskGtuID" />
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+                <ScalarProperty Name="UserRoleID" ColumnName="UserRoleID" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="GtuID" ColumnName="GtuID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tasktimes">
+            <EntityTypeMapping TypeName="timmModel.tasktime">
+              <MappingFragment StoreEntitySet="tasktime">
+                <ScalarProperty Name="TimeType" ColumnName="TimeType" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="gtustatushistories">
+            <EntityTypeMapping TypeName="timmModel.gtustatushistory">
+              <MappingFragment StoreEntitySet="gtustatushistory">
+                <ScalarProperty Name="ReceiveTime" ColumnName="ReceiveTime" />
+                <ScalarProperty Name="Point" ColumnName="Point" />
+                <ScalarProperty Name="InsertedTime" ColumnName="InsertedTime" />
+                <ScalarProperty Name="StatusId" ColumnName="StatusId" />
+                <ScalarProperty Name="GTUInfoId" ColumnName="GTUInfoId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="GTUId" ColumnName="GTUId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ndaddresscoordinates">
+            <EntityTypeMapping TypeName="timmModel.ndaddresscoordinate">
+              <MappingFragment StoreEntitySet="ndaddresscoordinates">
+                <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+                <ScalarProperty Name="NdAddressId" ColumnName="NdAddressId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ViewDistributionRanges">
+            <EntityTypeMapping TypeName="timmModel.ViewDistributionRange">
+              <MappingFragment StoreEntitySet="ViewDistributionRange">
+                <ScalarProperty Name="MinLongitude" ColumnName="MinLongitude" />
+                <ScalarProperty Name="MaxLongitude" ColumnName="MaxLongitude" />
+                <ScalarProperty Name="MinLatitude" ColumnName="MinLatitude" />
+                <ScalarProperty Name="MaxLatitude" ColumnName="MaxLatitude" />
+                <ScalarProperty Name="DistributionMapId" ColumnName="DistributionMapId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ViewNdAddressRanges">
+            <EntityTypeMapping TypeName="timmModel.ViewNdAddressRange">
+              <MappingFragment StoreEntitySet="ViewNdAddressRange">
+                <ScalarProperty Name="MinLongitude" ColumnName="MinLongitude" />
+                <ScalarProperty Name="MaxLongitude" ColumnName="MaxLongitude" />
+                <ScalarProperty Name="MinLatitude" ColumnName="MinLatitude" />
+                <ScalarProperty Name="MaxLatitude" ColumnName="MaxLatitude" />
+                <ScalarProperty Name="NdAddressId" ColumnName="NdAddressId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="customareacoordinates">
+            <EntityTypeMapping TypeName="timmModel.customareacoordinate">
+              <MappingFragment StoreEntitySet="customareacoordinates">
+                <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+                <ScalarProperty Name="CustomAreaId" ColumnName="CustomAreaId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ViewCustomAreaRanges">
+            <EntityTypeMapping TypeName="timmModel.ViewCustomAreaRange">
+              <MappingFragment StoreEntitySet="ViewCustomAreaRange">
+                <ScalarProperty Name="MinLongitude" ColumnName="MinLongitude" />
+                <ScalarProperty Name="MaxLongitude" ColumnName="MaxLongitude" />
+                <ScalarProperty Name="MinLatitude" ColumnName="MinLatitude" />
+                <ScalarProperty Name="MaxLatitude" ColumnName="MaxLatitude" />
+                <ScalarProperty Name="CustomAreaId" ColumnName="CustomAreaId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="submaps">
+            <EntityTypeMapping TypeName="timmModel.submap">
+              <MappingFragment StoreEntitySet="submaps">
+                <ScalarProperty Name="CountAdjustment" ColumnName="CountAdjustment" />
+                <ScalarProperty Name="TotalAdjustment" ColumnName="TotalAdjustment" />
+                <ScalarProperty Name="CampaignId" ColumnName="CampaignId" />
+                <ScalarProperty Name="ColorString" ColumnName="ColorString" />
+                <ScalarProperty Name="ColorB" ColumnName="ColorB" />
+                <ScalarProperty Name="ColorG" ColumnName="ColorG" />
+                <ScalarProperty Name="ColorR" ColumnName="ColorR" />
+                <ScalarProperty Name="Percentage" ColumnName="Percentage" />
+                <ScalarProperty Name="Penetration" ColumnName="Penetration" />
+                <ScalarProperty Name="Total" ColumnName="Total" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="OrderId" ColumnName="OrderId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ViewGtuLocations">
+            <EntityTypeMapping TypeName="timmModel.ViewGtuLocation">
+              <MappingFragment StoreEntitySet="ViewGtuLocation">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="dwLongitude" ColumnName="dwLongitude" />
+                <ScalarProperty Name="dwLatitude" ColumnName="dwLatitude" />
+                <ScalarProperty Name="GTUId" ColumnName="GTUId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="TimmDataModel" ShowGrid="false" DisplayType="true" ZoomLevel="75">
+        <EntityTypeShape EntityType="timmModel.distributionmap" Width="1.875" PointX="3" PointY="1" Height="3.4001269531249996" IsExpanded="true" />
+        <EntityTypeShape EntityType="timmModel.distributionmapcoordinate" Width="2.25" PointX="2.875" PointY="4.875" Height="1.7566536458333317" />
+        <AssociationConnector Association="timmModel.distributionmapcoordinates_FK_distributionmapcoordinates_1" >
+          <ConnectorPoint PointX="3.9375" PointY="4.5644742838541656" />
+          <ConnectorPoint PointX="3.9375" PointY="4.875" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="timmModel.gtubag" Width="1.5" PointX="7.375" PointY="5.125" Height="1.5923063151041674" />
+        <EntityTypeShape EntityType="timmModel.gtu" Width="1.5" PointX="9.625" PointY="5" Height="2.2496956380208335" />
+        <AssociationConnector Association="timmModel.fk_gtus_gtubags" >
+          <ConnectorPoint PointX="8.875" PointY="5.9211531575520837" />
+          <ConnectorPoint PointX="9.625" PointY="5.9211531575520837" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="timmModel.taskgtuinfomapping" Width="1.5" PointX="5.375" PointY="4.625" Height="2.0853483072916656" />
+        <EntityTypeShape EntityType="timmModel.company" Width="1.5" PointX="9.625" PointY="1" Height="2.2496956380208339" />
+        <EntityTypeShape EntityType="timmModel.campaign" Width="1.5" PointX="0.875" PointY="0.75" Height="3.7288216145833317" />
+        <EntityTypeShape EntityType="timmModel.user" Width="1.5" PointX="7.375" PointY="0.875" Height="3.4001269531249996" />
+        <AssociationConnector Association="timmModel.fk_users_companies" >
+          <ConnectorPoint PointX="9.625" PointY="2.1248478190104167" />
+          <ConnectorPoint PointX="8.875" PointY="2.1248478190104167" />
+        </AssociationConnector>
+        <AssociationConnector Association="timmModel.fk_gtubags_user" >
+          <ConnectorPoint PointX="8.125" PointY="4.275126953125" />
+          <ConnectorPoint PointX="8.125" PointY="5.125" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="timmModel.monitoraddress" Width="1.5" PointX="4.875" PointY="7.25" Height="2.9070849609374996" />
+        <AssociationConnector Association="timmModel.monitoraddresses_FK_monitoraddresses_1" >
+          <ConnectorPoint PointX="4.875" PointY="4.1026822916666665" />
+          <ConnectorPoint PointX="5.25" PointY="4.1026822916666665" />
+          <ConnectorPoint PointX="5.25" PointY="7.25" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="timmModel.task" Width="1.5" PointX="5.375" PointY="1" Height="2.5783902994791674" />
+        <AssociationConnector Association="timmModel.task_FK_monitors_1" >
+          <ConnectorPoint PointX="4.875" PointY="2.2891951497395837" />
+          <ConnectorPoint PointX="5.375" PointY="2.2891951497395837" />
+        </AssociationConnector>
+        <AssociationConnector Association="timmModel.taskgtuinfomapping_FK_taskgtuinfomapping_3" >
+          <ConnectorPoint PointX="6.125" PointY="3.5783902994791674" />
+          <ConnectorPoint PointX="6.125" PointY="4.625" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="timmModel.gtuinfo" Width="1.5" PointX="7.5" PointY="7.375" Height="4.7149055989583335" />
+        <AssociationConnector Association="timmModel.gtuinfo_FK_gtuinfo_1" >
+          <ConnectorPoint PointX="6.875" PointY="6.7103483072916656" />
+          <ConnectorPoint PointX="7.5" PointY="7.375" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="timmModel.ViewGtuInTask" Width="1.5" PointX="9.625" PointY="7.5" Height="2.4140429687499996" />
+        <EntityTypeShape EntityType="timmModel.tasktime" Width="1.5" PointX="4.875" PointY="10.75" Height="1.5923063151041674" />
+        <EntityTypeShape EntityType="timmModel.gtustatushistory" Width="1.5" PointX="9.625" PointY="10.5" Height="2.2496956380208335" />
+        <EntityTypeShape EntityType="timmModel.ndaddresscoordinate" Width="1.5" PointX="11.5" PointY="1" Height="1.5923063151041674" />
+        <EntityTypeShape EntityType="timmModel.ViewDistributionRange" Width="1.5" PointX="11.625" PointY="5.125" Height="1.7566536458333388" />
+        <EntityTypeShape EntityType="timmModel.ViewNdAddressRange" Width="1.5" PointX="11.75" PointY="7.25" Height="1.7566536458333388" />
+        <EntityTypeShape EntityType="timmModel.customareacoordinate" Width="1.5" PointX="11.75" PointY="9.375" Height="1.5923063151041674" />
+        <EntityTypeShape EntityType="timmModel.ViewCustomAreaRange" Width="1.5" PointX="11.625" PointY="3.125" Height="1.7566536458333388" />
+        <EntityTypeShape EntityType="timmModel.submap" Width="1.5" PointX="1" PointY="5" Height="3.4001269531250049" />
+        <AssociationConnector Association="timmModel.submaps_FK_SubMaps_Campaign" >
+          <ConnectorPoint PointX="1.6875" PointY="4.4788216145833317" />
+          <ConnectorPoint PointX="1.6875" PointY="5" />
+        </AssociationConnector>
+        <AssociationConnector Association="timmModel.distributionmaps_FK_DistributionMaps_SubMap" >
+          <ConnectorPoint PointX="2.5" PointY="5" />
+          <ConnectorPoint PointX="3" PointY="4.5644742838541656" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="timmModel.ViewGtuLocation" Width="1.5" PointX="2" PointY="9.625" Height="1.4279589843750067" />
+        </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

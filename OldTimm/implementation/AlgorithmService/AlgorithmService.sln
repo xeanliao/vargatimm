@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithm", "AlgorithmWCF\Algorithm.csproj", "{36D8A229-E7ED-46C5-9EDA-0C15AD6D3F8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmService", "AlgorithmService\AlgorithmService.csproj", "{F87F4F06-71A9-43F2-9910-7B0E4B8A5AAD}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "GPSServiceSetup", "AlgorithmServiceSetup\AlgorithmServiceSetup.vdproj", "{20915371-4017-45C2-9A1A-E6611F7D048E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36D8A229-E7ED-46C5-9EDA-0C15AD6D3F8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36D8A229-E7ED-46C5-9EDA-0C15AD6D3F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36D8A229-E7ED-46C5-9EDA-0C15AD6D3F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36D8A229-E7ED-46C5-9EDA-0C15AD6D3F8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F87F4F06-71A9-43F2-9910-7B0E4B8A5AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F87F4F06-71A9-43F2-9910-7B0E4B8A5AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F87F4F06-71A9-43F2-9910-7B0E4B8A5AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F87F4F06-71A9-43F2-9910-7B0E4B8A5AAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20915371-4017-45C2-9A1A-E6611F7D048E}.Debug|Any CPU.ActiveCfg = Debug
+		{20915371-4017-45C2-9A1A-E6611F7D048E}.Debug|Any CPU.Build.0 = Debug
+		{20915371-4017-45C2-9A1A-E6611F7D048E}.Release|Any CPU.ActiveCfg = Release
+		{20915371-4017-45C2-9A1A-E6611F7D048E}.Release|Any CPU.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

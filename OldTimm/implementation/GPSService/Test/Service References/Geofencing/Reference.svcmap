@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="d22fc275-5bda-467a-a532-9bd33760b2c4" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://74.208.46.157:7801/WHYTAlgorithmService/Geofencing/" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="596590f6-4a0d-4991-8578-981bcc7b001d" SourceId="1" SourceUrl="http://74.208.46.157:7801/WHYTAlgorithmService/Geofencing/?xsd=xsd3" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="d55b85fb-cc24-4d25-a8d7-96a358c37f07" SourceId="1" SourceUrl="http://74.208.46.157:7801/WHYTAlgorithmService/Geofencing/?xsd=xsd1" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="a68780d0-ff41-49b8-a6a1-19d65b0d318e" SourceId="1" SourceUrl="http://74.208.46.157:7801/WHYTAlgorithmService/Geofencing/?xsd=xsd0" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="168eedf1-7c9e-49ac-a504-0b5d43a01d5d" SourceId="1" SourceUrl="http://74.208.46.157:7801/WHYTAlgorithmService/Geofencing/?disco" />
+    <MetadataFile FileName="Geofencing.wsdl" MetadataType="Wsdl" ID="ce9703c8-ecb3-4063-96d5-3b62adc98c4c" SourceId="1" SourceUrl="http://74.208.46.157:7801/WHYTAlgorithmService/Geofencing/?wsdl" />
+    <MetadataFile FileName="item3.xsd" MetadataType="Schema" ID="8bec3bbe-f533-4a74-afbb-01d5de05c130" SourceId="1" SourceUrl="http://74.208.46.157:7801/WHYTAlgorithmService/Geofencing/?xsd=xsd2" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

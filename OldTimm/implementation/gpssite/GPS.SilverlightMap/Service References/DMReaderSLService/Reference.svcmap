@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="d7e1d9c6-99b8-4866-885e-abc8736342c5" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?wsdl" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="DMReaderSLService.xsd" MetadataType="Schema" ID="f87bccbc-22d9-43d9-a4c6-9f0122f27dca" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd2" />
+    <MetadataFile FileName="DMReaderSLService7.xsd" MetadataType="Schema" ID="160294ca-f83f-4a96-b18b-55de64d7506c" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd7" />
+    <MetadataFile FileName="DMReaderSLService1.xsd" MetadataType="Schema" ID="533b7e68-1f15-4df7-b9b7-ab82e47f3bb9" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd0" />
+    <MetadataFile FileName="DMReaderSLService5.xsd" MetadataType="Schema" ID="b2e1c2ca-8520-4a33-b245-ac89d4a0dd30" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd5" />
+    <MetadataFile FileName="DMReaderSLService6.xsd" MetadataType="Schema" ID="01462581-c0e2-4113-9332-3f15116af5b9" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd6" />
+    <MetadataFile FileName="DMReaderSLService.wsdl" MetadataType="Wsdl" ID="6e4bbcd2-e331-4503-882e-ed7161391b63" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?wsdl" />
+    <MetadataFile FileName="DMReaderSLService1.wsdl" MetadataType="Wsdl" ID="017021e7-6d26-4bf1-8a54-56d682869d93" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="DMReaderSLService2.xsd" MetadataType="Schema" ID="248250e9-e66c-4c2e-a291-11864aef5957" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd3" />
+    <MetadataFile FileName="DMReaderSLService3.xsd" MetadataType="Schema" ID="4508e3b5-4a6e-4071-9e8c-3b11fa576812" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd4" />
+    <MetadataFile FileName="DMReaderSLService4.xsd" MetadataType="Schema" ID="a3cc4f70-af8b-46ef-9079-69e24655ae3c" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd1" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

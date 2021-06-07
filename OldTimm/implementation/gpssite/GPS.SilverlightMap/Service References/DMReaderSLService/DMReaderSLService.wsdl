@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:i0="TIMM.Website.SilverlightServices" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="http://tempuri.org/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" name="DMReaderSLService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:import namespace="TIMM.Website.SilverlightServices" location="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?wsdl=wsdl0" />
+  <wsdl:types />
+  <wsdl:binding name="BasicHttpBinding_DMReaderSLService" type="i0:DMReaderSLService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetDistributionMapsById">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetDistributionMapsById" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDistributionMapsObjectById">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetDistributionMapsObjectById" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomAreaByBox">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetCustomAreaByBox" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomAreaObjectByBox">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetCustomAreaObjectByBox" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTask">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetTask" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTaskObject">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetTaskObject" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGtuUserNameDic">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetGtuUserNameDic" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGtuInfoListByTaskId">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetGtuInfoListByTaskId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMAddressListByTaskId">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetMAddressListByTaskId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMAddressCOListByTaskId">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/GetMAddressCOListByTaskId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddTaskTime">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/AddTaskTime" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTaskObject">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/UpdateTaskObject" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTask">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/UpdateTask" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUserNameByUserId">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/getUserNameByUserId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadHistoryDotToLayerThread">
+      <soap:operation soapAction="TIMM.Website.SilverlightServices/DMReaderSLService/loadHistoryDotToLayerThread" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DMReaderSLService">
+    <wsdl:port name="BasicHttpBinding_DMReaderSLService" binding="tns:BasicHttpBinding_DMReaderSLService">
+      <soap:address location="http://localhost:3970/SilverlightServices/DMReaderSLService.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TIMM.GPS.Model.AbstractArea">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAIAAAEAACAAAEAE4gAAgIAAAAAAAAAAAAQAAAIA=</HashCode>
+      <FileName>Domain\Area\AbstractArea.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.Tract">
+    <Position X="5.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAICAAAIARBAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Area\Tract.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.FiveZipArea">
+    <Position X="3.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAgAAAICEAAAARhAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Domain\Area\FiveZipArea.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.PremiumCRoute">
+    <Position X="7.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAIAAAAQAgAAAAAEAAAABgAEAEAQAAAAAAACQAAAA=</HashCode>
+      <FileName>Domain\Area\PremiumCRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.BlockGroup">
+    <Position X="10" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Area\BlockGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

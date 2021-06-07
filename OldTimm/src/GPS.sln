@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.Map", "GPS.Map\GPS.Map.csproj", "{9BF5E8B0-A245-4218-854A-667C4D03BDAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.Website", "GPS.Website\GPS.Website.csproj", "{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPS.Datalayer", "GPS.Datalayer\GPS.Datalayer.csproj", "{68FB868F-1637-44E3-A8F5-2DD469192CB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PietschSoft.VE", "PietschSoft.VE\PietschSoft.VE.csproj", "{FBD40604-8C9F-4BB4-848C-4BD7FD89B65C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BF5E8B0-A245-4218-854A-667C4D03BDAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BF5E8B0-A245-4218-854A-667C4D03BDAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BF5E8B0-A245-4218-854A-667C4D03BDAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BF5E8B0-A245-4218-854A-667C4D03BDAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD3FE740-BC57-4FF4-8C84-47D2DF84E5D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68FB868F-1637-44E3-A8F5-2DD469192CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68FB868F-1637-44E3-A8F5-2DD469192CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68FB868F-1637-44E3-A8F5-2DD469192CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68FB868F-1637-44E3-A8F5-2DD469192CB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBD40604-8C9F-4BB4-848C-4BD7FD89B65C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBD40604-8C9F-4BB4-848C-4BD7FD89B65C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBD40604-8C9F-4BB4-848C-4BD7FD89B65C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBD40604-8C9F-4BB4-848C-4BD7FD89B65C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

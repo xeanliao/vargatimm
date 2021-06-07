@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.TransferObjects" elementFormDefault="qualified" targetNamespace="TIMM.Website.TransferObjects" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd3" namespace="TIMM.Website.AreaServices" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd5" namespace="TIMM.Website.DistributionMapServices" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="ToCampaign">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:ToBasicCampaignProperties">
+        <xs:sequence>
+          <xs:element xmlns:q1="TIMM.Website.AreaServices" minOccurs="0" name="Addresses" nillable="true" type="q1:ArrayOfToAddress" />
+          <xs:element minOccurs="0" name="CampaignPercentageColors" nillable="true" type="tns:ArrayOfToCampaignPercentageColor" />
+          <xs:element minOccurs="0" name="CampaignRecords" nillable="true" type="tns:ArrayOfToAreaRecord" />
+          <xs:element xmlns:q2="TIMM.Website.DistributionMapServices" minOccurs="0" name="SubMaps" nillable="true" type="q2:ArrayOfToSubMap" />
+          <xs:element xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Users" nillable="true" type="q3:ArrayOfKeyValueOfToUserToStatusInfovqCSK2vt" />
+          <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="VisibleClassifications" nillable="true" type="q4:ArrayOfint" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ToCampaign" nillable="true" type="tns:ToCampaign" />
+  <xs:complexType name="ToBasicCampaignProperties">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AreaDescription" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ClientCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ClientName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CompositeName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ContactName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CustemerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Date" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Latitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Logo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Longitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Sequence" type="xs:int" />
+      <xs:element minOccurs="0" name="UserName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ZoomLevel" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToBasicCampaignProperties" nillable="true" type="tns:ToBasicCampaignProperties" />
+  <xs:complexType name="ArrayOfToCampaignPercentageColor">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToCampaignPercentageColor" nillable="true" type="tns:ToCampaignPercentageColor" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToCampaignPercentageColor" nillable="true" type="tns:ArrayOfToCampaignPercentageColor" />
+  <xs:complexType name="ToCampaignPercentageColor">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CampaignId" type="xs:int" />
+      <xs:element minOccurs="0" name="ColorId" type="xs:int" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Max" type="xs:double" />
+      <xs:element minOccurs="0" name="Min" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToCampaignPercentageColor" nillable="true" type="tns:ToCampaignPercentageColor" />
+  <xs:complexType name="ArrayOfToAreaRecord">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToAreaRecord" nillable="true" type="tns:ToAreaRecord" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToAreaRecord" nillable="true" type="tns:ArrayOfToAreaRecord" />
+  <xs:complexType name="ToAreaRecord">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AreaId" type="xs:int" />
+      <xs:element minOccurs="0" name="Classification" type="xs:int" />
+      <xs:element xmlns:q5="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Relations" nillable="true" type="q5:ArrayOfKeyValueOfintArrayOfKeyValueOfintbooleanty7Ep6D1" />
+      <xs:element minOccurs="0" name="Value" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToAreaRecord" nillable="true" type="tns:ToAreaRecord" />
+  <xs:complexType name="ArrayOfToCoordinate">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToCoordinate" nillable="true" type="tns:ToCoordinate" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToCoordinate" nillable="true" type="tns:ArrayOfToCoordinate" />
+  <xs:complexType name="ToCoordinate">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Latitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Longitude" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToCoordinate" nillable="true" type="tns:ToCoordinate" />
+  <xs:complexType name="ArrayOfToAdjustData">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToAdjustData" nillable="true" type="tns:ToAdjustData" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToAdjustData" nillable="true" type="tns:ArrayOfToAdjustData" />
+  <xs:complexType name="ToAdjustData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Count" type="xs:int" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="IsPartModified" type="xs:boolean" />
+      <xs:element minOccurs="0" name="PartPercentage" type="xs:float" />
+      <xs:element minOccurs="0" name="Total" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToAdjustData" nillable="true" type="tns:ToAdjustData" />
+</xs:schema>

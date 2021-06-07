@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.TaskServices" elementFormDefault="qualified" targetNamespace="TIMM.Website.TaskServices" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd7" namespace="TIMM.Website.TrackServices" />
+  <xs:complexType name="ArrayOfToTask">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToTask" nillable="true" type="tns:ToTask" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToTask" nillable="true" type="tns:ArrayOfToTask" />
+  <xs:complexType name="ToTask">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AuditorId" type="xs:int" />
+      <xs:element minOccurs="0" name="Date" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="DmId" type="xs:int" />
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Status" type="xs:int" />
+      <xs:element minOccurs="0" name="Taskgtuinfomappings" nillable="true" type="tns:ArrayOfToTaskgtuinfomapping" />
+      <xs:element minOccurs="0" name="Tasktimes" nillable="true" type="tns:ArrayOfToTaskTime" />
+      <xs:element minOccurs="0" name="Telephone" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToTask" nillable="true" type="tns:ToTask" />
+  <xs:complexType name="ArrayOfToTaskgtuinfomapping">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToTaskgtuinfomapping" nillable="true" type="tns:ToTaskgtuinfomapping" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToTaskgtuinfomapping" nillable="true" type="tns:ArrayOfToTaskgtuinfomapping" />
+  <xs:complexType name="ToTaskgtuinfomapping">
+    <xs:sequence>
+      <xs:element xmlns:q1="TIMM.Website.TrackServices" minOccurs="0" name="GTU" nillable="true" type="q1:ToGtu" />
+      <xs:element minOccurs="0" name="Gtuinfos" nillable="true" type="tns:ArrayOfToGtuinfo" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="TaskId" type="xs:int" />
+      <xs:element minOccurs="0" name="UserColor" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="UserId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToTaskgtuinfomapping" nillable="true" type="tns:ToTaskgtuinfomapping" />
+  <xs:complexType name="ArrayOfToGtuinfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToGtuinfo" nillable="true" type="tns:ToGtuinfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToGtuinfo" nillable="true" type="tns:ArrayOfToGtuinfo" />
+  <xs:complexType name="ToGtuinfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Code" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Distance" type="xs:double" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="PowerInfo" type="xs:int" />
+      <xs:element minOccurs="0" name="Status" type="xs:int" />
+      <xs:element minOccurs="0" name="TaskgtuinfoId" type="xs:int" />
+      <xs:element minOccurs="0" name="dtReceivedTime" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="dtSendTime" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="dwAltitude" type="xs:double" />
+      <xs:element minOccurs="0" name="dwLatitude" type="xs:double" />
+      <xs:element minOccurs="0" name="dwLongitude" type="xs:double" />
+      <xs:element minOccurs="0" name="dwSpeed" type="xs:double" />
+      <xs:element minOccurs="0" name="nAccuracy" type="xs:int" />
+      <xs:element minOccurs="0" name="nAreaCode" type="xs:int" />
+      <xs:element minOccurs="0" name="nCellID" type="xs:int" />
+      <xs:element minOccurs="0" name="nCount" type="xs:int" />
+      <xs:element minOccurs="0" name="nGPSFix" type="xs:long" />
+      <xs:element minOccurs="0" name="nHeading" type="xs:int" />
+      <xs:element minOccurs="0" name="nLocationID" type="xs:int" />
+      <xs:element minOccurs="0" name="nNetworkCode" type="xs:int" />
+      <xs:element minOccurs="0" name="sIPAddress" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="sVersion" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToGtuinfo" nillable="true" type="tns:ToGtuinfo" />
+  <xs:complexType name="ArrayOfToTaskTime">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToTaskTime" nillable="true" type="tns:ToTaskTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToTaskTime" nillable="true" type="tns:ArrayOfToTaskTime" />
+  <xs:complexType name="ToTaskTime">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="TaskId" type="xs:int" />
+      <xs:element minOccurs="0" name="Time" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="TimeType" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToTaskTime" nillable="true" type="tns:ToTaskTime" />
+</xs:schema>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToAddress, GPS.Website" source="GPS.DomainLayer.Area.Addresses.MapAddress, GPS.DomainLayer.Area">
+    <member name="Id" nullValue="0" />
+    <member name="Street" nullValue="String.Empty" />
+    <member name="ZipCode" nullValue="String.Empty" />
+    <member name="OriginalLatitude" nullValue="0" />
+    <member name="OriginalLongitude" nullValue="0" />
+    <member name="Latitude" nullValue="0" />
+    <member name="Longitude" nullValue="0" />
+    <member name="Color" nullValue="String.Empty" />
+    <member name="Radiuses" nullValue="null" />
+    <member name="Picture" nullValue="String.Empty" />
+  </class>
+  <class name="GPS.Website.TransferObjects.ToAddress, GPS.Website" source="GPS.DomainLayer.Entities.Address, GPS.DomainLayer"
+         helper="GPS.Website.TransferObjects.ToAddress.Convert">
+    <member name="Id" nullValue="0" />
+    <member name="ZipCode" nullValue="String.Empty" />
+    <member name="OriginalLatitude" nullValue="0" />
+    <member name="OriginalLongitude" nullValue="0" />
+    <member name="Latitude" nullValue="0" />
+    <member name="Longitude" nullValue="0" />
+    <member name="Color" nullValue="String.Empty" />
+    <member name="Radiuses" nullValue="null" />
+    <member name="Picture" nullValue="String.Empty" />
+  </class>
+</otis-mapping>

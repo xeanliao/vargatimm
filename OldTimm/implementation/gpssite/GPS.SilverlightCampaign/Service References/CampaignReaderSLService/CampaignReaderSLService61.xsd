@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/GPS.DomainLayer.Enum" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/GPS.DomainLayer.Enum" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="Classifications">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Z3" />
+      <xs:enumeration value="Z5" />
+      <xs:enumeration value="TRK" />
+      <xs:enumeration value="BG" />
+      <xs:enumeration value="CBSA" />
+      <xs:enumeration value="Urban" />
+      <xs:enumeration value="County" />
+      <xs:enumeration value="SLD_Senate" />
+      <xs:enumeration value="SLD_House" />
+      <xs:enumeration value="Voting_District" />
+      <xs:enumeration value="SD_Elem" />
+      <xs:enumeration value="SD_Secondary" />
+      <xs:enumeration value="SD_Unified" />
+      <xs:enumeration value="Custom" />
+      <xs:enumeration value="Address" />
+      <xs:enumeration value="PremiumCRoute" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Classifications" nillable="true" type="tns:Classifications" />
+</xs:schema>

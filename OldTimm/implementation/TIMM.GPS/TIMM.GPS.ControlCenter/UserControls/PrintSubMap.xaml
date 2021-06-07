@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="TIMM.GPS.ControlCenter.UserControls.PrintSubMap"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <StackPanel x:Name="LayoutRoot" Background="White">
+        <Border Background="#94b43d" HorizontalAlignment="Stretch" Padding="4">
+            <TextBlock Text="{Binding SubMapName}" FontSize="24" FontWeight="Bold" Foreground="Black" HorizontalAlignment="Center" />
+        </Border>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="30" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="SUB MAP #:" HorizontalAlignment="Left" FontSize="23" FontWeight="Bold" Foreground="Black" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="SUB MAP NAME:" HorizontalAlignment="Left" FontSize="23" FontWeight="Bold" Foreground="Black" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="TARGETING METHOD:" HorizontalAlignment="Left" FontSize="23" FontWeight="Bold" Foreground="Black" />
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="TOTAL HOUSEHOLDS:" HorizontalAlignment="Left" FontSize="23" FontWeight="Bold" Foreground="Black" />
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="TARGET HOUSEHOLDS:" HorizontalAlignment="Left" FontSize="23" FontWeight="Bold" Foreground="Black" />
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="PENETRATION:" HorizontalAlignment="Left" FontSize="23" FontWeight="Bold" Foreground="Black" />
+
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding ClientName}" FontSize="15"  Foreground="Black" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ClientName}" FontSize="15"  Foreground="Black" />
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding ClientName}" FontSize="15"  Foreground="Black" />
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding ClientName}" FontSize="15"  Foreground="Black" />
+            <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding ClientName}" FontSize="15"  Foreground="Black" />
+            <TextBlock Grid.Row="5" Grid.Column="2" Text="{Binding ClientName}" FontSize="15"  Foreground="Black" />
+        </Grid>
+
+        <Border Background="#94b43d" HorizontalAlignment="Stretch" Padding="4" Margin="0 10 0 0">
+            <TextBlock Text="Campaign Summary Map" FontSize="24" FontWeight="Bold" Foreground="Black" HorizontalAlignment="Center" />
+        </Border>
+        <Border BorderThickness="1" BorderBrush="#94b43d">
+            <Image x:Name="SubMapImage" Stretch="Uniform" />
+        </Border>
+    </StackPanel>
+</UserControl>

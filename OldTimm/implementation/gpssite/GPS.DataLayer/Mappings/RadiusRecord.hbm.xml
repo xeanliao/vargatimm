@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.RadiusRecord, GPS.DomainLayer" table="RadiusRecords" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+
+      <many-to-one name="Radiuse" column="RadiusId" class="GPS.DomainLayer.Entities.Radiuse, GPS.DomainLayer" />
+    <property name="AreaId" column="AreaId" />
+    <property name="Classification" column="Classification" />
+  </class>
+</hibernate-mapping>

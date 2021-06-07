@@ -1,0 +1,94 @@
+﻿<navigation:Page x:Class="TIMM.GPS.ControlCenter.Views.DistributionMapPrint" 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:map="clr-namespace:Microsoft.Maps.MapControl;assembly=Microsoft.Maps.MapControl"
+    xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation"
+    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    xmlns:timm="clr-namespace:TIMM.GPS.Silverlight.Controls;assembly=TIMM.GPS.Silverlight.Controls"                 
+    d:DesignWidth="1280" d:DesignHeight="1024" mc:Ignorable="d"
+    Title="Distribution Map Print Page">
+    
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.Resources>
+            <Storyboard x:Name="PageStoryboard" BeginTime="0" Duration="0" Completed="Storyboard_Completed" />
+        </Grid.Resources>
+
+        
+
+        <Popup x:Name="popMap" IsOpen="False" Width="0" Height="0" Opened="OnShowPopup" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <toolkit:BusyIndicator x:Name="Loading" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Canvas x:Name="popBg" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Grid Canvas.Left="0" Canvas.Top="0" 
+                          Width="{Binding Width, ElementName=popBg}" 
+                          Height="{Binding Height, ElementName=popBg}"
+                          MouseLeftButtonUp="OnClosePopup" Background="#BD000000" />
+
+
+                    <map:Map x:Name="mapMain" Visibility="Visible" Width="854" Height="907"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                             Center="39.3683,-95.2734" ZoomLevel="4.0" 
+                             ViewChangeStart="mapMain_ViewChangeStart"
+                             ViewChangeEnd="mapMain_ViewChangeEnd"
+                             ScaleVisibility="Collapsed" NavigationVisibility="Collapsed" >
+                    </map:Map>
+
+                    <Button x:Name="btnApply" Click="OnChangeMap" Width="100" Height="32" HorizontalAlignment="Right" VerticalAlignment="Top" >
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Images/apply.png" Width="20" Height="20" VerticalAlignment="Center" />
+                            <sdk:Label Content="Apply" VerticalAlignment="Center" Margin="5 0" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="btnCancel" Click="OnClosePopup" Width="100" Height="32" HorizontalAlignment="Right" VerticalAlignment="Top" >
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../Images/cancel.png" Width="20" Height="20" VerticalAlignment="Center" />
+                            <sdk:Label Content="Cancel" VerticalAlignment="Center" Margin="5 0" />
+                        </StackPanel>
+                    </Button>
+
+                    <StackPanel x:Name="navPanel" Orientation="Horizontal">
+                        <timm:ActiveImageButton x:Name="btnRoad" Source="../Images/32-Road.png" BorderBrush="Black" BorderThickness="1" Click="OnNavSwitchToRoad" Margin="5 0" VerticalAlignment="Center" />
+                        <timm:ActiveImageButton x:Name="btnAerial" Source="../Images/32-Aerial.png" BorderBrush="Black" BorderThickness="1" Click="OnNavSwitchToAerial" VerticalAlignment="Center" />
+                        <Image Source="../Images/compass.png" Height="64" Width="64" Margin="10 0" />
+                        <timm:ActiveImageButton x:Name="btnZoomIn" Source="../Images/zoom_in.png" Click="OnNavZoomIn" VerticalAlignment="Center" />
+                        <timm:ActiveImageButton x:Name="btnZoomOut" Source="../Images/zoom_out.png" Click="OnNavZoomOut" Margin="5 0" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                </Canvas>
+            </toolkit:BusyIndicator>
+        </Popup>
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <toolkit:WrapPanel Orientation="Horizontal" Height="35" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Button x:Name="btnPrint" Content="Print PDF" Click="OnPrintFile" IsEnabled="False"  Height="30" Margin="5 0" VerticalAlignment="Center" />
+            </toolkit:WrapPanel>
+
+            
+                
+            <ScrollViewer Margin="0 35 0 0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#565656">
+                    <StackPanel x:Name="PrintArea" Visibility="Collapsed" ></StackPanel>
+                </Grid>
+            </ScrollViewer>
+            
+
+
+            <StackPanel x:Name="StartPage" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+                <Button x:Name="btnStart" Click="OnStart" Style="{StaticResource OrangeButton}" Height="100" Width="320">
+                    <TextBlock TextAlignment="Center" Foreground="Black">
+                            <LineBreak />
+                            <Run Text="This will take a long time to prepare print preview" />
+                            <LineBreak />
+                            <LineBreak />
+                            <Run Text="Let's Go!" FontSize="24" FontWeight="Bold" />
+                            <LineBreak />
+                    </TextBlock>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</navigation:Page>

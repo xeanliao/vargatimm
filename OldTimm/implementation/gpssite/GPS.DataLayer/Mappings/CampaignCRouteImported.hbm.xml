@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CampaignCRouteImported, GPS.DomainLayer" table="CampaignCRouteImported" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Penetration" column="Penetration" />
+    <property name="Total" column="Total" />
+    <property name="PartPercentage" column="PartPercentage" />
+    <property name="IsPartModified" column="IsPartModified" />
+    <many-to-one name="PremiumCRoute"
+                 column="PremiumCRouteId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.PremiumCRoute, GPS.DomainLayer" />
+    <many-to-one name="Campaign"
+                 column="CampaignId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" />
+  </class>
+  <!-- delete all CampaignBlockGroupImporteds for the specified Campaign -->
+  <query name="CampaignCRouteImported.DeleteByCampaign">
+    delete from CampaignCRouteImported cbi where cbi.Campaign.Id = :campaignId
+  </query>
+</hibernate-mapping>

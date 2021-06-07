@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Versions>
+  <Version>
+    <ConnectName>timm</ConnectName>
+    <ConnectURl>http://localhost/timm</ConnectURl>
+  </Version>
+  <Version>
+    <ConnectName>timm201103</ConnectName>
+    <ConnectURl>http://localhost/timm201103</ConnectURl>
+  </Version>
+  <Version>
+    <ConnectName>timm201104</ConnectName>
+    <ConnectURl>http://localhost/timm201104</ConnectURl>
+  </Version>
+  <Version>
+    <ConnectName>timm201105</ConnectName>
+    <ConnectURl>http://localhost/timm201105</ConnectURl>
+  </Version>
+  <Version>
+    <ConnectName>timm201106</ConnectName>
+    <ConnectURl>http://localhost/timm201106</ConnectURl>
+  </Version>
+  <Version>
+    <ConnectName>timm201107</ConnectName>
+    <ConnectURl>http://localhost/timm201107</ConnectURl>
+  </Version>
+</Versions>

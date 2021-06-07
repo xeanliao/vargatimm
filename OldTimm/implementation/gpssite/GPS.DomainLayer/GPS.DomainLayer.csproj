@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8FC5044C-AC61-4886-966B-B097CBF8183B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GPS.DomainLayer</RootNamespace>
+    <AssemblyName>GPS.DomainLayer</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\gpssite\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.ActiveRecord">
+      <HintPath>..\Lib\Castle.ActiveRecord.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.ActiveRecord.Linq">
+      <HintPath>..\Lib\Castle.ActiveRecord.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="FileHelpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\FileHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=2.1.2.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActiveRecordDatabase\AssistantDatabase.cs" />
+    <Compile Include="Entities\AbstractArea.cs" />
+    <Compile Include="Entities\AbstractAreaBoxMapping.cs" />
+    <Compile Include="Entities\AbstractAreaCoordinate.cs" />
+    <Compile Include="Entities\Address.cs" />
+    <Compile Include="Entities\Area.designer.cs" />
+    <Compile Include="Entities\AuditorAssignment.cs" />
+    <Compile Include="Entities\BlockGroup.cs" />
+    <Compile Include="Entities\BlockGroupBoxMapping.cs" />
+    <Compile Include="Entities\BlockGroupCoordinate.cs" />
+    <Compile Include="Entities\Blockgroupselectmappings.cs" />
+    <Compile Include="Entities\Campaign.cs" />
+    <Compile Include="Entities\CampaignBackup.cs" />
+    <Compile Include="Entities\CampaignBlockGroupImported.cs" />
+    <Compile Include="Entities\CampaignClassification.cs" />
+    <Compile Include="Entities\CampaignCRouteImported.cs" />
+    <Compile Include="Entities\CampaignFiveZipImported.cs" />
+    <Compile Include="Entities\CampaignImportedDataItem.cs" />
+    <Compile Include="Entities\Campaignpercentagecolor.cs" />
+    <Compile Include="Entities\CampaignRecord.cs" />
+    <Compile Include="Entities\CampaignTractImported.cs" />
+    <Compile Include="Entities\MonitorAddresses.cs" />
+    <Compile Include="Entities\ScheduleTask.cs" />
+    <Compile Include="Entities\TaskTime.cs" />
+    <Compile Include="Entities\FakeGTU.cs" />
+    <Compile Include="Entities\Gtuinfo.cs" />
+    <Compile Include="Entities\Taskgtuinfomapping.cs" />
+    <Compile Include="Entities\Privilege.cs" />
+    <Compile Include="Entities\CountyArea.cs" />
+    <Compile Include="Entities\Countyareaboxmapping.cs" />
+    <Compile Include="Entities\Countyareacoordinate.cs" />
+    <Compile Include="Entities\Customarea.cs" />
+    <Compile Include="Entities\Customareaboxmapping.cs" />
+    <Compile Include="Entities\CustomAreaCoordinate.cs" />
+    <Compile Include="Entities\DistributionJob.cs" />
+    <Compile Include="Entities\DistributionJobMap.cs" />
+    <Compile Include="Entities\DistributionMap.cs" />
+    <Compile Include="Entities\Distributionmapcoordinate.cs" />
+    <Compile Include="Entities\DistributionMapRecords.cs" />
+    <Compile Include="Entities\DjParticipantAssignment.cs" />
+    <Compile Include="Entities\DriverAssignment.cs" />
+    <Compile Include="Entities\ElementarySchoolArea.cs" />
+    <Compile Include="Entities\Elementaryschoolareaboxmapping.cs" />
+    <Compile Include="Entities\Elementaryschoolareacoordinate.cs" />
+    <Compile Include="Entities\FiveZipArea.cs" />
+    <Compile Include="Entities\Fivezipareacoordinate.cs" />
+    <Compile Include="Entities\Fivezipboxmapping.cs" />
+    <Compile Include="Entities\GPSRadius.cs" />
+    <Compile Include="Entities\Groups.cs" />
+    <Compile Include="Entities\Gtus.cs" />
+    <Compile Include="Entities\Lowerhouseareaboxmapping.cs" />
+    <Compile Include="Entities\Lowerhouseareacoordinate.cs" />
+    <Compile Include="Entities\Lowerhouseareas.cs" />
+    <Compile Include="Entities\Metropolitancorearea.cs" />
+    <Compile Include="Entities\Metropolitancoreareaboxmappings.cs" />
+    <Compile Include="Entities\Metropolitancoreareacoordinate.cs" />
+    <Compile Include="Entities\Ndaddress.cs" />
+    <Compile Include="Entities\Ndaddressboxmapping.cs" />
+    <Compile Include="Entities\NdAddressCoordinate.cs" />
+    <Compile Include="Entities\Premiumcrouteboxmappings.cs" />
+    <Compile Include="Entities\Premiumcroutecoordinates.cs" />
+    <Compile Include="Entities\Premiumcroutes.cs" />
+    <Compile Include="Entities\Premiumcrouteselectmappings.cs" />
+    <Compile Include="Entities\Radius.cs" />
+    <Compile Include="Entities\RadiusRecord.cs" />
+    <Compile Include="Entities\Record.cs" />
+    <Compile Include="Entities\SecondarySchoolArea.cs" />
+    <Compile Include="Entities\Secondaryschoolareaboxmapping.cs" />
+    <Compile Include="Entities\Secondaryschoolareacoordinate.cs" />
+    <Compile Include="Entities\Submap.cs" />
+    <Compile Include="Entities\Submapcoordinate.cs" />
+    <Compile Include="Entities\Submaprecord.cs" />
+    <Compile Include="Entities\Task.cs" />
+    <Compile Include="Entities\ThreeZipArea.cs" />
+    <Compile Include="Entities\ThreeZipAreaCoordinate.cs" />
+    <Compile Include="Entities\Threezipboxmapping.cs" />
+    <Compile Include="Entities\Tract.cs" />
+    <Compile Include="Entities\Tractboxmapping.cs" />
+    <Compile Include="Entities\Tractcoordinate.cs" />
+    <Compile Include="Entities\UnifiedSchoolArea.cs" />
+    <Compile Include="Entities\Unifiedschoolareaboxmapping.cs" />
+    <Compile Include="Entities\Unifiedschoolareacoordinate.cs" />
+    <Compile Include="Entities\UpperSenateArea.cs" />
+    <Compile Include="Entities\Uppersenateareaboxmapping.cs" />
+    <Compile Include="Entities\Uppersenateareacoordinate.cs" />
+    <Compile Include="Entities\Urbanareaboxmappings.cs" />
+    <Compile Include="Entities\Urbanareacoordinates.cs" />
+    <Compile Include="Entities\Urbanareas.cs" />
+    <Compile Include="Entities\Users.cs" />
+    <Compile Include="Entities\Votingdistrictareaboxmappings.cs" />
+    <Compile Include="Entities\Votingdistrictareacoordinates.cs" />
+    <Compile Include="Entities\Votingdistrictareas.cs" />
+    <Compile Include="Entities\WalkerAssignment.cs" />
+    <Compile Include="Enum\Classifications.cs" />
+    <Compile Include="Enum\EnumPrivileges.cs" />
+    <Compile Include="Enum\EnumLengthMeasurecs.cs" />
+    <Compile Include="Enum\EnumRoles.cs" />
+    <Compile Include="Interfaces\IAddress.cs" />
+    <Compile Include="Interfaces\IArea.cs" />
+    <Compile Include="Interfaces\IAreaRecord.cs" />
+    <Compile Include="Interfaces\IBoxArea.cs" />
+    <Compile Include="Interfaces\ICampaign.cs" />
+    <Compile Include="Interfaces\ICampaignClassification.cs" />
+    <Compile Include="Interfaces\ICampaignPercentageColor.cs" />
+    <Compile Include="Interfaces\ICampaignRecords.cs" />
+    <Compile Include="Interfaces\ICircle.cs" />
+    <Compile Include="Interfaces\ICircleAreaRelation.cs" />
+    <Compile Include="Interfaces\ICoordinate.cs" />
+    <Compile Include="Interfaces\IDistributionMap.cs" />
+    <Compile Include="Interfaces\IExportSourceRepository.cs" />
+    <Compile Include="Interfaces\IExportSourceSpecification.cs" />
+    <Compile Include="Interfaces\IGPSColor.cs" />
+    <Compile Include="Interfaces\IGPSMap.cs" />
+    <Compile Include="Interfaces\IRadiuse.cs" />
+    <Compile Include="Interfaces\IRelations.cs" />
+    <Compile Include="Interfaces\ISubMap.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuerySpecifications\BlockGroupsSatisfyingDistributionMapSpecification.cs" />
+    <Compile Include="QuerySpecifications\BlockGroupsSatisfyingSubMapSpecification.cs" />
+    <Compile Include="QuerySpecifications\ExportSourceSpecification.cs" />
+    <Compile Include="QuerySpecifications\FiveZipsSatisfyingDistributionMapSpecification.cs" />
+    <Compile Include="QuerySpecifications\FiveZipsSatisfyingSubMapSpecification.cs" />
+    <Compile Include="QuerySpecifications\ImportedDataSpecification.cs" />
+    <Compile Include="QuerySpecifications\PremiumCRoutesSatisfyingDistributionMapSpecification.cs" />
+    <Compile Include="QuerySpecifications\PremiumCRoutesSatisfyingSubMapSpecification.cs" />
+    <Compile Include="QuerySpecifications\TractsSatisfyingDistributionMapSpecification.cs" />
+    <Compile Include="QuerySpecifications\TractsSatisfyingSubMapSpecification.cs" />
+    <Compile Include="RepositoryInterfaces\BulkRepositories\IBulkCampaignBGRepository.cs" />
+    <Compile Include="RepositoryInterfaces\BulkRepositories\IBulkCampaignCRouteRepository.cs" />
+    <Compile Include="RepositoryInterfaces\BulkRepositories\IBulkDistributionMapCoordinateRepository.cs" />
+    <Compile Include="RepositoryInterfaces\BulkRepositories\IBulkRepository.cs" />
+    <Compile Include="RepositoryInterfaces\BulkRepositories\IBulkSubMapCoordinateRepository.cs" />
+    <Compile Include="RepositoryInterfaces\ICampaignBackupRepository.cs" />
+    <Compile Include="RepositoryInterfaces\IPrivilegeRepository.cs" />
+    <Compile Include="RepositoryInterfaces\IAddressRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IBlockGroupBoxRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IBlockGroupRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ICampaignClassificationRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ICampaignPercentageColorRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ICampaignRecordRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ICampaignRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ICbsaBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ICountyAreaBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ICustomAreaRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IDistributionJobRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IDistributionMapRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IElementarySchoolBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IFiveZipBoxRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IFiveZipRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IGroupRepository.cs" />
+    <Compile Include="RepositoryInterfaces\IGtuRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ILowerHouseBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\INdAddressRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IPremiumCRouteRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\BulkRepositories\IBulkRadiusRecordRepository.cs" />
+    <Compile Include="RepositoryInterfaces\IRadiusRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ISecondarySchoolBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ISubMapRepository.cs" />
+    <Compile Include="RepositoryInterfaces\ITaskRepository.cs" />
+    <Compile Include="RepositoryInterfaces\IThreeZipRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\ITractRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IUnifiedSchoolBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IUpperSenateBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IUrbanBoxMappingRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RepositoryInterfaces\IUserRepository.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ValueObjects\Coordinate.cs" />
+    <Compile Include="ValueObjects\CsvAreaRecord.cs" />
+    <Compile Include="ValueObjects\ExcelAreaRecord.cs" />
+    <Compile Include="ValueObjects\ToAreaData.cs" />
+    <Compile Include="ValueObjects\ToBlockGroupSelectMapping.cs" />
+    <Compile Include="ValueObjects\ToPremiumCRouteSelectMapping.cs" />
+    <Compile Include="ValueObjects\UserRoles.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

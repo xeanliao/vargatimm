@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<hibernate-configuration xmlns="urn:nhibernate-configuration-2.2" >
+  <session-factory>
+    <property name="connection.driver_class">NHibernate.Driver.MySqlDataDriver</property>
+    <property name="connection.connection_string">Server=10.10.40.6; Port=10000; Database=Timm;User ID=root;Password=123456</property>
+    <property name="adonet.batch_size">10</property>
+    <property name="show_sql">true</property>
+    <property name="dialect">NHibernate.Dialect.MySQL5Dialect</property>
+    <property name="use_outer_join">true</property>
+    <property name="command_timeout">10</property>
+    <property name="query.substitutions">true 1, false 0, yes 'Y', no 'N'</property>
+    <property name="proxyfactory.factory_class">NHibernate.ByteCode.Castle.ProxyFactoryFactory, NHibernate.ByteCode.Castle</property>
+    <mapping assembly="GPS.DataLayer"/>
+  </session-factory>
+</hibernate-configuration>

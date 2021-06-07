@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CampaignBackup, GPS.DomainLayer" table="Campaigns_backup" lazy="true" >
+      <id name="Id" type="Int32" column="Id"/>
+    <property name="AreaDescription" column="AreaDescription" />
+    <property name="ClientCode" column="ClientCode" />
+    <property name="ClientName" column="ClientName" />
+    <property name="ContactName" column="ContactName" />
+    <property name="CustemerName" column="CustemerName" />
+    <property name="Date" column="Date" />
+    <property name="Description" column="Description" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Logo" column="Logo" />
+    <property name="Longitude" column="Longitude" />
+    <property name="Name" column="Name" />
+    <property name="Sequence" column="Sequence" />
+    <property name="UserName" column="UserName" />
+    <property name="ZoomLevel" column="ZoomLevel" />
+    <property name="IPAddress" column="IPAddress" />
+    <property name="OperationTime" column="OperationTime" />
+    <property name="OperationUser" column="OperationUser" />
+  </class>
+</hibernate-mapping>

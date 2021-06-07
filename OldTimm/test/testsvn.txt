@@ -1,0 +1,4 @@
+make one change to a different email address
+make one change to a different correct the password
+make svn client work with bugnet
+make svn client work with verify timm project code.

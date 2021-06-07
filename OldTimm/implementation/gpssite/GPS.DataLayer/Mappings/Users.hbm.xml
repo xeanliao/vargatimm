@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.User, GPS.DomainLayer" table="Users" lazy="true" >
+    <id name="Id" column="Id" >
+      <generator class="native" />
+    </id>
+    <property name="Enabled" column="Enabled" />
+    <property name="FullName" column="FullName" />
+    <property name="Password" column="Password" />
+    <property name="UserCode" column="UserCode" />
+    <property name="UserName" column="UserName" />
+    <property name="Email" column="Email" />
+    <property name="Token" column="Token" />
+    <property name="LastLoginTime" column="LastLoginTime" />
+    <property name="Role" column="Role" type="GPS.DataLayer.ValueObjects.UserRoles, GPS.DomainLayer" />
+    <!--<map name="Campaigns" table="campaignusermappings" >
+      <key column="userId"/>
+      <index-many-to-many column="campaignId" class ="GPS.DomainLayer.Entities.Campaign"/>
+      <composite-element class="GPS.DomainLayer.Entities.StatusInfo">
+        <property name="Status" column="Status" type="Int32"></property>       
+      </composite-element>
+    </map>-->
+    <bag name="Groups" table="usergroupmappings" >
+      <key column="userId"/>
+      <many-to-many column="groupId" class ="GPS.DomainLayer.Entities.Group"/>
+    </bag>
+
+    <!--<bag name="Taskgtuinfomappings" table="taskgtuinfomapping" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="UserId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Taskgtuinfomapping, GPS.DomainLayer" />
+    </bag>-->
+
+    <!--<bag name="Tasks" table="task" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="AuditorId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Task, GPS.DomainLayer" />
+    </bag>-->
+  </class>
+</hibernate-mapping>

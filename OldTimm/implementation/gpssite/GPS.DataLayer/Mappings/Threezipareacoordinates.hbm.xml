@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.ThreeZipAreaCoordinate, GPS.DomainLayer" table="ThreeZipAreaCoordinates" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="ShapeId" column="ShapeId" />
+    <property name="ThreeZipAreaId" column="ThreeZipAreaId" />
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,326 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B9C454DE-9834-4632-882B-7189B09DE3F1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GPS.DataLayer</RootNamespace>
+    <AssemblyName>GPS.DataLayer</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\gpssite\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.1.0.39271, Culture=neutral, PublicKeyToken=3a9cab8f8d22bfb7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.DynamicProxy2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle.DynamicProxy2.dll</HintPath>
+    </Reference>
+    <Reference Include="FileHelpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\FileHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\Lib\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=2.1.2.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Linq, Version=1.1.0.1001, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\NHibernate.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataInfrastructure\IBulkRepositoryFactory.cs" />
+    <Compile Include="DataInfrastructure\Implementations\BulkRepositoryFactory.cs" />
+    <Compile Include="DataInfrastructure\Implementations\NHibernateBasedBulkWorkSpace.cs" />
+    <Compile Include="DataInfrastructure\IRepositoryFactory.cs" />
+    <Compile Include="DataInfrastructure\ITransaction.cs" />
+    <Compile Include="DataInfrastructure\Implementations\NHibernateBasedTransaction.cs" />
+    <Compile Include="DataInfrastructure\IWorkspace.cs" />
+    <Compile Include="DataInfrastructure\Implementations\NHibernateBasedWorkSpace.cs" />
+    <Compile Include="DataInfrastructure\Implementations\RepositoryFactory.cs" />
+    <Compile Include="DataInfrastructure\IBulkWorkSpace.cs" />
+    <Compile Include="RepositoryImplementations\AddressRepository.cs" />
+    <Compile Include="RepositoryImplementations\BlockGroupRepository.cs" />
+    <Compile Include="RepositoryImplementations\BulkRepository\BulkCampaignBGRepository.cs" />
+    <Compile Include="RepositoryImplementations\BulkRepository\BulkCampaignCRouteRepository.cs" />
+    <Compile Include="RepositoryImplementations\BulkRepository\BulkDistributionMapCoordinateRepository.cs" />
+    <Compile Include="RepositoryImplementations\BulkRepository\BulkRepositoryBase.cs" />
+    <Compile Include="RepositoryImplementations\BulkRepository\BulkSubMapCoordinateRepository.cs" />
+    <Compile Include="RepositoryImplementations\CampaignBackupRepository.cs" />
+    <Compile Include="RepositoryImplementations\CampaignClassificationRepository.cs" />
+    <Compile Include="RepositoryImplementations\CampaignPercentageColorRepository.cs" />
+    <Compile Include="RepositoryImplementations\CampaignRecordRepository.cs" />
+    <Compile Include="RepositoryImplementations\CampaignRepository.cs" />
+    <Compile Include="RepositoryImplementations\CbsaBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\CountyAreaBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\CustomAreaRepository.cs" />
+    <Compile Include="RepositoryImplementations\DistributionJobRepository.cs" />
+    <Compile Include="RepositoryImplementations\DistributionMapRepository.cs" />
+    <Compile Include="RepositoryImplementations\ElementarySchoolBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\FiveZipRepository.cs" />
+    <Compile Include="RepositoryImplementations\GroupRepository.cs" />
+    <Compile Include="RepositoryImplementations\GtuInfoRepository.cs" />
+    <Compile Include="RepositoryImplementations\GtuRepository.cs" />
+    <Compile Include="RepositoryImplementations\LowerHouseBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\NdAddressRepository.cs" />
+    <Compile Include="RepositoryImplementations\PremiumCRouteRepository.cs" />
+    <Compile Include="RepositoryImplementations\BulkRepository\BulkRadiusRecordRepository.cs" />
+    <Compile Include="RepositoryImplementations\PrivilegeRepository.cs" />
+    <Compile Include="RepositoryImplementations\RadiusRepository.cs" />
+    <Compile Include="RepositoryImplementations\RepositoryBase.cs" />
+    <Compile Include="RepositoryImplementations\SecondarySchoolBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\SubMapRepository.cs" />
+    <Compile Include="RepositoryImplementations\TaskRepository.cs" />
+    <Compile Include="RepositoryImplementations\ThreeZipRepository.cs" />
+    <Compile Include="RepositoryImplementations\TractRepository.cs" />
+    <Compile Include="RepositoryImplementations\UnifiedSchoolBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\UpperSenateBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\UrbanBoxMappingRepository.cs" />
+    <Compile Include="RepositoryImplementations\UserRepository.cs" />
+    <Compile Include="DataInfrastructure\Implementations\NHibernateHelper.cs" />
+    <Compile Include="SequenceGenerators\SequenceGenerator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="DataInfrastructure\WorkSpaceManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GPS.DomainLayer\GPS.DomainLayer.csproj">
+      <Project>{8FC5044C-AC61-4886-966B-B097CBF8183B}</Project>
+      <Name>GPS.DomainLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GPS.Utilities\GPS.Utilities.csproj">
+      <Project>{0EF83599-99BE-4E9B-87C3-E1C3A0A5C5C5}</Project>
+      <Name>GPS.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Users.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\BlockGroup.hbm.xml" />
+    <EmbeddedResource Include="Mappings\BlockGroupBoxMapping.hbm.xml" />
+    <EmbeddedResource Include="Mappings\BlockGroupCoordinate.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Blockgroupselectmappings.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Campaignblockgroupimported.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Campaignclassifications.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Campaignfivezipimported.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Campaignpercentagecolors.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Campaignrecords.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Campaigns.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Campaigntractimported.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Countyareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Countyareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Countyareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Customareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Customareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Customareas.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Elementaryschoolareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Elementaryschoolareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Elementaryschoolareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Fivezipareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Fivezipareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Fivezipboxmappings.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Gtus.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Lowerhouseareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Lowerhouseareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Lowerhouseareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Metropolitancoreareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Metropolitancoreareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Metropolitancoreareas.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Addresses.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Ndaddressboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Ndaddresscoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Ndaddresses.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Premiumcrouteboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Premiumcroutecoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Premiumcroutes.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Premiumcrouteselectmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Radiuses.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Secondaryschoolareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Secondaryschoolareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Secondaryschoolareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Submapcoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Submaprecords.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Submaps.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mappings\Threezipareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Threezipareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Threezipboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Tractboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Tractcoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Tracts.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Unifiedschoolareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Unifiedschoolareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Unifiedschoolareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Uppersenateareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Uppersenateareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Uppersenateareas.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Urbanareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Urbanareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Urbanareas.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Votingdistrictareaboxmappings.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Votingdistrictareacoordinates.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Votingdistrictareas.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\DistributionMap.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\DistributionJob.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\DistributionJobMap.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\WalkerAssignment.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\AuditorAssignment.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\DriverAssignment.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\CampaignCRouteImported.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\RadiusRecord.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\DistributionMapRecords.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\DistributionMapCoordinates.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Groups.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Privilege.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Gtuinfo.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Task.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Taskgtuinfomapping.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\TaskTime.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\CampaignBackup.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\MonitorAddresses.hbm.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+</Project>

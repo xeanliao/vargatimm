@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.Gtuinfo, GPS.DomainLayer" table="gtuinfo" lazy="false" >
+    <id name="Id" column="Id" type="Int32">
+      <generator class="native" />
+    </id>
+    <property name="Code" column="code" />
+    <property name="dwSpeed" column="dwSpeed" />
+    <property name="nHeading" column="nHeading" />
+    <property name="dtSendTime" column="dtSendTime" />
+    <property name="dtReceivedTime" column="dtReceivedTime" />
+    <property name="sIPAddress" column="sIPAddress" />
+    <property name="nAreaCode" column="nAreaCode" />
+    <property name="nNetworkCode" column="nNetworkCode" />
+    <property name="nCellID" column="nCellID" />
+    <property name="nGPSFix" column="nGPSFix" />
+    <property name="nAccuracy" column="nAccuracy" />
+    <property name="nCount" column="nCount" />
+    <property name="nLocationID" column="nLocationID" />
+    <property name="sVersion" column="sVersion" />
+    <property name="dwAltitude" column="dwAltitude" />
+    <property name="dwLatitude" column="dwLatitude" />
+    <property name="dwLongitude" column="dwLongitude" />
+    <property name="PowerInfo" column="PowerInfo" />
+    <property name="TaskgtuinfoId" column="TaskgtuinfoId" />
+    <property name="Status" column="Status" />
+    <property name="Distance" column="Distance" />
+  </class>
+</hibernate-mapping>

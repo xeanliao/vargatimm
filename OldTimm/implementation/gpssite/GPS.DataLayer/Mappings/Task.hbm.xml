@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.Task, GPS.DomainLayer" table="task" lazy="true" >
+    <id name="Id" column="Id" type="Int32">
+      <generator class="native" />
+    </id>
+    <property name="Name" column="Name" />
+    <!--<property name="StartTime" column="StartTime" />
+    <property name="EndTime" column="EndTime" />-->
+    <property name="Date" column="Date" />
+    <!--<property name="LunchS" column="LunchS" />
+    <property name="LunchE" column="LunchE" />
+    <property name="BreakS" column="BreakS" />
+    <property name="BreakE" column="BreakE" />-->  
+    <property name="AuditorId" column="AuditorId" />
+    <property name="DmId" column="DmId" />
+    <property name="Status" column="Status" />
+    <property name="Email" column="Email" />
+    <property name="Telephone" column="Telephone" />
+
+    <bag name="Taskgtuinfomappings" table="taskgtuinfomapping" generic="true" inverse="true" cascade="all-delete-orphan" >
+      <key column="TaskId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Taskgtuinfomapping, GPS.DomainLayer" />
+    </bag>
+    <bag name="Tasktimes" table="tasktime" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="TaskId" />
+      <one-to-many class="GPS.DomainLayer.Entities.TaskTime, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

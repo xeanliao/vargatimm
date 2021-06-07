@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CampaignPercentageColor, GPS.DomainLayer" table="CampaignPercentageColors" lazy="true" >
+    <id name="Id" type="Int32" column="Id">
+      <generator class="native" />
+    </id>
+      <many-to-one name="Campaign"
+                   column="CampaignId"
+                   not-null="true"
+                   class="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" />
+    <property name="ColorId" column="ColorId" />
+    <property name="Max" column="Max" />
+    <property name="Min" column="Min" />
+  </class>
+</hibernate-mapping>

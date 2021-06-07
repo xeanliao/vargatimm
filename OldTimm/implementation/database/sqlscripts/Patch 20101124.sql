@@ -1,0 +1,21 @@
+CREATE TABLE `campaigns_backup` (
+  `Id` int(11) NOT NULL,
+  `Name` varchar(64) NOT NULL,
+  `Description` varchar(1024) NOT NULL,
+  `UserName` varchar(64) NOT NULL,
+  `Date` datetime NOT NULL,
+  `CustemerName` varchar(64) NOT NULL,
+  `Latitude` double NOT NULL,
+  `Longitude` double NOT NULL,
+  `ZoomLevel` int(10) unsigned NOT NULL,
+  `Sequence` int(10) unsigned default NULL,
+  `ClientName` varchar(64) NOT NULL,
+  `ContactName` varchar(64) NOT NULL,
+  `ClientCode` varchar(64) NOT NULL,
+  `Logo` varchar(64) default NULL,
+  `AreaDescription` varchar(128) NOT NULL,
+  `IPAddress` varchar(100) default NULL,
+  `OperationTime` datetime default NULL,
+  `OperationUser` varchar(64) default NULL,
+  PRIMARY KEY  (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

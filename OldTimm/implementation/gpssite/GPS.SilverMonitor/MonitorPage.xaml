@@ -1,0 +1,20 @@
+﻿<navigation:Page x:Class="GPS.SilverMonitor.MonitorPage" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation"
+           d:DesignWidth="640" d:DesignHeight="480"
+           xmlns:m="clr-namespace:Microsoft.Maps.MapControl;assembly=Microsoft.Maps.MapControl"       
+           Title="MonitorPage Page">
+    <Grid x:Name="LayoutRoot" Background="Green">
+        <m:Map Name="map1" Mode="road">
+            <m:MapLayer Name="DMLayer"></m:MapLayer>
+            <m:MapLayer Name="GtuLayer"></m:MapLayer>
+            <m:MapLayer Name="AddressLayer"></m:MapLayer>
+        </m:Map>
+        <TextBox Height="23" HorizontalAlignment="Right" Name="txtMessage" VerticalAlignment="Top" Width="200" Opacity="0.5" />
+    </Grid>
+    
+</navigation:Page>

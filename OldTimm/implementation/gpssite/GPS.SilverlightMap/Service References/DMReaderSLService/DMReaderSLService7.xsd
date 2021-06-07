@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.AreaServices" elementFormDefault="qualified" targetNamespace="TIMM.Website.AreaServices" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd3" namespace="TIMM.Website.TransferObjects" />
+  <xs:complexType name="ArrayOfToArea">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToArea" nillable="true" type="tns:ToArea" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToArea" nillable="true" type="tns:ArrayOfToArea" />
+  <xs:complexType name="ToArea">
+    <xs:sequence>
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Attributes" nillable="true" type="q1:ArrayOfKeyValueOfstringstring" />
+      <xs:element minOccurs="0" name="Classification" type="xs:int" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsEnabled" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Latitude" type="xs:double" />
+      <xs:element xmlns:q2="TIMM.Website.TransferObjects" minOccurs="0" name="Locations" nillable="true" type="q2:ArrayOfToCoordinate" />
+      <xs:element minOccurs="0" name="Longitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Relations" nillable="true" type="q3:ArrayOfKeyValueOfintArrayOfKeyValueOfintbooleanty7Ep6D1" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToArea" nillable="true" type="tns:ToArea" />
+  <xs:complexType name="ArrayOfToMonitorAddresses">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToMonitorAddresses" nillable="true" type="tns:ToMonitorAddresses" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToMonitorAddresses" nillable="true" type="tns:ArrayOfToMonitorAddresses" />
+  <xs:complexType name="ToMonitorAddresses">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Address1" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Latitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Longitude" type="xs:double" />
+      <xs:element minOccurs="0" name="OriginalLatitude" type="xs:double" />
+      <xs:element minOccurs="0" name="OriginalLongitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Picture" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ZipCode" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToMonitorAddresses" nillable="true" type="tns:ToMonitorAddresses" />
+</xs:schema>

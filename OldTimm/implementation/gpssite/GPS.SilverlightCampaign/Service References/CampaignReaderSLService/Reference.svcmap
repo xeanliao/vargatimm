@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="de76d1bb-d5bf-4f05-8ef5-957f5914da26" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?wsdl" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="CampaignReaderSLService6.xsd" MetadataType="Schema" ID="3ada2411-aaf0-4b02-b80a-f5087b519285" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd9" />
+    <MetadataFile FileName="CampaignReaderSLService4.xsd" MetadataType="Schema" ID="f0392507-55a6-4312-8d68-6324723ea2fa" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd4" />
+    <MetadataFile FileName="CampaignReaderSLService3.xsd" MetadataType="Schema" ID="079526a2-e6cd-4961-859c-62a7cc7d702b" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd3" />
+    <MetadataFile FileName="CampaignReaderSLService.wsdl" MetadataType="Wsdl" ID="34c8fcc7-f357-4a34-811c-0fa27fc6ac49" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?wsdl" />
+    <MetadataFile FileName="CampaignReaderSLService41.xsd" MetadataType="Schema" ID="c2602ce0-62ed-4764-a121-73f02f952006" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd6" />
+    <MetadataFile FileName="CampaignReaderSLService61.xsd" MetadataType="Schema" ID="987af1bd-ff77-49de-a57b-b50b0ddc7f40" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd10" />
+    <MetadataFile FileName="CampaignReaderSLService1.wsdl" MetadataType="Wsdl" ID="dd575b17-196b-4e62-9f41-15e8995d932c" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="CampaignReaderSLService42.xsd" MetadataType="Schema" ID="43357b47-f40c-45ba-99ee-be9979f8a8bc" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd5" />
+    <MetadataFile FileName="CampaignReaderSLService1.xsd" MetadataType="Schema" ID="824d120b-b712-4032-b2d4-af6fb6e8cef6" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd0" />
+    <MetadataFile FileName="CampaignReaderSLService62.xsd" MetadataType="Schema" ID="c5b85e31-ed59-4cf6-abdc-f699e8f2bce7" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd8" />
+    <MetadataFile FileName="CampaignReaderSLService5.xsd" MetadataType="Schema" ID="73a4449d-768a-4ed0-913c-995f760e7d54" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd7" />
+    <MetadataFile FileName="CampaignReaderSLService2.xsd" MetadataType="Schema" ID="758ff342-f580-4e39-8b01-a6bf49f78fdb" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd2" />
+    <MetadataFile FileName="CampaignReaderSLService.xsd" MetadataType="Schema" ID="5bfb300c-5305-4c77-8b4d-a0bbbde54d8f" SourceId="1" SourceUrl="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd1" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

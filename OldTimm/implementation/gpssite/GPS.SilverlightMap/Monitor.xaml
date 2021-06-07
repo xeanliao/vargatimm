@@ -1,0 +1,102 @@
+﻿<UserControl x:Class="GPS.SilverlightMap.Monitor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
+    xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+    xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+    Width="1280" Height="960" xmlns:m="clr-namespace:Microsoft.Maps.MapControl;assembly=Microsoft.Maps.MapControl">
+    <Grid x:Name="LayoutRoot" Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="LayoutTop" Background="White"  Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal"  Grid.Row="1" Grid.ColumnSpan="2">
+                <TextBlock x:Name="lblEmail" HorizontalAlignment="Left" Width="38">Email:</TextBlock>
+                <TextBlock x:Name="txtEmail" HorizontalAlignment="Left" Grid.Column="1"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2">
+                <TextBlock x:Name="lblTel" HorizontalAlignment="Left" Width="38">Tel:  </TextBlock>
+                <TextBlock x:Name="txtTel" HorizontalAlignment="Left" Grid.Column="1"/>
+            </StackPanel>
+
+            <!--<TextBlock x:Name="lblTel" HorizontalAlignment="Right" Grid.Row ="1" Grid.Column="4">Tel:</TextBlock>
+            
+            <TextBlock x:Name="txtTel" HorizontalAlignment="Left" Grid.Row ="1" Width="100" Grid.Column="5" />-->
+        </Grid>
+
+        <Grid x:Name="LayoutLeft" Background="White" Grid.Column="0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="75" />
+                <RowDefinition Height="70" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Vertical" Grid.Row="0">
+                <TextBlock HorizontalAlignment="Left" Height="20" Foreground="Blue" >Task</TextBlock>
+                <Button x:Name="btnTaskCtl"  IsEnabled="False"  Click="btnTaskCtl_Click" Background="#62A21D"  Content="Start"  Height="20" Width=" 60" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+            </StackPanel>
+            <!--<StackPanel Orientation="Vertical" Grid.Row="1" >
+                <TextBlock Grid.Row="3" HorizontalAlignment="Left" Height="20" Foreground="Blue" FontStretch="ExtraCondensed">Mode</TextBlock>
+                <RadioButton x:Name="rdCurrentGTUMode" Checked="rdCurrentGTUMode_Checked" VerticalAlignment="Center" Content="Current" GroupName ="Mode" IsEnabled="False"/>
+                <RadioButton x:Name="rdHistoryGTUMode" Checked="rdHistoryGTUMode_Checked" VerticalAlignment="Center"  Content="History"  GroupName ="Mode" IsEnabled="False"/>
+            </StackPanel>-->
+            <StackPanel Orientation="Vertical" Grid.Row="1">
+                <TextBlock HorizontalAlignment="Left" Height="20" Foreground="Blue" >Review</TextBlock>
+                <Button x:Name="btnHistory"  Click="btnHistory_Click" Background="#62A21D"  Content="History"  Height="20" Width=" 60" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsEnabled="False"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Row="2" >
+                <TextBlock Grid.Row="6" HorizontalAlignment="Left" Height="20" Foreground="Blue" >Get Selected GTUs</TextBlock>
+                <Button x:Name="btnRefresh" Click="btnRefresh_Click"  IsEnabled="False">
+                    <TextBlock x:Name="txtbtnRefresh"> Refresh</TextBlock>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Row="3" >
+                <TextBlock HorizontalAlignment="Left" Height="20" Foreground="Blue" >Add New Address</TextBlock>
+                <Button x:Name="btnAddAddress" Click="btnAddAddress_Click" Content="Add">
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Row="4" >
+                <TextBlock Height="50" HorizontalAlignment="Left" Foreground="Blue" >GTU List</TextBlock>
+                <ListBox IsEnabled="False"  SelectionMode="Multiple" x:Name="lstGTU">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Width="10" Fill="{Binding Path=Col}"/>
+                                <TextBlock  Width="15" Text=""/>
+                                <TextBlock  Width="60" Text="{Binding Path=DisplayGTUId}"/>
+                                <TextBlock  Width="0" Text="{Binding Path=GTUId}" Visibility="Collapsed"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+            
+        </Grid>
+
+        <m:Map x:Name="MyMap" CredentialsProvider="AvKr95P5eEx2mhj5vfZbh1-0VVXPY9BzNvwGkTsIvoCiIIagK3n106lMjoOjp__u"  Grid.Row="1" Grid.Column="1">
+            <m:MapLayer x:Name="DMLayer">
+            </m:MapLayer>
+            <m:MapLayer x:Name="NDLayer">
+            </m:MapLayer>
+            <m:MapLayer x:Name="AddressLayer">
+            </m:MapLayer>
+            <m:MapLayer x:Name="pointsLayer">
+            </m:MapLayer>
+        </m:Map>
+    </Grid>
+</UserControl>

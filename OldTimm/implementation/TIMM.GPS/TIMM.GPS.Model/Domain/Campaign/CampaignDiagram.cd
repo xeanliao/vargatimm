@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TIMM.GPS.Model.Campaign" Collapsed="true">
+    <Position X="12.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAECASAgAEAiAAgAAAAoAAQACAAAAAABQQAQAAEAAAQ=</HashCode>
+      <FileName>Domain\Campaign\Campaign.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.CampaignBackup" Collapsed="true">
+    <Position X="14" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECAQAgAEAmAAAAAAAoAEQACAAAAAABQQAAAAECAAA=</HashCode>
+      <FileName>Domain\Campaign\CampaignBackup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.CampaignBlockGroupImported" Collapsed="true">
+    <Position X="6" Y="1.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Campaign\CampaignBlockGroupImported.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.CampaignFiveZipImported" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAggAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Campaign\CampaignFiveZipImported.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.CampaignImportedDataItem" Collapsed="true">
+    <Position X="5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAABA=</HashCode>
+      <FileName>Domain\Campaign\CampaignImportedDataItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.CampaignTractImported" Collapsed="true">
+    <Position X="9.25" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Campaign\CampaignTractImported.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TIMM.GPS.Model.CampaignCRouteImported" Collapsed="true">
+    <Position X="3.25" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Domain\Campaign\CampaignCRouteImported.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

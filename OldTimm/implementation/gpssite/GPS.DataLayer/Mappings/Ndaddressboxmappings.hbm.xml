@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.NdAddressBoxMapping, GPS.DomainLayer" table="NdAddressBoxMappings" lazy="true" >
+    <id name="Id" column ="Id" unsaved-value="0">
+      <generator class="native" /><!--
+      <generator class="GPS.DataLayer.SequenceGenerators.SequenceGenerator, GPS.DataLayer">
+        <param name="table">SequenceCounters</param>
+        <param name="column">NdAddressBoxMapping</param>
+      </generator>-->
+    </id>
+    <property name="BoxId" column="BoxId" />
+    <many-to-one name="NdAddress"
+                 column="NdAddressId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.NdAddress, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

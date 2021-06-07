@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToGtu, GPS.Website" source="GPS.DomainLayer.Entities.Gtu, GPS.DomainLayer" 
+         helper="GPS.Website.TransferObjects.ToGtu.Convert">
+    <member name="Id" nullValue="0" />
+    <member name="UniqueID" nullValue="String.Empty" />
+    <member name="Model" nullValue="String.Empty" />
+    <member name="IsEnabled" nullValue="false" />
+    <!--<member name="Taskgtuinfomappings" nullValue="null" />-->
+  </class>
+</otis-mapping>

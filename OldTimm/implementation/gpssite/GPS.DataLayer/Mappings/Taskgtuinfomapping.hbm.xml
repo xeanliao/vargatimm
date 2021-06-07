@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.Taskgtuinfomapping, GPS.DomainLayer" table="taskgtuinfomapping" lazy="true"  >
+    <!--<id name="Id" column="Id" type="Int32"/>-->
+    <id name="Id" column="Id" type="Int32">
+      <generator class="native" />
+    </id>
+    <property name="UserColor" column="UserColor" />
+    <property name="TaskId" column="TaskId" />
+    <property name="UserId" column="UserId"/>
+    <many-to-one name="GTU" column="GTUId" class="GPS.DomainLayer.Entities.Gtu, GPS.DomainLayer"/>
+    <bag name="Gtuinfos" table="gtuinfo" generic="true" inverse="true" cascade="all-delete-orphan" >
+      <key column="TaskgtuinfoId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Gtuinfo, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping> 

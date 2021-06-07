@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.GroupServices" elementFormDefault="qualified" targetNamespace="TIMM.Website.GroupServices" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ArrayOfToGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToGroup" nillable="true" type="tns:ToGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToGroup" nillable="true" type="tns:ArrayOfToGroup" />
+  <xs:complexType name="ToGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Privileges" nillable="true" type="tns:ArrayOfToPrivilege" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToGroup" nillable="true" type="tns:ToGroup" />
+  <xs:complexType name="ArrayOfToPrivilege">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ToPrivilege" nillable="true" type="tns:ToPrivilege" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfToPrivilege" nillable="true" type="tns:ArrayOfToPrivilege" />
+  <xs:complexType name="ToPrivilege">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Value" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToPrivilege" nillable="true" type="tns:ToPrivilege" />
+</xs:schema>

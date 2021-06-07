@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             x:Class="TIMM.GPS.ControlCenter.App" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:vm="clr-namespace:TIMM.GPS.ControlCenter.ViewModel" 
+             xmlns:converter="clr-namespace:TIMM.GPS.ControlCenter.Converters"
+             mc:Ignorable="d">
+  <Application.Resources>
+  	<ResourceDictionary>      			  
+		<ResourceDictionary.MergedDictionaries>		
+            <ResourceDictionary Source="Assets/Themes/JetPack.xaml"/> 		
+        </ResourceDictionary.MergedDictionaries> 
+    <!--Global View Model Locator-->
+    <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
+        <!--Converters-->
+        <converter:NullToFalseConverter x:Key="NullToFalseConverter" />
+		</ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.Gtu, GPS.DomainLayer" table="Gtus" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="IsEnabled" column="IsEnabled" />
+    <property name="Model" column="Model" />
+    <property name="UniqueID" column="UniqueID" />
+    <many-to-one name="User" unique="true" column="UserId" />
+    
+    <!--<bag name="Taskgtuinfomappings" table="taskgtuinfomapping" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="GTUId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Taskgtuinfomapping, GPS.DomainLayer" />
+    </bag>-->
+  </class>
+</hibernate-mapping>

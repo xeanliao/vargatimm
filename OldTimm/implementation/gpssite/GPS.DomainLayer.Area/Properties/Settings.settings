@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GPS.DomainLayer.Area.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="GPS_DomainLayer_Area_MapPointService_CommonService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://findv3.staging.mappoint.net/Find-30/Common.asmx</Value>
+    </Setting>
+    <Setting Name="GPS_DomainLayer_Area_BingGeocodeService_GeocodeService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://dev.virtualearth.net/webservices/v1/geocodeservice/GeocodeService.svc</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

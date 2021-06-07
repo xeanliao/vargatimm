@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToStatusInfo, GPS.Website" source="GPS.DomainLayer.Entities.StatusInfo, GPS.DomainLayer">
+    <member name="Status" nullValue="0" />   
+  </class>
+</otis-mapping>

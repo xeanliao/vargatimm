@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.SilverlightServices" elementFormDefault="qualified" targetNamespace="TIMM.Website.SilverlightServices" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd2" namespace="TIMM.Website.DistributionMapServices" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd7" namespace="TIMM.Website.AreaServices" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd5" namespace="TIMM.Website.TaskServices" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:element name="GetDistributionMapsById">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDistributionMapsByIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetDistributionMapsByIdResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDistributionMapsObjectById">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDistributionMapsObjectByIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="TIMM.Website.DistributionMapServices" minOccurs="0" name="GetDistributionMapsObjectByIdResult" nillable="true" type="q1:ToDistributionMap" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCustomAreaByBox">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCustomAreaByBoxResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetCustomAreaByBoxResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCustomAreaObjectByBox">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCustomAreaObjectByBoxResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="TIMM.Website.AreaServices" minOccurs="0" name="GetCustomAreaObjectByBoxResult" nillable="true" type="q2:ArrayOfToArea" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTask">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTaskResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetTaskResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTaskObject">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTaskObjectResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="TIMM.Website.TaskServices" minOccurs="0" name="GetTaskObjectResult" nillable="true" type="q3:ToTask" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetGtuUserNameDic">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetGtuUserNameDicResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetGtuUserNameDicResult" nillable="true" type="q4:ArrayOfKeyValueOfstringstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetGtuInfoListByTaskId">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="tid" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetGtuInfoListByTaskIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="TIMM.Website.TaskServices" minOccurs="0" name="GetGtuInfoListByTaskIdResult" nillable="true" type="q5:ArrayOfToTaskgtuinfomapping" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMAddressListByTaskId">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="tid" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMAddressListByTaskIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="TIMM.Website.AreaServices" minOccurs="0" name="GetMAddressListByTaskIdResult" nillable="true" type="q6:ArrayOfToMonitorAddresses" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMAddressCOListByTaskId">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="tid" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMAddressCOListByTaskIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="TIMM.Website.AreaServices" minOccurs="0" name="GetMAddressCOListByTaskIdResult" nillable="true" type="q7:ArrayOfToMonitorAddresses" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddTaskTime">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="taskId" type="xs:int" />
+        <xs:element minOccurs="0" name="timeType" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddTaskTimeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q8="TIMM.Website.TaskServices" minOccurs="0" name="AddTaskTimeResult" nillable="true" type="q8:ToTask" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateTaskObject">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="TIMM.Website.TaskServices" minOccurs="0" name="toTask" nillable="true" type="q9:ToTask" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateTaskObjectResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q10="TIMM.Website.TaskServices" minOccurs="0" name="UpdateTaskObjectResult" nillable="true" type="q10:ToTask" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateTask">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="toTask" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateTaskResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="UpdateTaskResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="getUserNameByUserId">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="uid" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="getUserNameByUserIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="getUserNameByUserIdResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="loadHistoryDotToLayerThread">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="gid" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="loadHistoryDotToLayerThreadResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="loadHistoryDotToLayerThreadResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

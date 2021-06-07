@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.TractBoxMapping, GPS.DomainLayer" table="TractBoxMappings" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="BoxId" column="BoxId" />
+    <property name="TractId" column="TractId" />
+  </class>
+</hibernate-mapping>

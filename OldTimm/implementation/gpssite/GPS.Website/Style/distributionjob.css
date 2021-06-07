@@ -1,0 +1,262 @@
+﻿body
+{
+}
+#distribution-job-panel
+{
+    background-color:Transparent;
+    font-family: Arial, Verdana;
+    font-size: 11px;
+    color: #000;
+    margin: 0px 0;
+    padding: 0px 0px 0px 0px;
+    z-index:-1000;
+}
+
+#distribution-job-panel .menubar
+{
+    background: #94b43d;
+    color: white;
+	font-family: Arial,Verdana;
+	font-size: 11px;
+	font-weight:bold;
+    text-align: right;
+    padding: 6px;
+}
+#distribution-job-panel .menubar a
+{
+	padding:0px 4px 0px 4px;
+}
+
+#distribution-job-panel .menubar A.selected
+{
+}
+
+
+#distribution-job-panel .menubar A.hover
+{
+    color: #FFF;
+    background-color: #3399FF;
+}
+
+#distribution-job-panel .menubar A.disabled
+{
+    color: #AAA;
+    cursor: default;
+}
+
+#distribution-job-panel .menubar A.hover.disabled
+{
+    background-color: transparent;
+}
+
+#distribution-job-panel .djform
+{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    left: 0px;
+    height: auto;
+    background: #94b43d;
+    color: #000;
+    font-size: 11px;
+    border: solid 2px #94b43d;
+    padding: 4px 4px 10px 4px;
+    display: none;
+}
+
+#distribution-job-panel .djform div
+{
+    margin-top: 10px;
+}
+
+#distribution-job-panel .djform DIV A
+{
+    text-decoration: none;
+    border: solid 1px white;
+    padding: 4px;
+    color:White;
+    background: #444444;
+}
+
+#distribution-job-panel .djform DIV textarea
+{
+    width: 200px;
+    height: 20px;
+    border: none;
+    padding-top: 4px;
+    font-size: 11px;
+}
+
+#distribution-job-panel .djform DIV Input
+{
+    width: 190px;
+    height: 16px;
+    padding-top: 4px;
+    border: none;
+    font-size: 11px;
+}
+
+#distribution-job-panel .djform DIV SPAN
+{
+    display: block;
+    padding: 0px 0px 4px 0px;
+    color: white;
+}
+
+#distribution-job-panel .selected
+{
+    background: #94b43d;
+}
+
+#distribution-job-panel .djlist
+{
+    padding: 5px 0px 5px 40px;
+    font-size: 11px;
+    white-space: nowrap;
+    position:relative;
+    cursor:pointer;
+}
+
+#distribution-job-panel .djlist .djitem
+{
+    padding: 3px 5px 3px 0px;
+    margin-bottom: 3px;
+    position:relative;
+}
+
+
+#distribution-job-panel .djlist span
+{
+    font-size: 9px;
+}
+
+#distribution-job-panel .djlist .dmlist
+{
+    padding: 3px 5px 3px 0px;
+    margin-left:10px;
+    margin-top:3px;
+    white-space: nowrap;
+}
+
+
+
+#distribution-job-panel ul#navmenu
+        {
+            margin: 0;
+            border: 0 none;
+            padding: 5px 5px 5px 5px;
+            width: 100px; /*For KHTML*/
+            list-style: none;
+            height:auto;
+            /*height: 100px;*/
+            position:absolute;
+            left:0px;
+            top:0px;
+            float:left;
+        }
+        
+#distribution-job-panel ul#navmenu li
+        {
+            margin: 0;
+            border: 0 none;
+            padding: 0;
+            float: left; /*For Gecko*/
+            display: inline;
+            list-style: none;
+            position: relative;
+            height:15px;
+        }
+#distribution-job-panel ul#navmenu ul
+        {
+            margin: 0;
+            border: 0 none;
+            padding: 0;
+            width: 100px;
+            list-style: none;
+            display: none;
+            position: absolute;
+            top: 16px;
+            left: 0;
+        }
+#distribution-job-panel ul#navmenu ul li
+        {
+            float: none; /*For Gecko*/
+            display: block !important;
+            display: inline; /*For IE*/
+        }
+        /* Root Menu */
+#distribution-job-panel ul#navmenu a
+        {
+            border: 1px solid #FFF;
+            border-right-color: #CCC;
+            border-bottom-color: #CCC;
+            padding: 0 6px;
+            float: none !important; /*For Opera*/
+            float: left; /*For IE*/
+            display: block;
+            background: #EEE;
+            color: #666;
+            font: bold 9px/16px Verdana, Arial, Helvetica, sans-serif;
+            text-decoration: none;
+            height: auto !important;
+            height: 1%; /*For IE*/
+        }
+        /* Root Menu Hover Persistence */
+#distribution-job-panel ul#navmenu a:hover, #distribution-job-panel ul#navmenu li:hover a, #distribution-job-panel ul#navmenu li.iehover a
+        {
+            background: #CCC;
+            color: #FFF;
+        }
+        /* 2nd Menu */
+#distribution-job-panel ul#navmenu li:hover li a, #distribution-job-panel ul#navmenu li.iehover li a
+        {
+            float: none;
+            background: #EEE;
+            color: #666;
+        }
+        /* 2nd Menu Hover Persistence */
+#distribution-job-panel ul#navmenu li:hover li a:hover, #distribution-job-panel ul#navmenu li:hover li:hover a, #distribution-job-panel ul#navmenu li.iehover li a:hover, #distribution-job-panel ul#navmenu li.iehover li.iehover a
+        {
+            background: #CCC;
+            color: #FFF;
+        }
+        /* 3rd Menu */
+#distribution-job-panel ul#navmenu li:hover li:hover li a, #distribution-job-panel ul#navmenu li.iehover li.iehover li a
+        {
+            background: #EEE;
+            color: #666;
+        }
+        /* 3rd Menu Hover Persistence */
+#distribution-job-panel ul#navmenu li:hover li:hover li a:hover, #distribution-job-panel ul#navmenu li:hover li:hover li:hover a, #distribution-job-panel ul#navmenu li.iehover li.iehover li a:hover, #distribution-job-panel ul#navmenu li.iehover li.iehover li.iehover a
+        {
+            background: #CCC;
+            color: #FFF;
+        }
+        /* 4th Menu */
+#distribution-job-panel ul#navmenu li:hover li:hover li:hover li a, #distribution-job-panel ul#navmenu li.iehover li.iehover li.iehover li a
+        {
+            background: #EEE;
+            color: #666;
+        }
+        /* 4th Menu Hover */
+#distribution-job-panel ul#navmenu li:hover li:hover li:hover li a:hover, #distribution-job-panel ul#navmenu li.iehover li.iehover li.iehover li a:hover
+        {
+            background: #CCC;
+            color: #FFF;
+        }
+#distribution-job-panel ul#navmenu ul ul
+        {
+            display: none;
+            /*position: absolute;*/
+            top: 0;
+            left: 160px;
+        }
+        /* Do Not Move - Must Come Before display:block for Gecko */
+#distribution-job-panel ul#navmenu li:hover ul
+        {
+            display: none;
+        }
+#distribution-job-panel ul#navmenu li:hover ul, #distribution-job-panel ul#navmenu ul li:hover ul, #distribution-job-panel ul#navmenu ul ul li:hover ul, #distribution-job-panel ul#navmenu li.iehover ul, #distribution-job-panel ul#navmenu ul li.iehover ul, #distribution-job-panel ul#navmenu ul ul li.iehover ul
+        {
+            display: block;
+        }

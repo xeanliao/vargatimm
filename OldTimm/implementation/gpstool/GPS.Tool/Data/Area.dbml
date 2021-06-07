@@ -1,0 +1,561 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="test" Class="AreaDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=localhost;Initial Catalog=test;Persist Security Info=True;User ID=sa" SettingsObjectName="GPS.Tool.Properties.Settings" SettingsPropertyName="testConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.BlockGroupBoxMappings" Member="BlockGroupBoxMappings">
+    <Type Name="BlockGroupBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BlockGroupId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="BlockGroup_BlockGroupBoxMapping" Member="BlockGroup" ThisKey="BlockGroupId" OtherKey="Id" Type="BlockGroup" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.VotingDistrictAreas" Member="VotingDistrictAreas">
+    <Type Name="VotingDistrictArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="VTD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="CountyCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8)" CanBeNull="true" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="VotingDistrictArea_VotingDistrictAreaCoordinate" Member="VotingDistrictAreaCoordinates" ThisKey="Id" OtherKey="VotingDistrictAreaId" Type="VotingDistrictAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.BlockGroupCoordinates" Member="BlockGroupCoordinates">
+    <Type Name="BlockGroupCoordinate">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BlockGroupId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="BlockGroup_BlockGroupCoordinate" Member="BlockGroup" ThisKey="BlockGroupId" OtherKey="Id" Type="BlockGroup" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.BlockGroupMappings" Member="BlockGroupMappings">
+    <Type Name="BlockGroupMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ThreeZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ThreeZipAreaCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="TractId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TractCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="BlockGroupId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BlockGroupCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Association Name="ThreeZipArea_BlockGroupMapping" Member="ThreeZipArea" ThisKey="ThreeZipAreaId" OtherKey="Id" Type="ThreeZipArea" IsForeignKey="true" />
+      <Association Name="Tract_BlockGroupMapping" Member="Tract" ThisKey="TractId" OtherKey="Id" Type="Tract" IsForeignKey="true" />
+      <Association Name="BlockGroup_BlockGroupMapping" Member="BlockGroup" ThisKey="BlockGroupId" OtherKey="Id" Type="BlockGroup" IsForeignKey="true" />
+      <Association Name="FiveZipArea_BlockGroupMapping" Member="FiveZipArea" ThisKey="FiveZipAreaId" OtherKey="Id" Type="FiveZipArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CountyAreaBoxMappings" Member="CountyAreaBoxMappings">
+    <Type Name="CountyAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CountyAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="CountyArea_CountyAreaBoxMapping" Member="CountyArea" ThisKey="CountyAreaId" OtherKey="Id" Type="CountyArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CountyAreaCoordinates" Member="CountyAreaCoordinates">
+    <Type Name="CountyAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CountyAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="CountyArea_CountyAreaCoordinate" Member="CountyArea" ThisKey="CountyAreaId" OtherKey="Id" Type="CountyArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CountyAreas" Member="CountyAreas">
+    <Type Name="CountyArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="CountyArea_CountyAreaBoxMapping" Member="CountyAreaBoxMappings" ThisKey="Id" OtherKey="CountyAreaId" Type="CountyAreaBoxMapping" />
+      <Association Name="CountyArea_CountyAreaCoordinate" Member="CountyAreaCoordinates" ThisKey="Id" OtherKey="CountyAreaId" Type="CountyAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Countys" Member="Counties">
+    <Type Name="County">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8)" CanBeNull="true" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElementarySchoolAreaBoxMappings" Member="ElementarySchoolAreaBoxMappings">
+    <Type Name="ElementarySchoolAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ElementarySchoolAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="ElementarySchoolArea_ElementarySchoolAreaBoxMapping" Member="ElementarySchoolArea" ThisKey="ElementarySchoolAreaId" OtherKey="Id" Type="ElementarySchoolArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElementarySchoolAreaCoordinates" Member="ElementarySchoolAreaCoordinates">
+    <Type Name="ElementarySchoolAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ElementarySchoolAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="ElementarySchoolArea_ElementarySchoolAreaCoordinate" Member="ElementarySchoolArea" ThisKey="ElementarySchoolAreaId" OtherKey="Id" Type="ElementarySchoolArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElementarySchoolAreas" Member="ElementarySchoolAreas">
+    <Type Name="ElementarySchoolArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="ElementarySchoolArea_ElementarySchoolAreaBoxMapping" Member="ElementarySchoolAreaBoxMappings" ThisKey="Id" OtherKey="ElementarySchoolAreaId" Type="ElementarySchoolAreaBoxMapping" />
+      <Association Name="ElementarySchoolArea_ElementarySchoolAreaCoordinate" Member="ElementarySchoolAreaCoordinates" ThisKey="Id" OtherKey="ElementarySchoolAreaId" Type="ElementarySchoolAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FiveZipAreaCoordinates" Member="FiveZipAreaCoordinates">
+    <Type Name="FiveZipAreaCoordinate">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="FiveZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="ShapeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="FiveZipArea_FiveZipAreaCoordinate" Member="FiveZipArea" ThisKey="FiveZipAreaId" OtherKey="Id" Type="FiveZipArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FiveZipBoxMappings" Member="FiveZipBoxMappings">
+    <Type Name="FiveZipBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="FiveZipArea_FiveZipBoxMapping" Member="FiveZipArea" ThisKey="FiveZipAreaId" OtherKey="Id" Type="FiveZipArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LowerHouseAreaBoxMappings" Member="LowerHouseAreaBoxMappings">
+    <Type Name="LowerHouseAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LowerHouseAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="LowerHouseArea_LowerHouseAreaBoxMapping" Member="LowerHouseArea" ThisKey="LowerHouseAreaId" OtherKey="Id" Type="LowerHouseArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LowerHouseAreaCoordinates" Member="LowerHouseAreaCoordinates">
+    <Type Name="LowerHouseAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="LowerHouseAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="LowerHouseArea_LowerHouseAreaCoordinate" Member="LowerHouseArea" ThisKey="LowerHouseAreaId" OtherKey="Id" Type="LowerHouseArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LowerHouseAreas" Member="LowerHouseAreas">
+    <Type Name="LowerHouseArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="GEO_ID" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="LowerHouseArea_LowerHouseAreaBoxMapping" Member="LowerHouseAreaBoxMappings" ThisKey="Id" OtherKey="LowerHouseAreaId" Type="LowerHouseAreaBoxMapping" />
+      <Association Name="LowerHouseArea_LowerHouseAreaCoordinate" Member="LowerHouseAreaCoordinates" ThisKey="Id" OtherKey="LowerHouseAreaId" Type="LowerHouseAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MetropolitanCoreAreaBlockGroupMappings" Member="MetropolitanCoreAreaBlockGroupMappings">
+    <Type Name="MetropolitanCoreAreaBlockGroupMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="MetropolitanCoreAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CountyId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TractId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BlockGroupId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MetropolitanCoreAreaBoxMappings" Member="MetropolitanCoreAreaBoxMappings">
+    <Type Name="MetropolitanCoreAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="MetropolitanCoreAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="MetropolitanCoreArea_MetropolitanCoreAreaBoxMapping" Member="MetropolitanCoreArea" ThisKey="MetropolitanCoreAreaId" OtherKey="Id" Type="MetropolitanCoreArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MetropolitanCoreAreaCoordinates" Member="MetropolitanCoreAreaCoordinates">
+    <Type Name="MetropolitanCoreAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="MetropolitanCoreAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="ShapeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="MetropolitanCoreArea_MetropolitanCoreAreaCoordinate" Member="MetropolitanCoreArea" ThisKey="MetropolitanCoreAreaId" OtherKey="Id" Type="MetropolitanCoreArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MetropolitanCoreAreas" Member="MetropolitanCoreAreas">
+    <Type Name="MetropolitanCoreArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="Type" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Status" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="GEOCODE" Type="System.String" DbType="NVarChar(8)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="MetropolitanCoreArea_MetropolitanCoreAreaBoxMapping" Member="MetropolitanCoreAreaBoxMappings" ThisKey="Id" OtherKey="MetropolitanCoreAreaId" Type="MetropolitanCoreAreaBoxMapping" />
+      <Association Name="MetropolitanCoreArea_MetropolitanCoreAreaCoordinate" Member="MetropolitanCoreAreaCoordinates" ThisKey="Id" OtherKey="MetropolitanCoreAreaId" Type="MetropolitanCoreAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MetropolitanCoreAreaZipCodeMappings" Member="MetropolitanCoreAreaZipCodeMappings">
+    <Type Name="MetropolitanCoreAreaZipCodeMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="MetropolitanCoreAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ThreeZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ThreeZipCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.SecondarySchoolAreaBoxMappings" Member="SecondarySchoolAreaBoxMappings">
+    <Type Name="SecondarySchoolAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SecondarySchoolAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="SecondarySchoolArea_SecondarySchoolAreaBoxMapping" Member="SecondarySchoolArea" ThisKey="SecondarySchoolAreaId" OtherKey="Id" Type="SecondarySchoolArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.SecondarySchoolAreaCoordinates" Member="SecondarySchoolAreaCoordinates">
+    <Type Name="SecondarySchoolAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="SecondarySchoolAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="SecondarySchoolArea_SecondarySchoolAreaCoordinate" Member="SecondarySchoolArea" ThisKey="SecondarySchoolAreaId" OtherKey="Id" Type="SecondarySchoolArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.SecondarySchoolAreas" Member="SecondarySchoolAreas">
+    <Type Name="SecondarySchoolArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="SecondarySchoolArea_SecondarySchoolAreaBoxMapping" Member="SecondarySchoolAreaBoxMappings" ThisKey="Id" OtherKey="SecondarySchoolAreaId" Type="SecondarySchoolAreaBoxMapping" />
+      <Association Name="SecondarySchoolArea_SecondarySchoolAreaCoordinate" Member="SecondarySchoolAreaCoordinates" ThisKey="Id" OtherKey="SecondarySchoolAreaId" Type="SecondarySchoolAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.States" Member="States">
+    <Type Name="State">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(24) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ThreeZipAreaCoordinates" Member="ThreeZipAreaCoordinates">
+    <Type Name="ThreeZipAreaCoordinate">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ThreeZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="ShapeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="ThreeZipArea_ThreeZipAreaCoordinate" Member="ThreeZipArea" ThisKey="ThreeZipAreaId" OtherKey="Id" Type="ThreeZipArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ThreeZipAreas" Member="ThreeZipAreas">
+    <Type Name="ThreeZipArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8)" CanBeNull="true" />
+      <Column Name="LSADTrans" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Association Name="ThreeZipArea_BlockGroupMapping" Member="BlockGroupMappings" ThisKey="Id" OtherKey="ThreeZipAreaId" Type="BlockGroupMapping" />
+      <Association Name="ThreeZipArea_ThreeZipAreaCoordinate" Member="ThreeZipAreaCoordinates" ThisKey="Id" OtherKey="ThreeZipAreaId" Type="ThreeZipAreaCoordinate" />
+      <Association Name="ThreeZipArea_ThreeZipBoxMapping" Member="ThreeZipBoxMappings" ThisKey="Id" OtherKey="ThreeZipAreaId" Type="ThreeZipBoxMapping" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ThreeZipBoxMappings" Member="ThreeZipBoxMappings">
+    <Type Name="ThreeZipBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ThreeZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="ThreeZipArea_ThreeZipBoxMapping" Member="ThreeZipArea" ThisKey="ThreeZipAreaId" OtherKey="Id" Type="ThreeZipArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TractBoxMappings" Member="TractBoxMappings">
+    <Type Name="TractBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TractId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Tract_TractBoxMapping" Member="Tract" ThisKey="TractId" OtherKey="Id" Type="Tract" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TractCoordinates" Member="TractCoordinates">
+    <Type Name="TractCoordinate">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="TractId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="Tract_TractCoordinate" Member="Tract" ThisKey="TractId" OtherKey="Id" Type="Tract" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UnifiedSchoolAreaBoxMappings" Member="UnifiedSchoolAreaBoxMappings">
+    <Type Name="UnifiedSchoolAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UnifiedSchoolAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="UnifiedSchoolArea_UnifiedSchoolAreaBoxMapping" Member="UnifiedSchoolArea" ThisKey="UnifiedSchoolAreaId" OtherKey="Id" Type="UnifiedSchoolArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UnifiedSchoolAreaCoordinates" Member="UnifiedSchoolAreaCoordinates">
+    <Type Name="UnifiedSchoolAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UnifiedSchoolAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="UnifiedSchoolArea_UnifiedSchoolAreaCoordinate" Member="UnifiedSchoolArea" ThisKey="UnifiedSchoolAreaId" OtherKey="Id" Type="UnifiedSchoolArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UnifiedSchoolAreas" Member="UnifiedSchoolAreas">
+    <Type Name="UnifiedSchoolArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="UnifiedSchoolArea_UnifiedSchoolAreaBoxMapping" Member="UnifiedSchoolAreaBoxMappings" ThisKey="Id" OtherKey="UnifiedSchoolAreaId" Type="UnifiedSchoolAreaBoxMapping" />
+      <Association Name="UnifiedSchoolArea_UnifiedSchoolAreaCoordinate" Member="UnifiedSchoolAreaCoordinates" ThisKey="Id" OtherKey="UnifiedSchoolAreaId" Type="UnifiedSchoolAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UpperSenateAreaBoxMappings" Member="UpperSenateAreaBoxMappings">
+    <Type Name="UpperSenateAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UpperSenateAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="UpperSenateArea_UpperSenateAreaBoxMapping" Member="UpperSenateArea" ThisKey="UpperSenateAreaId" OtherKey="Id" Type="UpperSenateArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UpperSenateAreaCoordinates" Member="UpperSenateAreaCoordinates">
+    <Type Name="UpperSenateAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UpperSenateAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="UpperSenateArea_UpperSenateAreaCoordinate" Member="UpperSenateArea" ThisKey="UpperSenateAreaId" OtherKey="Id" Type="UpperSenateArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UpperSenateAreas" Member="UpperSenateAreas">
+    <Type Name="UpperSenateArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="GEO_ID" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="UpperSenateArea_UpperSenateAreaBoxMapping" Member="UpperSenateAreaBoxMappings" ThisKey="Id" OtherKey="UpperSenateAreaId" Type="UpperSenateAreaBoxMapping" />
+      <Association Name="UpperSenateArea_UpperSenateAreaCoordinate" Member="UpperSenateAreaCoordinates" ThisKey="Id" OtherKey="UpperSenateAreaId" Type="UpperSenateAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UrbanAreaBlockGroupMappings" Member="UrbanAreaBlockGroupMappings">
+    <Type Name="UrbanAreaBlockGroupMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UrbanAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UrbanCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="CountyId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CountyCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="TractId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TractCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="BlockGroupId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BlockGroupCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UrbanAreaBoxMappings" Member="UrbanAreaBoxMappings">
+    <Type Name="UrbanAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UrbanAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="UrbanArea_UrbanAreaBoxMapping" Member="UrbanArea" ThisKey="UrbanAreaId" OtherKey="Id" Type="UrbanArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UrbanAreaCoordinates" Member="UrbanAreaCoordinates">
+    <Type Name="UrbanAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UrbanAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="UrbanArea_UrbanAreaCoordinate" Member="UrbanArea" ThisKey="UrbanAreaId" OtherKey="Id" Type="UrbanArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UrbanAreas" Member="UrbanAreas">
+    <Type Name="UrbanArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD_TRAN" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="UrbanArea_UrbanAreaBoxMapping" Member="UrbanAreaBoxMappings" ThisKey="Id" OtherKey="UrbanAreaId" Type="UrbanAreaBoxMapping" />
+      <Association Name="UrbanArea_UrbanAreaCoordinate" Member="UrbanAreaCoordinates" ThisKey="Id" OtherKey="UrbanAreaId" Type="UrbanAreaCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UrbanAreaZipCodeMappings" Member="UrbanAreaZipCodeMappings">
+    <Type Name="UrbanAreaZipCodeMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UrbanAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UrbanAreaCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="ThreeZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ThreeZipCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.VotingDistrictAreaBoxMappings" Member="VotingDistrictAreaBoxMappings">
+    <Type Name="VotingDistrictAreaBoxMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BoxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="VotingDistrictAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.VotingDistrictAreaCoordinates" Member="VotingDistrictAreaCoordinates">
+    <Type Name="VotingDistrictAreaCoordinate">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="VotingDistrictAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Association Name="VotingDistrictArea_VotingDistrictAreaCoordinate" Member="VotingDistrictArea" ThisKey="VotingDistrictAreaId" OtherKey="Id" Type="VotingDistrictArea" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Tracts" Member="Tracts">
+    <Type Name="Tract">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="CountyCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="ArbitraryUniqueCode" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8)" CanBeNull="true" />
+      <Column Name="LSADTrans" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="IsEnabled" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OTotal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(256)" CanBeNull="true" />
+      <Association Name="Tract_BlockGroupMapping" Member="BlockGroupMappings" ThisKey="Id" OtherKey="TractId" Type="BlockGroupMapping" />
+      <Association Name="Tract_TractBoxMapping" Member="TractBoxMappings" ThisKey="Id" OtherKey="TractId" Type="TractBoxMapping" />
+      <Association Name="Tract_TractCoordinate" Member="TractCoordinates" ThisKey="Id" OtherKey="TractId" Type="TractCoordinate" />
+    </Type>
+  </Table>
+  <Table Name="dbo.BlockGroups" Member="BlockGroups">
+    <Type Name="BlockGroup">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="CountyCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="TractCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8)" CanBeNull="true" />
+      <Column Name="LSADTrans" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="IsEnabled" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OTotal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(256)" CanBeNull="true" />
+      <Column Name="ArbitraryUniqueCode" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Association Name="BlockGroup_BlockGroupBoxMapping" Member="BlockGroupBoxMappings" ThisKey="Id" OtherKey="BlockGroupId" Type="BlockGroupBoxMapping" />
+      <Association Name="BlockGroup_BlockGroupCoordinate" Member="BlockGroupCoordinates" ThisKey="Id" OtherKey="BlockGroupId" Type="BlockGroupCoordinate" />
+      <Association Name="BlockGroup_BlockGroupMapping" Member="BlockGroupMappings" ThisKey="Id" OtherKey="BlockGroupId" Type="BlockGroupMapping" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FiveZipAreas" Member="FiveZipAreas">
+    <Type Name="FiveZipArea">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="LSAD" Type="System.String" DbType="NVarChar(8)" CanBeNull="true" />
+      <Column Name="LSADTrans" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="MinLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLongitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MinLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaxLatitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Latitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Longitude" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="StateCode" Type="System.String" DbType="NVarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="IsEnabled" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OTotal" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(256)" CanBeNull="true" />
+      <Column Name="PartCount" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IsInnerShape" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="FiveZipArea_BlockGroupMapping" Member="BlockGroupMappings" ThisKey="Id" OtherKey="FiveZipAreaId" Type="BlockGroupMapping" />
+      <Association Name="FiveZipArea_FiveZipAreaCoordinate" Member="FiveZipAreaCoordinates" ThisKey="Id" OtherKey="FiveZipAreaId" Type="FiveZipAreaCoordinate" />
+      <Association Name="FiveZipArea_FiveZipBoxMapping" Member="FiveZipBoxMappings" ThisKey="Id" OtherKey="FiveZipAreaId" Type="FiveZipBoxMapping" />
+    </Type>
+  </Table>
+</Database>

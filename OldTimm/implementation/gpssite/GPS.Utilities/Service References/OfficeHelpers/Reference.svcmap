@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="cfa4f381-6e17-4301-a768-fd35d9101be5" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:8010/ExcelHelperService" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="ExcelHelper.wsdl" MetadataType="Wsdl" ID="5cd8eb9a-34b7-49d4-9480-59db8d2312bb" SourceId="1" SourceUrl="http://localhost:8010/ExcelHelperService?wsdl" />
+    <MetadataFile FileName="ExcelHelperService.xsd" MetadataType="Schema" ID="de709e96-1505-406e-9a70-884f28eefe4f" SourceId="1" SourceUrl="http://localhost:8010/ExcelHelperService?xsd=xsd0" />
+    <MetadataFile FileName="ExcelHelperService1.xsd" MetadataType="Schema" ID="db54f07a-67b4-4307-b348-4b202f08bd4d" SourceId="1" SourceUrl="http://localhost:8010/ExcelHelperService?xsd=xsd2" />
+    <MetadataFile FileName="ExcelHelperService2.xsd" MetadataType="Schema" ID="47935302-aaa9-44ec-a4dd-32f8cbfa2792" SourceId="1" SourceUrl="http://localhost:8010/ExcelHelperService?xsd=xsd1" />
+    <MetadataFile FileName="ExcelHelperService.disco" MetadataType="Disco" ID="796b7fba-f7e1-4bce-a4dc-ded79dcabf1a" SourceId="1" SourceUrl="http://localhost:8010/ExcelHelperService?disco" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="http://tempuri.org/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" name="GTUQueryService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import namespace="http://tempuri.org/" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/GTUService.TIMM" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IGTUQueryService_GetGTU_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTU" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetGTU_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTUResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetGTUs_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTUs" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetGTUs_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTUsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetCurrentCoordinate_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCurrentCoordinate" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetCurrentCoordinate_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCurrentCoordinateResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetCurrentCoordinates_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCurrentCoordinates" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetCurrentCoordinates_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCurrentCoordinatesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetGTUInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTUInfo" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetGTUInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTUInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetGTUCodeList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTUCodeList" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_GetGTUCodeList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetGTUCodeListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_RegisterDM_InputMessage">
+    <wsdl:part name="parameters" element="tns:RegisterDM" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_RegisterDM_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RegisterDMResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_IsInArea_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsInArea" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_IsInArea_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsInAreaResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_RemoveTaskFromStore_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveTaskFromStore" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_RemoveTaskFromStore_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveTaskFromStoreResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_AddTaskToStore_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddTaskToStore" />
+  </wsdl:message>
+  <wsdl:message name="IGTUQueryService_AddTaskToStore_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddTaskToStoreResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IGTUQueryService">
+    <wsdl:operation name="GetGTU">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTU" message="tns:IGTUQueryService_GetGTU_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTUResponse" message="tns:IGTUQueryService_GetGTU_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGTUs">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTUs" message="tns:IGTUQueryService_GetGTUs_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTUsResponse" message="tns:IGTUQueryService_GetGTUs_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentCoordinate">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/GetCurrentCoordinate" message="tns:IGTUQueryService_GetCurrentCoordinate_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/GetCurrentCoordinateResponse" message="tns:IGTUQueryService_GetCurrentCoordinate_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentCoordinates">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/GetCurrentCoordinates" message="tns:IGTUQueryService_GetCurrentCoordinates_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/GetCurrentCoordinatesResponse" message="tns:IGTUQueryService_GetCurrentCoordinates_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGTUInfo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTUInfo" message="tns:IGTUQueryService_GetGTUInfo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTUInfoResponse" message="tns:IGTUQueryService_GetGTUInfo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGTUCodeList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTUCodeList" message="tns:IGTUQueryService_GetGTUCodeList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/GetGTUCodeListResponse" message="tns:IGTUQueryService_GetGTUCodeList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RegisterDM">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/RegisterDM" message="tns:IGTUQueryService_RegisterDM_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/RegisterDMResponse" message="tns:IGTUQueryService_RegisterDM_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IsInArea">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/IsInArea" message="tns:IGTUQueryService_IsInArea_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/IsInAreaResponse" message="tns:IGTUQueryService_IsInArea_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveTaskFromStore">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/RemoveTaskFromStore" message="tns:IGTUQueryService_RemoveTaskFromStore_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/RemoveTaskFromStoreResponse" message="tns:IGTUQueryService_RemoveTaskFromStore_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddTaskToStore">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGTUQueryService/AddTaskToStore" message="tns:IGTUQueryService_AddTaskToStore_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGTUQueryService/AddTaskToStoreResponse" message="tns:IGTUQueryService_AddTaskToStore_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IGTUQueryService" type="tns:IGTUQueryService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetGTU">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/GetGTU" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGTUs">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/GetGTUs" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentCoordinate">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/GetCurrentCoordinate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentCoordinates">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/GetCurrentCoordinates" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGTUInfo">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/GetGTUInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGTUCodeList">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/GetGTUCodeList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterDM">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/RegisterDM" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsInArea">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/IsInArea" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveTaskFromStore">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/RemoveTaskFromStore" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddTaskToStore">
+      <soap:operation soapAction="http://tempuri.org/IGTUQueryService/AddTaskToStore" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GTUQueryService">
+    <wsdl:port name="BasicHttpBinding_IGTUQueryService" binding="tns:BasicHttpBinding_IGTUQueryService">
+      <soap:address location="http://74.208.46.157:7800/GTUService/GTUQuery/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

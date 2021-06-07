@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.MetropolitanCoreArea, GPS.DomainLayer" table="MetropolitanCoreAreas" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Code" column="Code" />
+    <property name="GEOCODE" column="GEOCODE" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="Name" column="Name" />
+    <property name="Status" column="Status" />
+    <property name="Type" column="Type" />
+    <bag name="MetropolitanCoreAreaCoordinates" table="MetropolitanCoreAreaCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="MetropolitanCoreAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.MetropolitanCoreAreaCoordinate, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

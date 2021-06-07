@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="GPS.DomainLayer"  namespace="GPS.DomainLayer.Entities">
+  <class name ="BlockGroup" table="BlockGroups">
+    <id name="Id" column ="Id" unsaved-value="0"></id>
+    <property name ="Name" />
+    <property name ="Code" />
+    <property name ="StateCode" />
+    <property name ="CountyCode" />
+    <property name ="TractCode" />
+    <property name ="ArbitraryUniqueCode" />
+    <property name ="LSAD" />
+    <property name ="LSADTrans" />
+    <property name ="MinLongitude" />
+    <property name ="MaxLongitude" />
+    <property name ="MinLatitude" />
+    <property name ="MaxLatitude" />
+    <property name ="Latitude" />
+    <property name ="Longitude" />
+    <property name ="IsEnabled" />
+    <property name ="OTotal" />
+    <property name ="Description" />
+    <bag name="BlockGroupCoordinates" table="BlockGroupCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="BlockGroupId" />
+      <one-to-many class="GPS.DomainLayer.Entities.BlockGroupCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="BlockGroupBoxMappings" table="BlockGroupBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="BlockGroupId" />
+      <one-to-many class="GPS.DomainLayer.Entities.BlockGroupBoxMapping, GPS.DomainLayer" />
+    </bag>
+    <bag name="BlockGroupSelectMappings" table="BlockGroupSelectMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="BlockGroupId" />
+      <one-to-many class="GPS.DomainLayer.Entities.BlockGroupSelectMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

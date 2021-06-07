@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CountyAreaCoordinate, GPS.DomainLayer" table="CountyAreaCoordinates" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <many-to-one name="CountyArea"
+                 column="CountyAreaId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.CountyArea, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

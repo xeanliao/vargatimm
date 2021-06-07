@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CampaignBlockGroupImported, GPS.DomainLayer" table="CampaignBlockGroupImported" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Penetration" column="Penetration" />
+    <property name="Total" column="Total" />
+    <many-to-one name="Campaign"
+                 column="CampaignId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" />
+    <many-to-one name="BlockGroup"
+                 column="BlockGroupId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.BlockGroup, GPS.DomainLayer" />
+  </class>
+  
+  <!-- delete all CampaignBlockGroupImporteds for the specified Campaign -->
+  <query name="CampaignBlockGroupImported.DeleteAllForCampaign">
+    delete from CampaignBlockGroupImported cbgi where cbgi.Campaign.Id = :campaignId
+  </query>
+</hibernate-mapping>

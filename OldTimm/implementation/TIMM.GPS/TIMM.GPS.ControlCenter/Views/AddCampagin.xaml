@@ -1,0 +1,75 @@
+﻿<controls:ChildWindowBase
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:controls="clr-namespace:TIMM.GPS.ControlCenter.Controls"
+    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    xmlns:System="clr-namespace:System;assembly=mscorlib" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:local="clr-namespace:TIMM.GPS.ControlCenter.ViewModel"
+	xmlns:TIMM_GPS_ControlCenter_Converters="clr-namespace:TIMM.GPS.ControlCenter.Converters"
+	mc:Ignorable="d" x:Class="TIMM.GPS.ControlCenter.Views.AddCampagin" 	
+	Width="480" MinHeight="600"
+    Title="Campagin Properties"
+	d:DataContext="{d:DesignInstance Type=local:CampaignDetailViewModel}">
+
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+
+        <StackPanel x:Name="form" DataContext="{Binding Detail, Mode=TwoWay}">
+            <sdk:Label Content="Client Name" Margin="0 5"/>
+            <TextBox Text="{Binding ClientName, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
+
+            <sdk:Label Content="Contact Name" Margin="0 5"/>
+            <TextBox Text="{Binding ContactName, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
+
+            <sdk:Label Content="Client Code" Margin="0 5"/>
+            <TextBox Text="{Binding ClientCode, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
+
+            <sdk:Label Content="Client Name" Margin="0 5"/>
+            <TextBox Text="{Binding ClientName, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
+
+            <StackPanel Orientation="Horizontal">
+                <sdk:Label  Content="Insert Logo" Margin="0 5" VerticalAlignment="Center"/>
+                <Button Content="Upload" Margin="5 5" Click="UploadButton_Click" VerticalAlignment="Center" />
+            </StackPanel>
+
+            <Image x:Name="imgLogo" Margin="0 5" Visibility="Collapsed"/>
+
+        	<sdk:Label 
+        		IsEnabled="False" Content="Area Description" Margin="0 5"/>
+        	<TextBox Text="{Binding AreaDescription, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" 
+        		IsEnabled="False" />
+            
+        	<toolkit:DataField Label="Total Type" LabelPosition="Top" Margin="-6,3,3,3" DescriptionViewerVisibility="Collapsed">
+        		<ComboBox 
+        			SelectedItem="{Binding AreaDescription, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnDataErrors=True}">
+        			<System:String>&lt;select total type&gt;</System:String>
+        			<System:String>APT + HOME</System:String>
+        			<System:String>APT ONLY</System:String>
+        			<System:String>HOME ONLY</System:String>
+        		</ComboBox>        			
+        	</toolkit:DataField>
+            
+            <sdk:Label Content="Sales" Margin="0 5"/>
+            <ComboBox MinWidth="120" HorizontalAlignment="Left" 
+                                  ItemsSource="{Binding CampaignViewModel.Users, Source={StaticResource Locator}}"
+                                  DisplayMemberPath="UserName"
+                                  SelectedValuePath="UserName"
+                                  SelectedValue="{Binding UserName, Mode=TwoWay}"/>
+
+            <sdk:Label Content="Date" Margin="0 5"/>
+            <sdk:DatePicker SelectedDate="{Binding Date, Mode=TwoWay}" Width="200" HorizontalAlignment="Left" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1">
+            <Button x:Name="CancelButton" MinWidth="80" Height="30" Content="Cancel" Click="CancelButton_Click" Margin="5 0" />
+            <Button x:Name="OKButton" MinWidth="80" Height="30" Style="{StaticResource OrangeButton}" Content="Save" Command="{Binding SaveCommand}"  Margin="5 0" />
+        </StackPanel>
+        
+    </Grid>
+</controls:ChildWindowBase>

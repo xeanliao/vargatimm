@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.DomainLayer.Entities.User, GPS.DomainLayer" source="GPS.Website.TransferObjects.ToUser, GPS.Website"
+         helper="GPS.Website.TransferObjects.ToUser.ConvertBack">
+    <member name="Id" nullValue="0" />
+    <member name="UserName" nullValue="String.Empty" />
+    <member name="Password" nullValue="String.Empty" />
+    <member name="Enabled" nullValue="false" />
+    <member name="FullName" nullValue="String.Empty" />
+    <member name="UserCode" nullValue="String.Empty" />
+    <member name="Groups" nullValue="null" />
+    <member name="Email" nullValue="String.Empty" />
+    <!--<member name="Taskgtuinfomappings" nullValue="null" />-->
+    <!--<member name="Tasks" nullValue="null" />-->
+  </class>
+</otis-mapping>

@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/GTUService.TIMM" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/GTUService.TIMM" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="GTU">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Accuracy" type="xs:int" />
+      <xs:element minOccurs="0" name="AreaCode" type="xs:int" />
+      <xs:element minOccurs="0" name="CellID" type="xs:int" />
+      <xs:element minOccurs="0" name="Code" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Count" type="xs:int" />
+      <xs:element minOccurs="0" name="CurrentCoordinate" nillable="true" type="tns:Coordinate" />
+      <xs:element minOccurs="0" name="Distance" type="xs:double" />
+      <xs:element minOccurs="0" name="GPSFix" type="xs:long" />
+      <xs:element minOccurs="0" name="Heading" type="xs:int" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="IPAddress" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LocationID" type="xs:int" />
+      <xs:element minOccurs="0" name="NetworkCode" type="xs:int" />
+      <xs:element minOccurs="0" name="PowerInfo" type="tns:PowerInfo" />
+      <xs:element minOccurs="0" name="ReceivedTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="SendTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Speed" type="xs:double" />
+      <xs:element minOccurs="0" name="Status" type="tns:Status" />
+      <xs:element minOccurs="0" name="Version" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GTU" nillable="true" type="tns:GTU" />
+  <xs:complexType name="Coordinate">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Altitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Latitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Longitude" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Coordinate" nillable="true" type="tns:Coordinate" />
+  <xs:simpleType name="PowerInfo">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ON" />
+      <xs:enumeration value="OFF" />
+      <xs:enumeration value="Low" />
+      <xs:enumeration value="UnKnown" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="PowerInfo" nillable="true" type="tns:PowerInfo" />
+  <xs:simpleType name="Status">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Normal" />
+      <xs:enumeration value="OutBoundary" />
+      <xs:enumeration value="Frozen" />
+      <xs:enumeration value="OutAndFrozen" />
+      <xs:enumeration value="UnKnown" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Status" nillable="true" type="tns:Status" />
+  <xs:complexType name="ArrayOfGTU">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="GTU" nillable="true" type="tns:GTU" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfGTU" nillable="true" type="tns:ArrayOfGTU" />
+  <xs:complexType name="ArrayOfCoordinate">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Coordinate" nillable="true" type="tns:Coordinate" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCoordinate" nillable="true" type="tns:ArrayOfCoordinate" />
+</xs:schema>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.VotingDistrictArea, GPS.DomainLayer" table="VotingDistrictAreas" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Code" column="Code" />
+    <property name="CountyCode" column="CountyCode" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="LSAD" column="LSAD" />
+    <property name="LSAD_TRAN" column="LSAD_TRAN" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="Name" column="Name" />
+    <property name="StateCode" column="StateCode" />
+    <property name="VTD" column="VTD" />
+  </class>
+</hibernate-mapping>

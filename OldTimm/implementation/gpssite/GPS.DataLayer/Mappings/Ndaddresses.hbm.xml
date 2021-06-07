@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.NdAddress, GPS.DomainLayer" table="NdAddresses" lazy="true" >
+    <id name="Id" column ="Id" unsaved-value="0">
+      <generator class="GPS.DataLayer.SequenceGenerators.SequenceGenerator, GPS.DataLayer">
+        <param name="table">SequenceCounters</param>
+        <param name="column">NdAddress</param>
+      </generator>
+    </id>
+    <property name="Description" column="Description" />
+    <property name="Geofence" column="Geofence" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="Street" column="Street" />
+    <property name="ZipCode" column="ZipCode" />
+    <bag name="NdAddressBoxMappings" table="NdAddressBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="NdAddressId" />
+      <one-to-many class="GPS.DomainLayer.Entities.NdAddressBoxMapping, GPS.DomainLayer" />
+    </bag>
+    <bag name="NdAddressCoordinates" table="NdAddressCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="NdAddressId" />
+      <one-to-many class="GPS.DomainLayer.Entities.NdAddressCoordinate, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

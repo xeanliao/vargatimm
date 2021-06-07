@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CampaignClassification, GPS.DomainLayer" table="CampaignClassifications" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="Classification" column="Classification" />
+    <many-to-one name="Campaign"
+                 column="CampaignId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

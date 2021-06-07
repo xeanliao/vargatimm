@@ -1,0 +1,344 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="DM.master.cs" Inherits="GPS.Website.DM" %>
+<%@ Import Namespace="GPS.DataLayer.ValueObjects" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>TIMM &gt; Home</title>
+    <link href="Style/jquery-ui-1.7.2.custom.css" rel="Stylesheet" />
+    <link href="Style/all.css" type="text/css" rel="stylesheet" />
+    <link href="Style/mappanel.css" type="text/css" rel="stylesheet" />
+    <%--    <link href="Style/contextmenu.css" rel="Stylesheet" />--%>
+
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol'></script>
+    <script type="text/javascript" src="Javascript/BingMapsV63ToV8Shim.js"></script>
+
+    <script type="text/javascript" src="Javascript/jquery-1.3.2.js"></script>
+
+    <script type="text/javascript" src="Javascript/ajaxfileupload.js"></script>
+
+    <script type="text/javascript" src="Javascript/jquery.ui.all.js"></script>
+
+    <script type="text/javascript" src="Javascript/jquery.layout.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.js"></script>
+
+    <script type="text/javascript" src="Handler/mapsettings.ashx"></script>
+
+    <script type="text/javascript" src="Javascript/gps.loading.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.eventtrigger.js"></script>
+     
+    <script type="text/javascript" src="Javascript/gps.colors.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/address/gps.campaign.addresspanel.js"></script>
+    
+    <script type="text/javascript" src="Javascript/campaign/address/gps.campaign.addressview.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.settings.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.arealayer.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.areabox.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.area.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.arearecorder.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.container.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/colorpicker.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/eye.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/layout.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/utils.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.map.eventtrigger.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.map.objectstore.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submap.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submaparea.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submappanel.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submapview.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.map.submaparearecorder.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.extend.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.extend.data.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.extend.address.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.mappanel.js"></script>
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dm.mappanel.js"></script>
+        
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dm.js"></script>    
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dmpanel.js"></script>
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dmview.js"></script>
+    <script type="text/javascript" src="Javascript/distributionmap/gps.submap.js"></script>
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dm.objectstore.js"></script>
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dmdataoperation.js"></script>
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dmlayout.js"></script>
+    <script type="text/javascript" src="Javascript/distributionmap/gps.dm.dmarea.js"></script>
+    
+    
+    <script type="text/javascript" src="Javascript/distributionjob/gps.dj.js"></script>
+    <script type="text/javascript" src="Javascript/distributionjob/gps.djpanel.js"></script>
+    <script type="text/javascript" src="Javascript/distributionjob/gps.djview.js"></script>
+    <script type="text/javascript" src="Javascript/distributionjob/gps.dj.objectstore.js"></script>
+    <script type="text/javascript" src="Javascript/distributionjob/distributionjob.js"></script>
+    <script type="text/javascript" src="Javascript/distributionjob/gps.user.js"></script>
+    <script type="text/javascript" src="Javascript/distributionjob/gps.djuser.js"></script>
+    <script type="text/javascript" src="Javascript/distributionjob/gps.djuser.objectstore.js"></script>
+    
+    <script type="text/javascript" src="Javascript/DD_roundies.uicornerfix.js"></script>
+
+    <script type="text/javascript">
+        // $.uicornerfix('6px');
+    </script>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        // Prepare layout and menu
+        $(document).ready(function() {
+            //            initLayout();
+            //            initMenu();
+        });
+        //]]>
+    </script>
+
+    <script type="text/javascript">
+        function initLayout1() {
+            outerLayout = $('body').layout({
+                center__paneSelector: ".outer-center"
+		    , north__paneSelector: ".ui-layout-north"
+		    , south__paneSelector: ".ui-layout-south"
+		    , east__paneSelector: ".outer-east"
+		    , north__size: 39
+		    , south__size: 50
+		    , east__size: 250
+		    , spacing_open: 2 // ALL panes
+		    , spacing_closed: 4 // ALL panes
+		    , north__spacing_open: 2
+		    , south__spacing_open: 2
+		    , center__onresize: "innerLayout.resizeAll"
+		    , east__onresize: "eastInnerLayout.resizeAll"
+            });
+
+            innerLayout = $('div.outer-center').layout({
+                center__paneSelector: ".inner-center"
+		    , north__paneSelector: ".inner-north"
+		    , south__paneSelector: ".inner-south"
+		    , north__size: 90
+		    , south__size: 90
+		    , spacing_open: 2  // ALL panes
+		    , spacing_closed: 4  // ALL panes
+		    , center__onresize: 'mapLayout.resizeAll'
+            });
+
+            eastInnerLayout = $('div.outer-east').layout({
+                center__paneSelector: ".east-inner-center"
+		    , north__paneSelector: ".east-inner-north"
+		    , south__paneSelector: ".east-inner-south"
+		    , north__size: 189
+		    , south__size: 87
+		    , spacing_open: 2  // ALL panes
+		    , spacing_closed: 4  // ALL panes
+		    , center__onresize: 'submapLayout.resizeAll'
+            });
+
+            mapLayout = $('#map-inner').layout({
+                center__paneSelector: "#map-container"
+		    , spacing_open: 0  // ALL panes
+		    , spacing_closed: 0  // ALL panes
+		    , center__onopen: function() { }
+		    , center__onresize_end: function() { MapResizer.resize(map, mapLayout); }
+            });
+
+            submapLayout = $('#sub-map-container-inner').layout({
+                center__paneSelector: "#sub-map-inner"
+		    , spacing_open: 0  // ALL panes
+		    , spacing_closed: 0  // ALL panes
+		    , center__onopen: function() { }
+		    , center__onresize_end: function() { }
+            });
+        }
+
+        // Prepare menu.
+        function initMenu() {
+            $('li.head-link').hover(
+			    function() { $('ul', this).css('display', 'block'); },
+			    function() { $('ul', this).css('display', 'none'); }
+    	    );
+
+            $('#menu-container li.head-link ul li').hover(
+			    function() { $(this).addClass('ui-state-hover'); },
+			    function() { $(this).removeClass('ui-state-hover'); }
+    	    );
+        }
+        //]]>
+    </script>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        var MapResizer = function() {
+            return {
+                lastEventTime: new Date(),
+                minEventDuration: 500,
+
+                resize: function(map, layout) {
+                    // Make sure we only handle once
+                    var now = new Date();
+                    if (now - this.lastEventTime < this.minEventDuration) return;
+
+                    // resize the map to the current pane size
+                    var width = layout.panes.center.width();
+                    var height = layout.panes.center.height();
+                    map.ResizeMap(width, height);
+
+                    // record the time of this event 
+                    this.lastEventTime = now;
+                },
+
+                getMapLayoutSize: function() {
+                    return {
+                        width: mapLayout.panes.center.width(),
+                        height: mapLayout.panes.center.height()
+                    };
+                }
+            }
+        } ();
+
+        //]]>
+    </script>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        var SysBrowser = {};
+        SysBrowser.ie;
+        SysBrowser.firefox;
+        SysBrowser.chrome;
+        SysBrowser.opera;
+        SysBrowser.safari;
+        var ua = navigator.userAgent.toLowerCase();
+        var s;
+        (s = ua.match(/msie ([\d.]+)/)) ? SysBrowser.ie = s[1] :
+        (s = ua.match(/firefox\/([\d.]+)/)) ? SysBrowser.firefox = s[1] :
+        (s = ua.match(/chrome\/([\d.]+)/)) ? SysBrowser.chrome = s[1] :
+        (s = ua.match(/opera.([\d.]+)/)) ? SysBrowser.opera = s[1] :
+        (s = ua.match(/version\/([\d.]+).*safari/)) ? SysBrowser.safari = s[1] : 0;
+        //]]>
+    </script>
+    
+    <script type="text/javascript">       
+        self.moveTo(0, 0);
+        self.resizeTo(screen.availWidth, screen.availHeight);       
+    </script>
+    
+     <style type="text/css">
+    .menu-container
+    {
+	 position : absolute;	
+	 left : 200px;
+	 font-weight : bold;
+	 font-size:14px;
+   }
+   </style>
+
+</head>
+<body>
+    <form id="form1" runat="server">
+    <input type="hidden" id="bingMapKey" value="<%= System.Configuration.ConfigurationManager.AppSettings["BinMapKey"] %>" />
+    <asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
+    <!-- content -->
+    <asp:ContentPlaceHolder ID="content" runat="server">
+    </asp:ContentPlaceHolder>
+    <!--page head-->
+    <div class="ui-layout-north">
+        <div class="head-container ui-widget-header ui-corner-all">
+            <div class="head-logo-container">
+            </div>
+           <%-- <div style="position: absolute; top: 9px; right: 6px;">
+            <a href="javascript:void(0);"
+                    class="gps-toolbar-button ui-corner-all" onclick="javascript:window.close();"><span
+                        class="ui-icon ui-icon-close"></span>Save & Close</a>
+            </div>--%>
+             <div class="menu-container" id="divCampaignName">
+            </div>
+            <ul id="menu-container">
+                <li class="head-link" style="display:none;">Distribution Maps
+                    <ul>
+                        <li id="menu-item-save-campaign" class="ui-widget-header" title="Save Distribution Maps" onclick="javascript:OnSaveDMsClick();">
+                            Save Distribution Maps</li>
+                    </ul>
+                </li>        
+                
+                <%--<% if (null != GPS.DomainLayer.Security.LoginMember.CurrentMember)
+                   {
+                       var cUSER = GPS.DomainLayer.Security.LoginMember.CurrentMember;
+                       var length = cUSER.Groups.Count;
+                        for (var i = 0; i < length; i++)
+                        {
+                            //DistributionManager:51,DistributionSupervisor:52,Administrator:53
+                            if (cUSER.Groups[i].Id == 51 || cUSER.Groups[i].Id == 52 || cUSER.Groups[i].Id == 53)
+                            {
+                %>
+                            
+                             <li class="head-link"><a href="javascript:void(0);" onclick="javascript:OnPrintClick();"
+                                style="color: #000;">Print</a></li>   
+
+                <%          }
+                        }
+                
+               
+                } %>--%>
+                
+                <% if (null != GPS.DomainLayer.Security.LoginMember.CurrentMember)
+                   {
+                       var cUSER = GPS.DomainLayer.Security.LoginMember.CurrentMember;
+                       var length = cUSER.Groups.Count;
+                       var flagBool = false;
+                        for (var i = 0; i < length; i++)
+                        {
+                            //DistributionManager:51,DistributionSupervisor:52,Administrator:53
+                            if (cUSER.Groups[i].Id == 51 || cUSER.Groups[i].Id == 52 || cUSER.Groups[i].Id == 53)
+                            {
+                                flagBool = true;
+                                break;
+
+                         }
+                        }
+                       if(flagBool){
+                       %>
+                        <li class="head-link" style="width: 156px;">Print
+                            <ul style="width: 155px;">
+                                
+                                <li class="ui-widget-header"><a href="javascript:void(0);" onclick="javascript:OnPrintClick('phantomjs');"
+                                style="color: #000;">Print</a></li> 
+                            </ul>
+                        </li>
+                       <%
+                       }
+                
+               
+                } %>
+                
+                <li class="head-link"><a href="javascript:void(0);" onclick="javascript:window.close();"
+                    style="color: #000;">Save & Close</a></li>
+            </ul>
+        </div>
+    </div>
+    <!--end of outer-north-->
+    <!-- page foot -->
+    </form>
+</body>
+</html>

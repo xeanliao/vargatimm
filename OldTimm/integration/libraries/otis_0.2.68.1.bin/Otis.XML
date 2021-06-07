@@ -1,0 +1,800 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Otis</name>
+    </assembly>
+    <members>
+        <member name="T:Otis.AggregateMappingDescription">
+            <summary>
+            Describes the aggregate mapping expression
+            </summary>
+        </member>
+        <member name="P:Otis.AggregateMappingDescription.PathParts">
+            <summary>
+            Returns the parts of the aggregate path excluding the final expression
+            </summary>
+            <remarks>
+            For expression "Projects/Tasks/Duration", returns array {"Projects", "Tasks"}
+            </remarks>
+        </member>
+        <member name="P:Otis.AggregateMappingDescription.FinalExpression">
+            <summary>
+            Returns the final expression of the aggregate path, which is being processed by aggregate function
+            </summary>
+            <remarks>
+            For expression "Projects/Tasks/Duration", returns string "Duration"
+            </remarks>
+        </member>
+        <member name="P:Otis.AggregateMappingDescription.TargetType">
+            <summary>
+            returns the target type of the expression
+            </summary>
+        </member>
+        <member name="P:Otis.AggregateMappingDescription.FunctionName">
+            <summary>
+            returns the name of the aggregate function used in mapping expression
+            </summary>
+        </member>
+        <member name="P:Otis.AggregateMappingDescription.FunctionObject">
+            <summary>
+            returns the default name for the aggregate function instance
+            </summary>
+        </member>
+        <member name="T:Otis.AssemblerGenerationOptions">
+            <summary>
+            Represents options for generation of the assembler. Assembler can be generated as
+            a dll assembly or only a source code.
+            </summary>
+        </member>
+        <member name="P:Otis.AssemblerGenerationOptions.OutputType">
+            <summary>
+            Gets/sets the type of the output for the generator.
+            </summary>
+            <remarks>
+            Default is <c>OutputType.InMemoryAssembly</c>
+            which results in an assembly being create in the memory of the client process, but without any
+            artifacts on file system.
+            <para>
+            <c>OutputType.Assembly</c> specifies that an assembly should be created on the file system.
+            The assembly contains the assembler implementation and can be used independently. <see cref="P:Otis.AssemblerGenerationOptions.OutputFile"/>
+            property must be set. (e.g. to "myAssembler.dll")
+            </para>
+            <para>
+            <c>OutputType.SourceCode</c> specifies that only the source code for the assembler will be created on the file system.
+            This file contains the assembler implementation and can be included in some other project.
+            <see cref="P:Otis.AssemblerGenerationOptions.OutputFile"/> property must be set. (e.g. to "assembler.cs")
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Otis.AssemblerGenerationOptions.Namespace">
+            <summary>
+            gets sets the namespace for generated assembler class. If omit0ted, a unique
+            namespace name will be automatically generated
+            </summary>
+        </member>
+        <member name="P:Otis.AssemblerGenerationOptions.OutputFile">
+            <summary>
+            name of the output file if <see cref="P:Otis.AssemblerGenerationOptions.OutputType"/> is <c>OutputType.Assembly</c>
+            or <c>OutputType.SourceCode</c>
+            </summary>
+        </member>
+        <member name="P:Otis.AssemblerGenerationOptions.IncludeDebugInformationInAssembly">
+            <summary>
+            Gets/sets whether the debug information will be added to the generated assembly. This option
+            is ignored if <see cref="P:Otis.AssemblerGenerationOptions.OutputType"/> is <c>OutputType.SourceCode</c>
+            </summary>
+        </member>
+        <member name="P:Otis.AssemblerGenerationOptions.SupressInstanceCreation">
+            <summary>
+            Gets/sets whether an assembler instance will be created when the assembly is built.
+            Default is <c>true</c>. This should be set to false if the assembler is not intended
+            to be used, but only the assembly generation is wanted
+            </summary>
+        </member>
+        <member name="T:Otis.CodeGen.IAggregateFunctionCodeGenerator">
+            <summary>
+            Interface to code generation facility which is used to generate code for aggregate mappings.
+            An aggregate function implementation (i.e. an implementation of <see cref="T:Otis.IAggregateFunction`1"/>)
+            can also implement this interface to provide custom code generation. If an aggregate function 
+            implementation implements IAggregateFunctionCodeGenerator, it must also provide parameterless
+            constructor. For most aggregate function implementation this is not needed, they will derive from
+            <see cref="T:Otis.Functions.SimpleFunctionBase"/> class.
+            </summary>
+        </member>
+        <member name="M:Otis.CodeGen.IAggregateFunctionCodeGenerator.GetInitializationStatements(Otis.CodeGen.AggregateFunctionContext)">
+            <summary>
+            generates initialization statements for aggregate function.
+            </summary>
+            <param name="context">context for aggregate function code generation</param>
+            <returns>CodeStatement collection representing the initialization of aggregate function implementation.</returns>
+        </member>
+        <member name="M:Otis.CodeGen.IAggregateFunctionCodeGenerator.GetIterationStatements(Otis.CodeGen.AggregateFunctionContext,System.Collections.Generic.IList{Otis.CodeGen.AggregateExpressionPathItem})">
+            <summary>
+            generates iteration statements for aggregate function.
+            </summary>
+            <param name="context">context for aggregate function code generation</param>
+            <param name="pathItems">list of path items which comprise aggregate expression</param>
+            <returns>collection of expressions representing the iteration of aggregate function implementation
+            over mapping path expression items.</returns>
+        </member>
+        <member name="M:Otis.CodeGen.IAggregateFunctionCodeGenerator.GetAssignmentStatement(Otis.CodeGen.AggregateFunctionContext)">
+            <summary>
+            generates assignment statements for aggregate function.
+            </summary>
+            <param name="context">context for aggregate function code generation</param>
+            <returns>CodeStatement representing the assignment of aggregate function implementation result
+            to the mapped member of the target object.</returns>
+        </member>
+        <member name="T:Otis.FunctionMap">
+            <summary>
+            Implements a map of implementation types for various aggregate functions. Aggregate function
+            is a class which implements <see cref="T:Otis.IAggregateFunction`1"/> interface, and can be used
+            in mapping to process a set of values on the source side.
+            </summary>
+        </member>
+        <member name="M:Otis.FunctionMap.Register(System.String,System.Type)">
+            <summary>
+            Registers a new aggregate function function. If another function with   the specified name
+            is already registered, it will be replaced!
+            </summary>
+            <param name="name">Name of the function</param>
+            <param name="type">Type which implements the function</param>
+            <exception cref="T:Otis.OtisException">Thrown if specified type doesn't implement IAggregateFunction</exception>
+        </member>
+        <member name="M:Otis.FunctionMap.GetTypeForFunction(System.String)">
+            <summary>
+            Retrieves the implementation type for specified function
+            </summary>
+            <param name="name">Function name</param>
+            <returns>Implementation type for specified function</returns>
+            <exception cref="T:Otis.OtisException">Thrown if specified function hasn't been registered yet</exception>
+        </member>
+        <member name="M:Otis.Functions.SimpleFunctionBase.GetDefaultTargetType">
+            <summary>
+            returns the function object type which will be used if target type can't be deduced.
+            this usually happens when mapping expression has formatting, so declared target type
+            is string, but expression is a 'count' function which needs numeric type to be incremented.
+            however, library has no way to find out this type, because it source type might be anything
+            (e.g. some entity type), so derived class can override this function to provide suitable
+            target type.
+            </summary>
+            <returns>Target type to be used. If null is returned, mapper will use the type of source item
+            as a target type</returns>
+        </member>
+        <member name="M:Otis.Functions.SimpleFunctionBase.IsTypeSupportedAsTarget(System.Type)">
+            <summary>
+            Returns whether the 
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Otis.Functions.SimpleFunctionBase.IsTypeSupportedAsSource(System.Type)">
+            <summary>
+            Returns whether the 
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Otis.Functions.SimpleFunctionBase.UnsupportedTargetTypeErrorMessage">
+            <summary>
+            Returns the message which will be displayed when mapping is done to unsupported target type
+            </summary>
+        </member>
+        <member name="P:Otis.Functions.SimpleFunctionBase.UnsupportedSourceTypeErrorMessage">
+            <summary>
+            Returns the message which will be displayed when mapping is done from unsupported source type
+            </summary>
+        </member>
+        <member name="T:Otis.Functions.MinMaxFunctionBase">
+            <summary>
+            base class for MinFunction and MaxFunction classes
+            </summary>
+        </member>
+        <member name="T:Otis.IAggregateFunction`1">
+            <summary>
+            Interface implemented by all aggregate functions which can be executed
+            on path expressions
+            </summary>
+            <remarks>
+            Client applications can implement additional functions by extending this interface
+            and registering those classes with <see cref="T:Otis.Configuration"/>.
+            </remarks>
+        </member>
+        <member name="P:Otis.IExpressionFormatProvider.ExpressionFormat">
+            <summary>
+            returns expression which will be used to format value which is
+            sent as an argument to ProcessValue
+            </summary>
+        </member>
+        <member name="M:Otis.IAggregateFunction`1.Initialize(`0)">
+            <summary>
+            Sets the starting value of the function
+            </summary>
+            <param name="initialValue">Initial value</param>
+        </member>
+        <member name="M:Otis.IAggregateFunction`1.ProcessValue(`0)">
+            <summary>
+            Updates the function with specified value
+            </summary>
+            <param name="value">New value to be processed</param>
+        </member>
+        <member name="P:Otis.IAggregateFunction`1.ProcessedItemCount">
+            <summary>
+            returns the number of items processed by the function
+            </summary>
+        </member>
+        <member name="P:Otis.IAggregateFunction`1.Result">
+            <summary>
+            Returns the current function result
+            </summary>
+        </member>
+        <member name="T:Otis.OutputType">
+            <summary>
+            Types of the output for the assembler generator
+            </summary>
+        </member>
+        <member name="T:Otis.IMappingDescriptorProvider">
+            <summary>
+            This interface is used to provide <see cref="T:Otis.Configuration"/> object with mapping information
+            </summary>
+            <remarks>
+            Configuration class can be configured from various sources: XML data, directly from the assembly which
+            contains mapped types, etc. Internally, <c>Configuration</c> class accesses this information through
+            instances of <see cref="T:Otis.IMappingDescriptorProvider"/> interface. For every supported source type, 
+            there is an implementation of <c>IMappingDescriptorProvider</c>. E.g. XML data is processed using
+            <see cref="T:Otis.Providers.XmlMappingDescriptionProvider"/> class, while assembly metadata is processed using
+            <see cref="T:Otis.Providers.AssemblyResourceMappingDescriptorProvider"/>. To provide support for custom mapping info
+            sources, client applications need to provide an implementation of <c>IMappingDescriptorProvider</c>
+            and call <see cref="M:Otis.Configuration.AddProvider(Otis.IMappingDescriptorProvider)"/>.
+            <example>
+            Example:
+            <code>
+            	Configuration cfg = new Configuration();
+                // CustomMappingProvider is an imaginary class which reads mapping info from web service
+            	IMappingDescriptorProvider provider = new CustomMappingProvider("http://server/get_mappings.asmx");
+            	cfg.AddProvider(provider);
+            </code>
+            </example>
+            </remarks>
+        </member>
+        <member name="P:Otis.IMappingDescriptorProvider.ClassDescriptors">
+            <summary>
+            Returns a list of mapping descriptors. For each tranformation type, there is an
+            <see cref="T:Otis.ClassMappingDescriptor"/> instance in the list
+            </summary>
+        </member>
+        <member name="T:Otis.ClassMappingDescriptor">
+            <summary>
+            Describes the single type transformation. E.g. <c>Entity.User</c>-><c>DTO.User</c>
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.MemberDescriptors">
+            <summary>
+            Returns the list of member transformations. For each transformation from a source field/property
+            to a target field/property, there is an <c>MemberMappingDescriptor</c> instance in the list.
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.TargetType">
+            <summary>
+            Gets/sets target type for transformation
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.SourceType">
+            <summary>
+            Gets/sets source type for transformation
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.MappingHelper">
+            <summary>
+            Gets/sets name of the mapping helper function. For details, see <see cref="T:Otis.MapClassAttribute"/>.
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.HasHelper">
+            <summary>
+            returns whether there is a helper function
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.IsHelperStatic">
+            <summary>
+            Returns whether the helper function is static
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.MappingPreparer">
+            <summary>
+            Gets/sets name of the mapping preparer function. For details, see <see cref="T:Otis.MapClassAttribute"/>.
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.HasPreparer">
+            <summary>
+            returns whether there is a preparer function
+            </summary>
+        </member>
+        <member name="P:Otis.ClassMappingDescriptor.IsPreparerStatic">
+            <summary>
+            Returns whether the preparer function is static
+            </summary>
+        </member>
+        <member name="T:Otis.Configuration">
+            <summary>
+            <c>Configuration</c> class enables client applications to specify mappings between different
+            types. These mappings are then used to generate an assembly with implementations of <c>IAssembler</c>
+            interface for specified transformation.
+            </summary>
+            
+            <remarks>
+            Client application will tipically create a single <c>Configuration</c> instance, initialize it
+            and then retrieve appropriate <c>IAssembler</c> instances. Configuration can be initialized from
+            an assembly, a single type, an XML file or XML string. Clients can also provide custom configuration
+            sources by implementing <see cref="T:Otis.IMappingDescriptorProvider"/> interface.
+            <example>
+            	An example of usage:
+            <code>
+            	Configuration cfg = new Configuration();          // instantiate a new Configuration
+            	cfg.AddAssembly(Assembly.GetExecutingAssembly()); // initialize it using type metadata
+            	IAssembler&lt;Target, Source&gt; asm = cfg.GetAssembler&lt;Target, Source&gt;(); // retrieve the assembler
+            	Source src = ...                                  // retrieve a <c>Source</c> instance from somewhere
+            	Target t = asm.AssembleFrom(src);                 // convert source object to a <c>Target</c> instance
+            </code>
+            </example>
+            </remarks>
+        </member>
+        <member name="M:Otis.Configuration.#ctor">
+            <summary>
+            Creates a new <c>Configuration</c> instance
+            </summary>
+        </member>
+        <member name="M:Otis.Configuration.AddAssembly(System.Reflection.Assembly)">
+            <summary>
+            Configures the assembler using metadata of types in the specified assembly
+            </summary>
+            <param name="asm">Assembly containing types which act as targets of transformation</param>
+        </member>
+        <member name="M:Otis.Configuration.AddAssemblyResources(System.Reflection.Assembly,System.String)">
+            <summary>
+            Configures the assembler using resource XML files in the specified assembly
+            </summary>
+            <param name="asm">Assembly containing mapping xml files as resuorces</param>
+            <param name="suffix">Suffix of the files. only files whose name ends with the specified suffix will be processed.</param>
+        </member>
+        <member name="M:Otis.Configuration.AddType(System.Type)">
+            <summary>
+            Configures the assembler using metadata of the specified type
+            </summary>
+            <param name="type">type which acts as targets of transformation</param>
+        </member>
+        <member name="M:Otis.Configuration.AddType``1">
+            <summary>
+            Configures the assembler using metadata of the specified type
+            </summary>
+            <typeparam name="T">type which acts as targets of transformation</typeparam>
+        </member>
+        <member name="M:Otis.Configuration.AddXmlFile(System.String)">
+            <summary>
+            Configures the assembler using mapping info from XML file. File structure must conform
+            to Otis schema.
+            </summary>
+            <param name="filename">name of the XML file containing mapping definitions</param>
+        </member>
+        <member name="M:Otis.Configuration.AddXmlString(System.String)">
+            <summary>
+            Configures the assembler using mapping info from string containing XML mapping definition.
+            XML structure must conform to Otis schema.
+            </summary>
+            <param name="data">XML string</param>
+        </member>
+        <member name="M:Otis.Configuration.AddProvider(Otis.IMappingDescriptorProvider)">
+            <summary>
+            Configures the assembler using mapping info provided by the specified provider.
+            You can implement your own provider to support sources which are not originally supported.
+            </summary>
+            <param name="provider">an instanc of provider implementation</param>
+        </member>
+        <member name="M:Otis.Configuration.BuildAssemblers">
+            <summary>
+            This function starts the generation of the assembly which implements all the assembler interfaces. 
+            </summary>
+            <remarks>
+            It is NOT necessary to call this function, beacuse it will be automatically
+            called first time when <see cref="M:Otis.Configuration.GetAssembler``2"/> function is called. however, sometimes
+            it is desirable to do the assembly generation at controlled time, before the first call to
+            <see cref="M:Otis.Configuration.GetAssembler``2"/>. In that case, the first call to <see cref="M:Otis.Configuration.GetAssembler``2"/> 
+            will NOT regenerate the assembly, it is always done just once.
+            </remarks>
+            <exception cref="T:Otis.OtisException">Thrown if there is an error while compiling the assembly</exception>
+        </member>
+        <member name="M:Otis.Configuration.GetAssembler``2">
+            <summary>
+            Returns the assembler object for specified transformation
+            </summary>
+            <typeparam name="Target">Target type for conversion</typeparam>
+            <typeparam name="Source">Source type for conversion</typeparam>
+            <returns>Specific assembler</returns>
+            <exception cref="T:Otis.OtisException">Thrown if transformation is not configured</exception>
+        </member>
+        <member name="M:Otis.Configuration.RegisterFunction(System.String,System.Type)">
+            <summary>
+            Registers a user-defined aggregate function
+            </summary>
+            <param name="name">name of the function (e.g. 'stddev')</param>
+            <param name="type">type which implements the function as an implementation of <see cref="T:Otis.IAggregateFunction`1"/></param>
+            <exception cref="T:Otis.OtisException">Thrown if type doesn't implement IAggregateFunction</exception>
+        </member>
+        <member name="M:Otis.Configuration.RegisterFunction``1(System.String)">
+            <summary>
+            Registers a user-defined aggregate function
+            </summary>
+            <typeparam name="T">type which implements the function as an implementation of <see cref="T:Otis.IAggregateFunction`1"/></typeparam>
+            <param name="name">name of the function (e.g. 'stddev')</param>
+        </member>
+        <member name="M:Otis.Configuration.AddAssemblyReference(System.String)">
+            <summary>
+            Adds an assembly reference given its file name or path
+            </summary>
+            <param name="assemblyFile">The name or path of the file that contains the manifest of the assembly.</param>
+        </member>
+        <member name="M:Otis.Configuration.AddAssemblyReference(System.Reflection.AssemblyName)">
+            <summary>
+            Adds an assembly reference given its <see cref="T:System.Reflection.AssemblyName"/>
+            </summary>
+            <param name="assemblyName">assembly name</param>
+        </member>
+        <member name="M:Otis.Configuration.AddAssemblyReference(System.Reflection.Assembly)">
+            <summary>
+            Adds an assembly reference
+            </summary>
+            <param name="asm">assembly to be added</param>
+        </member>
+        <member name="P:Otis.Configuration.GenerationOptions">
+            <summary>
+            Returns a <see cref="T:Otis.AssemblerGenerationOptions"/> object which enables the client to
+            tune the generation process
+            </summary>
+        </member>
+        <member name="P:Otis.Configuration.ReferencedAssemblies">
+            <summary>
+            Returns the list of referenced assemblies
+            </summary>
+        </member>
+        <member name="T:Otis.IAssembler`2">
+            <summary>
+            <c>IAssembler</c> interface provides a method for conversion between two types.
+            There is a specialization of this interface for every configured type transformation. Client
+            application obtain an instanc of the <c>IAssembler</c> by calling <see cref="M:Otis.Configuration.GetAssembler``2"/>
+            with appropriate type parameters
+            </summary>
+            <typeparam name="Target">Target type</typeparam>
+            <typeparam name="Source">Target Type</typeparam>	
+        </member>
+        <member name="M:Otis.IAssembler`2.AssembleFrom(`1)">
+            <summary>
+            Maps a source object to a newly instantiated target object
+            </summary>
+            <param name="source">source object</param>
+            <returns>an instance of the target type whose property values are mapped from the source object</returns>
+        </member>
+        <member name="M:Otis.IAssembler`2.Assemble(`0@,`1@)">
+            <summary>
+            Maps a source object to an already existing target object. This form is handy
+            for transforming value types
+            </summary>
+            <param name="target">target object</param>
+            <param name="source">source object</param>
+        </member>
+        <member name="M:Otis.IAssembler`2.Assemble(`0,`1)">
+            <summary>
+            Maps a source object to an already existing target object.
+            </summary>
+            <param name="target">target object</param>
+            <param name="source">source object</param>
+        </member>
+        <member name="M:Otis.IAssembler`2.ToArray(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Converts an enumerable container of source objects to array of target objects
+            </summary>
+            <param name="source">enumerable container source objects</param>
+            <returns>array containing transformed objects</returns>
+        </member>
+        <member name="M:Otis.IAssembler`2.ToList(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Converts an enumerable container of source objects to list of target objects
+            </summary>
+            <param name="source">enumerable container source objects</param>
+            <returns>list containing transformed objects</returns>
+        </member>
+        <member name="T:Otis.MapAttribute">
+            <summary>
+            Marks a field or property of a class as being mapped from another type.
+            </summary>
+            <remarks>
+            This attribute is used to provide mapping metadata on target types in type transformation.
+            The expression set in attribute is applied on source object and the resulting value is assigned
+            to the mapped field/property of the target object.
+            <example>
+            An example of mapping using MapAttribute:
+            <code>
+            [MapClass(typeof(User), Helper = "Otis.Tests.Util.Convert")]
+            public class AttributedUserDTO
+            {
+            	private string m_fullName;
+            
+            	[Map("$Id")]        // simple mapping
+            	public int Id;
+            
+            	[Map]				// if source member name is omitted it is assumed to be equal to target member name
+            	public int Age;
+            
+            	[Map("$UserName.ToUpper()", NullValue = "[unknown]")]	 // null value can be set to anything
+            	public string UserName;
+            
+            	[Map("$FirstName + \" \" + $LastName")] // 
+            	public string FullName
+            	{
+            		get { return m_fullName; }
+            		set { m_fullName = value; }
+            	}
+            
+            	[Map("$Projects.Count")]
+            	public int ProjectCount;
+            }
+            </code>
+            </example>
+            </remarks>
+        </member>
+        <member name="M:Otis.MapAttribute.#ctor">
+            <summary>
+            Instantiates new MapAttribute. Target member will be assigned the value of the source object member with 
+            same name.
+            <example>
+            <code>
+            [MapClass(typeof(User), Helper = "Otis.Tests.Util.Convert")]
+            public class AttributedUserDTO
+            {
+            	[Map] // expression is ommited, 'Id' property of the source object will be used
+            	public int Id;
+            }
+            </code>
+            </example>
+            </summary>
+        </member>
+        <member name="M:Otis.MapAttribute.#ctor(System.String)">
+            <summary>
+            Instantiates new MapAttribute
+            </summary>
+            <param name="expression">Expression to be applied on source object and assigned to the target member</param>
+        </member>
+        <member name="P:Otis.MapAttribute.Expression">
+            <summary>
+            Gets/sets mapping expression
+            </summary>
+        </member>
+        <member name="P:Otis.MapAttribute.NullValue">
+            <summary>
+            If mapping expression returns null, target member will be assigned the value specified by this property.
+            Default is null.
+            </summary>
+        </member>
+        <member name="P:Otis.MapAttribute.Format">
+            <summary>
+            If target member is a string, this property can be used to modify the result of conversion
+            </summary>
+            <remarks>
+            This property can only be applied to members which are strings. 
+            The content of this property is format string as used in <c>string.Format</c> method,
+            where the source expression is used as first parameter:
+            <code>
+            class UserDTO
+            {
+            	[Map("$BirthDate", Format="{0:D}")
+            	public string Birthday;
+            }
+            
+            void Test()
+            {
+            	User u = ... // get user from somewher
+            	u.BirthDate	= new DateTime(1973, 10, 22);
+            	UserDTO dto = m_assembler.AssembleFrom(u);
+            	Assert.AreEqual("Monday, October 22, 1973", dto.Birthday);
+            } 
+            </code>
+            </remarks>
+            <exception cref="T:Otis.OtisException">
+            Thrown if mapped member is not of string type
+            </exception>
+        </member>
+        <member name="P:Otis.MapAttribute.Projection">
+            <summary>
+            Defines projection mapping. Projection mapping maps set of values to
+            another set of values
+            </summary>
+            <remarks>
+            Projection mapping is used to map a set of to a different set of values,
+            e.g. from one enumeration to another, or from integer code to textual description.
+            Projection string contains semicolon delimited list of projections in form: 
+            SOURCE =&gt; TARGET. Whitespace is ignored except inside the target value. E.g.
+            expression  " 100 =&gt; Unknown user " maps value 100 to string "Unknown user" if target
+            member is a string.
+            <code>
+            class UserDTO
+            {
+            	[Map("$GenderCode", Projection=" W =&gt; Female; M =&gt; Male ")
+            	public Gender Gender;
+            
+            	[Map("$SecurityLevel", Projection=" 1 =&gt; Restricted; 2 =&gt; Normal; 3 =&gt; High ")
+            	public string Security;
+            }
+            
+            void Test()
+            {
+            	User u = ... // get user from somewhere
+            	u.GenderCode = "W";
+            	u.SecurityLevel = 2;
+            	UserDTO dto = m_assembler.AssembleFrom(u);
+            	Assert.AreEqual(Gender.Female, dto.Gender);
+            	Assert.AreEqual("Normal", dto.Security);
+            } 
+            </code>
+            </remarks>
+            <exception cref="T:Otis.OtisException">
+            Thrown if source side of projection has multiple mappings. E.g:
+            [Map("$SecurityLevel", Projection=" 1 =&gt; Restricted; 1 =&gt; Normal")
+            </exception>
+        </member>
+        <member name="T:Otis.MapClassAttribute">
+            <summary>
+            Marks a class as a part of some type transformation.
+            </summary>
+            <remarks>
+            If class is not marked with this attribute it will not be analyzed during configuration building.
+            <example>
+            An example of mapping using MapAttribute:
+            <code>
+            /// Defines the following transformation: AttributedUserDTO -> User
+            [MapClass(typeof(User), Helper = "Otis.Tests.Util.Convert")]
+            public class AttributedUserDTO
+            {
+            	[Map("$Id")] 
+            	public int Id; 
+            
+            	[Map("$FirstName + \" \" + $LastName")] 
+            	public string FullName;
+            }
+            </code>
+            </example>
+            </remarks>
+        </member>
+        <member name="M:Otis.MapClassAttribute.#ctor(System.Type)">
+            <summary>
+            Instantiates new instance. 
+            </summary>
+            <param name="sourceType">Defines the source type for the transformation.</param>
+        </member>
+        <member name="P:Otis.MapClassAttribute.Helper">
+            <summary>
+            Sets the helper function for the mapping.
+            </summary>
+            <remarks>This function is called after other mappings are done, to provide support for more
+            complex mappings which cannot be easily defined in mapping metadata. This can be a static 
+            function, in which case full name has to be provided, including namespace, or a member 
+            function of the target class, in which case only the name of the function is needed. 
+            <para>
+            Function has to be public, and only one helper is allowed per mapping. the signature of
+            the function must be <c>void Function(ref Target target, ref Source source)</c>
+            </para>
+            <para>
+            Helper function can also be assigned by marking a member of the target class with
+            <see cref="T:Otis.MappingHelperAttribute"/>.
+            </para>
+            </remarks> 
+        </member>
+        <member name="P:Otis.MapClassAttribute.Preparer">
+            <summary>
+            Sets the preparer function for the mapping.
+            </summary>
+            <remarks>This function is called before any other mappings are done, to enable custom
+            preparation code to be run. E.g. you can check if some property of target has to be 
+            initialized in some special way to allow assembler to do its work. This can be a static 
+            function, in which case full name has to be provided, including namespace, or a member 
+            function of the target class, in which case only the name of the function is needed. 
+            <para>
+            Function has to be public, and only one preparer is allowed per mapping. the signature of
+            the function must be <c>void Function(ref Target target, ref Source source)</c>
+            </para>
+            <para>
+            Preparer function can also be assigned by marking a member of the target class with
+            <see cref="T:Otis.MappingPreparerAttribute"/>.
+            </para>
+            </remarks> 
+        </member>
+        <member name="T:Otis.MemberMappingDescriptor">
+            <summary>
+            Describes a transformation for one field/property within a type transformation
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.Member">
+            <summary>
+            Gets/sets name of the mapped field or property on the target class of transformation.
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.Expression">
+            <summary>
+            Gets/sets name of the expression to which <see cref="P:Otis.MemberMappingDescriptor.Member"/> is mapped.
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.NullValue">
+            <summary>
+            Gets/sets the value which will be assigned to target <see cref="P:Otis.MemberMappingDescriptor.Member"/> if the
+            <see cref="P:Otis.MemberMappingDescriptor.Expression"/> is null
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.Format">
+            <summary>
+            Gets/sets the formatting string for dtring members
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.Type">
+            <summary>
+            Gets/sets the type of the target member
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.OwnerType">
+            <summary>
+            Gets/sets the type where the memeber is defined
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.IsArray">
+            <summary>
+            Gets/sets whether the target member is an array
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.IsList">
+            <summary>
+            Gets/sets whether the target member is an implementation of <see cref="T:System.Collections.Generic.ICollection`1"/>
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.HasFormatting">
+            <summary>
+            returns whether the mapping has the formatting string attached
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.IsAggregateExpression">
+            <summary>
+            returns whether the mapped expression is a aggregate expression
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.AggregateMappingDescription">
+            <summary>
+            Returns the descriptor for aggregate expression
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.Projections">
+            <summary>
+            Returns the projections
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.NullableParts">
+            <summary>
+            Returns the list of nullable parts in the mapped expression
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.HasNullableParts">
+            <summary>
+            returns whether there are parts in mapped expression which can have null value
+            </summary>
+        </member>
+        <member name="P:Otis.MemberMappingDescriptor.HasNullValue">
+            <summary>
+            returns whether the mapping has a custom value if mapped expression is null
+            </summary>
+        </member>
+        <member name="M:Otis.TypeHelper.GetTypeDefinition(System.Type)">
+            <summary>
+            Gets a correct type definition for a given type, ready for code generation, since
+            type.FullName doesnt represent generics in a way to be used in code generation.
+            Handles generics.
+            Based on: http://stackoverflow.com/questions/401681/how-can-i-get-the-correct-text-definition-of-a-generic-type-using-reflection
+            </summary>
+            <param name="type">the type to get definition for</param>
+            <returns>the string representation of the type definition</returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.SilverlightServices" elementFormDefault="qualified" targetNamespace="TIMM.Website.SilverlightServices" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd2" namespace="TIMM.Website.TransferObjects" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd10" namespace="http://schemas.datacontract.org/2004/07/GPS.DomainLayer.Enum" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd3" namespace="TIMM.Website.AreaServices" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd5" namespace="TIMM.Website.DistributionMapServices" />
+  <xs:element name="GetCampaignById">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCampaignByIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetCampaignByIdResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCampaignObjectById">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCampaignObjectByIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="TIMM.Website.TransferObjects" minOccurs="0" name="GetCampaignObjectByIdResult" nillable="true" type="q1:ToCampaign" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCroutesByBoxes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="boxIds" nillable="true" type="q2:ArrayOfint" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCroutesByBoxesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetCroutesByBoxesResult" nillable="true" type="q3:ArrayOfKeyValueOfstringArrayOfToCoordinateE8kjr32j" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAreaByBoxes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="boxIds" nillable="true" type="q4:ArrayOfint" />
+        <xs:element minOccurs="0" name="campaignId" type="xs:int" />
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/GPS.DomainLayer.Enum" minOccurs="0" name="classification" type="q5:Classifications" />
+        <xs:element xmlns:q6="TIMM.Website.AreaServices" minOccurs="0" name="toArea" nillable="true" type="q6:ToArea" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAreaByBoxesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetAreaByBoxesResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCampaignCRouteAreas">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="campaignId" type="xs:int" />
+        <xs:element minOccurs="0" name="geoCode" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCampaignCRouteAreasResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetCampaignCRouteAreasResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSubMapsById">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="id" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSubMapsByIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="TIMM.Website.DistributionMapServices" minOccurs="0" name="GetSubMapsByIdResult" nillable="true" type="q7:ToSubMap" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AdjustData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="campaignId" type="xs:int" />
+        <xs:element minOccurs="0" name="classification" type="xs:int" />
+        <xs:element xmlns:q8="TIMM.Website.TransferObjects" minOccurs="0" name="datas" nillable="true" type="q8:ArrayOfToAdjustData" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AdjustDataResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveCampaign">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="TIMM.Website.TransferObjects" minOccurs="0" name="toCampaign" nillable="true" type="q9:ToCampaign" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveCampaignResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

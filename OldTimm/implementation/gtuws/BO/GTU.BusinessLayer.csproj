@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4C4ED8EF-D473-4D21-875D-1F94533CCDE2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GTU.BusinessLayer</RootNamespace>
+    <AssemblyName>GTU.BusinessLayer</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GTU.DataLayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DAL\bin\Debug\GTU.DataLayer.dll</HintPath>
+    </Reference>
+    <Reference Include="GTU.ModelLayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\GTU.ModelLayer\bin\Debug\GTU.ModelLayer.dll</HintPath>
+    </Reference>
+    <Reference Include="GTU.Utilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Utilities\bin\Debug\GTU.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.TeamSystem.Data.UnitTesting, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Jobs\JobBo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Read\AckGtackBo.cs" />
+    <Compile Include="Read\AckGtbeiBo.cs" />
+    <Compile Include="Read\AckGtgeoBo.cs" />
+    <Compile Include="Read\AckGtrtoBo.cs" />
+    <Compile Include="Read\AckGtsfrBO.cs" />
+    <Compile Include="Read\AckGtsriBo.cs" />
+    <Compile Include="Read\AckGtsziBo.cs" />
+    <Compile Include="Read\AckGttriBo.cs" />
+    <Compile Include="Read\AtGthbdBo.cs" />
+    <Compile Include="Read\RespGtallBo.cs" />
+    <Compile Include="Read\RespGtbtcBo.cs" />
+    <Compile Include="Read\RespGtcbcBo.cs" />
+    <Compile Include="Read\RespGtcidBo.cs" />
+    <Compile Include="Read\RespGtcsqBo.cs" />
+    <Compile Include="Read\RespGtestBo.cs" />
+    <Compile Include="Read\RespGtgcrBo.cs" />
+    <Compile Include="Read\RespGtgeoBo.cs" />
+    <Compile Include="Read\RespGthwvBo.cs" />
+    <Compile Include="Read\RespGtinfBo.cs" />
+    <Compile Include="Read\RespGtlbcBo.cs" />
+    <Compile Include="Read\RespGtlgtBo.cs" />
+    <Compile Include="Read\RespGtpfaBo.cs" />
+    <Compile Include="Read\RespGtplaBo.cs" />
+    <Compile Include="Read\RespGtpnaBo.cs" />
+    <Compile Include="Read\RespGtrtlBo.cs" />
+    <Compile Include="Read\RespGtsosBo.cs" />
+    <Compile Include="Read\RespGtstcBo.cs" />
+    <Compile Include="Read\RespGtswvBo.cs" />
+    <Compile Include="Read\RespGtsziBo.cs" />
+    <Compile Include="Read\RespGttriBo.cs" />
+    <Compile Include="Send\AtGtackBo.cs" />
+    <Compile Include="Send\AtGtbeiBo.cs" />
+    <Compile Include="Send\AtGtgeoBo.cs" />
+    <Compile Include="Send\AtGtrtoBo.cs" />
+    <Compile Include="Send\AtGtsfrBo.cs" />
+    <Compile Include="Send\AtGtsriBo.cs" />
+    <Compile Include="Send\AtGtsziBo.cs" />
+    <Compile Include="Send\AtGttriBo.cs" />
+    <Compile Include="Send\RespGthbdBo.cs" />
+    <Compile Include="Send\SrvackBo.cs" />
+    <Compile Include="Sockets\SocketBo.cs" />
+    <Compile Include="Track\DataSaveFilter.cs" />
+    <Compile Include="Track\InvalidAreaFilter.cs" />
+    <Compile Include="Track\ProcessA.cs" />
+    <Compile Include="Track\ProcessChain.cs" />
+    <Compile Include="Track\StayFilter.cs" />
+    <Compile Include="Track\TrackFactory.cs" />
+    <Compile Include="Track\TrackItemBo.cs" />
+    <Compile Include="Track\InvalidAddressFilter.cs" />
+    <Compile Include="Track\ValidAreaFilter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Model\GTU.ModelLayer.Device.csproj">
+      <Project>{2598EF9B-E97A-4030-BDEA-A05A9CFC62AB}</Project>
+      <Name>GTU.ModelLayer.Device</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

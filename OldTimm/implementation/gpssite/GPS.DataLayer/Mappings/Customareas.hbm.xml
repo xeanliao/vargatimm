@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CustomArea, GPS.DomainLayer" table="CustomAreas" lazy="true" >
+    <id name="Id" column ="Id" unsaved-value="0">
+      <generator class="native" />
+    </id>
+    <property name="Description" column="Description" />
+    <property name="IsEnabled" column="IsEnabled" />
+    <property name="Name" column="Name" />
+    <property name="total" column="total" />
+    <bag name="CustomAreaCoordinates" table="CustomAreaCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CustomAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CustomAreaCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="CustomAreaBoxMappings" table="CustomAreaBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CustomAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CustomAreaBoxMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

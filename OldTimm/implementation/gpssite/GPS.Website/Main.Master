@@ -1,0 +1,260 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Main.master.cs" Inherits="GPS.Website.Main" %>
+
+<%@ Import Namespace="GPS.DataLayer.ValueObjects" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>TIMM &gt; Home</title>
+    <link href="Style/jquery-ui-1.7.2.custom.css" rel="Stylesheet" />
+    <link href="Style/all.css" type="text/css" rel="stylesheet" />
+    <link href="Style/mappanel.css" type="text/css" rel="stylesheet" />
+
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol'></script>
+    <script type="text/javascript" src="Javascript/BingMapsV63ToV8Shim.js"></script>
+
+    <script type="text/javascript" src="Javascript/jquery-1.3.2.js"></script>
+
+    <script type="text/javascript" src="Javascript/ajaxfileupload.js"></script>
+
+    <script type="text/javascript" src="Javascript/jquery.ui.all.js"></script>
+
+    <script type="text/javascript" src="Javascript/jquery.layout.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.js"></script>
+
+    <script type="text/javascript" src="Handler/mapsettings.ashx"></script>
+
+    <script type="text/javascript" src="Javascript/gps.loading.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.form.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.eventtrigger.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.colors.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.settings.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.arealayer.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.areabox.js"></script>
+
+    <script type="text/javascript" src="Javascript/map/gps.map.area.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.container.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/colorpicker.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/eye.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/layout.js"></script>
+
+    <script type="text/javascript" src="Javascript/colorpicker/utils.js"></script>
+
+    <script type="text/javascript" src="Javascript/gps.map.objectstore.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submap.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submaparea.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submappanel.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/submap/gps.campaign.submapview.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.extend.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.extend.data.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.extend.address.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/gps.campaign.mappanel.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/address/gps.campaign.addresspanel.js"></script>
+
+    <script type="text/javascript" src="Javascript/campaign/address/gps.campaign.addressview.js"></script>
+
+    <script type="text/javascript" src="Javascript/DD_roundies.uicornerfix.js"></script>
+
+    <script type="text/javascript">
+        // Prepare menu.
+        function initMenu() {
+            $('li.head-link').hover(
+			    function() { $('ul', this).css('display', 'block'); },
+			    function() { $('ul', this).css('display', 'none'); }
+    	    );
+
+            $('#menu-container li.head-link ul li').hover(
+			    function() { $(this).addClass('ui-state-hover'); },
+			    function() { $(this).removeClass('ui-state-hover'); }
+    	    );
+        }
+        //]]>
+    </script>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        var MapResizer = function() {
+            return {
+                lastEventTime: new Date(),
+                minEventDuration: 500,
+
+                resize: function(map, layout) {
+                    // Make sure we only handle once
+                    var now = new Date();
+                    if (now - this.lastEventTime < this.minEventDuration) return;
+
+                    // resize the map to the current pane size
+                    var width = layout.panes.center.width();
+                    var height = layout.panes.center.height();
+                    map.ResizeMap(width, height);
+
+                    // record the time of this event 
+                    this.lastEventTime = now;
+                },
+
+                getMapLayoutSize: function() {
+                    return {
+                        width: mapLayout.panes.center.width(),
+                        height: mapLayout.panes.center.height()
+                    };
+                }
+            }
+        } ();
+
+        //]]>
+    </script>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        var SysBrowser = {};
+        SysBrowser.ie;
+        SysBrowser.firefox;
+        SysBrowser.chrome;
+        SysBrowser.opera;
+        SysBrowser.safari;
+        var ua = navigator.userAgent.toLowerCase();
+        var s;
+        (s = ua.match(/msie ([\d.]+)/)) ? SysBrowser.ie = s[1] :
+        (s = ua.match(/firefox\/([\d.]+)/)) ? SysBrowser.firefox = s[1] :
+        (s = ua.match(/chrome\/([\d.]+)/)) ? SysBrowser.chrome = s[1] :
+        (s = ua.match(/opera.([\d.]+)/)) ? SysBrowser.opera = s[1] :
+        (s = ua.match(/version\/([\d.]+).*safari/)) ? SysBrowser.safari = s[1] : 0;
+        //]]>
+    </script>
+    
+    
+    <script type="text/javascript">        
+        self.moveTo(0, 0);
+        self.resizeTo(screen.availWidth, screen.availHeight);        
+    </script>
+    
+ <style type="text/css">
+    .menu-container
+    {
+	 position : absolute;	
+	 left : 200px;
+	 font-weight : bold;
+	 font-size:14px;
+   }
+</style>   
+</head>
+<body>
+    <form id="form1" runat="server">
+        <input type="hidden" id="bingMapKey" value="<%= System.Configuration.ConfigurationManager.AppSettings["BinMapKey"] %>" />
+    <asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
+    <!-- content -->
+    <asp:ContentPlaceHolder ID="content" runat="server">
+    </asp:ContentPlaceHolder>
+    <!--page head-->
+    <div class="ui-layout-north">
+        <div class="head-container ui-widget-header ui-corner-all">
+            <div class="head-logo-container" style="text-align:right" >             
+            </div>
+            <div class="menu-container" id="divCampaignName">
+            </div>
+            <ul id="menu-container">                       
+                <li class="head-link" style="display: none;" onclick="javascript:OnSaveCampaignClick();">
+                    Save Campaign
+                    <ul style="display: none;">
+                        <li id="menu-item-new-campaign" class="ui-widget-header" title="New Campaign" onclick="javascript:OnNewCampaignClick();">
+                            New Campaign</li>
+                        <li id="menu-item-open-campaign" class="ui-widget-header" title="Open Campaign" onclick="javascript:OnOpenCampaignClick();">
+                            Open Campaign</li>
+                        <li id="menu-item-save-campaign" class="ui-widget-header" title="Save Campaign" onclick="javascript:OnSaveCampaignClick();">
+                            Save Campaign</li>
+                        <li id="Li2" class="ui-widget-header" title="Modify campaign properties like client name, contact name, etc."
+                            onclick="javascript:OnCampaignPropertiesClick();">Campaign Properties</li>
+                        <li id="menu-item-delete-campaign" class="ui-widget-header" title="Delete Campaign"
+                            onclick="javascript:OnDeleteCampaignClick();">Delete Campaign</li>
+                    </ul>
+                </li>
+                <li class="head-link">Data
+                    <ul>
+                        <li id="menu-item-import" class="ui-widget-header" title="Import Data" onclick="Javascript:ShowImportData();">
+                            Import Data</li>
+                        <li id="menu-item-export" class="ui-widget-header" title="Export Data" onclick="javascript:ShowExportDialog();">
+                            Export Data</li>
+                        <li id="Li1" class="ui-widget-header" title="Penetration Colors" onclick="javascript:ShowPenetrationColorDialog();">
+                            Penetration Colors</li>
+                    </ul>
+                </li>
+                <li class="head-link" style="width: 156px;">Addresses
+                    <ul style="width: 155px;">
+                        <li id="menu-item-load-addresses-green" class="ui-widget-header" title="Load Addresses(Green)"
+                            onclick="javascript:OnLoadAddresses('green');">Load Addresses (Green)</li>
+                        <li id="menu-item-load-addresses-red" class="ui-widget-header" title="Load Addresses(Red)"
+                            onclick="javascript:OnLoadAddresses('red');">Load Addresses (Red)</li>
+                        <li id="menu-item-load-fivezip-area" class="ui-widget-header" title="Find 5 Zip Area"
+                            onclick="javascript:OnLoadFiveZipAreaClick();">Find 5 Zip Area</li>
+                        <li id="menu-item-load-blockgroup-area" class="ui-widget-header" title="Find Block Group Area"
+                            onclick="javascript:OnLoadBlockGroupAreaClick();">Find Block Group Area</li>
+                        <li id="Li3" class="ui-widget-header" title="Find Carrier Route Area"
+                            onclick="javascript:OnLoadCrouteAreaClick();">Find Carrier Route Area</li>
+                    </ul>
+                </li>
+                <% if (null != GPS.DomainLayer.Security.LoginMember.CurrentMember)
+                   {
+                       var cUSER = GPS.DomainLayer.Security.LoginMember.CurrentMember;
+                       var length = cUSER.Groups.Count;
+                       var flagBool = false;
+                        for (var i = 0; i < length; i++)
+                        {
+                            //Sales:46,CampaignSupervisor:47,Administrator:53
+                            if (cUSER.Groups[i].Id == 46 || cUSER.Groups[i].Id == 47 || cUSER.Groups[i].Id == 53)
+                            {
+                                flagBool = true;
+                                break;
+
+                         }
+                        }
+                       if(flagBool){
+                       %>
+                        <li class="head-link" style="width: 156px;">Print
+                            <ul style="width: 155px;">
+                                
+                                <li class="ui-widget-header"><a href="javascript:void(0);" onclick="javascript:OnPrintClick('phantomjs');"
+                                style="color: #000;">Print</a></li> 
+                            </ul>
+                        </li>
+                       <%
+                       }
+                
+               
+                } %>
+                <%--<li class="head-link"><a href="javascript:void(0);" onclick="javascript:OnPrintClick();"
+                    style="color: #000;">Print</a></li>--%>
+                <li class="head-link"><a href="javascript:void(0);" onclick="javascript:OnSaveCampaignClick();"
+                    style="color: #000;">Save & Close</a></li>
+            </ul>
+        </div>
+    </div>
+    <!--end of outer-north-->
+    <!-- page foot -->
+    </form>
+    <!-- enable/disable logging -->
+</body>
+</html>

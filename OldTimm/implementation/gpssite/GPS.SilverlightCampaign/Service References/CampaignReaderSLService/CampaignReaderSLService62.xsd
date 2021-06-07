@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.UserServices" elementFormDefault="qualified" targetNamespace="TIMM.Website.UserServices" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd9" namespace="TIMM.Website.GroupServices" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/CampaignReaderSLService.svc?xsd=xsd6" namespace="TIMM.Website.TaskServices" />
+  <xs:complexType name="ToUser">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Enabled" type="xs:boolean" />
+      <xs:element minOccurs="0" name="FullName" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="TIMM.Website.GroupServices" minOccurs="0" name="Groups" nillable="true" type="q1:ArrayOfToGroup" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Role" type="xs:int" />
+      <xs:element minOccurs="0" name="RoleName" nillable="true" type="xs:string" />
+      <xs:element xmlns:q2="TIMM.Website.TaskServices" minOccurs="0" name="Taskgtuinfomappings" nillable="true" type="q2:ArrayOfToTaskgtuinfomapping" />
+      <xs:element minOccurs="0" name="UserCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="UserName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToUser" nillable="true" type="tns:ToUser" />
+  <xs:complexType name="ToStatusInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Status" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToStatusInfo" nillable="true" type="tns:ToStatusInfo" />
+</xs:schema>

@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="TIMM.GPS.ControlCenter.UserControls.PrintFooter"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignWidth="592">
+    <Border BorderThickness="0 1 0 0" BorderBrush="Black">
+        <Grid x:Name="LayoutRoot" Background="White">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="119" />
+                <ColumnDefinition Width="193" />
+                <ColumnDefinition Width="143" />
+                <ColumnDefinition Width="137" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="12" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="12" />
+            </Grid.RowDefinitions>
+
+            <Image x:Name="imgLeftLogo" Source="../../Images/vargainc-logo.jpg" Grid.RowSpan="4" Height="40" HorizontalAlignment="Left" Stretch="Uniform" />
+            
+            <TextBlock Text="{Binding DisplayName, StringFormat='MC#:{0}'}" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" FontSize="6" Foreground="Black" />
+            <TextBlock Text="{Binding Date, StringFormat='Created on:{0:dd-MM-yyyy}'}" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" FontSize="6" Foreground="Black"  />
+            <TextBlock Text="{Binding ContactName, StringFormat='Created for:{0}'}" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" FontSize="6" Foreground="Black"  />
+            <TextBlock Text="{Binding CreatorName, StringFormat='Created by:{0}'}" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" FontSize="6" Foreground="Black" />
+
+            <TextBlock Text="www.vargainc.com" Grid.Column="2" FontSize="6" FontFamily="Arial" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="Black" />
+            <TextBlock Text="PH:949-768-1500" Grid.Row="1" Grid.Column="2" FontSize="6" FontFamily="Arial" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="Black" />
+            <TextBlock Text="FX:949-768-1501" Grid.Row="2" Grid.Column="2" FontSize="6" FontFamily="Arial" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="Black" />
+            <TextBlock Text="©2010 Varga Media Solutions,Inc.All rights reserved." Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" FontSize="6" FontFamily="Arial" HorizontalAlignment="Right" Foreground="Black" />
+
+            <TextBlock Grid.Column="3" FontSize="7" FontFamily="Verdana" VerticalAlignment="Center"  TextAlignment="Right" Foreground="Black" >
+                <Run>Created for</Run>
+                <Run FontStyle="Italic" Text=" you "></Run>
+                <Run>with help from:</Run>
+            </TextBlock>
+            <Image x:Name="imgRightLogo" Source="../../Images/timm-logo.jpg" HorizontalAlignment="Right" VerticalAlignment="Center" Height="30" Grid.Row="1" Grid.RowSpan="3" Grid.Column="4" Stretch="Uniform" />
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,4 @@
+﻿dear {0}.
+
+    The following addresses can't be uploaded successfully, either because they are incorrect, or becauese they already exist in the system.
+{1}

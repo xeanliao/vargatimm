@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="test" Class="SelectMappingDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=192.168.4.210;Initial Catalog=test;Persist Security Info=True;User ID=sa" SettingsObjectName="GPS.Tool.Properties.Settings" SettingsPropertyName="testConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.BlockGroupSelectMappings" Member="BlockGroupSelectMappings">
+    <Type Name="BlockGroupSelectMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ThreeZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TractId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BlockGroupId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PremiumCRouteSelectMappings" Member="PremiumCRouteSelectMappings">
+    <Type Name="PremiumCRouteSelectMapping">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ThreeZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FiveZipAreaId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PremiumCRouteId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+</Database>

@@ -1,0 +1,512 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{047DBA2D-07FE-45EE-A395-20BDCF97A7B2}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TIMM.GPS.ControlCenter</RootNamespace>
+    <AssemblyName>TIMM.GPS.ControlCenter</AssemblyName>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>true</SilverlightApplication>
+    <SupportedCultures>
+    </SupportedCultures>
+    <XapOutputs>true</XapOutputs>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
+    <XapFilename>TIMM.GPS.ControlCenter.xap</XapFilename>
+    <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
+    <SilverlightAppEntry>TIMM.GPS.ControlCenter.App</SilverlightAppEntry>
+    <TestPageFileName>TIMM.GPS.ControlCenterTestPage.html</TestPageFileName>
+    <CreateTestPage>true</CreateTestPage>
+    <ValidateXaml>true</ValidateXaml>
+    <EnableOutOfBrowser>false</EnableOutOfBrowser>
+    <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
+    <UsePlatformExtensions>false</UsePlatformExtensions>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <LinkedServerProject>
+    </LinkedServerProject>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\TIMM.GPS\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <InBrowserSettingsFile>Properties\InBrowserSettings.xml</InBrowserSettingsFile>
+    <RequireInBrowserElevation>true</RequireInBrowserElevation>
+  </PropertyGroup>
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GalaSoft.MvvmLight.Extras.SL5">
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\SL5\GalaSoft.MvvmLight.Extras.SL5.dll</HintPath>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.SL5">
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\SL5\GalaSoft.MvvmLight.SL5.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZLib.Silverlight">
+      <HintPath>..\Library\ICSharpCode.SharpZLib.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools">
+      <HintPath>..\Library\ImageTools.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.IO.Png">
+      <HintPath>..\Library\ImageTools.IO.Png.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.Utils">
+      <HintPath>..\Library\ImageTools.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Maps.MapControl">
+      <HintPath>..\Library\Microsoft.Maps.MapControl.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Maps.MapControl.Common">
+      <HintPath>..\Library\Microsoft.Maps.MapControl.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\SL5\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.7\lib\sl4\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations, Version=5.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Controls, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Data, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Data.DataForm.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Data.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Data.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.DataVisualization.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.DomainServices, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Navigation, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Theming.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit.Internals, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\SL5\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Browser" />
+    <Reference Include="System.Xml.Serialization, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ChildWindowBase.cs" />
+    <Compile Include="Controls\TiledBackground.cs" />
+    <Compile Include="Converters\BooleanToVisiblityConverter.cs" />
+    <Compile Include="Converters\NullToFalseConverter.cs" />
+    <Compile Include="Converters\ReverseBooleanConverter.cs" />
+    <Compile Include="Extend\ColorExtend.cs" />
+    <Compile Include="Extend\GeoCodeCalculation.cs" />
+    <Compile Include="Interface\ICanEditMapPdfPage.cs" />
+    <Compile Include="Interface\INeedSetTargetMethod.cs" />
+    <Compile Include="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Model\CampaignPercentageColor.cs" />
+    <Compile Include="Model\CampaignUI.cs" />
+    <Compile Include="Model\DistributionMapUI.cs" />
+    <Compile Include="Model\ExportPageTypeEnum.cs" />
+    <Compile Include="Model\ModelBase.cs" />
+    <Compile Include="Model\NdAddressUI.cs" />
+    <Compile Include="Model\PenetrationColor.cs" />
+    <Compile Include="Model\PrintOption.cs" />
+    <Compile Include="Model\PublishResult.cs" />
+    <Compile Include="Model\ReportFilterModel.cs" />
+    <Compile Include="Model\SubMapUI.cs" />
+    <Compile Include="Model\TaskStatus.cs" />
+    <Compile Include="Model\UploadResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\LocationService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PdfPageBase.cs" />
+    <Compile Include="UserControls\Print\PrintBigDMap.xaml.cs">
+      <DependentUpon>PrintBigDMap.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PrintCampaign.xaml.cs">
+      <DependentUpon>PrintCampaign.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PrintCover.xaml.cs">
+      <DependentUpon>PrintCover.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PrintDMap.xaml.cs">
+      <DependentUpon>PrintDMap.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PrintFooter.xaml.cs">
+      <DependentUpon>PrintFooter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PrintSubMap.xaml.cs">
+      <DependentUpon>PrintSubMap.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PrintSubMapSummary.xaml.cs">
+      <DependentUpon>PrintSubMapSummary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Print\PrintSubMapDetail.xaml.cs">
+      <DependentUpon>PrintSubMapDetail.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\AdministrationViewModel.cs" />
+    <Compile Include="ViewModel\CampaignDetailViewModel.cs" />
+    <Compile Include="ViewModel\CampaignViewModel.cs" />
+    <Compile Include="ViewModel\DistributionMapsViewModel.cs" />
+    <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\MonitorViewModel.cs" />
+    <Compile Include="ViewModel\ReportViewModel.cs" />
+    <Compile Include="ViewModel\TaskDetailViewModel.cs" />
+    <Compile Include="ViewModel\ValidationViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="Views\AddCampagin.xaml.cs">
+      <DependentUpon>AddCampagin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Administration.xaml.cs">
+      <DependentUpon>Administration.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Alert.xaml.cs">
+      <DependentUpon>Alert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AssignUser.xaml.cs">
+      <DependentUpon>AssignUser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Campaigns.xaml.cs">
+      <DependentUpon>Campaigns.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Confirm.xaml.cs">
+      <DependentUpon>Confirm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DistributionMaps.xaml.cs">
+      <DependentUpon>DistributionMaps.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DistributionMap_Snap.xaml.cs">
+      <DependentUpon>DistributionMap_Snap.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditTask.xaml.cs">
+      <DependentUpon>EditTask.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Monitors.xaml.cs">
+      <DependentUpon>Monitors.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PrintOptionDialog.xaml.cs">
+      <DependentUpon>PrintOptionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DistributionMapPrint.xaml.cs">
+      <DependentUpon>DistributionMapPrint.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ReportPrint.xaml.cs">
+      <DependentUpon>ReportPrint.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Reports.xaml.cs">
+      <DependentUpon>Reports.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+    <Page Include="Assets\Themes\JetPack.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\Themes\JetPack\Brushes.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\Themes\JetPack\CoreStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\Themes\JetPack\Fonts.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\Themes\JetPack\SDKStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\Themes\JetPack\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\Themes\JetPack\ToolkitStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintBigDMap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintCampaign.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintCover.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintDMap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintFooter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintSubMap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintSubMapSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Print\PrintSubMapDetail.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AddCampagin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Administration.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Alert.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AssignUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Campaigns.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Confirm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DistributionMaps.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DistributionMap_Snap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditTask.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Monitors.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PrintOptionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DistributionMapPrint.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReportPrint.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Reports.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\AppManifest.xml" />
+    <None Include="Service References\LocationService\LocationService.wsdl" />
+    <None Include="Service References\LocationService\LocationService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\LocationService\LocationService1.wsdl" />
+    <None Include="Service References\LocationService\LocationService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\LocationService\LocationService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="ServiceReferences.ClientConfig" />
+    <Content Include="ServiceReferences.Debug.ClientConfig">
+      <DependentUpon> ServiceReferences.ClientConfig</DependentUpon>
+    </Content>
+    <Content Include="ServiceReferences.Release.ClientConfig">
+      <DependentUpon> ServiceReferences.ClientConfig</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\backgroundshadow.png" />
+    <Resource Include="Images\backgroundtexture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\map_back.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\map.png" />
+    <Resource Include="Images\map_add.png" />
+    <Resource Include="Images\map_delete.png" />
+    <Resource Include="Images\map_edit.png" />
+    <Resource Include="Images\map_go.png" />
+    <Resource Include="Images\map_magnify.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\map_copy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SharpZipLib.Silverlight\SharpZipLib.Silverlight.csproj">
+      <Project>{8B7CF854-73A1-4882-B317-07625C13A425}</Project>
+      <Name>SharpZipLib.Silverlight</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TIMM.GPS.Model\TIMM.GPS.Model.csproj">
+      <Project>{D853E0CF-A48F-4084-96E7-8E76C3097CCA}</Project>
+      <Name>TIMM.GPS.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TIMM.GPS.Net.Http\TIMM.GPS.Net.Http.csproj">
+      <Project>{B228158E-AC56-4DEF-AF81-23F222209C6D}</Project>
+      <Name>TIMM.GPS.Net.Http</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TIMM.GPS.Silverlight.Controls\TIMM.GPS.Silverlight.Controls.csproj">
+      <Project>{D754F813-742B-4A1C-BBB1-F8A5159B15DB}</Project>
+      <Name>TIMM.GPS.Silverlight.Controls</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\vargainc-logo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\direction-legend.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\timm-logo-small.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\timm-logo-print.jpg" />
+    <Resource Include="Images\timm-logo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\apply.png" />
+    <Resource Include="Images\cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\green-star.png" />
+    <Resource Include="Images\red-star.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\flag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\32-Aerial.png" />
+    <Resource Include="Images\32-Road.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\zoom_in.png" />
+    <Resource Include="Images\zoom_out.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\compass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\InBrowserSettings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\OutOfBrowserSettings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\LocationService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\LocationService\LocationService.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\LocationService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\LocationService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\LocationService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  -->
+  <Target Name="BeforeBuild">
+    <Exec Condition="'$(Configuration)' == 'Debug' " Command="XCOPY ServiceReferences.Debug.ClientConfig ServiceReferences.ClientConfig /R /Y" IgnoreExitCode="true" />
+    <Exec Condition="'$(Configuration)' == 'Release' " Command="XCOPY ServiceReferences.Release.ClientConfig ServiceReferences.ClientConfig /R /Y" IgnoreExitCode="true" />
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetDir)\$(TargetName).xap $(SolutionDir)\..\gpssite\Lib\NewControlCenterXap\</PostBuildEvent>
+  </PropertyGroup>
+</Project>

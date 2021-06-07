@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="26c6d967-435d-455e-b1ed-5d1338aac765" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:7800/GTUService/GTUQuery/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="6ae23f21-c03d-47b1-904c-2396abdd8bd1" SourceId="1" SourceUrl="http://localhost:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="559df336-b363-4c18-a9aa-4a36703beb89" SourceId="1" SourceUrl="http://localhost:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="59e29072-e030-4e87-aaab-7eedc4011980" SourceId="1" SourceUrl="http://localhost:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="GTUService.TIMM.xsd" MetadataType="Schema" ID="0b093795-3dc4-48d0-96d6-16d276e097b5" SourceId="1" SourceUrl="http://localhost:7800/GTUService/GTUQuery/mex" />
+    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="1eecd33d-bb67-44a1-bf8a-c1c53d8d52f0" SourceId="1" SourceUrl="http://localhost:7800/GTUService/GTUQuery/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

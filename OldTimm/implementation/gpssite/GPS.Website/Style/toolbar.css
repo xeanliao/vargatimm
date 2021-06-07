@@ -1,0 +1,4 @@
+﻿.gps-toolbar-button {padding: .4em 1em .4em 20px;text-decoration: none;position: relative;font-weight:bold;font-size:11px;}
+.gps-toolbar-button span.ui-icon {margin: 0 5px 0 0;position: absolute;left: .2em;top: 50%;margin-top: -8px;}
+.gps-toolbar-small-button {padding: .4em 1em .4em 1em;text-decoration: none;position: relative;font-weight:bold;font-size:11px;}
+.gps-toolbar-small-button span.ui-icon {margin: 0 5px 0 0;position: absolute;left: .2em;top: 50%;margin-top: -8px; cursor:pointer;}

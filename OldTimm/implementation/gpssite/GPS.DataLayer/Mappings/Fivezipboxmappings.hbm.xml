@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.FiveZipBoxMapping, GPS.DomainLayer" table="FiveZipBoxMappings" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="BoxId" column="BoxId" />
+    <many-to-one name="FiveZipArea"
+                 column="FiveZipAreaId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.FiveZipArea, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

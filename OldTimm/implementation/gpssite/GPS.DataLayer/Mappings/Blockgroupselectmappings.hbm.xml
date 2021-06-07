@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.BlockGroupSelectMapping, GPS.DomainLayer" table="BlockGroupSelectMappings" lazy="true" >
+    <id name="Id" column ="Id" unsaved-value="0">
+      <generator class="GPS.DataLayer.SequenceGenerators.SequenceGenerator, GPS.DataLayer">
+        <param name="table">SequenceCounters</param>
+        <param name="column">BlockGroupSelectMapping</param>
+      </generator>
+    </id>
+    <many-to-one name="ThreeZipArea"
+                 column="ThreeZipAreaId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.ThreeZipArea, GPS.DomainLayer" />
+    <many-to-one name="FiveZipArea"
+                 column="FiveZipAreaId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.FiveZipArea, GPS.DomainLayer" />
+    <many-to-one name="Tract"
+                 column="TractId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.Tract, GPS.DomainLayer" />
+    <many-to-one name="BlockGroup"
+                 column="BlockGroupId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.BlockGroup, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

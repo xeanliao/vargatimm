@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="GPS.DomainLayer"  namespace="GPS.DomainLayer.Entities">
+  <class name ="BlockGroupBoxMapping" table="BlockGroupBoxMappings">
+    <id name="Id" column ="Id" unsaved-value="0">
+      <generator class="GPS.DataLayer.SequenceGenerators.SequenceGenerator, GPS.DataLayer">
+        <param name="table">SequenceCounters</param>
+        <param name="column">BlockGroupBoxMapping</param>
+      </generator>
+    </id>
+    <property name ="BoxId" />
+    <many-to-one name="BlockGroup"
+                 column="BlockGroupId"
+                 not-null="true"
+                 class="GPS.DomainLayer.Entities.BlockGroup, GPS.DomainLayer" />
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToCoordinate, GPS.Website" source="GPS.DomainLayer.Entities.SubMapCoordinate, GPS.DomainLayer">
+    <member name="Latitude" nullValue="0" />
+    <member name="Longitude" nullValue="0" />
+  </class>
+  <class name="GPS.Website.TransferObjects.ToCoordinate, GPS.Website" source="GPS.DomainLayer.Entities.DistributionMapCoordinate, GPS.DomainLayer">
+    <member name="Latitude" nullValue="0" />
+    <member name="Longitude" nullValue="0" />
+  </class>
+  <class name="GPS.Website.TransferObjects.ToCoordinate, GPS.Website" source="GPS.DomainLayer.Interfaces.ICoordinate, GPS.DomainLayer">
+    <member name="Latitude" nullValue="0" />
+    <member name="Longitude" nullValue="0" />
+  </class>
+</otis-mapping>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="TIMM.Website.DistributionMapServices" elementFormDefault="qualified" targetNamespace="TIMM.Website.DistributionMapServices" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd3" namespace="TIMM.Website.TransferObjects" />
+  <xs:import schemaLocation="http://localhost:3970/SilverlightServices/DMReaderSLService.svc?xsd=xsd5" namespace="TIMM.Website.TaskServices" />
+  <xs:complexType name="ToDistributionMap">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ColorB" type="xs:int" />
+      <xs:element minOccurs="0" name="ColorG" type="xs:int" />
+      <xs:element minOccurs="0" name="ColorR" type="xs:int" />
+      <xs:element minOccurs="0" name="ColorString" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CountAdjustment" type="xs:int" />
+      <xs:element xmlns:q1="TIMM.Website.TransferObjects" minOccurs="0" name="DistributionMapCoordinates" nillable="true" type="q1:ArrayOfToCoordinate" />
+      <xs:element xmlns:q2="TIMM.Website.TransferObjects" minOccurs="0" name="DistributionMapRecords" nillable="true" type="q2:ArrayOfToAreaRecord" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Penetration" type="xs:int" />
+      <xs:element minOccurs="0" name="Percentage" type="xs:double" />
+      <xs:element minOccurs="0" name="SubMapId" type="xs:int" />
+      <xs:element xmlns:q3="TIMM.Website.TaskServices" minOccurs="0" name="Tasks" nillable="true" type="q3:ArrayOfToTask" />
+      <xs:element minOccurs="0" name="Total" type="xs:int" />
+      <xs:element minOccurs="0" name="TotalAdjustment" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ToDistributionMap" nillable="true" type="tns:ToDistributionMap" />
+</xs:schema>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.Website.TransferObjects.ToSubMap, GPS.Website" source="GPS.DomainLayer.Entities.SubMap, GPS.DomainLayer" helper="GPS.Website.TransferObjects.ToSubMap.Convert">
+    <member name="Id" nullValue="0" />
+    <member name="Name" nullValue="String.Empty" />
+    <member name="CampaignId" nullValue="0" />
+    <member name="ColorB" nullValue="0" />
+    <member name="ColorG" nullValue="0" />
+    <member name="ColorR" nullValue="0" />
+    <member name="ColorString" nullValue="String.Empty" />
+    <member name="OrderId" nullValue="0" />
+    <member name="Penetration" nullValue="0" />
+    <member name="Percentage" nullValue="0" />
+    <member name="Total" nullValue="0" />
+    <member name="TotalAdjustment" nullValue="0" />
+    <member name="CountAdjustment" nullValue="0" />
+    <member name="SubMapCoordinates" nullValue="null" />
+    <member name="SubMapRecords" nullValue="null" />
+    <member name="DistributionMaps" nullValue="null" />
+  </class>
+</otis-mapping>

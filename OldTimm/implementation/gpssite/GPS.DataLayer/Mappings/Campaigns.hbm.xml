@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.Campaign, GPS.DomainLayer" table="Campaigns" lazy="true" >
+      <id name="Id" column="Id" >
+          <generator class="native" />
+      </id>
+    <property name="AreaDescription" column="AreaDescription" />
+    <property name="ClientCode" column="ClientCode" />
+    <property name="ClientName" column="ClientName" />
+    <property name="ContactName" column="ContactName" />
+    <property name="CustemerName" column="CustemerName" />
+    <property name="Date" column="Date" />
+    <property name="Description" column="Description" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Logo" column="Logo" />
+    <property name="Longitude" column="Longitude" />
+    <property name="Name" column="Name" />
+    <property name="Sequence" column="Sequence" />
+    <property name="UserName" column="UserName" />
+    <property name="CreatorName" column="CreatorName" />
+    <property name="ZoomLevel" column="ZoomLevel" />
+    <!-- 'cascade' is set to 'none' because CampaignBlockGroupImporteds need bulk operations -->
+    <bag name="CampaignBlockGroupImporteds" table="CampaignBlockGroupImported" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CampaignBlockGroupImported, GPS.DomainLayer" />
+    </bag>
+    <bag name="CampaignClassifications" table="CampaignClassifications" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CampaignClassification, GPS.DomainLayer" />
+    </bag>
+    <bag name="CampaignPercentageColors" table="CampaignPercentageColors" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CampaignPercentageColor, GPS.DomainLayer" />
+    </bag>
+    <bag name="CampaignFiveZipImporteds" table="CampaignFiveZipImported" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CampaignFiveZipImported, GPS.DomainLayer" />
+    </bag>
+    <bag name="CampaignRecords" table="CampaignRecords" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CampaignRecord, GPS.DomainLayer" />
+    </bag>
+    <bag name="CampaignTractImporteds" table="CampaignTractImported" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CampaignTractImported, GPS.DomainLayer" />
+    </bag>
+    <bag name="CampaignCRouteImporteds" table="CampaignCRouteImported" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CampaignCRouteImported, GPS.DomainLayer" />
+    </bag>
+    <bag name="Addresses" table="Addresses" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.Address, GPS.DomainLayer" />
+    </bag>
+    <bag name="SubMaps" table="SubMaps" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CampaignId" />
+      <one-to-many class="GPS.DomainLayer.Entities.SubMap, GPS.DomainLayer" />
+    </bag>
+    <map name="Users" table="campaignusermappings" cascade="all-delete-orphan" >
+      <key column="campaignId"/>
+      <index-many-to-many column="userId" class ="GPS.DomainLayer.Entities.User"/>
+      <composite-element class="GPS.DomainLayer.Entities.StatusInfo">
+        <property name="Status" column="Status" type="Int32"></property>        
+      </composite-element>
+    </map>
+  </class>
+</hibernate-mapping>

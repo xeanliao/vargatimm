@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="GPS.DomainLayer" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="GPS.DomainLayer.Entities.CountyArea, GPS.DomainLayer" table="CountyAreas" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Code" column="Code" />
+    <property name="Latitude" column="Latitude" />
+    <property name="Longitude" column="Longitude" />
+    <property name="LSAD" column="LSAD" />
+    <property name="LSAD_TRAN" column="LSAD_TRAN" />
+    <property name="MaxLatitude" column="MaxLatitude" />
+    <property name="MaxLongitude" column="MaxLongitude" />
+    <property name="MinLatitude" column="MinLatitude" />
+    <property name="MinLongitude" column="MinLongitude" />
+    <property name="Name" column="Name" />
+    <property name="StateCode" column="StateCode" />
+    <bag name="CountyAreaCoordinates" table="CountyAreaCoordinates" order-by="id" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CountyAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CountyAreaCoordinate, GPS.DomainLayer" />
+    </bag>
+    <bag name="CountyAreaBoxMappings" table="CountyAreaBoxMappings" generic="true" inverse="true" cascade="all-delete-orphan">
+      <key column="CountyAreaId" />
+      <one-to-many class="GPS.DomainLayer.Entities.CountyAreaBoxMapping, GPS.DomainLayer" />
+    </bag>
+  </class>
+</hibernate-mapping>

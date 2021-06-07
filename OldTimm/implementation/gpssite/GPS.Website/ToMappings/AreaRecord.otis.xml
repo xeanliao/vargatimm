@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<otis-mapping xmlns="urn:otis-mapping-1.0">
+  <class name="GPS.DomainLayer.Area.AreaRecord, GPS.DomainLayer.Area" source="GPS.Website.TransferObjects.ToAreaRecord, GPS.Website"
+       helper="GPS.Website.TransferObjects.ToAreaRecord.ConvertBack">
+    <member name="AreaId" nullValue="0" />
+    <member name="Value" nullValue="false" />
+  </class>
+</otis-mapping>
