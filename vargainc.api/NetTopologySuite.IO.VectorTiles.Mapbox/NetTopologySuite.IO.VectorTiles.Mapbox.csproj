@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props')" />
+	<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>    
     <Nullable>enable</Nullable>
@@ -11,11 +12,11 @@
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-		<ProjectGuid>{805bd8b4-4a0d-4527-955c-c169e43f6f0d}</ProjectGuid>
+		<ProjectGuid>{eb5999ad-2b9e-46a9-a3af-c70f46c9cf7b}</ProjectGuid>
 		<OutputType>Library</OutputType>
 		<AppDesignerFolder>Properties</AppDesignerFolder>
-		<RootNamespace>NetTopologySuite.IO.VectorTiles.Mapbox</RootNamespace>
-		<AssemblyName>NetTopologySuite.IO.VectorTiles.Mapbox</AssemblyName>
+		<RootNamespace>Vargainc.Timm.EF</RootNamespace>
+		<AssemblyName>Vargainc.Timm.EF</AssemblyName>
 		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
 		<FileAlignment>512</FileAlignment>
 		<TargetFrameworkProfile />
@@ -49,7 +50,6 @@
     <Compile Include="VectorTileSource.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NetTopologySuite" Version="2.3.0" />
     <PackageReference Include="protobuf-net" Version="2.4.6" />
 	  <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
   </ItemGroup>
