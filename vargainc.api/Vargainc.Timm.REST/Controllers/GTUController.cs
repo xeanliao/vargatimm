@@ -12,6 +12,7 @@ using NetTopologySuite.Geometries;
 using Vargainc.Timm.Extentions;
 using System.Data.Common;
 using System.Configuration;
+using NetTopologySuite.Simplify;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -362,19 +363,19 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 lastUpdateTime = lastTime.Value;
             }
-            var result = await query.Select(i => new GeoAPI.Geometries.Coordinate
+            var result = await query.Select(i => new Coordinate
             {
                 Y = i.dwLatitude ?? 0,
                 X = i.dwLongitude ?? 0
             }).ToArrayAsync();
-            GeoAPI.Geometries.Coordinate[] simplify = null;
+            Coordinate[] simplify = null;
             if (result.Length > 3)
             {
-                simplify = NetTopologySuite.Simplify.DouglasPeuckerLineSimplifier.Simplify(result, 0.0001);
+                simplify = DouglasPeuckerLineSimplifier.Simplify(result, 0.0001);
             }
             else
             {
-                simplify = new GeoAPI.Geometries.Coordinate[0];
+                simplify = new Coordinate[0];
 
             }
             

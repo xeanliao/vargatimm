@@ -12,11 +12,9 @@ using System.Web;
 using Vargainc.Timm.EF;
 using Vargainc.Timm.Models;
 using NetTopologySuite.Geometries;
-using GeoAPI.Geometries;
 using NetTopologySuite.IO.KML;
 using Vargainc.Timm.REST.ViewModel.ControlCenter;
 using Vargainc.Timm.REST.Helper;
-
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -1592,7 +1590,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             #region Union
             Polygon resultPolygon = null;
-            IGeometry unionPolygon = null;
+            Geometry unionPolygon = null;
             MultiPolygon cRouteCollection = null;
             try
             {

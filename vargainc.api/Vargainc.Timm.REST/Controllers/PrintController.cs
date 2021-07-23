@@ -1,5 +1,4 @@
-﻿using GeoAPI.Geometries;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,6 @@ using System.Net.Http;
 using System.Web.Http;
 using Vargainc.Timm.EF;
 using Vargainc.Timm.Models;
-using Wintellect.PowerCollections;
 using Vargainc.Timm.REST.Helper;
 using System.Threading.Tasks;
 using Vargainc.Timm.Extentions;
@@ -679,7 +677,7 @@ namespace Vargainc.Timm.REST.Controllers
             }).ToList();
         }
 
-        internal IGeometry GetDMapPolygon(int dmapId)
+        internal Geometry GetDMapPolygon(int dmapId)
         {
             var coordinates = db.DistributionMaps
                 .FirstOrDefault(i => i.Id == dmapId)
@@ -769,17 +767,13 @@ namespace Vargainc.Timm.REST.Controllers
             return result;
         }
 
-        private IGeometry BuildPolygon(List<ViewModel.Location> locations)
+        private Geometry BuildPolygon(List<ViewModel.Location> locations)
         {
             if(locations == null || locations.Count == 0)
             {
                 return null;
             }
-            var coordinate = locations.Select(i => new Coordinate
-            {
-                Y = i.Latitude ?? 0,
-                X = i.Longitude ?? 0
-            }).ToList();
+            var coordinate = locations.Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
             coordinate.Add(new Coordinate {
                 Y = locations[0].Latitude ?? 0,
                 X = locations[0].Longitude ?? 0

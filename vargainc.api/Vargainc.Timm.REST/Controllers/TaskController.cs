@@ -440,7 +440,7 @@ namespace Vargainc.Timm.REST.Controllers
                 .FirstOrDefault(i => i.Id == targetTask.DistributionMapId)
                 .DistributionMapCoordinates
                 .OrderBy(i => i.Id)
-                .Select(i => new GeoAPI.Geometries.Coordinate
+                .Select(i => new Coordinate
                 {
                     X = i.Longitude.Value,
                     Y = i.Latitude.Value

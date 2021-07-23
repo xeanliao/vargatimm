@@ -47,19 +47,19 @@ namespace Vargainc.Timm.REST
             }
             
             // Web API routes
-            config.MapHttpAttributeRoutes();
+            //config.MapHttpAttributeRoutes();
             
-            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+            //config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
-            config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+            //config.Routes.MapHttpRoute(
+            //    name: "DefaultApi",
+            //    routeTemplate: "{controller}/{id}",
+            //    defaults: new { id = RouteParameter.Optional }
+            //);
 
-            config.EnsureInitialized();
+            //config.EnsureInitialized();
             
-            app.UseWebApi(config);
+            //app.UseWebApi(config);
         }
     }
 }
