@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>    
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFramework>net48</TargetFramework>
+	<Title>NetTopologySuite.IO.VectorTiles.GeoJson</Title>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="GeoJsonTileWriter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
+    <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetTopologySuite.IO.VectorTiles\NetTopologySuite.IO.VectorTiles.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    
+    
+    <Reference Include="Microsoft.CSharp" />
+    
+    <Reference Include="System.Data" />
+    
+    <Reference Include="System.Net.Http" />
+    
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+ </Project>
