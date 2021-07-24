@@ -1,19 +1,26 @@
-﻿using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.IO.VectorTiles;
+using NetTopologySuite.IO.VectorTiles.Mapbox;
+using NetTopologySuite.IO.VectorTiles.GeoJson;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Data.Entity;
 using Vargainc.Timm.EF;
 
 namespace Vargainc.Timm.REST.Controllers
 {
+    [RoutePrefix("area")]
     public class AreaController : ApiController
     {
         private TimmContext db = new TimmContext();
@@ -29,11 +36,11 @@ namespace Vargainc.Timm.REST.Controllers
             return 180.0 / Math.PI * Math.Atan(0.5 * (Math.Exp(n) - Math.Exp(-n)));
         }
 
-        [Route("titles/{type}/{z}/{x}/{y}")]
+        [Route("tiles/{type}/{z}/{x}/{y}")]
         [HttpGet]
         public async Task<HttpResponseMessage> GetTiles(string type, int z, int x, int y)
         {
-            var tree = new VectorTileTree();
+            
 
 
             var topLeftLng = Tile2Lng(z, x);
@@ -99,6 +106,57 @@ namespace Vargainc.Timm.REST.Controllers
                 response.Headers.Add("content-type", "application/geo+json");
                 return response;
             }
+        }
+
+        [Route("tiles")]
+        [HttpGet]
+        public async Task BuildTiles()
+        {
+            var data = await db.FiveZipAreas.Include("Locations").Take(1).Select(i => new
+            {
+                i.Id,
+                Type = "5zip",
+                i.Longitude,
+                i.Latitude,
+                i.Locations
+            })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            
+
+            var features = data.Select(i =>
+           {
+               var points = i.Locations.ToArray().Select(j => new Coordinate(j.Longitude ?? 0, j.Latitude ?? 0)).ToList();
+               points.Add(points[0]);
+               return new Feature
+               {
+                   Geometry = new Polygon(new LinearRing(points.ToArray())),
+                   Attributes = new AttributesTable
+                   {
+                        { "id", i.Id},
+                        { "type", i.Type},
+                        { "center", new { lng = i.Longitude, lat = i.Latitude} }
+                   }
+               };
+           }).ToList();
+
+            var featureCollection = new Collection<Feature>(features);
+
+            var tree = new VectorTileTree();
+            IEnumerable<(IFeature feature, int zoom, string layerName)> ConfigureFeature(IFeature feature)
+            {
+                //for (var z = 10; z <= 18; z++)
+                //{
+                //    yield return (feature, z, "5zip");
+                //}
+                yield return (feature, 10, "5zip");
+            }
+            tree.Add(features, ConfigureFeature);
+
+            MapboxTileWriter.Write(tree, "z:\\tiles");
+            GeoJsonTileWriter.Write(tree, "z:\\tiles");
+
         }
 
         protected override void Dispose(bool disposing)

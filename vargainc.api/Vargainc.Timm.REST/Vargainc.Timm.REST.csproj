@@ -1,14 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props')" />
-	<PropertyGroup>
-		<LangVersion>8.0</LangVersion>
-		<Nullable>enable</Nullable>
-		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-		<TargetFramework>net48</TargetFramework>
-		<Title>Vargainc.Timm.REST</Title>
-	</PropertyGroup>
-	<PropertyGroup>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>
@@ -213,6 +206,7 @@
     <Compile Include="Helper\CampaignLogFix.cs" />
     <Compile Include="Helper\PublicAccessFilter.cs" />
     <Compile Include="Helper\UserManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModel\ControlCenter\CampaignViewModel.cs" />
     <Compile Include="ViewModel\ControlCenter\TaskViewModel.cs" />
@@ -235,10 +229,9 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetTopologySuite.IO.VectorTiles\NetTopologySuite.IO.VectorTiles.csproj">
-      <Project>{8555a86a-d1ca-4d99-9e03-ca8213f6731a}</Project>
-      <Name>NetTopologySuite.IO.VectorTiles</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\NetTopologySuite.IO.VectorTiles.GeoJson\NetTopologySuite.IO.VectorTiles.GeoJson.csproj" />
+    <ProjectReference Include="..\NetTopologySuite.IO.VectorTiles.Mapbox\NetTopologySuite.IO.VectorTiles.Mapbox.csproj" />
+    <ProjectReference Include="..\NetTopologySuite.IO.VectorTiles\NetTopologySuite.IO.VectorTiles.csproj" />
     <ProjectReference Include="..\Vargainc.Timm.EF\Vargainc.Timm.EF.csproj">
       <Project>{51901696-9a1d-4b06-9b8e-8185a33f984f}</Project>
       <Name>Vargainc.Timm.EF</Name>
@@ -252,7 +245,9 @@
       <Name>Vargainc.Timm.Models</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="log4net.config" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -268,7 +263,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>0</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8091/</IISUrl>
+          <IISUrl>http://localhost:8091</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -278,10 +273,4 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-	<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-		<PropertyGroup>
-			<ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-		</PropertyGroup>
-		<Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props'))" />
-	</Target>
 </Project>
