@@ -395,7 +395,7 @@ namespace GPSListener.TIMM
                 DateTime dtSentTime;
                 string sDateTime = result[13];
                 System.Globalization.CultureInfo enUS = new System.Globalization.CultureInfo("en-US");
-                if (!DateTime.TryParseExact(sDateTime, "yyyyMMddHHmmss", enUS, System.Globalization.DateTimeStyles.AssumeLocal, out dtSentTime))
+                if (!DateTime.TryParseExact(sDateTime, "yyyyMMddHHmmss", enUS, System.Globalization.DateTimeStyles.AssumeUniversal, out dtSentTime))
                 {
                     dtSentTime = DateTime.Now;
                     log.ErrorFormat("Failed to get GPS UTC Time at poistion:14 in \r\n>> {0} \r\n== use server time replace ==", sIn);
