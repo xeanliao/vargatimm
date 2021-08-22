@@ -1,0 +1,248 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>TIMM &gt; Log in to TIMM</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="style/jquery-ui-1.7.2.custom.css">
+    <style type="text/css">
+        body {
+            background: #fff;
+            padding-top: 40px;
+            font-family: Verdana, Arial, sans-serif;
+            margin: 0;
+            font-size: 11px;
+            color: #000;
+        }
+
+        #login_container {
+            padding-left: 4px;
+            background: none;
+            border: solid 0px #dddddd;
+            color: #454545;
+            width: 680px;
+            height: 280px;
+            margin-left: auto;
+            margin-right: auto;
+            overflow: visible;
+        }
+
+        #logo_container {
+            width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0px;
+            text-align: center;
+        }
+
+        .login_title {
+            font-size: 20px;
+            padding: 15px;
+            display: block;
+        }
+
+        .login_form,
+        #login-progressbar_section {
+            background: none;
+            padding-left: 80px;
+            padding-top: 15px;
+        }
+
+        .login_label {
+            color: #444444;
+            font-weight: bold;
+            width: 100px;
+            height: 55px;
+        }
+
+        .text_field {
+            height: 20px;
+            width: 360px;
+            padding-top: 10px;
+            padding-bottom: 4px;
+            font-size: 20px;
+        }
+
+        #login_button {
+            padding: 8px;
+            color: black;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #login_button_text {
+            background: #94b43d;
+        }
+
+        #login_button_text:hover {
+            background: #94bb3d;
+        }
+
+        #login_button_text div {
+            background: #94b43d;
+        }
+
+        #login_button_text div:hover {
+            background: #94bb3d;
+        }
+
+        #error_info {
+            color: Red;
+            font-size: 11px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #login-progressbar_section {
+            font-size: 25px;
+            font-weight: bolder;
+            height: 100px;
+            margin-left: 150px;
+            margin-top: 50px;
+            background: transparent;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="logo_container">
+        <img src="images/timm-logo.png" alt="" style="height: 100px; margin-bottom: 30px;" />
+    </div>
+    <div id="login_container">
+        <div style="position: relative; border: solid 0px black; width: 400px; height: 280px;">
+            <div style="position: absolute; width: 650px; height: 280px; left: 4px; top: 4px;
+                padding: 0px;" class="ui-widget ui-widget-content ui-corner-all">
+                <div class="ui-dialog-content ui-widget-content" style="border: 0;">
+                    <span class="login_title">Log in to TIMM</span>
+                    <p id="login-progressbar_section">
+                        Logging in...</p>
+                    <div id="login-section" class="login_form">
+                        <table>
+                            <tr id="error_info" class="hidden">
+                                <td>
+                                </td>
+                                <td>
+                                    Incorrect username or password, or the account is disabled
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="login_label">
+                                    Username
+                                </td>
+                                <td>
+                                    <input id="username" name="username" class="text_field" type="text" value="" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="login_label">
+                                    Password
+                                </td>
+                                <td>
+                                    <input id="password" name="password" class="text_field" type="password" value="" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="login_label">
+                                </td>
+                                <td>
+                                    <div id="login_button"
+                                        style="position: relative; border: none; width: 400px; height: 30px;">
+                                        <div id="login_button_text" style="position: absolute; width: 300px; left: 0px; top: 8px;
+                                            padding: 1px;" class="ui-widget ui-widget-content ui-corner-all">
+                                            <div class="ui-dialog-content ui-widget-content" id="loginDiv"
+                                                onclick="javascript:login()" style="border: 0;
+                                                text-align: center; padding: 10px;">
+                                                Log in to TIMM
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                $("#login-section").show();
+                $("#login-progressbar_section").hide();
+                $("#password").bind("keyup", function (e) {
+                    if (e.keyCode == 13 && $("#password").val().length > 0) {
+                        login();
+                    }
+                });
+                $("#username").bind("keyup", function (e) {
+                    if (e.keyCode == 13) {
+                        if ($("#password").val().length == 0) {
+                            $("#password").focus();
+                        } else {
+                            login();
+                        }
+                    }
+                });
+                $("#username").focus();
+            });
+
+            // log in to system
+            function login() {
+                $("#login-section").hide();
+                $("#login-progressbar_section").show();
+
+                var data = [
+                    "username=" + $("#username").val(),
+                    "&password=" + $("#password").val()
+                ].join(''),
+                    failed = function () {
+                        $('#error_info').removeClass('hidden');
+                        $("#login-section").show();
+                        $("#login-progressbar_section").hide();
+                    };
+
+
+                $.ajax({
+                    type: "POST",
+                    url: "api/user/login",
+                    data: data,
+                    dataType: "JSON",
+                    success: function (reuslt) {
+                        if (reuslt && reuslt.success) {
+                            window.location = "index.html";
+                            return;
+                        } else {
+                            failed();
+                        }
+                    },
+                    error: function (msg) {
+                        failed();
+                    }
+                });
+            }
+
+            /**
+            * Called when the user clicks on the 'Log Out' menu item.
+            */
+            function OnLogOutClick() {
+                var data = "logout=true";
+                $.ajax({
+                    type: "POST",
+                    url: "api/user/logout",
+                    data: data,
+                    success: function (msg) {
+                        window.location = "login.html";
+                    }
+                });
+            }
+    </script>
+</body>
+
+</html>
