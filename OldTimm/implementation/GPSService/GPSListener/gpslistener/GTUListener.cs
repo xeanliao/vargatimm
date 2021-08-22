@@ -140,6 +140,23 @@ namespace GPSListener.TIMM
             AddReply(sReply);
             log.Debug("End Process GL300 HeartBeat");
         }
+
+        private void ProcessHeartBeatForGL300M(String sIn)
+        {
+            log.Debug("Begin Process GL300M HeartBeat");
+            //device send +SACK:GTHDB,{Count number},$
+            //server should reply: +SACK:{Count number}$
+            var msg = sIn.Split(new char[] { ',' }, StringSplitOptions.None);
+            if (msg.Length < 2)
+            {
+                log.ErrorFormat("Recived bad Heart Beat: {0}", sIn);
+                return;
+            }
+
+            string sReply = string.Format("+SACK:{0}$", msg[1]);
+            AddReply(sReply);
+            log.Debug("End Process GL300 HeartBeat");
+        }
         /// <summary>
         /// This function processed in TCP thread pool, need to finish the function as soon as possible;
         /// Process the Fixing timing reporting
@@ -433,8 +450,11 @@ namespace GPSListener.TIMM
                 }
                 //if Report type == 0 means there will NOT have I/O status. the count field will be in position: 22
                 //if Report type == 1 means there will have I/O status. the count field will be in position: 23
+                // In GL300M the count always in position 22 and have 2 new report type 16 and 17
+                //if Report type == 16 means The message is a scheduled postiion report generated in MOTION state.
+                //if Report type == 17 means The message is a turning point report generated in MOTION state.
                 int nCount;
-                if (result[5] == "0")
+                if (result[5] == "0" || result[5] == "16" || result[5] == "17")
                 {
                     if (!int.TryParse(result[21], NumberStyles.HexNumber | NumberStyles.AllowHexSpecifier, null, out nCount))
                     {
@@ -478,7 +498,7 @@ namespace GPSListener.TIMM
 
                 if (dwLatitude != 0 && dwLongtitude != 0)
                 {
-                    _GTUQUpdater.AddQ(oGut);
+                    //_GTUQUpdater.AddQ(oGut);
                 }
                 else
                 {
@@ -638,6 +658,7 @@ namespace GPSListener.TIMM
                             break;
                         //GL300
                         case "+RESP:GTINF":
+                        case "+BUFF:GTINF":
                             //report device status. ignor.
                             break;
                         case "+ACK:GTFKS":
