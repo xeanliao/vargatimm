@@ -71,8 +71,11 @@
     <Compile Include="Area\Location.cs" />
     <Compile Include="Area\PremiumCRoute.cs" />
     <Compile Include="Area\PremiumCRouteCoordinate.cs" />
+    <Compile Include="Area\ThreeZipArea.cs" />
+    <Compile Include="Area\ThreeZipCoordinate.cs" />
     <Compile Include="Area\Tract.cs" />
     <Compile Include="Area\TractCoordinate.cs" />
+    <Compile Include="Attributes\DateTime2.cs" />
     <Compile Include="Campaign\Campaign.cs" />
     <Compile Include="Campaign\CampaignBackup.cs" />
     <Compile Include="Campaign\CampaignBlockGroupImported.cs" />

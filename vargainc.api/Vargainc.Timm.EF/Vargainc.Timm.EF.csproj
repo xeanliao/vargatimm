@@ -97,9 +97,12 @@
     <Compile Include="Config\TaskConfig.cs" />
     <Compile Include="Config\TaskGtuInfoMappingConfig.cs" />
     <Compile Include="Config\TaskTimeConfig.cs" />
+    <Compile Include="Config\ThreeZipAreaConfig.cs" />
+    <Compile Include="Config\ThreeZipCoordinateConfig.cs" />
     <Compile Include="Config\TractConfig.cs" />
     <Compile Include="Config\TractCoordinateConfig.cs" />
     <Compile Include="Config\UserConfig.cs" />
+    <Compile Include="Conventions\DateTime2Convention.cs" />
     <Compile Include="TimmContext.cs" />
   </ItemGroup>
   <ItemGroup>

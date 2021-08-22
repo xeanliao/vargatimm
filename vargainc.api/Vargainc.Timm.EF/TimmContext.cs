@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using Vargainc.Timm.EF.Config;
+using Vargainc.Timm.EF.Conventions;
 using Vargainc.Timm.Models;
 
 namespace Vargainc.Timm.EF
@@ -20,7 +21,10 @@ namespace Vargainc.Timm.EF
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            //modelBuilder.Conventions.AddAfter<IdKeyDiscoveryConvention>(new DateTime2Convention());
 
+            modelBuilder.Configurations.Add(new ThreeZipAreaConfig());
+            modelBuilder.Configurations.Add(new ThreeZipCoordinateConfig());
             modelBuilder.Configurations.Add(new FiveZipAreaConfig());
             modelBuilder.Configurations.Add(new FiveZipCoordinateConfig());
             modelBuilder.Configurations.Add(new BlockGroupConfig());
@@ -40,8 +44,6 @@ namespace Vargainc.Timm.EF
             modelBuilder.Configurations.Add(new CampaignConfig());
             modelBuilder.Configurations.Add(new CampaignBackupConfig());
 
-            
-
             modelBuilder.Configurations.Add(new StatusInfoConfig());
             modelBuilder.Configurations.Add(new SubMapConfig());
             modelBuilder.Configurations.Add(new SubMapCoordinateConfig());
@@ -49,7 +51,6 @@ namespace Vargainc.Timm.EF
 
             modelBuilder.Configurations.Add(new RadiusesConfig());
             modelBuilder.Configurations.Add(new AddressConfig());
-
 
             modelBuilder.Configurations.Add(new DistributionMapConfig());
             modelBuilder.Configurations.Add(new DistributionMapCoordinateConfig());
@@ -66,13 +67,13 @@ namespace Vargainc.Timm.EF
             modelBuilder.Configurations.Add(new TaskConfig());
             modelBuilder.Configurations.Add(new TaskTimeConfig());
 
-
-
             modelBuilder.Configurations.Add(new UserConfig());
             modelBuilder.Configurations.Add(new GroupConfig());
             modelBuilder.Configurations.Add(new CompanyConfig());
         }
 
+        public DbSet<ThreeZipArea> ThreeZipAreas { get; set; }
+        public DbSet<ThreeZipCoordinate> ThreeZipCoordinates { get; set; }
         public DbSet<FiveZipArea> FiveZipAreas { get; set; }
         public DbSet<FiveZipCoordinate> FiveZipCoordinates { get; set; }
         public DbSet<BlockGroup> BlockGroups { get; set; }

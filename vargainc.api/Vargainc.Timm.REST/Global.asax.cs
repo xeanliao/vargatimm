@@ -12,6 +12,9 @@ namespace Vargainc.Timm.REST
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
+
+            SqlServerTypes.Utilities.LoadNativeAssemblies(Server.MapPath("~/bin"));
+
         }
     }
 }

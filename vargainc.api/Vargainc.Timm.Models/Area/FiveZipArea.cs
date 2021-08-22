@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Entity.Spatial;
 
 namespace Vargainc.Timm.Models
 {
@@ -22,6 +23,7 @@ namespace Vargainc.Timm.Models
         [DefaultValue(0)]
         public int? TOTAL_COUNT { get; set; }
 
+        public DbGeometry Geom { get; set; }
         public virtual ICollection<FiveZipCoordinate> Locations { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Vargainc.Timm.Models
@@ -43,6 +44,7 @@ namespace Vargainc.Timm.Models
         }
         [DefaultValue(0)]
         public int CampaignId { get; set; }
+
         public virtual Campaign Campaign { get; set; }
 
         public virtual ICollection<SubMapCoordinate> SubMapCoordinates { get; set; }

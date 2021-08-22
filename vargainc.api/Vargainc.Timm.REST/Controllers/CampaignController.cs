@@ -273,6 +273,61 @@ namespace Vargainc.Timm.REST.Controllers
         }
 
         [Route("{campaignId:int}")]
+        [HttpGet]
+        public async Task<List<SubMap>> GetCampaign(int campaignId)
+        {
+            var campaign = await db.Companies.FindAsync(campaignId).ConfigureAwait(false);
+            var subMaps = await db.SubMaps.Where(i=>i.CampaignId == campaignId).OrderBy(i=>i.OrderId).ToListAsync().ConfigureAwait(false);
+            return subMaps;
+        }
+
+        [Route("{campaignId:int}/submap")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetCampaignWithSubmap(int campaignId)
+        {
+            var campaign = await db.Campaigns
+                .Include(i=>i.SubMaps)
+                .Include(i=>i.Addresses)
+                .Where(i=>i.Id == campaignId)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.ClientCode,
+                    i.ClientName,
+                    i.ContactName,
+                    i.CreatorName,
+                    i.Longitude,
+                    i.Latitude,
+                    i.ZoomLevel,
+                    Addresses = i.Addresses.Select(a=>new 
+                    { 
+                        a.AddressName, 
+                        a.Color, 
+                        a.Radiuses, 
+                        a.ZipCode, 
+                        a.Id, 
+                        a.Latitude, 
+                        a.Longitude
+                    }).OrderBy(a=>a.AddressName).ToList(),
+                    SubMaps = i.SubMaps.Select(s=>new 
+                    { 
+                        s.Id, 
+                        s.ColorString, 
+                        s.CountAdjustment, 
+                        s.Name, 
+                        s.OrderId, 
+                        s.Total, 
+                        s.Penetration, 
+                        s.Percentage, 
+                        s.TotalAdjustment,
+                    }).OrderBy(s=>s.OrderId).ToList()
+                })
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+            return Json(new { success = true, data = campaign });
+        }
+
+        [Route("{campaignId:int}")]
         [HttpPut]
         public async Task<IHttpActionResult> EditCampaign(int campaignId, [FromBody] CampaignViewModel campaign)
         {

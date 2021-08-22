@@ -13,6 +13,5 @@ namespace Vargainc.Timm.Models
         [DefaultValue(0)]
         public int SubMapId { get; set; }
         public virtual SubMap SubMap { get; set; }
-        
     }
 }

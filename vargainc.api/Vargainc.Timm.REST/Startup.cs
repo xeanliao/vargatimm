@@ -45,10 +45,10 @@ namespace Vargainc.Timm.REST
                 var cors = new EnableCorsAttribute(allowWebsite, "*", "*");
                 config.EnableCors(cors);
             }
-            
+
             // Web API routes
             //config.MapHttpAttributeRoutes();
-            
+
             //config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
             //config.Routes.MapHttpRoute(
@@ -58,8 +58,12 @@ namespace Vargainc.Timm.REST
             //);
 
             //config.EnsureInitialized();
-            
+
             //app.UseWebApi(config);
+
+            // log4net
+            log4net.Config.XmlConfigurator.Configure();
+
         }
     }
 }
