@@ -21,17 +21,18 @@ using System.Text;
 using Microsoft.SqlServer.Types;
 using System.Diagnostics;
 using System.Data.SqlTypes;
+using Vargainc.Timm.REST.ViewModel;
 
 namespace Vargainc.Timm.REST.Controllers
 {
     [RoutePrefix("area")]
     public class AreaController : BaseController
     {
-        private static readonly HashSet<string> LAYERS = new HashSet<string>() 
-        { 
-            "3zip",
-            "5zip",
-            "croute",
+        private static readonly HashSet<Classifications> LAYERS = new HashSet<Classifications>() 
+        {
+            Classifications.Z3,
+            Classifications.Z5,
+            Classifications.PremiumCRoute,
         };
 
         /// <summary>
@@ -40,7 +41,7 @@ namespace Vargainc.Timm.REST.Controllers
         /// <returns></returns>
         [Route("tiles/{layer}/{z}/{x}/{y}")]
         [HttpGet]
-        public async Task<HttpResponseMessage> GetTiles(string layer, int z, int x, int y)
+        public async Task<HttpResponseMessage> GetTiles(Classifications layer, int z, int x, int y)
         {
             if (!LAYERS.Contains(layer))
             {
@@ -66,17 +67,17 @@ namespace Vargainc.Timm.REST.Controllers
                 StringBuilder sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_MAP});");
                 switch (layer)
                 {
-                    case "3zip":
-                        sql.AppendLine("SELECT [Id],[Name],'' AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
+                    case Classifications.Z3:
+                        sql.AppendLine("SELECT [Id],[Code] AS [Name],'' AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
                         sql.AppendLine("FROM [dbo].[threezipareas] WITH(INDEX(threezipareas_spatial_index))");
                         sql.AppendLine("WHERE [IsInnerRing] = 0 AND geom.STIntersects(@g) = 1");
                         break;
-                    case "5zip":
-                        sql.AppendLine("SELECT [Id],[Name],[Code] AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
+                    case Classifications.Z5:
+                        sql.AppendLine("SELECT [Id],[Code] AS [Name],[Code] AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
                         sql.AppendLine("FROM [dbo].[fivezipareas] WITH(INDEX(fivezipareas_spatial_index))");
                         sql.AppendLine("WHERE [IsInnerRing] = 0 AND geom.STIntersects(@g) = 1");
                         break;
-                    case "croute":
+                    case Classifications.PremiumCRoute:
                         sql.AppendLine("SELECT [Id],[GEOCODE] AS [Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
                         sql.AppendLine("FROM [dbo].[premiumcroutes] WITH(INDEX(premiumcroutes_spatial_index))");
                         sql.AppendLine("WHERE [IsInnerRing] = 0 AND geom.STIntersects(@g) = 1");
@@ -95,11 +96,11 @@ namespace Vargainc.Timm.REST.Controllers
                 sqlCmd.Parameters.Add(p);
                 List<ViewModel.Tile> data = new List<ViewModel.Tile>();
 
-                var sqlReader = sqlCmd.ExecuteReader();
+                var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
                 while(sqlReader.Read())
                 {
                     data.Add(new ViewModel.Tile { 
-                        Layer = layer,
+                        Layer = layer.ToString(),
                         Id = sqlReader.GetInt32(0),
                         Name = sqlReader.GetString(1),
                         ZIP = sqlReader.GetString(2),
@@ -132,7 +133,7 @@ namespace Vargainc.Timm.REST.Controllers
                         Geometry = geom,
                         Attributes = new AttributesTable
                         {
-                            { "id", $"{layer}-{i.Id}" },
+                            { "id", $"{i.Layer}-{i.Id}" },
                             { "name", i.Name },
                             { "zip", i.ZIP },
                             { "home", i.HOME_COUNT },
@@ -149,7 +150,7 @@ namespace Vargainc.Timm.REST.Controllers
                         Geometry = GeometryFactory.CreatePoint(new Coordinate(i.Center[0], i.Center[1])),
                         Attributes = new AttributesTable
                         {
-                            { "id", $"{layer}-label-{i.Id}" },
+                            { "id", $"{i.Layer}-label-{i.Id}" },
                             { "name", i.Name },
                             { "zip", i.ZIP },
                             { "home", i.HOME_COUNT },
@@ -160,7 +161,7 @@ namespace Vargainc.Timm.REST.Controllers
                 }).ToList();
 
                 var features = polygons.Concat(points);
-                tree.Add(features, z, layer);
+                tree.Add(features, z, layer.ToString());
 
                 response = new HttpResponseMessage(HttpStatusCode.OK);
                 response.Headers.CacheControl = new CacheControlHeaderValue()

@@ -19,9 +19,8 @@ using Vargainc.Timm.REST.Helper;
 namespace Vargainc.Timm.REST.Controllers
 {
     [RoutePrefix("campaign")]
-    public class CampaignController : ApiController
+    public class CampaignController : BaseController
     {
-        private TimmContext db = new TimmContext();
 
         #region Calculate Total need base campaign AreaDescription(APT ONLY/HOME ONLY/APT + HOME)
         private const string APT = "APT ONLY";
@@ -288,6 +287,7 @@ namespace Vargainc.Timm.REST.Controllers
             var campaign = await db.Campaigns
                 .Include(i=>i.SubMaps)
                 .Include(i=>i.Addresses)
+                .Include(i => i.SubMaps.Select(y => y.SubMapRecords))
                 .Where(i=>i.Id == campaignId)
                 .Select(i => new
                 {
@@ -309,7 +309,7 @@ namespace Vargainc.Timm.REST.Controllers
                         a.Latitude, 
                         a.Longitude
                     }).OrderBy(a=>a.AddressName).ToList(),
-                    SubMaps = i.SubMaps.Select(s=>new 
+                    SubMaps = i.SubMaps.Select(s=>new
                     { 
                         s.Id, 
                         s.ColorString, 
@@ -320,6 +320,10 @@ namespace Vargainc.Timm.REST.Controllers
                         s.Penetration, 
                         s.Percentage, 
                         s.TotalAdjustment,
+                        SubMapRecords = s.SubMapRecords.Select(r=>new { 
+                            r.Classification,
+                            r.AreaId
+                        }).ToList()
                     }).OrderBy(s=>s.OrderId).ToList()
                 })
                 .FirstOrDefaultAsync()
@@ -1758,14 +1762,6 @@ namespace Vargainc.Timm.REST.Controllers
             }
             var total = await db.Database.SqlQuery<int>(sql, new SqlParameter("@SubMapId", subMapId)).FirstOrDefaultAsync();
             return total;
-        }
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

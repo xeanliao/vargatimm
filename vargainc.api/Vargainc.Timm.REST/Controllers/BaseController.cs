@@ -46,7 +46,7 @@ namespace Vargainc.Timm.REST.Controllers
             JsonSerializerSettings config = new JsonSerializerSettings() {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateFormatString = "MM-dd-yyyy",
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                //ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 NullValueHandling = NullValueHandling.Ignore,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
