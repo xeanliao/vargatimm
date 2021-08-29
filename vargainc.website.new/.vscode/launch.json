@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "request": "attach",
+            "type": "pwa-chrome",
+            "webRoot": "${workspaceFolder}/src",
+            "url": "http://localhost:8090/",
+            "sourceMaps": true,
+            "sourceMapPathOverrides": { // if you override this, you MUST provide all defaults again
+                "webpack:///./~/*": "${webRoot}/node_modules/*", // a default
+                "webpack:///./*": "${webRoot}/js-src/*", // unsure how/why webpack generates ./links.js
+                "webpack:///../*": "${webRoot}/js-src/*", // unsure how/why webpack generates ../links.js
+                "webpack:///*": "*" // a default, catch everything else
+            }
+        },
+    ]
+}

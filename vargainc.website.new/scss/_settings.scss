@@ -1,0 +1,22 @@
+@import 'foundation-sites/scss/util/_unit';
+
+// Global
+// ---------
+$global-width: rem-calc(1400);
+$foundation-palette: (
+    primary: #2199e8,
+    secondary: #777,
+    success: #3adb76,
+    warning: #ffae00,
+    alert: #ec5840,
+);
+
+// Title Bar
+// -------------
+$titlebar-background: #fefefe;
+$titlebar-color: #8a8a8a;
+$titlebar-icon-color: #222222;
+
+// Tooltip
+// -----------
+$tooltip-background-color: #2199e8;

@@ -412,7 +412,7 @@ namespace GPSListener.TIMM
                 DateTime dtSentTime;
                 string sDateTime = result[13];
                 System.Globalization.CultureInfo enUS = new System.Globalization.CultureInfo("en-US");
-                if (!DateTime.TryParseExact(sDateTime, "yyyyMMddhhmmss", enUS, System.Globalization.DateTimeStyles.AssumeUniversal, out dtSentTime))
+                if (!DateTime.TryParseExact(sDateTime, "yyyyMMddHHmmss", enUS, System.Globalization.DateTimeStyles.AssumeUniversal, out dtSentTime))
                 {
                     dtSentTime = DateTime.Now;
                     log.ErrorFormat("Failed to get GPS UTC Time at poistion:14 in \r\n>> {0} \r\n== use server time replace ==", sIn);
@@ -470,10 +470,7 @@ namespace GPSListener.TIMM
                         return;
                     }
                 }
-                
-                
-               
-                
+
                 #endregion
 
                 GTU oGut = new GTU();
@@ -616,7 +613,7 @@ namespace GPSListener.TIMM
                     }
                     
                     int index = sSentence.IndexOf(',');
-                    var protocol = sSentence.Substring(0, index);
+                    var protocol = sSentence.Substring(0, index).Trim();
                     log.DebugFormat("protocol: {0}", protocol);
                     switch (protocol)
                     {
@@ -660,7 +657,7 @@ namespace GPSListener.TIMM
                         case "+RESP:GTINF":
                         case "+BUFF:GTINF":
                             //report device status. ignor.
-                            break;
+                        break;
                         case "+ACK:GTFKS":
                             //report for +AT:GTFKS. report for function key settings.
                             break;
@@ -688,6 +685,9 @@ namespace GPSListener.TIMM
                         case "+RESP:GTSTT":
                             
                             break;
+                        case "+RESP:GTBPL":
+                            // ignore Battery low report
+                        break;
                         default:
                             log.Error("Unkown Message");
                             log.ErrorFormat(">>{0}", sSentence);

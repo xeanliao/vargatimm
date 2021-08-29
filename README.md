@@ -1,34 +1,103 @@
-# You've added your first Readme file!
-A README.md file is intended to quickly orient readers to what your project can do.  New to Markdown? [Learn more](http://go.microsoft.com/fwlink/p/?LinkId=524306&clcid=0x409)
+# Database Update
 
-## Edit this README and commit your change to a topic branch
-In Git, branches are cheap.  You should use them whenever you're making changes to your repository.  Edit this file by clicking on the edit icon.
+1. 2021-07-24
 
-Then make some changes to this README file.
+```sql
+-- 3zip
+IF EXISTS (SELECT 1
+               FROM   INFORMATION_SCHEMA.COLUMNS
+               WHERE  TABLE_NAME = 'threezipareas'
+                      AND COLUMN_NAME = 'Geom'
+                      AND TABLE_SCHEMA='DBO')
+  BEGIN
+      ALTER TABLE [dbo].[threezipareas]
+        DROP COLUMN Geom
+  END
+GO
 
-> Make some **edits** to _this_ blockquote
+ALTER TABLE [dbo].[threezipareas]
+ADD Geom geometry, IsMaster bit;
 
-When you are done, click the dropdown arrow next to the save button - that will allow you to commit your changes to a new branch.
+UPDATE [dbo].[threezipareas]
+SET [IsMaster] = 1
+WHERE Id IN (
+  SELECT B.Id
+  FROM
+    (
+      SELECT Code, Max(SqMile) AS SqMile
+      FROM [dbo].[threezipareas]
+      GROUP by Code
+    ) AS A INNER JOIN [dbo].[threezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile
+)
 
-## Create a pull request to contribute your changes back into master
-Pull requests are the way to move changes from a topic branch back into the master branch.
+CREATE SPATIAL INDEX threezipareas_spatial_index
+   ON [dbo].[threezipareas](Geom)
+   USING GEOMETRY_GRID
+   WITH (
+    BOUNDING_BOX = ( xmin=0, ymin=0, xmax=500, ymax=200 ),
+    GRIDS = (LOW, LOW, MEDIUM, HIGH),
+    CELLS_PER_OBJECT = 64,
+    PAD_INDEX  = ON );
 
-Click on the **Pull Requests** page in the **CODE** hub, then click "New Pull Request" to create a new pull request from your topic branch to the master branch.
+-- 5zip
+IF EXISTS (SELECT 1
+               FROM   INFORMATION_SCHEMA.COLUMNS
+               WHERE  TABLE_NAME = 'fivezipareas'
+                      AND COLUMN_NAME = 'Geom'
+                      AND TABLE_SCHEMA='DBO')
+  BEGIN
+      ALTER TABLE [dbo].[fivezipareas]
+        DROP COLUMN Geom
+  END
+GO
 
-When you are done adding details, click "Create Pull request". Once a pull request is sent, reviewers can see your changes, recommend modifications, or even push follow-up commits.
 
-First time creating a pull request?  [Learn more](http://go.microsoft.com/fwlink/?LinkId=533211&clcid=0x409)
+ALTER TABLE [dbo].[fivezipareas]
+ADD Geom geometry, IsMaster bit;
 
-### Congratulations! You've completed the grand tour of the CODE hub!
+UPDATE [dbo].[fivezipareas]
+SET [IsMaster] = 1
+WHERE Id IN (
+  SELECT B.Id
+  FROM
+    (
+      SELECT Code, Max(SqMile) AS SqMile
+      FROM [dbo].[fivezipareas]
+      GROUP by Code
+    ) AS A INNER JOIN [dbo].[fivezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile
+)
 
-# Next steps
+CREATE SPATIAL INDEX fivezipareas_spatial_index
+   ON [dbo].[fivezipareas](Geom)
+   USING GEOMETRY_GRID
+   WITH (
+    BOUNDING_BOX = ( xmin=0, ymin=0, xmax=500, ymax=200 ),
+    GRIDS = (LOW, LOW, MEDIUM, HIGH),
+    CELLS_PER_OBJECT = 64,
+    PAD_INDEX  = ON );
 
-If you haven't done so yet:
-* [Install Visual Studio](http://go.microsoft.com/fwlink/?LinkId=309297&clcid=0x409&slcid=0x409)
-* [Install Git](http://git-scm.com/downloads)
 
-Then clone this repo to your local machine to get started with your own project.
+-- croute
+IF EXISTS (SELECT 1
+               FROM   INFORMATION_SCHEMA.COLUMNS
+               WHERE  TABLE_NAME = 'premiumcroutes'
+                      AND COLUMN_NAME = 'Geom'
+                      AND TABLE_SCHEMA='DBO')
+  BEGIN
+      ALTER TABLE [dbo].[premiumcroutes]
+        DROP COLUMN Geom
+  END
+GO
 
-Happy coding!
+ALTER TABLE [dbo].[premiumcroutes]
+ADD Geom geometry, IsMaster bit;
 
-# Control Center Revemp branck
+CREATE SPATIAL INDEX premiumcroutes_spatial_index
+   ON [dbo].[premiumcroutes](Geom)
+   USING GEOMETRY_GRID
+   WITH (
+    BOUNDING_BOX = ( xmin=0, ymin=0, xmax=500, ymax=200 ),
+    GRIDS = (LOW, LOW, MEDIUM, HIGH),
+    CELLS_PER_OBJECT = 64,
+    PAD_INDEX  = ON );
+```

@@ -1,0 +1,271 @@
+.panel{
+    input[type='checkbox']{
+        margin-bottom: 0 !important;
+    }
+    li{
+        padding-bottom: 0 !important;
+    }
+}
+.callout.alert {
+    background: #bd5151;
+    color: #fff;
+
+    i, span {
+        color: #fff;
+    }
+}
+i {
+    color: #dedede;
+}
+a:hover i, a:active i, i.active {
+    color: #8a8a8a;
+}
+table{
+    .button, select, input{
+        margin-bottom: 0 !important;
+    }
+    input{
+        padding: 0.25rem !important;
+        height: 25px !important;
+    }
+    input[type="color"]{
+        max-width: 50px;
+    }
+}
+table .select2-container{
+    margin: 0;
+}
+.select2-container{
+    width: 100% !important;
+    margin: 0 0 1rem;
+
+    .select2-selection--multiple{
+        height: 28px;
+        border-radius: 0px;
+        border: 1px solid rgb(138, 138, 138);
+        background-color: rgb(254, 254, 254);
+        outline: medium none;
+        box-shadow: 0px 0px 5px rgb(202, 202, 202);
+        transition: box-shadow 0.5s ease 0s, border-color 0.25s ease-in-out 0s;
+        input{
+            margin-bottom: 0px;
+            height: 25px;
+            font-size: 16px !important;
+            padding: 0px;
+            line-height: 25px;
+            position: relative;
+            top: -2px;
+        }
+        ul{
+            height: 28px !important;
+        }
+    }
+}
+.dropdown-pane {
+    .button {
+        margin-bottom: 0 !important;
+    }
+    box-shadow: 0 .5em 1em 0 rgba(0, 0, 0, .1);
+    font-size: 1rem !important;
+}
+.list-group {
+    background-clip: padding-box;
+    margin: 0 0 1rem 0;
+
+    .list-group-item {
+        background-color: #5479aa;
+        border-color: transparent;
+        color: #555;
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        cursor: pointer;
+
+        &.active {
+            z-index: 2;
+            background-color: #337ab7;
+            border-color: #337ab7;
+            color: #fff;
+        }
+        &:hover, &:active {
+            background-color: #f5f5f5;
+        }
+    }
+}
+.has-tip {
+    border: none !important;
+    cursor: pointer !important;
+}
+.pop-tool-bar {
+    &.text-center{
+        .button{
+            float: unset;
+        }
+    }
+    .button {
+        animation: bounceInDown 900ms 200ms ease-in-out both;
+        text-decoration: none;
+        outline-width: 0px;
+        z-index: 990;
+        color: #a675b3;
+        text-align: center;
+        display: inline-block;
+    }
+    .button:not(.active) {
+        box-shadow: inset 0 1px 1px rgba(111, 55, 125, 0.8), inset 0 -1px 0px rgba(63, 59, 113, 0.2), 0 9px 16px 0 rgba(0, 0, 0, 0.3), 0 4px 3px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px #150a1e;
+        background-image: linear-gradient(#3b2751, #271739);
+        text-shadow: 0 0 21px rgba(223, 206, 228, 0.5), 0 -1px 0 #311d47;
+    }
+    .button:not(.active):hover, .button:not(.active):focus {
+        transition: color 200ms linear;
+        transition: text-shadow 500ms linear;
+        color: #caadd2;
+        text-shadow: 0 0 21px rgba(223, 206, 228, 0.5), 0 0 10px rgba(223, 206, 228, 0.4), 0 0 2px #2a153c;
+    }
+    .button:not(.active):active {
+        color: #e4e3ce !important;
+    }
+    .button.active, .button:active {
+        box-shadow: 0 9px 16px 0 rgba(0, 0, 0, 0.1), 0 0 0 1px #170c22, 0 2px 1px 0 rgba(121, 65, 135, 0.5), inset 0 0 4px 3px rgba(15, 8, 22, 0.2);
+        background-image: linear-gradient(#1f132e, #311d47);
+        text-shadow: 0 0 21px rgba(223, 206, 228, 0.5), 0 0 10px rgba(223, 206, 228, 0.4), 0 0 2px #2a153c;
+        color: #e4e3ce;
+    }
+    .button.active:before, .button:active:before {
+        position: absolute;
+        display: block;
+        content: "";
+        width: 1px;
+        top: 1px;
+        left: -2px;
+        background-image: linear-gradient(rgba(91, 35, 105, 0), #5b2369 41%, #5b2369 59%, rgba(91, 35, 105, 0));
+        box-shadow: -2px 0 6px 0 #5b2369;
+    }
+    .button.active:after, .button:active:after {
+        position: absolute;
+        display: block;
+        content: "";
+        width: 1px;
+        top: 1px;
+        right: -2px;
+        background-image: linear-gradient(rgba(91, 35, 105, 0), #5b2369 41%, #5b2369 59%, rgba(91, 35, 105, 0));
+        box-shadow: 2px 0 6px 0 #5b2369;
+    }
+    .button.active {
+        z-index: 1000;
+    }
+    .button:active {
+        z-index: 999;
+    }
+    .button:last-of-type {
+        border-radius: 0 7px 7px 0;
+    }
+    .button:first-of-type {
+        border-radius: 7px 0 0 7px;
+    }
+}
+.reveal.full{
+    margin-top: 0 !important;
+    top: 0 !important;
+}
+.select2-container{
+    border-radius: 0;
+    border-color: #cacaca;
+    input{
+        margin-bottom: 0;
+    }
+    .select2-selection--single{
+        border-radius: 0;
+        border-color: #cacaca;
+    }
+}
+.loading{
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -50px;
+    margin-top: -50px;
+    z-index: 1;
+
+    .gear {
+        position: absolute;
+        z-index: -10;
+        width: 40px;
+        height: 40px;
+        animation: spin 5s infinite;
+    }
+
+    .two {
+        left: 40px;
+        width: 80px;
+        height: 80px;
+        animation: spin-reverse 5s infinite;
+    }
+
+    .three {
+        top: 45px;
+        left: -10px;
+        width: 60px;
+        height: 60px;
+    }
+
+    @keyframes spin {
+        50% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin-reverse {
+        50% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    .lil-circle {
+        position: absolute;
+        border-radius: 50%;
+        box-shadow: inset 0 0 10px 2px gray, 0 0 50px white;
+        width: 100px;
+        height: 100px;
+        opacity: .1;
+    }
+
+    .blur-circle {
+        position: absolute;
+        top: -19px;
+        left: -19px;
+    }
+
+    .text {
+        position: absolute;
+        text-align: center;
+        color: #fff;
+        font-weight: 400;
+        width: 100px;
+        top: 50px;
+        margin-top: -20px;
+        height: 40px;
+        line-height: 40px;
+        text-shadow: 1px 1px 3px rgb(0, 0, 0);
+    }
+}
+.overlayer{
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(100, 100, 100, 0.75);
+    z-index: 9998;
+    display: none;
+    .loading{
+        z-index: 9999;
+    }
+}

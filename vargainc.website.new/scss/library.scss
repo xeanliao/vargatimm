@@ -1,0 +1,32 @@
+$fa-font-path: '~font-awesome/fonts/';
+@import '~font-awesome/scss/font-awesome';
+
+@import 'mapbox-gl/dist/mapbox-gl.css';
+
+@import 'settings';
+
+@import 'motion-ui/src/motion-ui';
+//begin select 2
+@import 'core';
+//fix select2 style
+.select2-container input {
+    height: 1.75rem !important;
+}
+//end select2
+
+@import 'foundation-sites/scss/foundation';
+@include foundation-everything($prototype: true);
+@include foundation-flex-classes;
+@include foundation-flex-grid;
+
+@import 'foundation-datepicker/scss/foundation-datepicker';
+//fix foundation reveal-overlay issue
+// .reveal-overlay {
+//     background: none;
+//     pointer-events: none;
+// }
+// .reveal {
+//     pointer-events: all;
+// }
+
+@import 'simplebar/dist/simplebar.min.css';
