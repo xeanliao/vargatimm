@@ -2,6 +2,7 @@ import Backbone from 'backbone'
 import React from 'react'
 import Topic from 'postal'
 import Promise from 'bluebird'
+import axios from 'axios'
 
 export default Backbone.Router.extend({
     routes: {
@@ -49,17 +50,17 @@ export default Backbone.Router.extend({
         Backbone.history.history.back(-2)
     },
     campaignAction: function (campaignId) {
-        let Campaigin = require('models/campaign').default
-        let campaign = new Campaigin({ Id: campaignId })
-        campaign.getWithSubmap().then(() => {
-            let View = require('views/campaign/campaignMap').default
+        axios.get(`campaign/${campaignId}/submap`).then((resp) => {
+            let View = require('views/campaign/CampaignMap').default
             Topic.publish({
                 channel: 'View',
                 topic: 'loadView',
                 data: {
                     view: View,
                     params: {
-                        campaign: campaign,
+                        campaign: resp?.data?.data ?? {},
+                        registeredTopic: {},
+                        registeredEvents: [],
                     },
                     options: {
                         showMenu: false,

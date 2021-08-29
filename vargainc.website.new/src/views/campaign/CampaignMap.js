@@ -3,17 +3,28 @@ import mapboxgl from 'mapbox-gl'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { color } from 'd3-color'
+import { scaleOrdinal } from 'd3-scale'
+import { interpolateSinebow } from 'd3-scale-chromatic'
 import axios from 'axios'
 import Logger from 'logger.mjs'
 import ClassNames from 'classnames'
 
+import Helper from 'views/base'
+import SubmapEdit from './SubmapEdit'
+
 const log = new Logger('views:campaign')
 
 const layers = [
-    { layer: '3zip', zoom: [7, 18, 7], color: '#323232' },
-    { layer: '5zip', zoom: [9, 18, 11], color: '#00FF00' },
-    { layer: 'croute', zoom: [11, 18, 14], color: '#00FF00' },
+    { layer: 'Z3', zoom: [7, 18, 7], color: '#323232' },
+    { layer: 'Z5', zoom: [9, 18, 11], color: '#00FF00' },
+    { layer: 'PremiumCRoute', zoom: [11, 18, 14], color: '#00FF00' },
 ]
+
+const Classification = new Map([
+    [0, 'Z3'],
+    [1, 'Z5'],
+    [15, 'PremiumCRoute'],
+])
 
 export default class Campaign extends React.Component {
     static propTypes = {
@@ -26,8 +37,8 @@ export default class Campaign extends React.Component {
             mapInited: false,
             mapReady: false,
             activeLayer: null,
-            highlightLayerName: null,
-            selectedLayer: [],
+            allowedLayer: new Set(['Z3', 'Z5', 'PremiumCRoute']),
+            selectedShapes: new Map(),
             selectedSubmap: null,
             campaginSource: { features: [] },
         }
@@ -41,10 +52,33 @@ export default class Campaign extends React.Component {
 
         this.onSubmapSelect = this.onSubmapSelect.bind(this)
         this.onClassificationsChange = this.onClassificationsChange.bind(this)
-        this.onLayerHightlight = this.onLayerHightlight.bind(this)
-        this.onLayerSelect = this.onLayerSelect.bind(this)
+        this.onShapeSelect = this.onShapeSelect.bind(this)
+
+        this.onLoadSubmapList = this.onLoadSubmapList.bind(this)
+        this.onNewSubmap = this.onNewSubmap.bind(this)
+        this.onEditSubmap = this.onEditSubmap.bind(this)
+        this.onSaveShapesToSubmap = this.onSaveShapesToSubmap.bind(this)
+        this.onEmptySubmap = this.onEmptySubmap.bind(this)
+        this.onClearSelectedShapes = this.onClearSelectedShapes.bind(this)
 
         this.map = null
+
+        this.subscribe = Helper.subscribe.bind(this)
+        this.doUnsubscribe = Helper.doUnsubscribe.bind(this)
+
+        this.subscribe('CampaignMap.Refresh', this.onLoadSubmapList)
+    }
+
+    componentWillUnmount() {
+        this.doUnsubscribe()
+    }
+
+    onInitSubMapScrollbar(el) {
+        if (el) {
+            let containerHeight = $(el).parent().height()
+            let menuHeight = $(el).prev().height()
+            $(el).css({ height: `${containerHeight - menuHeight}px` })
+        }
     }
 
     onInitMap(mapContainer) {
@@ -52,8 +86,8 @@ export default class Campaign extends React.Component {
             this.setState((state) => {
                 if (state.mapInited == false) {
                     mapboxgl.accessToken = MapboxToken
-                    let zoom = this.props.campaign.get('ZoomLevel', 8)
-                    let center = [this.props.campaign.get('Longitude', -73.987378), this.props.campaign.get('Latitude', 40.744556)]
+                    let zoom = this.props.campaign.ZoomLevel ?? 8
+                    let center = [this.props.campaign.Longitude ?? -73.987378, this.props.campaign.Latitude ?? 40.744556]
                     this.map = new mapboxgl.Map({
                         container: mapContainer,
                         zoom: zoom,
@@ -67,14 +101,6 @@ export default class Campaign extends React.Component {
                 }
                 return { mapInited: true }
             })
-        }
-    }
-
-    onInitSubMapScrollbar(el) {
-        if (el) {
-            let containerHeight = $(el).parent().height()
-            let menuHeight = $(el).prev().height()
-            $(el).css({ height: `${containerHeight - menuHeight}px` })
         }
     }
 
@@ -93,12 +119,20 @@ export default class Campaign extends React.Component {
         //     log.info(`map zoom: ${this.map.getZoom()}`)
         // })
 
-        this.initBackgroundLayer(firstSymbolId)
-        this.initCampaignLayer(firstSymbolId)
-        this.initPopup()
+        this.setState(
+            {
+                mapTextLayerId: firstSymbolId,
+            },
+            () => {
+                this.initBackgroundLayer()
+                this.initCampaignLayer()
+                this.initPopup()
+            }
+        )
     }
 
-    initBackgroundLayer(firstSymbolId) {
+    initBackgroundLayer() {
+        let textLayerId = this.state.mapTextLayerId
         layers.forEach((item) => {
             let tileSource = `${location.protocol}//${location.host}/api/area/tiles/${item.layer}/{z}/{x}/{y}`
             this.map.addSource(`area-source-${item.layer}`, {
@@ -123,8 +157,9 @@ export default class Campaign extends React.Component {
                         'fill-opacity': 0.5,
                     },
                 },
-                firstSymbolId
+                textLayerId
             )
+            let selectedColor = color(`hsl(156, 20%, 95%)`).darker(1)
             this.map.addLayer(
                 {
                     id: `area-layer-${item.layer}-selected`,
@@ -135,12 +170,30 @@ export default class Campaign extends React.Component {
                     maxzoom: item.zoom[1],
                     layout: {},
                     paint: {
-                        'fill-color': 'hsl(156, 20%, 75%)',
+                        'fill-color': selectedColor.formatHsl(),
+                        'fill-opacity': 0.3,
+                    },
+                    filter: ['==', 'id', ''],
+                },
+                textLayerId
+            )
+            let highlight = color(`hsl(156, 20%, 95%)`).darker(2)
+            this.map.addLayer(
+                {
+                    id: `area-layer-${item.layer}-highlight`,
+                    type: 'fill',
+                    source: `area-source-${item.layer}`,
+                    'source-layer': item.layer,
+                    minzoom: item.zoom[0],
+                    maxzoom: item.zoom[1],
+                    layout: {},
+                    paint: {
+                        'fill-color': highlight.formatHsl(),
                         'fill-opacity': 0.75,
                     },
                     filter: ['==', 'name', ''],
                 },
-                firstSymbolId
+                textLayerId
             )
             this.map.addLayer(
                 {
@@ -161,7 +214,7 @@ export default class Campaign extends React.Component {
                         'line-blur': ['interpolate', ['linear'], ['zoom'], 4, 0, 18, 4],
                     },
                 },
-                firstSymbolId
+                textLayerId
             )
             this.map.addLayer(
                 {
@@ -181,7 +234,7 @@ export default class Campaign extends React.Component {
                         'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.5, 18, 4],
                     },
                 },
-                firstSymbolId
+                textLayerId
             )
             this.map.addLayer({
                 id: `area-layer-${item.layer}-label`,
@@ -231,64 +284,62 @@ export default class Campaign extends React.Component {
                 filter: ['==', ['geometry-type'], 'Point'],
             })
 
-            this.map.on('mousemove', `area-layer-${item.layer}-fill`, this.onLayerHightlight)
+            this.map.on('click', `area-layer-${item.layer}-fill`, this.onShapeSelect)
         })
     }
 
-    initCampaignLayer(firstSymbolId) {
-        axios.get(`${location.protocol}//${location.host}/api/campaign/${this.props.campaign.get('Id')}/submap/geojson`).then((response) => {
-            this.setState(
-                {
-                    campaginSource: response.data,
-                    mapReady: true,
-                },
-                () => {
-                    this.map.addSource('campaign-source', { type: 'geojson', data: response.data })
-
-                    this.map.addLayer(
-                        {
-                            id: 'campaign-layer-fill',
-                            type: 'fill',
-                            source: 'campaign-source',
-                            layout: {},
-                            paint: {
-                                'fill-color': ['get', 'color'],
-                                'fill-opacity': 0.3,
-                            },
+    initCampaignLayer() {
+        let textLayerId = this.state.mapTextLayerId
+        axios.get(`campaign/${this.props.campaign.Id}/submap/geojson`).then((resp) => {
+            if (this.state.mapReady == true) {
+                this.map.getSource('campaign-source').setData(resp.data)
+            } else {
+                this.map.addSource('campaign-source', { type: 'geojson', data: resp.data })
+                this.map.addLayer(
+                    {
+                        id: 'campaign-layer-fill',
+                        type: 'fill',
+                        source: 'campaign-source',
+                        layout: {},
+                        paint: {
+                            'fill-color': ['get', 'color'],
+                            'fill-opacity': 0.3,
                         },
-                        firstSymbolId
-                    )
-
-                    this.map.addLayer(
-                        {
-                            id: 'campaign-layer-line',
-                            type: 'line',
-                            source: 'campaign-source',
-                            layout: {},
-                            paint: {
-                                'line-color': ['get', 'color'],
-                                'line-width': 3,
-                            },
+                    },
+                    textLayerId
+                )
+                this.map.addLayer(
+                    {
+                        id: 'campaign-layer-line',
+                        type: 'line',
+                        source: 'campaign-source',
+                        layout: {},
+                        paint: {
+                            'line-color': ['get', 'color'],
+                            'line-width': 2,
                         },
-                        firstSymbolId
-                    )
-
-                    this.map.addLayer(
-                        {
-                            id: 'campaign-layer-highlighted',
-                            type: 'line',
-                            source: 'campaign-source',
-                            layout: {},
-                            paint: {
-                                'line-color': '#000000',
-                                'line-width': 6,
-                            },
-                            filter: ['==', ['get', 'sid'], ''],
+                    },
+                    textLayerId
+                )
+                this.map.addLayer(
+                    {
+                        id: 'campaign-layer-highlight',
+                        type: 'line',
+                        source: 'campaign-source',
+                        layout: {},
+                        paint: {
+                            'line-color': '#000000',
+                            'line-width': 6,
                         },
-                        firstSymbolId
-                    )
-                }
-            )
+                        filter: ['==', ['get', 'sid'], ''],
+                    },
+                    textLayerId
+                )
+            }
+            this.setState({
+                campaginSource: resp.data,
+                mapReady: true,
+            })
         })
     }
 
@@ -352,17 +403,18 @@ export default class Campaign extends React.Component {
                 activeLayer: activeLayer,
             },
             () => {
-                const type = ['fill', 'selected', 'line-bg', 'line', 'label']
+                const type = ['fill', 'highlight', 'line-bg', 'line', 'label']
                 layers.forEach((item) => {
                     type.forEach((type) => {
                         this.map.setLayoutProperty(`area-layer-${item.layer}-${type}`, 'visibility', item.layer == activeLayer ? 'visible' : 'none')
                     })
+                    this.map.setFilter(`area-layer-${item.layer}-highlight`, ['==', 'name', ''])
                 })
 
                 if (activeLayer) {
                     let minZoom = layers.filter((i) => i.layer == activeLayer)?.[0]?.zoom?.[2]
                     if (this.map.getZoom() < minZoom) {
-                        this.map.setZoom(minZoom)
+                        // this.map.setZoom(minZoom)
                     }
                 }
             }
@@ -373,42 +425,159 @@ export default class Campaign extends React.Component {
         if (!this.state.mapReady) {
             return
         }
-        this.setState((state) => {
-            if (state.selectedSubmap != submap.Id) {
-                let highlightColor = color(`#${submap.ColorString}`).darker(2).toString()
-                this.map.setLayoutProperty('campaign-layer-highlighted', 'visibility', 'none')
-                this.map.setFilter('campaign-layer-highlighted', ['==', ['get', 'sid'], submap.Id])
-                this.map.setPaintProperty('campaign-layer-highlighted', 'line-color', highlightColor)
-                this.map.setLayoutProperty('campaign-layer-highlighted', 'visibility', 'visible')
+        let needTrigerClassificationsChange
+        this.setState(
+            (state) => {
+                let allowedLayer = Array.from(Classification.values())
+                let fixClassification = Classification.get(submap.SubMapRecords?.[0]?.Classification)
+                if (fixClassification) {
+                    allowedLayer = [fixClassification]
+                }
 
-                let selectedLayer = this.state.campaginSource.features.filter((i) => i.id == submap.Id)?.[0]
-                this.map.fitBounds([
-                    [selectedLayer.bbox[0], selectedLayer.bbox[1]],
-                    [selectedLayer.bbox[2], selectedLayer.bbox[3]],
-                ])
+                let selectedShapes = new Map(state.selectedShapes)
+
+                if (state.selectedSubmap != submap.Id) {
+                    selectedShapes = new Map()
+
+                    needTrigerClassificationsChange = true
+
+                    let highlightColor = color(`#${submap.ColorString}`).darker(2).toString()
+                    this.map.setLayoutProperty('campaign-layer-highlight', 'visibility', 'none')
+                    this.map.setFilter('campaign-layer-highlight', ['==', ['get', 'sid'], submap.Id])
+                    this.map.setPaintProperty('campaign-layer-highlight', 'line-color', highlightColor)
+                    this.map.setLayoutProperty('campaign-layer-highlight', 'visibility', 'visible')
+
+                    let submapGeo = this.state.campaginSource.features.filter((i) => i.id == submap.Id)?.[0]
+
+                    if (submapGeo) {
+                        this.map.fitBounds([
+                            [submapGeo.bbox[0], submapGeo.bbox[1]],
+                            [submapGeo.bbox[2], submapGeo.bbox[3]],
+                        ])
+                    }
+                }
+
+                return { selectedSubmap: submap.Id, allowedLayer: new Set(allowedLayer), selectedShapes: selectedShapes }
+            },
+            () => {
+                if (needTrigerClassificationsChange && !this.state.allowedLayer.has(this.state.activeLayer)) {
+                    this.onClassificationsChange({ currentTarget: { id: Array.from(this.state.allowedLayer.values())[0] } })
+                }
+
+                //set selected layer fill color as submap color
+                layers.forEach((item) => {
+                    this.map.setPaintProperty(`area-layer-${item.layer}-selected`, 'fill-color', `#${submap.ColorString}`)
+                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', Array.from(this.state.selectedShapes.keys())]])
+                })
             }
-            return { selectedSubmap: submap.Id }
-        })
+        )
     }
 
-    onLayerHightlight(e) {
+    onShapeSelect(e) {
+        let id = e.features?.[0]?.properties?.id
         let name = e.features?.[0]?.properties?.name
         let layer = this.state.activeLayer
-        if (!name || !layer) {
+        if (!id || !layer) {
             return
         }
-
-        let newState = `${layer}-${name}`
-        this.setState((state) => {
-            if (state.highlightLayerName != newState) {
-                log.info(`highlight ${layer} name ${name}`)
-                this.map.setFilter(`area-layer-${layer}-selected`, ['==', 'name', name])
+        // let id = `${layer}-${name}`
+        // check layer is in another submap
+        let submaps = this.props?.campaign?.SubMaps ?? []
+        let blockLayers = submaps
+            .filter((s) => s.Id != this.state.selectedSubmap)
+            .flatMap((s) => (s.SubMapRecords ?? []).map((r) => `${Classification.get(r.Classification)}-${r.AreaId}`))
+        if (new Set(blockLayers).has(id)) {
+            return
+        }
+        let currentShapes = new Set(
+            (submaps.filter((i) => i.Id == this.state.selectedSubmap)?.[0]?.SubMapRecords ?? []).map((r) => `${Classification.get(r.Classification)}-${r.AreaId}`)
+        )
+        this.setState(
+            (state) => {
+                let selectedShapes = new Map(state.selectedShapes)
+                if (selectedShapes.has(id)) {
+                    selectedShapes.delete(id)
+                } else {
+                    selectedShapes.set(id, { Classification: layer, Id: id, Value: !currentShapes.has(id), Name: name })
+                }
+                return {
+                    selectedShapes: selectedShapes,
+                }
+            },
+            () => {
+                let selectedShapes = Array.from(this.state.selectedShapes.keys())
+                this.map.setFilter(`area-layer-${layer}-selected`, ['in', ['get', 'id'], ['literal', selectedShapes]])
             }
-            return { highlightLayerName: newState }
+        )
+    }
+
+    onLoadSubmapList() {
+        axios.get(`campaign/${this.props.campaign.Id}/submap`).then((resp) => {
+            this.props.campaign.SubMaps = resp.data.data.SubMaps
+            this.forceUpdate()
         })
     }
 
-    onLayerSelect() {}
+    onNewSubmap() {
+        let colorIndex = (this.props?.campaign?.Id ?? 0) + (this.props?.campaign?.SubMaps?.length ?? 0)
+        let color = Helper.randomColor(colorIndex).replace('#', '')
+        let model = { ColorString: color, CampaignId: this.props.campaign.Id }
+        Helper.publish('showDialog', {
+            view: <SubmapEdit model={model} registeredTopic={{}} registeredEvents={[]} />,
+            options: {
+                size: 'tiny',
+            },
+        })
+    }
+
+    onEditSubmap() {
+        if (!this.state.selectedSubmap) {
+            return
+        }
+        var submap = this.props.campaign.SubMaps.filter((i) => i.Id == this.state.selectedSubmap)?.[0]
+        Helper.publish('showDialog', {
+            view: <SubmapEdit model={submap} registeredTopic={{}} registeredEvents={[]} />,
+            options: {
+                size: 'tiny',
+            },
+        })
+    }
+
+    onSaveShapesToSubmap() {
+        if (!this.state.selectedSubmap) {
+            return
+        }
+        let data = Array.from(this.state.selectedShapes.values()).map((i) => {
+            return {
+                Classification: i.Classification,
+                Name: i.Name,
+                Value: i.Value,
+            }
+        })
+        let url = `campaign/${this.props.campaign.Id}/submap/${this.state.selectedSubmap}/merge`
+        axios.post(url, data).then((resp) => {
+            this.onLoadSubmapList()
+            this.initCampaignLayer()
+            this.onClearSelectedShapes()
+        })
+    }
+
+    onEmptySubmap() {
+        if (!this.state.selectedSubmap) {
+            return
+        }
+        let url = `campaign/${this.props.campaign.Id}/submap/${this.state.selectedSubmap}`
+        axios.delete(url).then(() => {
+            this.initCampaignLayer()
+        })
+    }
+
+    onClearSelectedShapes() {
+        let layer = this.state.activeLayer
+        this.setState({ selectedShapes: new Map() }, () => {
+            this.map.setFilter(`area-layer-${layer}-selected`, ['==', 'id', ''])
+        })
+    }
 
     render() {
         return (
@@ -422,8 +591,7 @@ export default class Campaign extends React.Component {
     }
 
     renderRightMenu() {
-        let campaign = this.props.campaign
-        let submaps = campaign.get('SubMaps', [])
+        let submaps = this.props?.campaign?.SubMaps ?? []
         return (
             <div className="grid-y" style={{ height: '100%' }}>
                 <div className="small-1 cell max-width-100 padding-horizontal-1">
@@ -434,40 +602,72 @@ export default class Campaign extends React.Component {
                             <label htmlFor="none">None</label>
                         </div>
                         <div className="cell">
-                            <input type="radio" name="mapType" id="3zip" onChange={this.onClassificationsChange} checked={this.state.activeLayer == '3zip'} />
-                            <label htmlFor="3zip">3 ZIP</label>
+                            <input
+                                type="radio"
+                                name="mapType"
+                                id="Z3"
+                                onChange={this.onClassificationsChange}
+                                disabled={!this.state.allowedLayer.has('Z3')}
+                                checked={this.state.activeLayer == 'Z3'}
+                            />
+                            <label htmlFor="Z3">3 ZIP</label>
                         </div>
                         <div className="cell">
-                            <input type="radio" name="mapType" id="5zip" onChange={this.onClassificationsChange} checked={this.state.activeLayer == '5zip'} />
-                            <label htmlFor="5zip">5 ZIP</label>
+                            <input
+                                type="radio"
+                                name="mapType"
+                                id="Z5"
+                                onChange={this.onClassificationsChange}
+                                disabled={!this.state.allowedLayer.has('Z5')}
+                                checked={this.state.activeLayer == 'Z5'}
+                            />
+                            <label htmlFor="Z5">5 ZIP</label>
                         </div>
-                        {/* <div className="cell">
-                            <input type="radio" name="mapType" id="trk" onChange={this.onClassificationsChange} />
-                            <label htmlFor="trk">TRK</label>
-                        </div> */}
-                        {/* <div className="cell">
-                            <input type="radio" name="mapType" id="bg" onChange={this.onClassificationsChange} />
-                            <label htmlFor="bg">{"BG's"}</label>
-                        </div> */}
                         <div className="cell auto">
-                            <input type="radio" name="mapType" id="croute" onChange={this.onClassificationsChange} checked={this.state.activeLayer == 'croute'} />
-                            <label htmlFor="croute">CRoute</label>
+                            <input
+                                type="radio"
+                                name="mapType"
+                                id="PremiumCRoute"
+                                onChange={this.onClassificationsChange}
+                                disabled={!this.state.allowedLayer.has('PremiumCRoute')}
+                                checked={this.state.activeLayer == 'PremiumCRoute'}
+                            />
+                            <label htmlFor="PremiumCRoute">CRoute</label>
                         </div>
                     </div>
                 </div>
                 <div className="small-10 cell max-width-100 padding-top-1">
                     <div className="row small-collapse">
                         <div className="columns small-6">
-                            <button className="button expanded">SubMaps</button>
+                            <button className="button expanded margin-0">SubMaps</button>
                         </div>
                         <div className="columns small-6">
-                            <button className="button expanded secondary">Address</button>
+                            <button className="button expanded secondary margin-0">Address</button>
                         </div>
-                        {/* <div className="columns small-12">New|Edit|Delete|Add All Shapes|Remove All Shapes|Deselect All Shapes</div> */}
+                        <div className="columns small-12">
+                            <div className="button-group no-gaps clear small">
+                                <div className="button" onClick={this.onNewSubmap}>
+                                    New
+                                </div>
+                                <div className="button" onClick={this.onEditSubmap}>
+                                    Edit
+                                </div>
+                                <div className="button">Delete</div>
+                                <div className="button" onClick={this.onSaveShapesToSubmap}>
+                                    Save Shapes
+                                </div>
+                                <div className="button" onClick={this.onEmptySubmap}>
+                                    Remove All Shapes
+                                </div>
+                                <div className="button" onClick={this.onClearSelectedShapes}>
+                                    Deselect All Shapes
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div ref={this.onInitSubMapScrollbar} style={{ overflow: 'hidden scroll', height: '640px' }}>
                         <div className="row">
-                            {submaps.map((s) => {
+                            {submaps.map((s, index) => {
                                 let boxStyle = {
                                     width: '28px',
                                     height: '28px',
@@ -491,7 +691,7 @@ export default class Campaign extends React.Component {
                                                     <div style={boxStyle}></div>
                                                 </div>
                                                 <div className="cell auto padding-left-1">
-                                                    <div className="margin-0 padding-0 font-medium">{`${s.OrderId}. ${s.Name}`}</div>
+                                                    <div className="margin-0 padding-0 font-medium">{`${index + 1}. ${s.Name}`}</div>
                                                     <div className="margin-0 padding-0 font-small">{desc}</div>
                                                 </div>
                                             </div>

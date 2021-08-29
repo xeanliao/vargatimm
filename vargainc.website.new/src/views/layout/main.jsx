@@ -148,7 +148,7 @@ export default React.createBackboneClass({
             self.publish('Global.Window.Click')
         })
     },
-    componentDidUpdate: function (prevProps, prevState) {
+    componentDidUpdate: function () {
         var haveOpenModal = false
         if (this.state.dialogView && Foundation) {
             $('.dialog').foundation()
@@ -168,8 +168,9 @@ export default React.createBackboneClass({
         }
 
         if (!haveOpenModal) {
-            $('body').removeClass('is-reveal-open')
+            $('.reveal-overlay').css({ display: 'none' })
         }
+        $('html').removeClass('is-reveal-open')
         $('iframe').height($(window).height())
     },
     fullTextSearch: function (e) {

@@ -9,6 +9,7 @@ import AppRouter from 'route'
 import UserModel from 'models/user'
 import LayoutView from 'views/layout/main'
 import Promise from 'bluebird'
+import Axios from 'axios'
 
 /**
  * register loading event except ajax request is quite
@@ -46,6 +47,12 @@ Backbone.sync = function (method, model, options) {
         options.url = '//timm.vargainc.com/' + RELEASE_VERSION + '/api/' + options.url
     }
     return backboneSync(method, model, options)
+}
+
+if (typeof RELEASE_VERSION !== 'undefined') {
+    Axios.defaults.baseURL = '//timm.vargainc.com/' + RELEASE_VERSION + '/api/'
+} else {
+    Axios.defaults.baseURL = '../api/'
 }
 
 var userModel = new UserModel()
