@@ -86,6 +86,7 @@ namespace Vargainc.Timm.REST.Controllers
 
                 db.Database.Connection.Open();
                 var sqlCmd = db.Database.Connection.CreateCommand();
+                sqlCmd.CommandTimeout = 300;
                 sqlCmd.CommandText = sql.ToString();
                 SqlParameter p = new SqlParameter()
                 {
