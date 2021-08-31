@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Web.Http.Cors;
 using System.Configuration;
 using Vargainc.Timm.Extentions;
+using System.IO;
 
 [assembly: OwinStartup(typeof(Vargainc.Timm.REST.Startup))]
 
@@ -45,6 +46,7 @@ namespace Vargainc.Timm.REST
                 var cors = new EnableCorsAttribute(allowWebsite, "*", "*");
                 config.EnableCors(cors);
             }
+
 
             // Web API routes
             //config.MapHttpAttributeRoutes();
