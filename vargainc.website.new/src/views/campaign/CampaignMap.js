@@ -133,8 +133,10 @@ export default class Campaign extends React.Component {
 
     initBackgroundLayer() {
         let textLayerId = this.state.mapTextLayerId
+
+        let tileUrl = new URL('./api/area/tiles', `${location.protocol}//${location.host}${location.pathname}`)
         layers.forEach((item) => {
-            let tileSource = `${location.protocol}//${location.host}/api/area/tiles/${item.layer}/{z}/{x}/{y}`
+            let tileSource = `${tileUrl}/${item.layer}/{z}/{x}/{y}`
             this.map.addSource(`area-source-${item.layer}`, {
                 type: 'vector',
                 tiles: [tileSource],
