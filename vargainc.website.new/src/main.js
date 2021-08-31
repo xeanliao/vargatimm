@@ -42,7 +42,7 @@ Backbone.sync = function (method, model, options) {
     if (!options.url) {
         options.url = model.urlRoot
     }
-    options.url = '../api/' + options.url
+    options.url = './api/' + options.url
     if (typeof RELEASE_VERSION !== 'undefined') {
         options.url = '//timm.vargainc.com/' + RELEASE_VERSION + '/api/' + options.url
     }
@@ -52,13 +52,13 @@ Backbone.sync = function (method, model, options) {
 if (typeof RELEASE_VERSION !== 'undefined') {
     Axios.defaults.baseURL = '//timm.vargainc.com/' + RELEASE_VERSION + '/api/'
 } else {
-    Axios.defaults.baseURL = '../api/'
+    Axios.defaults.baseURL = './api/'
 }
 
 var userModel = new UserModel()
 userModel.fetchCurrentUser().then(function (isSuccess) {
     if (!isSuccess && !startsWith(window.location.hash, '#driver')) {
-        window.location = '../login.html'
+        window.location = './login.html'
         return Promise.reject()
     }
     var LayoutViewInstance = React.createFactory(hot(LayoutView))
@@ -67,12 +67,7 @@ userModel.fetchCurrentUser().then(function (isSuccess) {
     })
     ReactDOM.render(layoutViewInstance, document.getElementById('main-container'))
     var appRouter = new AppRouter()
-    appRouter.on('route', function () {
-        // Topic.publish({
-        // 	channel: 'View',
-        // 	topic: 'showLoading'
-        // });
-    })
+    appRouter.on('route', function () {})
     Backbone.history.start()
     return Promise.resolve()
 })

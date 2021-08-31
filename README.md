@@ -92,6 +92,18 @@ GO
 ALTER TABLE [dbo].[premiumcroutes]
 ADD Geom geometry, IsMaster bit;
 
+UPDATE [dbo].[premiumcroutes]
+SET [IsMaster] = 1
+WHERE Id IN (
+  SELECT B.Id
+  FROM
+    (
+      SELECT GEOCODE, Max(SqMile) AS SqMile
+      FROM [dbo].[premiumcroutes]
+      GROUP by GEOCODE
+    ) AS A INNER JOIN [dbo].[premiumcroutes] B ON A.GEOCODE = B.GEOCODE AND A.SqMile = B.SqMile
+)
+
 CREATE SPATIAL INDEX premiumcroutes_spatial_index
    ON [dbo].[premiumcroutes](Geom)
    USING GEOMETRY_GRID
