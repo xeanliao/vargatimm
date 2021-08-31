@@ -13,14 +13,14 @@ using System.Net.Http;
 using System.Configuration;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace Vargainc.Timm.REST.Controllers
 {
     [RoutePrefix("user")]
-    public class UserController : ApiController
+    public class UserController : BaseController
     {
         private const string AuthCookieName = "ssid";
-        private TimmContext db = new TimmContext();
 
         [Route("info")]
         [HttpGet]
@@ -250,6 +250,7 @@ namespace Vargainc.Timm.REST.Controllers
         public async Task<IHttpActionResult> Login([FromBody]LoginUser user)
         {
             var existUser = await db.Users.Where(i => i.UserName == user.Username && i.Password == user.Password && i.Enabled == true).FirstOrDefaultAsync();
+            
             if (existUser != null)
             {
                 //var claims = new List<System.Security.Claims.Claim>();
@@ -282,6 +283,7 @@ namespace Vargainc.Timm.REST.Controllers
                 authCookie.Value = token;
 
                 HttpContext.Current.Response.SetCookie(authCookie);
+
                 return Json(new
                 {
                     success = true,
@@ -358,15 +360,6 @@ namespace Vargainc.Timm.REST.Controllers
                 HttpContext.Current.Response.Cookies.Add(authCookie);
             }
             return Ok();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }
