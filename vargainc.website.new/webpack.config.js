@@ -25,19 +25,6 @@ module.exports = {
         jquery: 'jQuery',
         'jquery-ui': '',
     },
-    // optimization: {
-    //     moduleIds: 'deterministic',
-    //     runtimeChunk: 'single',
-    //     splitChunks: {
-    //         cacheGroups: {
-    //             vendor: {
-    //                 test: /[\\/]node_modules[\\/]/,
-    //                 name: 'vendors',
-    //                 chunks: 'all',
-    //             },
-    //         },
-    //     },
-    // },
     devtool: 'eval-source-map',
     devServer: {
         contentBase: './wwwroot',
@@ -72,39 +59,14 @@ module.exports = {
                 { from: 'images', to: 'images' },
                 { from: 'style', to: 'style' },
                 { from: 'src/login.html', to: '' },
+                { from: 'street.json', to: '' },
             ],
         }),
         new webpack.DefinePlugin({
             DEBUG: JSON.stringify(true),
             MapboxToken: JSON.stringify('pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA'),
         }),
-        // new MiniCssExtractPlugin({
-        //     filename: '[name].[contenthash].css',
-        // }),
     ],
-    // optimization: {
-    //     minimize: true,
-    //     minimizer: [
-    //         new OptimizeCssAssetsPlugin({
-    //             cssProcessorOptions: {
-    //                 map: {
-    //                     inline: false,
-    //                     annotation: true,
-    //                 },
-    //             },
-    //         }),
-    //         new TerserPlugin({
-    //             parallel: true,
-    //             terserOptions: {
-    //                 format: {
-    //                     comments: false,
-    //                 },
-    //                 sourceMap: true,
-    //             },
-    //             extractComments: false,
-    //         }),
-    //     ],
-    // },
     module: {
         rules: [
             {

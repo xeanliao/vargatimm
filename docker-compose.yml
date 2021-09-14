@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  database:
+    container_name: timm_mssql
+    build: .
+    ports:
+      - 1433:1433
+      - 22:22
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: harry4h#
+    volumes:
+      - mssql-database:/var/opt/mssql/
+volumes:
+  mssql-database:

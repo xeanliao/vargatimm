@@ -28,6 +28,10 @@
     text-align: right !important;
 }
 
+.text-gray{
+    color: #8c8c8c;
+}
+
 html,
 body {
     font-family: 'Ubuntu', verdana, arial, sans-serif;
@@ -53,7 +57,7 @@ body {
     bottom: 0;
     left: 0 !important;
     color: #adb8ca;
-    background: #1a2a42;
+    background: #1a2a42 !important;
     transform: none !important;
 
     .menu {
@@ -753,7 +757,14 @@ $A3LeftRightMargin: 0.5in;
     }
 }
 
-.campaign-map {
+.campaign {
+    .tiny-button-group{
+        .button{
+            padding: 4px 12px !important;
+            line-height: 18px !important;
+            height: 18px !important;
+        }
+    }
 }
 
 .campaign-monitor {

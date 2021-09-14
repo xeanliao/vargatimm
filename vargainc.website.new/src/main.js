@@ -52,7 +52,8 @@ Backbone.sync = function (method, model, options) {
 if (typeof RELEASE_VERSION !== 'undefined') {
     Axios.defaults.baseURL = '//timm.vargainc.com/' + RELEASE_VERSION + '/api/'
 } else {
-    Axios.defaults.baseURL = './api/'
+    let baseUrl = new URL('./api/', `${location.protocol}//${location.host}${location.pathname}`)
+    Axios.defaults.baseURL = baseUrl.toString()
 }
 
 var userModel = new UserModel()
