@@ -15,9 +15,81 @@ import SubmapEdit from './SubmapEdit'
 const log = new Logger('views:campaign')
 
 const layers = [
-    { layer: 'Z3', zoom: [7, 18, 7], color: '#323232' },
-    { layer: 'Z5', zoom: [9, 18, 11], color: '#00FF00' },
-    { layer: 'PremiumCRoute', zoom: [11, 18, 14], color: '#00FF00' },
+    {
+        layer: 'PremiumCRoute',
+        zoom: [11, 24],
+        fontScale: [0.75, 0.75],
+        settings: [
+            {
+                id: 'boundaries',
+                type: 'line',
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round',
+                },
+                paint: {
+                    'line-color': 'hsl(250, 76%, 67%)',
+                    'line-width': {
+                        base: 1.5,
+                        stops: [
+                            [5, 0.25],
+                            [18, 6],
+                        ],
+                    },
+                },
+            },
+        ],
+    },
+    {
+        layer: 'Z5',
+        zoom: [11, 24],
+        fontScale: [1, 0.75],
+        settings: [
+            {
+                id: 'boundaries',
+                type: 'line',
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round',
+                },
+                paint: {
+                    'line-color': 'hsl(215, 36%, 59%)',
+                    'line-width': {
+                        base: 1.5,
+                        stops: [
+                            [5, 0.5],
+                            [18, 26],
+                        ],
+                    },
+                },
+            },
+        ],
+    },
+    {
+        layer: 'Z3',
+        zoom: [11, 24],
+        fontScale: [1.25, 1],
+        settings: [
+            {
+                id: 'boundaries',
+                type: 'line',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-color': 'hsl(215, 20%, 42%)',
+                    'line-width': {
+                        base: 1.5,
+                        stops: [
+                            [5, 1],
+                            [18, 32],
+                        ],
+                    },
+                },
+            },
+        ],
+    },
 ]
 
 const Classification = new Map([
@@ -36,10 +108,10 @@ export default class Campaign extends React.Component {
         this.state = {
             mapInited: false,
             mapReady: false,
-            activeLayer: null,
-            allowedLayer: new Set(['Z3', 'Z5', 'PremiumCRoute']),
+            activeLayers: new Set(),
+            allowedLayers: new Set(['Z3', 'Z5', 'PremiumCRoute']),
             selectedShapes: new Map(),
-            selectedSubmap: null,
+            selectedSubmapId: null,
             campaginSource: { features: [] },
         }
 
@@ -54,19 +126,25 @@ export default class Campaign extends React.Component {
         this.onClassificationsChange = this.onClassificationsChange.bind(this)
         this.onShapeSelect = this.onShapeSelect.bind(this)
 
-        this.onLoadSubmapList = this.onLoadSubmapList.bind(this)
+        this.loadSubmapList = this.loadSubmapList.bind(this)
         this.onNewSubmap = this.onNewSubmap.bind(this)
         this.onEditSubmap = this.onEditSubmap.bind(this)
+        this.onDeleteSubmap = this.onDeleteSubmap.bind(this)
         this.onSaveShapesToSubmap = this.onSaveShapesToSubmap.bind(this)
         this.onEmptySubmap = this.onEmptySubmap.bind(this)
-        this.onClearSelectedShapes = this.onClearSelectedShapes.bind(this)
+        this.clearSelectedShapes = this.clearSelectedShapes.bind(this)
+
+        this.getActiveLayer = this.getActiveLayer.bind(this)
 
         this.map = null
 
         this.subscribe = Helper.subscribe.bind(this)
         this.doUnsubscribe = Helper.doUnsubscribe.bind(this)
 
-        this.subscribe('CampaignMap.Refresh', this.onLoadSubmapList)
+        this.subscribe('CampaignMap.Refresh', () => {
+            this.loadSubmapList()
+            this.initCampaignLayer()
+        })
     }
 
     componentWillUnmount() {
@@ -95,6 +173,8 @@ export default class Campaign extends React.Component {
                         center: center,
                         // style: '/map/street.json',
                         style: 'mapbox://styles/mapbox/outdoors-v11',
+                        // style: 'mapbox://styles/mapbox/navigation-guidance-day-v4',
+                        // style: 'mapbox://styles/mapbox/navigation-preview-night-v4',
                     })
                     this.map.on('load', this.onMapLoad)
                     log.info(`mapbox inited`)
@@ -107,11 +187,11 @@ export default class Campaign extends React.Component {
     onMapLoad() {
         const layers = this.map.getStyle().layers
         // Find the index of the first symbol layer in the map style
-        let firstSymbolId = 'aerialway'
+        let labelLayer = null
         for (const layer of layers) {
             log.info(layer.id)
-            if (layer.id.indexOf('label') > -1 && !firstSymbolId) {
-                firstSymbolId = layer.id
+            if (labelLayer == null && layer.id.indexOf('label') > -1) {
+                labelLayer = layer.id
             }
         }
 
@@ -121,7 +201,7 @@ export default class Campaign extends React.Component {
 
         this.setState(
             {
-                mapTextLayerId: firstSymbolId,
+                mapLabelLayer: labelLayer,
             },
             () => {
                 this.initBackgroundLayer()
@@ -132,14 +212,32 @@ export default class Campaign extends React.Component {
     }
 
     initBackgroundLayer() {
-        let textLayerId = this.state.mapTextLayerId
+        let labelLayer = this.state.mapLabelLayer
+        let tileUrl = new URL('./api/area/tiles', `${location.protocol}//${location.host}${location.pathname}`)
         layers.forEach((item) => {
-            let tileSource = `${location.protocol}//${location.host}/api/area/tiles/${item.layer}/{z}/{x}/{y}`
-            this.map.addSource(`area-source-${item.layer}`, {
+            let tileSource = `${tileUrl}/${item.layer}/{z}/{x}/{y}`
+            let sourceName = `area-source-${item.layer}`
+            this.map.addSource(sourceName, {
                 type: 'vector',
                 tiles: [tileSource],
                 minzoom: item.zoom[0],
                 maxzoom: item.zoom[1],
+            })
+            item.settings.forEach((setting) => {
+                setting.layout['visibility'] = 'none'
+                this.map.addLayer(
+                    {
+                        id: `area-layer-${item.layer}-${setting.id}`,
+                        type: setting.type,
+                        source: sourceName,
+                        'source-layer': item.layer,
+                        minzoom: item.zoom[0],
+                        maxzoom: item.zoom[1],
+                        layout: setting.layout,
+                        paint: setting.paint,
+                    },
+                    labelLayer
+                )
             })
             this.map.addLayer(
                 {
@@ -149,16 +247,15 @@ export default class Campaign extends React.Component {
                     'source-layer': item.layer,
                     minzoom: item.zoom[0],
                     maxzoom: item.zoom[1],
-                    layout: {
-                        visibility: 'none',
-                    },
+                    layout: { visibility: 'none' },
                     paint: {
-                        'fill-color': 'hsl(156, 20%, 95%)',
-                        'fill-opacity': 0.5,
+                        'fill-color': 'white',
+                        'fill-opacity': 0,
                     },
                 },
-                textLayerId
+                labelLayer
             )
+
             let selectedColor = color(`hsl(156, 20%, 95%)`).darker(1)
             this.map.addLayer(
                 {
@@ -168,78 +265,20 @@ export default class Campaign extends React.Component {
                     'source-layer': item.layer,
                     minzoom: item.zoom[0],
                     maxzoom: item.zoom[1],
-                    layout: {},
+                    layout: { visibility: 'none' },
                     paint: {
                         'fill-color': selectedColor.formatHsl(),
                         'fill-opacity': 0.3,
                     },
                     filter: ['==', 'id', ''],
                 },
-                textLayerId
+                labelLayer
             )
-            let highlight = color(`hsl(156, 20%, 95%)`).darker(2)
-            this.map.addLayer(
-                {
-                    id: `area-layer-${item.layer}-highlight`,
-                    type: 'fill',
-                    source: `area-source-${item.layer}`,
-                    'source-layer': item.layer,
-                    minzoom: item.zoom[0],
-                    maxzoom: item.zoom[1],
-                    layout: {},
-                    paint: {
-                        'fill-color': highlight.formatHsl(),
-                        'fill-opacity': 0.75,
-                    },
-                    filter: ['==', 'name', ''],
-                },
-                textLayerId
-            )
-            this.map.addLayer(
-                {
-                    id: `area-layer-${item.layer}-line-bg`,
-                    type: 'line',
-                    source: `area-source-${item.layer}`,
-                    'source-layer': item.layer,
-                    minzoom: item.zoom[0],
-                    maxzoom: item.zoom[1],
-                    layout: {
-                        visibility: 'none',
-                    },
-                    paint: {
-                        'line-width': ['interpolate', ['linear'], ['zoom'], 4, 3.5, 18, 16],
-                        'line-color': 'hsl(0, 0%, 84%)',
-                        'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0, 18, 0.5],
-                        'line-translate': [0, 0],
-                        'line-blur': ['interpolate', ['linear'], ['zoom'], 4, 0, 18, 4],
-                    },
-                },
-                textLayerId
-            )
-            this.map.addLayer(
-                {
-                    id: `area-layer-${item.layer}-line`,
-                    type: 'line',
-                    source: `area-source-${item.layer}`,
-                    'source-layer': item.layer,
-                    minzoom: item.zoom[0],
-                    maxzoom: item.zoom[1],
-                    layout: {
-                        visibility: 'none',
-                        'line-join': 'round',
-                        'line-cap': 'round',
-                    },
-                    paint: {
-                        'line-color': 'hsl(0, 0%, 62%)',
-                        'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.5, 18, 4],
-                    },
-                },
-                textLayerId
-            )
+
             this.map.addLayer({
                 id: `area-layer-${item.layer}-label`,
                 type: 'symbol',
-                source: `area-source-${item.layer}`,
+                source: sourceName,
                 'source-layer': item.layer,
                 minzoom: item.zoom[0],
                 maxzoom: item.zoom[1],
@@ -249,7 +288,7 @@ export default class Campaign extends React.Component {
                     'text-field': [
                         'format',
                         ['get', 'name'],
-                        { 'font-scale': 1.2 },
+                        { 'font-scale': item.fontScale[0] },
                         '\n',
                         [
                             'concat',
@@ -260,26 +299,31 @@ export default class Campaign extends React.Component {
                             ['number-format', ['get', 'apt'], { locale: 'en-Latn-US' }],
                         ],
                         {
-                            'font-scale': 0.75,
+                            'font-scale': item.fontScale[1],
                         },
                         '\n',
                         ['concat', 'Total:', ['number-format', ['+', ['get', 'home'], ['get', 'apt']], { locale: 'en-Latn-US' }]],
                         {
-                            'font-scale': 0.75,
+                            'font-scale': item.fontScale[1],
                         },
                     ],
                 },
+                // paint: {
+                //     'text-halo-color': 'hsl(0, 0%, 100%)',
+                //     'text-halo-width': 0.5,
+                //     'text-halo-blur': 0.5,
+                //     'text-color': [
+                //         'step',
+                //         ['zoom'],
+                //         ['step', ['get', 'sizerank'], 'hsl(0, 0%, 66%)', 5, 'hsl(230, 0%, 56%)'],
+                //         17,
+                //         ['step', ['get', 'sizerank'], 'hsl(0, 0%, 66%)', 13, 'hsl(0, 0%, 56%)'],
+                //     ],
+                // },
                 paint: {
-                    'text-halo-color': 'hsl(0, 0%, 100%)',
-                    'text-halo-width': 0.5,
-                    'text-halo-blur': 0.5,
-                    'text-color': [
-                        'step',
-                        ['zoom'],
-                        ['step', ['get', 'sizerank'], 'hsl(0, 0%, 66%)', 5, 'hsl(230, 0%, 56%)'],
-                        17,
-                        ['step', ['get', 'sizerank'], 'hsl(0, 0%, 66%)', 13, 'hsl(0, 0%, 56%)'],
-                    ],
+                    'text-color': 'hsl(0, 0%, 0%)',
+                    'text-halo-color': ['interpolate', ['linear'], ['zoom'], 2, 'rgba(255, 255, 255, 0.75)', 3, 'rgb(255, 255, 255)'],
+                    'text-halo-width': item.fontScale[1],
                 },
                 filter: ['==', ['geometry-type'], 'Point'],
             })
@@ -289,7 +333,7 @@ export default class Campaign extends React.Component {
     }
 
     initCampaignLayer() {
-        let textLayerId = this.state.mapTextLayerId
+        let labelLayer = this.state.mapLabelLayer
         axios.get(`campaign/${this.props.campaign.Id}/submap/geojson`).then((resp) => {
             if (this.state.mapReady == true) {
                 this.map.getSource('campaign-source').setData(resp.data)
@@ -303,10 +347,10 @@ export default class Campaign extends React.Component {
                         layout: {},
                         paint: {
                             'fill-color': ['get', 'color'],
-                            'fill-opacity': 0.3,
+                            'fill-opacity': 0.5,
                         },
                     },
-                    textLayerId
+                    labelLayer
                 )
                 this.map.addLayer(
                     {
@@ -319,7 +363,7 @@ export default class Campaign extends React.Component {
                             'line-width': 2,
                         },
                     },
-                    textLayerId
+                    labelLayer
                 )
                 this.map.addLayer(
                     {
@@ -333,7 +377,7 @@ export default class Campaign extends React.Component {
                         },
                         filter: ['==', ['get', 'sid'], ''],
                     },
-                    textLayerId
+                    labelLayer
                 )
             }
             this.setState({
@@ -397,26 +441,32 @@ export default class Campaign extends React.Component {
         if (!this.state.mapReady) {
             return
         }
-        let activeLayer = evt.currentTarget.id == 'none' ? null : evt.currentTarget.id
+        let layerId = evt.currentTarget.id
         this.setState(
-            {
-                activeLayer: activeLayer,
+            (state) => {
+                let activeLayers = new Set(state.activeLayers)
+                if (activeLayers.has(layerId)) {
+                    activeLayers.delete(layerId)
+                } else {
+                    activeLayers.add(layerId)
+                }
+                return {
+                    activeLayers: activeLayers,
+                    // selectedShapes: new Map(),
+                }
             },
             () => {
-                const type = ['fill', 'highlight', 'line-bg', 'line', 'label']
+                const otherLayers = ['fill', 'selected', 'label']
                 layers.forEach((item) => {
-                    type.forEach((type) => {
-                        this.map.setLayoutProperty(`area-layer-${item.layer}-${type}`, 'visibility', item.layer == activeLayer ? 'visible' : 'none')
+                    item.settings.forEach((setting) => {
+                        this.map.setLayoutProperty(`area-layer-${item.layer}-${setting.id}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
                     })
-                    this.map.setFilter(`area-layer-${item.layer}-highlight`, ['==', 'name', ''])
-                })
+                    otherLayers.forEach((name) => {
+                        this.map.setLayoutProperty(`area-layer-${item.layer}-${name}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
+                    })
 
-                if (activeLayer) {
-                    let minZoom = layers.filter((i) => i.layer == activeLayer)?.[0]?.zoom?.[2]
-                    if (this.map.getZoom() < minZoom) {
-                        // this.map.setZoom(minZoom)
-                    }
-                }
+                    // this.map.setFilter(`area-layer-${item.layer}-selected`, ['==', 'name', ''])
+                })
             }
         )
     }
@@ -425,93 +475,108 @@ export default class Campaign extends React.Component {
         if (!this.state.mapReady) {
             return
         }
-        let needTrigerClassificationsChange
+        if (this.state.selectedSubmapId == submap.Id) {
+            return
+        }
         this.setState(
             (state) => {
-                let allowedLayer = Array.from(Classification.values())
+                let allowedLayers = Array.from(Classification.values())
                 let fixClassification = Classification.get(submap.SubMapRecords?.[0]?.Classification)
                 if (fixClassification) {
-                    allowedLayer = [fixClassification]
+                    allowedLayers = [fixClassification]
                 }
 
-                let selectedShapes = new Map(state.selectedShapes)
+                let submapGeo = state.campaginSource.features.filter((i) => i.id == submap.Id)?.[0]
 
-                if (state.selectedSubmap != submap.Id) {
-                    selectedShapes = new Map()
-
-                    needTrigerClassificationsChange = true
-
-                    let highlightColor = color(`#${submap.ColorString}`).darker(2).toString()
-                    this.map.setLayoutProperty('campaign-layer-highlight', 'visibility', 'none')
-                    this.map.setFilter('campaign-layer-highlight', ['==', ['get', 'sid'], submap.Id])
-                    this.map.setPaintProperty('campaign-layer-highlight', 'line-color', highlightColor)
-                    this.map.setLayoutProperty('campaign-layer-highlight', 'visibility', 'visible')
-
-                    let submapGeo = this.state.campaginSource.features.filter((i) => i.id == submap.Id)?.[0]
-
-                    if (submapGeo) {
-                        this.map.fitBounds([
-                            [submapGeo.bbox[0], submapGeo.bbox[1]],
-                            [submapGeo.bbox[2], submapGeo.bbox[3]],
-                        ])
-                    }
+                if (submapGeo) {
+                    this.map.fitBounds([
+                        [submapGeo.bbox[0], submapGeo.bbox[1]],
+                        [submapGeo.bbox[2], submapGeo.bbox[3]],
+                    ])
                 }
 
-                return { selectedSubmap: submap.Id, allowedLayer: new Set(allowedLayer), selectedShapes: selectedShapes }
+                return { selectedSubmapId: submap.Id, allowedLayers: new Set(allowedLayers), selectedShapes: new Map() }
             },
             () => {
-                if (needTrigerClassificationsChange && !this.state.allowedLayer.has(this.state.activeLayer)) {
-                    this.onClassificationsChange({ currentTarget: { id: Array.from(this.state.allowedLayer.values())[0] } })
-                }
-
                 //set selected layer fill color as submap color
+                let highlightColor = color(`#${submap.ColorString}`).darker(2).toString()
+                this.map.setLayoutProperty('campaign-layer-highlight', 'visibility', 'none')
+                this.map.setFilter('campaign-layer-highlight', ['==', ['get', 'sid'], submap.Id])
+                this.map.setPaintProperty('campaign-layer-highlight', 'line-color', highlightColor)
+                this.map.setLayoutProperty('campaign-layer-highlight', 'visibility', 'visible')
+
                 layers.forEach((item) => {
-                    this.map.setPaintProperty(`area-layer-${item.layer}-selected`, 'fill-color', `#${submap.ColorString}`)
                     this.map.setFilter(`area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', Array.from(this.state.selectedShapes.keys())]])
+                    this.map.setPaintProperty(`area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
                 })
             }
         )
     }
 
+    getActiveLayer() {
+        let allowedLayers = this.state.allowedLayers
+        let activeLayers = this.state.activeLayers
+        return activeLayers.has('PremiumCRoute') && allowedLayers.has('PremiumCRoute')
+            ? 'PremiumCRoute'
+            : activeLayers.has('Z5') && allowedLayers.has('Z5')
+            ? 'Z5'
+            : activeLayers.has('Z3') && allowedLayers.has('Z3')
+            ? 'Z3'
+            : null
+    }
+
     onShapeSelect(e) {
+        if (!this.state.selectedSubmapId) {
+            return
+        }
+
         let id = e.features?.[0]?.properties?.id
         let name = e.features?.[0]?.properties?.name
-        let layer = this.state.activeLayer
-        if (!id || !layer) {
+
+        // check is allowed layer
+        let activeLayer = this.getActiveLayer()
+        if (!id || !name || id.indexOf(activeLayer) == -1) {
             return
         }
         // let id = `${layer}-${name}`
         // check layer is in another submap
         let submaps = this.props?.campaign?.SubMaps ?? []
         let blockLayers = submaps
-            .filter((s) => s.Id != this.state.selectedSubmap)
+            .filter((s) => s.Id != this.state.selectedSubmapId)
             .flatMap((s) => (s.SubMapRecords ?? []).map((r) => `${Classification.get(r.Classification)}-${r.AreaId}`))
         if (new Set(blockLayers).has(id)) {
             return
         }
-        let currentShapes = new Set(
-            (submaps.filter((i) => i.Id == this.state.selectedSubmap)?.[0]?.SubMapRecords ?? []).map((r) => `${Classification.get(r.Classification)}-${r.AreaId}`)
-        )
+        let subMapRecords = submaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]?.SubMapRecords ?? []
+        let selectedShapes = subMapRecords.map((r) => `${Classification.get(r.Classification)}-${r.AreaId}`)
+        let currentShapes = new Set(selectedShapes)
         this.setState(
             (state) => {
                 let selectedShapes = new Map(state.selectedShapes)
                 if (selectedShapes.has(id)) {
                     selectedShapes.delete(id)
                 } else {
-                    selectedShapes.set(id, { Classification: layer, Id: id, Value: !currentShapes.has(id), Name: name })
+                    selectedShapes.set(id, { Classification: activeLayer, Id: id, Value: !currentShapes.has(id), Name: name })
+                }
+
+                let allowedLayers = new Set([activeLayer])
+                //if submap is empty allow all layers
+                if (selectedShapes.size == 0 && currentShapes.size == 0) {
+                    allowedLayers = new Set(layers.map((i) => i.layer))
                 }
                 return {
                     selectedShapes: selectedShapes,
+                    allowedLayers: allowedLayers,
                 }
             },
             () => {
                 let selectedShapes = Array.from(this.state.selectedShapes.keys())
-                this.map.setFilter(`area-layer-${layer}-selected`, ['in', ['get', 'id'], ['literal', selectedShapes]])
+                this.map.setFilter(`area-layer-${activeLayer}-selected`, ['in', ['get', 'id'], ['literal', selectedShapes]])
             }
         )
     }
 
-    onLoadSubmapList() {
+    loadSubmapList() {
         axios.get(`campaign/${this.props.campaign.Id}/submap`).then((resp) => {
             this.props.campaign.SubMaps = resp.data.data.SubMaps
             this.forceUpdate()
@@ -531,10 +596,10 @@ export default class Campaign extends React.Component {
     }
 
     onEditSubmap() {
-        if (!this.state.selectedSubmap) {
+        if (!this.state.selectedSubmapId) {
             return
         }
-        var submap = this.props.campaign.SubMaps.filter((i) => i.Id == this.state.selectedSubmap)?.[0]
+        var submap = this.props.campaign.SubMaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]
         Helper.publish('showDialog', {
             view: <SubmapEdit model={submap} registeredTopic={{}} registeredEvents={[]} />,
             options: {
@@ -543,8 +608,27 @@ export default class Campaign extends React.Component {
         })
     }
 
+    onDeleteSubmap() {
+        if (!this.state.selectedSubmapId) {
+            return
+        }
+        var submap = this.props.campaign.SubMaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]
+
+        axios.delete(`campaign/${submap.CampaignId}/submap/${submap.Id}/delete`).then(() => {
+            this.setState({}, () => {
+                layers.forEach((item) => {
+                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['=', 'id', ''])
+                })
+
+                this.loadSubmapList()
+                this.initCampaignLayer()
+                this.clearSelectedShapes()
+            })
+        })
+    }
+
     onSaveShapesToSubmap() {
-        if (!this.state.selectedSubmap) {
+        if (!this.state.selectedSubmapId) {
             return
         }
         let data = Array.from(this.state.selectedShapes.values()).map((i) => {
@@ -554,29 +638,49 @@ export default class Campaign extends React.Component {
                 Value: i.Value,
             }
         })
-        let url = `campaign/${this.props.campaign.Id}/submap/${this.state.selectedSubmap}/merge`
+        let url = `campaign/${this.props.campaign.Id}/submap/${this.state.selectedSubmapId}/merge`
         axios.post(url, data).then((resp) => {
-            this.onLoadSubmapList()
+            this.loadSubmapList()
             this.initCampaignLayer()
-            this.onClearSelectedShapes()
+            this.clearSelectedShapes()
         })
     }
 
     onEmptySubmap() {
-        if (!this.state.selectedSubmap) {
+        if (!this.state.selectedSubmapId) {
             return
         }
-        let url = `campaign/${this.props.campaign.Id}/submap/${this.state.selectedSubmap}`
+        let url = `campaign/${this.props.campaign.Id}/submap/${this.state.selectedSubmapId}/empty`
         axios.delete(url).then(() => {
-            this.initCampaignLayer()
+            this.setState(
+                {
+                    allowedLayers: new Set(['Z3', 'Z5', 'PremiumCRoute']),
+                },
+                () => {
+                    this.initCampaignLayer()
+                    this.clearSelectedShapes()
+                }
+            )
         })
     }
 
-    onClearSelectedShapes() {
-        let layer = this.state.activeLayer
-        this.setState({ selectedShapes: new Map() }, () => {
-            this.map.setFilter(`area-layer-${layer}-selected`, ['==', 'id', ''])
-        })
+    clearSelectedShapes() {
+        this.setState(
+            (state) => {
+                let submaps = this.props?.campaign?.SubMaps ?? []
+                let subMapRecords = submaps.filter((i) => i.Id == state.selectedSubmapId)?.[0]?.SubMapRecords ?? []
+                let allowedLayers = new Set(layers.map((i) => i.layer))
+                if (subMapRecords.length > 0) {
+                    allowedLayers = new Set([Classification.get(subMapRecords[0].Classification)])
+                }
+                return { selectedShapes: new Map(), allowedLayers: allowedLayers }
+            },
+            () => {
+                layers.forEach((item) => {
+                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['==', 'id', ''])
+                })
+            }
+        )
     }
 
     render() {
@@ -596,43 +700,46 @@ export default class Campaign extends React.Component {
             <div className="grid-y" style={{ height: '100%' }}>
                 <div className="small-1 cell max-width-100 padding-horizontal-1">
                     <legend>Classifications</legend>
-                    <div className="grid-x grid-margin-x margin-collapse small-up-3">
-                        <div className="cell">
-                            <input type="radio" name="mapType" id="none" onChange={this.onClassificationsChange} checked={this.state.activeLayer == null} />
-                            <label htmlFor="none">None</label>
+
+                    <div className="button-group stacked-for-small clear">
+                        <div>
+                            <input type="checkbox" name="Z3" id="Z3" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z3')} />
+                            <label
+                                htmlFor="Z3"
+                                className={ClassNames('margin-right-1', { 'font-bold': this.state.allowedLayers.has('Z3'), 'text-gray': !this.state.allowedLayers.has('Z3') })}
+                            >
+                                3 ZIP
+                            </label>
                         </div>
-                        <div className="cell">
-                            <input
-                                type="radio"
-                                name="mapType"
-                                id="Z3"
-                                onChange={this.onClassificationsChange}
-                                disabled={!this.state.allowedLayer.has('Z3')}
-                                checked={this.state.activeLayer == 'Z3'}
-                            />
-                            <label htmlFor="Z3">3 ZIP</label>
+                        <div>
+                            <input type="checkbox" name="Z5" id="Z5" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z5')} />
+                            <label
+                                htmlFor="Z5"
+                                className={ClassNames('margin-right-1', {
+                                    'font-bold': this.state.allowedLayers.has('Z5'),
+                                    'text-gray': !this.state.allowedLayers.has('Z5'),
+                                })}
+                            >
+                                5 ZIP
+                            </label>
                         </div>
-                        <div className="cell">
+                        <div>
                             <input
-                                type="radio"
-                                name="mapType"
-                                id="Z5"
-                                onChange={this.onClassificationsChange}
-                                disabled={!this.state.allowedLayer.has('Z5')}
-                                checked={this.state.activeLayer == 'Z5'}
-                            />
-                            <label htmlFor="Z5">5 ZIP</label>
-                        </div>
-                        <div className="cell auto">
-                            <input
-                                type="radio"
-                                name="mapType"
+                                type="checkbox"
+                                name="PremiumCRoute"
                                 id="PremiumCRoute"
                                 onChange={this.onClassificationsChange}
-                                disabled={!this.state.allowedLayer.has('PremiumCRoute')}
-                                checked={this.state.activeLayer == 'PremiumCRoute'}
+                                checked={this.state.activeLayers.has('PremiumCRoute')}
                             />
-                            <label htmlFor="PremiumCRoute">CRoute</label>
+                            <label
+                                htmlFor="PremiumCRoute"
+                                className={ClassNames('margin-right-1', {
+                                    'font-bold': this.state.allowedLayers.has('PremiumCRoute'),
+                                    'text-gray': !this.state.allowedLayers.has('PremiumCRoute'),
+                                })}
+                            >
+                                CRoute
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -645,21 +752,23 @@ export default class Campaign extends React.Component {
                             <button className="button expanded secondary margin-0">Address</button>
                         </div>
                         <div className="columns small-12">
-                            <div className="button-group no-gaps clear small">
-                                <div className="button" onClick={this.onNewSubmap}>
+                            <div className="button-group no-gaps clear small tiny-button-group">
+                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onNewSubmap}>
                                     New
                                 </div>
-                                <div className="button" onClick={this.onEditSubmap}>
+                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onEditSubmap}>
                                     Edit
                                 </div>
-                                <div className="button">Delete</div>
-                                <div className="button" onClick={this.onSaveShapesToSubmap}>
+                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onDeleteSubmap}>
+                                    Delete
+                                </div>
+                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onSaveShapesToSubmap}>
                                     Save Shapes
                                 </div>
-                                <div className="button" onClick={this.onEmptySubmap}>
+                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onEmptySubmap}>
                                     Remove All Shapes
                                 </div>
-                                <div className="button" onClick={this.onClearSelectedShapes}>
+                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.clearSelectedShapes}>
                                     Deselect All Shapes
                                 </div>
                             </div>
@@ -675,7 +784,7 @@ export default class Campaign extends React.Component {
                                 }
                                 let desc = `Total: ${s.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${s.CountAdjustment} Pen: ${s.Penetration}`
                                 let buttonClassName = ClassNames('button expanded border-none padding-0 margin-0 text-left', {
-                                    hollow: this.state.selectedSubmap != s.Id,
+                                    hollow: this.state.selectedSubmapId != s.Id,
                                 })
                                 return (
                                     <div

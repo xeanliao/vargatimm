@@ -8,8 +8,11 @@ export default class SubMapEdit extends React.Component {
         super(props)
 
         this.onChange = Helper.onFormChange.bind(this)
-        this.onDialogClose = Helper.onDialogClose.bind(this)
+        this.closeDialog = Helper.closeDialog.bind(this)
+        this.publish = Helper.publish.bind(this)
+
         this.onSave = this.onSave.bind(this)
+        this.onClose = this.onClose.bind(this)
     }
 
     onSave(e) {
@@ -27,8 +30,9 @@ export default class SubMapEdit extends React.Component {
         axios
             .post(`campaign/${model.CampaignId}/submap/edit`, postData)
             .then(() => {
-                Helper.onDialogClose()
-                Helper.publish('CampaignMap.Refresh')
+                this.closeDialog()
+                this.publish('CampaignMap.Refresh')
+                return Promise.resolve()
             })
             .catch(() => {
                 this.setState({
@@ -36,8 +40,9 @@ export default class SubMapEdit extends React.Component {
                 })
             })
     }
+
     onClose() {
-        Helper.publish('showDialog')
+        this.closeDialog()
     }
 
     render() {

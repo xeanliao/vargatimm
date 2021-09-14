@@ -524,7 +524,7 @@ export default React.createBackboneClass({
                     gtuIcon = <i className="fa fa-street-view"></i>
                     break
                 default:
-                    gtuIcon = null
+                    gtuIcon = <i className="fa fa-question-circle-o"></i>
                     break
             }
         }

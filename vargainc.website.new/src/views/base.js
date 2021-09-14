@@ -245,6 +245,10 @@ export const onDialogClose = function () {
     this.publish('showDialog')
 }
 
+export const closeDialog = function () {
+    this.publish('showDialog')
+}
+
 export const randomColor = function (index) {
     const schema = [
         '#d62728',
@@ -310,4 +314,19 @@ export const randomColor = function (index) {
     return schema[index % schema.length]
 }
 
-export default { getDefaultProps, on, subscribe, unsubscribe, publish, componentWillUnmount, doUnsubscribe, scrollTop, confirm, alert, onFormChange, onDialogClose, randomColor }
+export default {
+    getDefaultProps,
+    on,
+    subscribe,
+    unsubscribe,
+    publish,
+    componentWillUnmount,
+    doUnsubscribe,
+    scrollTop,
+    confirm,
+    alert,
+    onFormChange,
+    onDialogClose,
+    closeDialog: closeDialog,
+    randomColor,
+}

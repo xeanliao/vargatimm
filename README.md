@@ -4,6 +4,9 @@
 
 ```sql
 -- 3zip
+
+DROP INDEX IF EXISTS [threezipareas_spatial_index] ON [dbo].[threezipareas]
+
 IF EXISTS (SELECT 1
                FROM   INFORMATION_SCHEMA.COLUMNS
                WHERE  TABLE_NAME = 'threezipareas'
@@ -30,16 +33,22 @@ WHERE Id IN (
     ) AS A INNER JOIN [dbo].[threezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile
 )
 
-CREATE SPATIAL INDEX threezipareas_spatial_index
-   ON [dbo].[threezipareas](Geom)
-   USING GEOMETRY_GRID
-   WITH (
-    BOUNDING_BOX = ( xmin=0, ymin=0, xmax=500, ymax=200 ),
-    GRIDS = (LOW, LOW, MEDIUM, HIGH),
-    CELLS_PER_OBJECT = 64,
-    PAD_INDEX  = ON );
+CREATE INDEX [threezipareas_IsInnerRing_index] ON [dbo].[threezipareas]
+(
+	[IsInnerRing] ASC
+)
+
+CREATE SPATIAL INDEX [threezipareas_spatial_index]
+  ON [dbo].[threezipareas](Geom)
+  USING GEOMETRY_AUTO_GRID
+  WITH ( 
+    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
+  );
 
 -- 5zip
+
+DROP INDEX IF EXISTS [fivezipareas_spatial_index] ON [dbo].[fivezipareas]
+
 IF EXISTS (SELECT 1
                FROM   INFORMATION_SCHEMA.COLUMNS
                WHERE  TABLE_NAME = 'fivezipareas'
@@ -67,17 +76,23 @@ WHERE Id IN (
     ) AS A INNER JOIN [dbo].[fivezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile
 )
 
-CREATE SPATIAL INDEX fivezipareas_spatial_index
-   ON [dbo].[fivezipareas](Geom)
-   USING GEOMETRY_GRID
-   WITH (
-    BOUNDING_BOX = ( xmin=0, ymin=0, xmax=500, ymax=200 ),
-    GRIDS = (LOW, LOW, MEDIUM, HIGH),
-    CELLS_PER_OBJECT = 64,
-    PAD_INDEX  = ON );
+CREATE INDEX [fivezipareas_IsInnerRing_index] ON [dbo].[fivezipareas]
+(
+	[IsInnerRing] ASC
+)
+
+CREATE SPATIAL INDEX [fivezipareas_spatial_index]
+  ON [dbo].[fivezipareas](Geom)
+  USING GEOMETRY_AUTO_GRID
+  WITH ( 
+    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
+  );
 
 
 -- croute
+
+DROP INDEX IF EXISTS [premiumcroutes_spatial_index] ON [dbo].[premiumcroutes]
+
 IF EXISTS (SELECT 1
                FROM   INFORMATION_SCHEMA.COLUMNS
                WHERE  TABLE_NAME = 'premiumcroutes'
@@ -104,12 +119,15 @@ WHERE Id IN (
     ) AS A INNER JOIN [dbo].[premiumcroutes] B ON A.GEOCODE = B.GEOCODE AND A.SqMile = B.SqMile
 )
 
-CREATE SPATIAL INDEX premiumcroutes_spatial_index
-   ON [dbo].[premiumcroutes](Geom)
-   USING GEOMETRY_GRID
-   WITH (
-    BOUNDING_BOX = ( xmin=0, ymin=0, xmax=500, ymax=200 ),
-    GRIDS = (LOW, LOW, MEDIUM, HIGH),
-    CELLS_PER_OBJECT = 64,
-    PAD_INDEX  = ON );
+CREATE INDEX [premiumcroutes_IsInnerRing_index] ON [dbo].[premiumcroutes]
+(
+	[IsInnerRing] ASC
+)
+
+CREATE SPATIAL INDEX [premiumcroutes_spatial_index]
+  ON [dbo].[premiumcroutes](Geom)
+  USING GEOMETRY_AUTO_GRID
+  WITH ( 
+    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
+  );
 ```

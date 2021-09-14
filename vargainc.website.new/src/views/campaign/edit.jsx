@@ -62,7 +62,7 @@ export default React.createBackboneClass({
         var showError = this.state && this.state.error ? true : false
         var errorMessage = showError ? this.state.error : ''
         return (
-            <form data-abide onSubmit={this.onSave}>
+            <form onSubmit={this.onSave}>
                 <h3>{title}</h3>
                 <div data-abide-error className="alert callout" style={{ display: showError ? 'block' : 'none' }}>
                     <p>
