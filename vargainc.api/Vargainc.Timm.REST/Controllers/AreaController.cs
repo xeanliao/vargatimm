@@ -20,14 +20,20 @@ using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.SqlServer.Types;
 using System.Diagnostics;
-using System.Data.SqlTypes;
 using Vargainc.Timm.REST.ViewModel;
+using System.Configuration;
+using log4net;
+
 
 namespace Vargainc.Timm.REST.Controllers
 {
     [RoutePrefix("area")]
     public class AreaController : BaseController
     {
+        private static readonly ILog logger = LogManager.GetLogger(typeof(AreaController));
+
+        private static readonly string CachePath = ConfigurationManager.AppSettings["TilesCachePath"];
+
         private static readonly HashSet<Classifications> LAYERS = new HashSet<Classifications>() 
         {
             Classifications.Z3,
@@ -47,12 +53,47 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
+            HttpResponseMessage response = null;
+
+            var cacheFile = Path.Combine(CachePath, layer.ToString(), z.ToString(), $"{x}.{y}.pbf");
+            //try
+            //{
+            //    if (File.Exists(cacheFile))
+            //    {
+            //        byte[] content = File.ReadAllBytes(cacheFile);
+            //        string eTag = null;
+            //        eTag = GenerateETag(content);
+            //        var eTagCheck = GetETag();
+            //        if (eTag == eTagCheck)
+            //        {
+            //            return new HttpResponseMessage(HttpStatusCode.NotModified);
+            //        }
+
+            //        response = new HttpResponseMessage(HttpStatusCode.OK);
+            //        response.Headers.TryAddWithoutValidation("ETag", eTag);
+            //        response.Headers.TryAddWithoutValidation("profile", "cache");
+            //        response.Content = new ByteArrayContent(content);
+            //        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-protobuf");
+
+            //        response.Headers.CacheControl = new CacheControlHeaderValue()
+            //        {
+            //            Public = true,
+            //            MaxAge = new TimeSpan(365, 0, 0, 0),
+            //        };
+
+            //        return response;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    logger.Error("Load cache file failed. continue...", ex);
+            //}
+
             long database = 0;
             long process = 0;
             Stopwatch watch = new Stopwatch();
             watch.Start();
-
-            HttpResponseMessage response = null;
+            
             try
             {
                 var tile = new NetTopologySuite.IO.VectorTiles.Tiles.Tile(x, y, z);
@@ -64,23 +105,23 @@ namespace Vargainc.Timm.REST.Controllers
                     new Coordinate(tile.Left, tile.Bottom),
                     new Coordinate(tile.Left, tile.Top),
                 }));
-                StringBuilder sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_MAP});");
+                StringBuilder sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
                 switch (layer)
                 {
                     case Classifications.Z3:
-                        sql.AppendLine("SELECT [Id],[Code] AS [Name],'' AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
+                        sql.AppendLine("SELECT [Id],[Code] AS [Name],'' AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing], [Latitude],[Longitude],[Geom]");
                         sql.AppendLine("FROM [dbo].[threezipareas] WITH(INDEX(threezipareas_spatial_index))");
-                        sql.AppendLine("WHERE [IsInnerRing] = 0 AND geom.STIntersects(@g) = 1");
+                        sql.AppendLine("WHERE geom.STIntersects(@g) = 1");
                         break;
                     case Classifications.Z5:
-                        sql.AppendLine("SELECT [Id],[Code] AS [Name],[Code] AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
+                        sql.AppendLine("SELECT [Id],[Code] AS [Name],[Code] AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing],[Latitude],[Longitude],[Geom]");
                         sql.AppendLine("FROM [dbo].[fivezipareas] WITH(INDEX(fivezipareas_spatial_index))");
-                        sql.AppendLine("WHERE [IsInnerRing] = 0 AND geom.STIntersects(@g) = 1");
+                        sql.AppendLine("WHERE geom.STIntersects(@g) = 1");
                         break;
                     case Classifications.PremiumCRoute:
-                        sql.AppendLine("SELECT [Id],[GEOCODE] AS [Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[Latitude],[Longitude],[Geom]");
+                        sql.AppendLine("SELECT [Id],[GEOCODE] AS [Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing],[Latitude],[Longitude],[Geom]");
                         sql.AppendLine("FROM [dbo].[premiumcroutes] WITH(INDEX(premiumcroutes_spatial_index))");
-                        sql.AppendLine("WHERE [IsInnerRing] = 0 AND geom.STIntersects(@g) = 1");
+                        sql.AppendLine("WHERE geom.STIntersects(@g) = 1");
                         break;
                 }
 
@@ -109,9 +150,10 @@ namespace Vargainc.Timm.REST.Controllers
                         BUSINESS_COUNT = sqlReader.GetInt32(4),
                         APT_COUNT = sqlReader.GetInt32(5),
                         IsMaster = sqlReader.IsDBNull(6) ? false : sqlReader.GetBoolean(6),
-                        Latitude = sqlReader.GetDouble(7),
-                        Longitude = sqlReader.GetDouble(8),
-                        Geom = (SqlGeometry)sqlReader.GetValue(9),
+                        IsInnerRing = sqlReader.IsDBNull(7) ? false : sqlReader.GetByte(7) == 1,
+                        Latitude = sqlReader.GetDouble(8),
+                        Longitude = sqlReader.GetDouble(9),
+                        Geom = (SqlGeometry)sqlReader.GetValue(10),
                     });
                 }
 
@@ -165,11 +207,7 @@ namespace Vargainc.Timm.REST.Controllers
                 tree.Add(features, z, layer.ToString());
 
                 response = new HttpResponseMessage(HttpStatusCode.OK);
-                response.Headers.CacheControl = new CacheControlHeaderValue()
-                {
-                    Public = true,
-                    MaxAge = new TimeSpan(365, 0, 0, 0),
-                };
+                
 
                 if (tree.Contains(tile.Id))
                 {
@@ -181,6 +219,28 @@ namespace Vargainc.Timm.REST.Controllers
                         ms.Seek(0, SeekOrigin.Begin);
                         content = ms.ToArray();
                     }
+
+                    //try
+                    //{
+                    //    if (!Directory.Exists(Path.GetDirectoryName(cacheFile)))
+                    //    {
+                    //        Directory.CreateDirectory(Path.GetDirectoryName(cacheFile));
+                    //    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    logger.Error("Create cache file directory failed. continue...", ex);
+                    //}
+
+                    //try
+                    //{
+                    //    File.WriteAllBytes(cacheFile, content);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    logger.Error("Create cache file failed. continue...", ex);
+                    //}
+
                     eTag = GenerateETag(content);
                     var eTagCheck = GetETag();
                     if (eTag == eTagCheck)
@@ -188,13 +248,26 @@ namespace Vargainc.Timm.REST.Controllers
                         return new HttpResponseMessage(HttpStatusCode.NotModified);
                     }
                     response.Headers.TryAddWithoutValidation("ETag", eTag);
-
+                    response.Headers.TryAddWithoutValidation("profile", "database");
                     response.Content = new ByteArrayContent(content);
                     response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-protobuf");
+
+                    response.Headers.CacheControl = new CacheControlHeaderValue()
+                    {
+                        Public = true,
+                        MaxAge = new TimeSpan(365, 0, 0, 0),
+                    };
                 }
                 else
                 {
                     response.Content = new StringContent(string.Empty, Encoding.UTF8, "application/x-protobuf");
+
+                    response.Headers.CacheControl = new CacheControlHeaderValue
+                    {
+                        NoCache = true,
+                        NoStore= true,
+                        NoTransform= true
+                    };
                 }
             }
             catch (Exception ex)
@@ -225,32 +298,33 @@ namespace Vargainc.Timm.REST.Controllers
             var detailTable = db.ThreeZipCoordinates;
 
             var batchSize = 1000;
-            var count = await mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
+            var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
             var loops = (int)Math.Ceiling((double)count / (double)batchSize);
             int failed = 0;
             for (var j = 0; j < loops; j++)
             {
-                var areas = mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0)
+                var areas = mainTable.Where(i => i.Geom == null)
                     .OrderBy(i => i.Id)
-                    .Select(i => i.Id)
+                    .Select(i => new { i.Id, i.IsInnerRing })
                     .Take(batchSize)
                     .Skip(failed)
-                    .ToHashSet();
+                    .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
 
-                Dictionary<int?, List<Coordinate>> updateData = new Dictionary<int?, List<Coordinate>>();
-
-                var query = detailTable.Where(i => areas.Contains(i.ThreeZipAreaId))
+                Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
+                var ids = areas.Keys.ToList();
+                var query = detailTable.Where(i => ids.Contains(i.ThreeZipAreaId))
                     .OrderBy(i => i.ThreeZipAreaId)
                     .ThenBy(i => i.Id)
-                    .Select(i => new { i.ThreeZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
+                    .Select(i => new { AreaId = i.ThreeZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
 
                 foreach (var item in query)
                 {
-                    if (!updateData.ContainsKey(item.ThreeZipAreaId))
+                    if (!updateData.ContainsKey(item.AreaId))
                     {
-                        updateData.Add(item.ThreeZipAreaId, new List<Coordinate>());
+                        var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
+                        updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
                     }
-                    updateData[item.ThreeZipAreaId].Add(new Coordinate(item.Longitude, item.Latitude));
+                    updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
                 }
 
 
@@ -260,18 +334,27 @@ namespace Vargainc.Timm.REST.Controllers
                     {
                         Geometry geom = null;
 
-                        var startPoint = item.Value.FirstOrDefault();
-                        var endPoint = item.Value.LastOrDefault();
-                        if (!startPoint.Equals2D(endPoint))
+                        if (!item.Value.Key)
                         {
-                            item.Value.Add(endPoint);
+                            //polygon
+                            var startPoint = item.Value.Value.FirstOrDefault();
+                            var endPoint = item.Value.Value.LastOrDefault();
+                            if (!startPoint.Equals2D(endPoint))
+                            {
+                                item.Value.Value.Add(endPoint);
+                            }
+                            geom = GeometryFactory.CreatePolygon(item.Value.Value.ToArray());
+                            if (!geom.IsValid)
+                            {
+                                geom = geom.Buffer(0);
+                            }
                         }
-                        geom = GeometryFactory.CreatePolygon(item.Value.ToArray());
-                        if (!geom.IsValid)
+                        else
                         {
-                            geom = geom.Buffer(0);
+                            geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
                         }
 
+                        geom.Normalize();
 
                         if (geom == null)
                         {
@@ -279,7 +362,7 @@ namespace Vargainc.Timm.REST.Controllers
                             continue;
                         }
 
-                        geom.Normalize();
+                        
                         var dbItem = new Models.ThreeZipArea { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
                         mainTable.Attach(dbItem);
                         db.Entry(dbItem).Property("Geom").IsModified = true;
@@ -292,13 +375,10 @@ namespace Vargainc.Timm.REST.Controllers
                 db.SaveChanges();
             }
 
-            db.Database.SqlQuery<int?>("");
-
-            var total = await mainTable.Where(i => i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
-            var valid = await mainTable.Where(i => i.Geom.IsValid && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
-            var empty = await mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
+            var total = await mainTable.CountAsync().ConfigureAwait(false);
+            var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
+            var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
             db.Configuration.AutoDetectChangesEnabled = true;
-
 
             return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
         }
@@ -313,32 +393,33 @@ namespace Vargainc.Timm.REST.Controllers
             var detailTable = db.FiveZipCoordinates;
 
             var batchSize = 1000;
-            var count = await mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
+            var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
             var loops = (int)Math.Ceiling((double)count / (double)batchSize);
             int failed = 0;
             for (var j = 0; j < loops; j++)
             {
-                var areas = mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0)
+                var areas = mainTable.Where(i => i.Geom == null)
                     .OrderBy(i => i.Id)
-                    .Select(i => i.Id)
+                    .Select(i => new { i.Id, i.IsInnerRing })
                     .Take(batchSize)
                     .Skip(failed)
-                    .ToHashSet();
+                    .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
 
-                Dictionary<int?, List<Coordinate>> updateData = new Dictionary<int?, List<Coordinate>>();
-
-                var query = detailTable.Where(i => areas.Contains(i.FiveZipAreaId))
+                Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
+                var ids = areas.Keys.ToList();
+                var query = detailTable.Where(i => ids.Contains(i.FiveZipAreaId))
                     .OrderBy(i => i.FiveZipAreaId)
                     .ThenBy(i => i.Id)
-                    .Select(i => new { i.FiveZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
+                    .Select(i => new { AreaId = i.FiveZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
 
                 foreach (var item in query)
                 {
-                    if (!updateData.ContainsKey(item.FiveZipAreaId))
+                    if (!updateData.ContainsKey(item.AreaId))
                     {
-                        updateData.Add(item.FiveZipAreaId, new List<Coordinate>());
+                        var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
+                        updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
                     }
-                    updateData[item.FiveZipAreaId].Add(new Coordinate(item.Longitude, item.Latitude));
+                    updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
                 }
 
 
@@ -348,18 +429,27 @@ namespace Vargainc.Timm.REST.Controllers
                     {
                         Geometry geom = null;
 
-                        var startPoint = item.Value.FirstOrDefault();
-                        var endPoint = item.Value.LastOrDefault();
-                        if (!startPoint.Equals2D(endPoint))
+                        if (!item.Value.Key)
                         {
-                            item.Value.Add(endPoint);
+                            //polygon
+                            var startPoint = item.Value.Value.FirstOrDefault();
+                            var endPoint = item.Value.Value.LastOrDefault();
+                            if (!startPoint.Equals2D(endPoint))
+                            {
+                                item.Value.Value.Add(endPoint);
+                            }
+                            geom = GeometryFactory.CreatePolygon(item.Value.Value.ToArray());
+                            if (!geom.IsValid)
+                            {
+                                geom = geom.Buffer(0);
+                            }
                         }
-                        geom = GeometryFactory.CreatePolygon(item.Value.ToArray());
-                        if (!geom.IsValid)
+                        else
                         {
-                            geom = geom.Buffer(0);
+                            geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
                         }
 
+                        geom.Normalize();
 
                         if (geom == null)
                         {
@@ -367,7 +457,7 @@ namespace Vargainc.Timm.REST.Controllers
                             continue;
                         }
 
-                        geom.Normalize();
+
                         var dbItem = new Models.FiveZipArea { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
                         mainTable.Attach(dbItem);
                         db.Entry(dbItem).Property("Geom").IsModified = true;
@@ -380,10 +470,11 @@ namespace Vargainc.Timm.REST.Controllers
                 db.SaveChanges();
             }
 
-            var total = await mainTable.Where(i => i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
-            var valid = await mainTable.Where(i => i.Geom.IsValid && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
-            var empty = await mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
+            var total = await mainTable.CountAsync().ConfigureAwait(false);
+            var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
+            var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
             db.Configuration.AutoDetectChangesEnabled = true;
+
             return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
         }
 
@@ -397,32 +488,33 @@ namespace Vargainc.Timm.REST.Controllers
             var detailTable = db.PremiumCRouteCoordinates;
 
             var batchSize = 1000;
-            var count = await mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
+            var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
             var loops = (int)Math.Ceiling((double)count / (double)batchSize);
             int failed = 0;
             for (var j = 0; j < loops; j++)
             {
-                var areas = mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0)
+                var areas = mainTable.Where(i => i.Geom == null)
                     .OrderBy(i => i.Id)
-                    .Select(i => i.Id)
+                    .Select(i => new { i.Id, i.IsInnerRing })
                     .Take(batchSize)
                     .Skip(failed)
-                    .ToHashSet();
+                    .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
 
-                Dictionary<int?, List<Coordinate>> updateData = new Dictionary<int?, List<Coordinate>>();
-
-                var query = detailTable.Where(i => areas.Contains(i.PreminumCRouteId))
+                Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
+                var ids = areas.Keys.ToList();
+                var query = detailTable.Where(i => ids.Contains(i.PreminumCRouteId))
                     .OrderBy(i => i.PreminumCRouteId)
                     .ThenBy(i => i.Id)
-                    .Select(i => new { i.PreminumCRouteId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
+                    .Select(i => new { AreaId = i.PreminumCRouteId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
 
                 foreach (var item in query)
                 {
-                    if (!updateData.ContainsKey(item.PreminumCRouteId))
+                    if (!updateData.ContainsKey(item.AreaId))
                     {
-                        updateData.Add(item.PreminumCRouteId, new List<Coordinate>());
+                        var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
+                        updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
                     }
-                    updateData[item.PreminumCRouteId].Add(new Coordinate(item.Longitude, item.Latitude));
+                    updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
                 }
 
 
@@ -432,18 +524,33 @@ namespace Vargainc.Timm.REST.Controllers
                     {
                         Geometry geom = null;
 
-                        var startPoint = item.Value.FirstOrDefault();
-                        var endPoint = item.Value.LastOrDefault();
-                        if (!startPoint.Equals2D(endPoint))
+                        if (!item.Value.Key)
                         {
-                            item.Value.Add(endPoint);
+                            //polygon
+                            var temp = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
+                            if (!temp.IsClosed)
+                            {
+                                temp.Normalize();
+                                var coordinates = temp.Coordinates.ToList();
+                                coordinates.Add(coordinates[0]);
+                                geom = GeometryFactory.CreatePolygon(coordinates.ToArray());
+                            }
+                            else
+                            {
+                                geom = GeometryFactory.CreatePolygon(temp.Coordinates);
+                            }
+
+                            if (!geom.IsValid)
+                            {
+                                geom = geom.Buffer(0);
+                            }
                         }
-                        geom = GeometryFactory.CreatePolygon(item.Value.ToArray());
-                        if (!geom.IsValid)
+                        else
                         {
-                            geom = geom.Buffer(0);
+                            geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
                         }
 
+                        geom.Normalize();
 
                         if (geom == null)
                         {
@@ -451,7 +558,7 @@ namespace Vargainc.Timm.REST.Controllers
                             continue;
                         }
 
-                        geom.Normalize();
+
                         var dbItem = new Models.PremiumCRoute { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
                         mainTable.Attach(dbItem);
                         db.Entry(dbItem).Property("Geom").IsModified = true;
@@ -464,10 +571,11 @@ namespace Vargainc.Timm.REST.Controllers
                 db.SaveChanges();
             }
 
-            var total = await mainTable.Where(i => i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
-            var valid = await mainTable.Where(i => i.Geom.IsValid && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
-            var empty = await mainTable.Where(i => i.Geom == null && i.IsInnerRing == 0).CountAsync().ConfigureAwait(false);
+            var total = await mainTable.CountAsync().ConfigureAwait(false);
+            var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
+            var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
             db.Configuration.AutoDetectChangesEnabled = true;
+
             return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
         }
     }

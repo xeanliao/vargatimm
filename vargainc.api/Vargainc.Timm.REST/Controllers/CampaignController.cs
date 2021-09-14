@@ -320,6 +320,7 @@ namespace Vargainc.Timm.REST.Controllers
                         s.Penetration, 
                         s.Percentage, 
                         s.TotalAdjustment,
+                        s.CampaignId,
                         SubMapRecords = s.SubMapRecords.Select(r=>new { 
                             r.Classification,
                             r.AreaId

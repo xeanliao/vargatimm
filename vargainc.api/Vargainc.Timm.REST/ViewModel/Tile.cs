@@ -17,6 +17,7 @@ namespace Vargainc.Timm.REST.ViewModel
         public int? BUSINESS_COUNT { get; set; }
         public int? APT_COUNT { get; set; }
         public bool IsMaster { get; set; }
+        public bool IsInnerRing { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
         //public DbGeometry Geom { get; set; }
