@@ -8,6 +8,7 @@ export default Backbone.Router.extend({
     routes: {
         campaign: 'defaultAction',
         'campaign/:campaignId': 'campaignAction',
+        'campaign/:campaignId/dmap': 'dMapAction',
         distribution: 'distributionAction',
         monitor: 'monitorAction',
         'campaign/:campaignId/monitor': 'campaignMonitorAction',
@@ -52,13 +53,14 @@ export default Backbone.Router.extend({
     campaignAction: function (campaignId) {
         axios.get(`campaign/${campaignId}/submap`).then((resp) => {
             let View = require('views/campaign/CampaignMap').default
+            let campaignData = resp?.data?.data ?? {}
             Topic.publish({
                 channel: 'View',
                 topic: 'loadView',
                 data: {
                     view: View,
                     params: {
-                        campaign: resp?.data?.data ?? {},
+                        campaign: campaignData,
                         registeredTopic: {},
                         registeredEvents: [],
                     },
@@ -66,7 +68,31 @@ export default Backbone.Router.extend({
                         showMenu: false,
                         showUser: true,
                         showSearch: false,
-                        pageTitle: 'Campaign',
+                        pageTitle: `Campaign Map - ${campaignData.ClientCode} ${campaignData.ClientName}`,
+                    },
+                },
+            })
+        })
+    },
+    dMapAction: function (campaignId) {
+        axios.get(`campaign/${campaignId}/dmap`).then((resp) => {
+            let View = require('views/distribution/DMap').default
+            let campaignData = resp?.data?.data ?? {}
+            Topic.publish({
+                channel: 'View',
+                topic: 'loadView',
+                data: {
+                    view: View,
+                    params: {
+                        campaign: campaignData,
+                        registeredTopic: {},
+                        registeredEvents: [],
+                    },
+                    options: {
+                        showMenu: false,
+                        showUser: true,
+                        showSearch: false,
+                        pageTitle: `Distribution Map - ${campaignData.ClientCode} ${campaignData.ClientName}`,
                     },
                 },
             })

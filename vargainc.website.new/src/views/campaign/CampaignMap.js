@@ -658,6 +658,7 @@ export default class Campaign extends React.Component {
                 },
                 () => {
                     this.initCampaignLayer()
+                    this.loadSubmapList()
                     this.clearSelectedShapes()
                 }
             )
