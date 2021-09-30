@@ -40,12 +40,12 @@ namespace Vargainc.Timm.REST
             //config.Formatters.Add(new CustomJsonFormatter());
 
             // Web API Cros for Dev or local test
-            var allowWebsite = ConfigurationManager.AppSettings["CorsSite"];
-            if (!string.IsNullOrWhiteSpace(allowWebsite))
-            {
-                var cors = new EnableCorsAttribute(allowWebsite, "*", "*");
-                config.EnableCors(cors);
-            }
+            //var allowWebsite = ConfigurationManager.AppSettings["CorsSite"];
+            //if (!string.IsNullOrWhiteSpace(allowWebsite))
+            //{
+            //    var cors = new EnableCorsAttribute(allowWebsite, "*", "*");
+            //    config.EnableCors(cors);
+            //}
 
 
             // Web API routes

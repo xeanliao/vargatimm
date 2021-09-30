@@ -273,39 +273,43 @@ namespace Vargainc.Timm.REST.Controllers
                 }
             }
 
-            Polygon mergedPolygon = null;
-            // get max area polygon when merged have more than 1 polygons
-            if (mergeGeom.NumGeometries > 1)
+            Polygon mergedPolygon = GeometryFactory.CreatePolygon();
+
+            if (mergeGeom != null)
             {
-                Polygon maxArea = null;
-                for (var i = 0; i < mergeGeom.NumGeometries; i++)
+                // get max area polygon when merged have more than 1 polygons
+                if (mergeGeom.NumGeometries > 1)
                 {
-                    if(mergeGeom.GetGeometryN(i).GeometryType == "Polygon")
+                    Polygon maxArea = null;
+                    for (var i = 0; i < mergeGeom.NumGeometries; i++)
                     {
-                        Polygon p = mergeGeom.GetGeometryN(i) as Polygon;
-                        if (maxArea == null || p.Area > maxArea.Area)
+                        if (mergeGeom.GetGeometryN(i).GeometryType == "Polygon")
                         {
-                            maxArea = p;
+                            Polygon p = mergeGeom.GetGeometryN(i) as Polygon;
+                            if (maxArea == null || p.Area > maxArea.Area)
+                            {
+                                maxArea = p;
+                            }
+                        }
+                    }
+
+                    mergedPolygon = maxArea;
+
+                    foreach (var item in areaGeometry)
+                    {
+                        if (!maxArea.Contains(item.Value))
+                        {
+                            newRecords.Remove(item.Key.Value);
                         }
                     }
                 }
-
-                mergedPolygon = maxArea;
-
-                foreach (var item in areaGeometry)
+                else
                 {
-                    if (!maxArea.Contains(item.Value))
+                    mergedPolygon = mergeGeom as Polygon;
+                    if (mergedPolygon == null)
                     {
-                        newRecords.Remove(item.Key.Value);
+                        throw new Exception("merge failed. the merge area is not polygon");
                     }
-                }
-            }
-            else
-            {
-                mergedPolygon = mergeGeom as Polygon;
-                if(mergedPolygon == null)
-                {
-                    throw new Exception("merge failed. the merge area is not polygon");
                 }
             }
 
@@ -344,10 +348,10 @@ namespace Vargainc.Timm.REST.Controllers
                 case "APT + HOME":
                     total = apt + home;
                     break;
-                case "APT":
+                case "APT ONLY":
                     total = apt;
                     break;
-                case "HOME":
+                case "HOME ONLY":
                     total = home;
                     break;
             }
@@ -395,7 +399,28 @@ namespace Vargainc.Timm.REST.Controllers
         }
 
         [HttpDelete]
-        [Route("{campaignId:int}/submap/{submapId:int}/")]
+        [Route("{campaignId:int}/submap/{submapId:int}/delete")]
+        public async Task<IHttpActionResult> DeleteSubmap(int campaignId, int submapId)
+        {
+            var submap = await db.SubMaps.FindAsync(submapId).ConfigureAwait(false);
+            if (submap == null)
+            {
+                throw new Exception("submap not exists!");
+            }
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                db.Database.ExecuteSqlCommand("delete from [dbo].[submaprecords] where [SubMapId] = @p0", submapId);
+                db.Database.ExecuteSqlCommand("delete from [dbo].[submapcoordinates] where [SubMapId] = @p0", submapId);
+                db.Database.ExecuteSqlCommand("delete from [dbo].[submaps] where [Id] = @p0", submapId);
+
+                transaction.Commit();
+            }
+
+            return Json(new { success = true });
+        }
+
+        [HttpDelete]
+        [Route("{campaignId:int}/submap/{submapId:int}/empty")]
         public async Task<IHttpActionResult> EmptySubmap(int campaignId, int submapId)
         {
             var submap = await db.SubMaps.FindAsync(submapId).ConfigureAwait(false);
