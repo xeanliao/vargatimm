@@ -200,20 +200,6 @@ export default class DMap extends React.Component {
                 // submap
                 this.map.addLayer(
                     {
-                        id: 'submap-layer-fill',
-                        type: 'fill',
-                        source: 'map-source',
-                        layout: {},
-                        paint: {
-                            'fill-color': ['get', 'color'],
-                            'fill-opacity': 0.25,
-                        },
-                        filter: ['==', ['get', 'type'], 'submap'],
-                    },
-                    labelLayer
-                )
-                this.map.addLayer(
-                    {
                         id: 'submap-layer-line',
                         type: 'line',
                         source: 'map-source',
@@ -226,6 +212,7 @@ export default class DMap extends React.Component {
                     },
                     labelLayer
                 )
+
                 // dmap
                 this.map.addLayer(
                     {
@@ -241,35 +228,34 @@ export default class DMap extends React.Component {
                     },
                     labelLayer
                 )
-
-                // this.map.addLayer(
-                //     {
-                //         id: 'dmap-layer-fill',
-                //         type: 'fill',
-                //         source: 'map-source',
-                //         layout: {},
-                //         paint: {
-                //             'fill-color': ['get', 'color'],
-                //             'fill-opacity': 0.5,
-                //         },
-                //         filter: ['==', ['get', 'type'], 'dmap'],
-                //     },
-                //     labelLayer
-                // )
-                // this.map.addLayer(
-                //     {
-                //         id: 'dmap-layer-line',
-                //         type: 'line',
-                //         source: 'map-source',
-                //         layout: {},
-                //         paint: {
-                //             'line-color': ['get', 'color'],
-                //             'line-width': 2,
-                //         },
-                //         filter: ['==', ['get', 'type'], 'dmap'],
-                //     },
-                //     labelLayer
-                // )
+                this.map.addLayer(
+                    {
+                        id: 'dmap-layer-fill',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'fill-color': ['get', 'color'],
+                            'fill-opacity': 0.5,
+                        },
+                        filter: ['==', ['get', 'type'], 'dmap'],
+                    },
+                    labelLayer
+                )
+                this.map.addLayer(
+                    {
+                        id: 'dmap-layer-line',
+                        type: 'line',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'line-color': ['get', 'color'],
+                            'line-width': 2,
+                        },
+                        filter: ['==', ['get', 'type'], 'dmap'],
+                    },
+                    labelLayer
+                )
 
                 // area
                 this.map.addLayer(
@@ -301,13 +287,31 @@ export default class DMap extends React.Component {
                         source: 'map-source',
                         layout: {},
                         paint: {
-                            'line-color': '#000000',
-                            'line-width': 6,
+                            'line-width': 8,
                         },
                         filter: ['==', ['get', 'sid'], ''],
                     },
                     labelLayer
                 )
+
+                // fit all submap
+                let mapBbox = (resp.data.features ?? [])
+                    .filter((i) => i.properties?.type == 'submap')
+                    .reduce(
+                        (bbox, item) => {
+                            return [
+                                bbox[0] ? Math.min(bbox[0], item.bbox[0]) : item.bbox[0],
+                                bbox[1] ? Math.min(bbox[1], item.bbox[1]) : item.bbox[1],
+                                bbox[2] ? Math.max(bbox[2], item.bbox[2]) : item.bbox[2],
+                                bbox[3] ? Math.max(bbox[3], item.bbox[3]) : item.bbox[3],
+                            ]
+                        },
+                        [null, null, null, null]
+                    )
+                this.map.fitBounds([
+                    [mapBbox[0], mapBbox[1]],
+                    [mapBbox[2], mapBbox[3]],
+                ])
             }
             this.setState({
                 mapSource: resp.data,
@@ -339,22 +343,10 @@ export default class DMap extends React.Component {
             },
             () => {
                 //set selected layer fill color as submap color
-                let highlightColor = color(`#${subMap.ColorString}`).darker(2).toString()
                 this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'none')
-                this.map.setFilter('submap-layer-highlight', [
-                    'and',
-                    [
-                        ['==', 'sid', subMap.Id],
-                        ['==', 'type', 'submap'],
-                    ],
-                ])
-                this.map.setPaintProperty('submap-layer-highlight', 'line-color', highlightColor)
+                this.map.setFilter('submap-layer-highlight', ['all', ['==', 'sid', subMap.Id], ['==', 'type', 'submap']])
+                this.map.setPaintProperty('submap-layer-highlight', 'line-color', `#${subMap.ColorString}`)
                 this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'visible')
-
-                layers.forEach((item) => {
-                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', Array.from(this.state.selectedShapes.keys())]])
-                    this.map.setPaintProperty(`area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
-                })
             }
         )
     }
