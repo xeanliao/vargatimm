@@ -15,6 +15,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.IO.KML;
 using Vargainc.Timm.REST.ViewModel.ControlCenter;
 using Vargainc.Timm.REST.Helper;
+using Vargainc.Timm.REST.ViewModel;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -282,7 +283,7 @@ namespace Vargainc.Timm.REST.Controllers
 
         [Route("{campaignId:int}/submap")]
         [HttpGet]
-        public async Task<IHttpActionResult> GetCampaignWithSubmap(int campaignId)
+        public async Task<IHttpActionResult> GetCampaignWithSubMap(int campaignId)
         {
             var campaign = await db.Campaigns
                 .Include(i=>i.SubMaps)
@@ -330,6 +331,60 @@ namespace Vargainc.Timm.REST.Controllers
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
             return Json(new { success = true, data = campaign });
+        }
+
+        [Route("{campaignId:int}/dmap")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetCampaignWithDMap(int campaignId)
+        {
+            var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
+            var submaps = await db.SubMaps.Include(i=>i.SubMapRecords).Where(i=>i.CampaignId == campaignId).ToListAsync().ConfigureAwait(false);
+            var submapIds = submaps.Select(i => i.Id).ToArray();
+            var dmaps = await db.DistributionMaps.Include(i=>i.DistributionMapRecords).Where(i=>submapIds.Contains(i.SubMapId)).OrderBy(i=>i.SubMapId).ToListAsync().ConfigureAwait(false);
+
+            var submapResults = submaps.Select(s => new
+            {
+                s.Id,
+                s.ColorString,
+                s.CountAdjustment,
+                s.Name,
+                s.OrderId,
+                s.Total,
+                s.Penetration,
+                s.Percentage,
+                s.TotalAdjustment,
+                s.CampaignId,
+                SubMapRecords = s.SubMapRecords.Select(r => new {
+                    r.Classification,
+                    r.AreaId
+                }).ToList(),
+                DMaps = dmaps.Where(d=>d.SubMapId == s.Id).Select(d=> new { 
+                    d.Id,
+                    s.CampaignId,
+                    d.SubMapId,
+                    d.Name,
+                    d.ColorString,
+                    d.Total,
+                    d.Penetration,
+                    d.Percentage,
+                    d.TotalAdjustment,
+                    DMapRecords = d.DistributionMapRecords.Select(r => new { Classification = s.SubMapRecords.First().Classification ,r.AreaId })
+                })
+            }).OrderBy(s=>s.OrderId).ToList();
+
+            var result = new
+            {
+                campaign.Id,
+                campaign.ClientCode,
+                campaign.ClientName,
+                campaign.ContactName,
+                campaign.CreatorName,
+                campaign.Longitude,
+                campaign.Latitude,
+                campaign.ZoomLevel,
+                SubMaps = submapResults
+            };
+            return Json(new { success = true, data = result });
         }
 
         [Route("{campaignId:int}")]
