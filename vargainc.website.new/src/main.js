@@ -31,6 +31,41 @@ $(document).ajaxComplete(function (event, xhr, settings) {
     }
 })
 
+Axios.interceptors.request.use(
+    function (config) {
+        Topic.publish({
+            channel: 'View',
+            topic: 'showLoading',
+        })
+        return config
+    },
+    function (error) {
+        Topic.publish({
+            channel: 'View',
+            topic: 'hideLoading',
+        })
+        return Promise.reject(error)
+    }
+)
+
+// Add a response interceptor
+Axios.interceptors.response.use(
+    function (response) {
+        Topic.publish({
+            channel: 'View',
+            topic: 'hideLoading',
+        })
+        return response
+    },
+    function (error) {
+        Topic.publish({
+            channel: 'View',
+            topic: 'hideLoading',
+        })
+        return Promise.reject(error)
+    }
+)
+
 /**
  * override base url
  */

@@ -3,7 +3,7 @@ import React from 'react'
 import { color } from 'd3-color'
 import * as Helper from 'views/base'
 
-export default class SubMapEdit extends React.Component {
+export default class DMapEdit extends React.Component {
     constructor(props) {
         super(props)
 
@@ -22,16 +22,16 @@ export default class SubMapEdit extends React.Component {
         let formData = Object.fromEntries(new FormData(e.target))
         let postData = Object.assign({}, model, formData)
 
-        let submapColor = color(postData.ColorString)
-        postData.ColorR = submapColor.r
-        postData.ColorG = submapColor.g
-        postData.ColorB = submapColor.b
+        let dMapColor = color(postData.ColorString)
+        postData.ColorR = dMapColor.r
+        postData.ColorG = dMapColor.g
+        postData.ColorB = dMapColor.b
 
         axios
-            .post(`campaign/${model.CampaignId}/submap/edit`, postData)
+            .post(`campaign/${model.CampaignId}/${postData.SubMapId}/dmap/edit`, postData)
             .then(() => {
                 this.closeDialog()
-                Helper.publish('CampaignMap.Refresh')
+                Helper.publish('DMap.Refresh')
                 return Promise.resolve()
             })
             .catch(() => {
@@ -47,7 +47,7 @@ export default class SubMapEdit extends React.Component {
 
     render() {
         var model = this.props.model
-        var title = model.Id ? 'Edit SubMap' : 'New SubMap'
+        var title = model.Id ? 'Edit Distribution Map' : 'New Distribution Map'
         var showError = this.state && this.state.error ? true : false
         var errorMessage = showError ? this.state.error : ''
         return (
@@ -70,6 +70,23 @@ export default class SubMapEdit extends React.Component {
                         <label>
                             Name
                             <input onChange={this.onChange} name="Name" type="text" defaultValue={model.Name} required />
+                            <span className="form-error">it is required.</span>
+                        </label>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="small-12 columns">
+                        <label>
+                            Submap
+                            <select name="SubMapId" disabled={model.SubMapId} required>
+                                {this.props.model.SubMaps.map((s) => {
+                                    return (
+                                        <option key={s.Id} value={s.Id} selected={s.Id == model.SubMapId}>
+                                            {s.Name}
+                                        </option>
+                                    )
+                                })}
+                            </select>
                             <span className="form-error">it is required.</span>
                         </label>
                     </div>

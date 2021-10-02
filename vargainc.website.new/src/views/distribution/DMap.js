@@ -8,6 +8,7 @@ import Logger from 'logger.mjs'
 import ClassNames from 'classnames'
 
 import Helper from 'views/base'
+import DMapEdit from './DMapEdit'
 
 const log = new Logger('views:campaign')
 
@@ -115,16 +116,24 @@ export default class DMap extends React.Component {
         this.onInitMenuScrollbar = this.onInitMenuScrollbar.bind(this)
         this.onInitMap = this.onInitMap.bind(this)
         this.onMapLoad = this.onMapLoad.bind(this)
+        this.loadMapList = this.loadMapList.bind(this)
         this.loadCampaignGeojson = this.loadCampaignGeojson.bind(this)
+        this.onRefresh = this.onRefresh.bind(this)
 
         this.onSubmapSelect = this.onSubmapSelect.bind(this)
+        this.onDMapSelect = this.onDMapSelect.bind(this)
+        this.onShapeSelect = this.onShapeSelect.bind(this)
+
+        this.onNewDMap = this.onNewDMap.bind(this)
+        this.onEditDMap = this.onEditDMap.bind(this)
+        this.onDeleteDMap = this.onDeleteDMap.bind(this)
+        this.onSaveShapesToDMap = this.onSaveShapesToDMap.bind(this)
 
         this.subscribe = Helper.subscribe.bind(this)
         this.doUnsubscribe = Helper.doUnsubscribe.bind(this)
 
         this.subscribe('DMap.Refresh', () => {
-            this.loadSubmapList()
-            this.initCampaignLayer()
+            this.onRefresh()
         })
     }
 
@@ -165,6 +174,13 @@ export default class DMap extends React.Component {
         }
     }
 
+    loadMapList() {
+        axios.get(`campaign/${this.props.campaign.Id}/dmap`).then((resp) => {
+            this.props.campaign.SubMaps = resp.data.data.SubMaps
+            this.forceUpdate()
+        })
+    }
+
     onMapLoad() {
         const layers = this.map.getStyle().layers
         // Find the index of the first symbol layer in the map style
@@ -200,20 +216,6 @@ export default class DMap extends React.Component {
                 // submap
                 this.map.addLayer(
                     {
-                        id: 'submap-layer-fill',
-                        type: 'fill',
-                        source: 'map-source',
-                        layout: {},
-                        paint: {
-                            'fill-color': ['get', 'color'],
-                            'fill-opacity': 0.25,
-                        },
-                        filter: ['==', ['get', 'type'], 'submap'],
-                    },
-                    labelLayer
-                )
-                this.map.addLayer(
-                    {
                         id: 'submap-layer-line',
                         type: 'line',
                         source: 'map-source',
@@ -226,6 +228,7 @@ export default class DMap extends React.Component {
                     },
                     labelLayer
                 )
+
                 // dmap
                 this.map.addLayer(
                     {
@@ -241,35 +244,34 @@ export default class DMap extends React.Component {
                     },
                     labelLayer
                 )
-
-                // this.map.addLayer(
-                //     {
-                //         id: 'dmap-layer-fill',
-                //         type: 'fill',
-                //         source: 'map-source',
-                //         layout: {},
-                //         paint: {
-                //             'fill-color': ['get', 'color'],
-                //             'fill-opacity': 0.5,
-                //         },
-                //         filter: ['==', ['get', 'type'], 'dmap'],
-                //     },
-                //     labelLayer
-                // )
-                // this.map.addLayer(
-                //     {
-                //         id: 'dmap-layer-line',
-                //         type: 'line',
-                //         source: 'map-source',
-                //         layout: {},
-                //         paint: {
-                //             'line-color': ['get', 'color'],
-                //             'line-width': 2,
-                //         },
-                //         filter: ['==', ['get', 'type'], 'dmap'],
-                //     },
-                //     labelLayer
-                // )
+                this.map.addLayer(
+                    {
+                        id: 'dmap-layer-fill',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'fill-color': ['get', 'color'],
+                            'fill-opacity': 0.5,
+                        },
+                        filter: ['==', ['get', 'type'], 'dmap'],
+                    },
+                    labelLayer
+                )
+                this.map.addLayer(
+                    {
+                        id: 'dmap-layer-line',
+                        type: 'line',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'line-color': ['get', 'color'],
+                            'line-width': 2,
+                        },
+                        filter: ['==', ['get', 'type'], 'dmap'],
+                    },
+                    labelLayer
+                )
 
                 // area
                 this.map.addLayer(
@@ -292,6 +294,35 @@ export default class DMap extends React.Component {
                     },
                     labelLayer
                 )
+                this.map.addLayer(
+                    {
+                        id: 'area-layer-fill',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'fill-color': 'white',
+                            'fill-opacity': 0,
+                        },
+                        filter: ['==', ['get', 'type'], 'area'],
+                    },
+                    labelLayer
+                )
+                let selectedColor = color(`hsl(156, 20%, 95%)`).darker(1)
+                this.map.addLayer(
+                    {
+                        id: 'area-layer-selected',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: { visibility: 'none' },
+                        paint: {
+                            'fill-color': selectedColor.formatHsl(),
+                            'fill-opacity': 0.3,
+                        },
+                        filter: ['==', 'id', ''],
+                    },
+                    labelLayer
+                )
 
                 // submap highlight
                 this.map.addLayer(
@@ -301,13 +332,34 @@ export default class DMap extends React.Component {
                         source: 'map-source',
                         layout: {},
                         paint: {
-                            'line-color': '#000000',
-                            'line-width': 6,
+                            'line-width': 8,
                         },
                         filter: ['==', ['get', 'sid'], ''],
                     },
                     labelLayer
                 )
+
+                // event
+                this.map.on('click', `area-layer-fill`, this.onShapeSelect)
+
+                // fit all submap
+                let mapBbox = (resp.data.features ?? [])
+                    .filter((i) => i.properties?.type == 'submap')
+                    .reduce(
+                        (bbox, item) => {
+                            return [
+                                bbox[0] ? Math.min(bbox[0], item.bbox[0]) : item.bbox[0],
+                                bbox[1] ? Math.min(bbox[1], item.bbox[1]) : item.bbox[1],
+                                bbox[2] ? Math.max(bbox[2], item.bbox[2]) : item.bbox[2],
+                                bbox[3] ? Math.max(bbox[3], item.bbox[3]) : item.bbox[3],
+                            ]
+                        },
+                        [null, null, null, null]
+                    )
+                this.map.fitBounds([
+                    [mapBbox[0], mapBbox[1]],
+                    [mapBbox[2], mapBbox[3]],
+                ])
             }
             this.setState({
                 mapSource: resp.data,
@@ -316,47 +368,198 @@ export default class DMap extends React.Component {
         })
     }
 
+    onRefresh() {
+        this.loadCampaignGeojson()
+        this.loadMapList()
+        this.setState({ selectedShapes: new Map() }, () => {
+            this.map.setFilter(`area-layer-selected`, ['=', 'vid', ''])
+        })
+    }
+
     onSubmapSelect(subMap) {
         if (!this.state.mapReady) {
-            return
+            return Promise.resolve()
         }
         if (this.state.selectedSubmapId == subMap.Id) {
+            return Promise.resolve()
+        }
+        return new Promise((resolve) => {
+            this.setState(
+                (state) => {
+                    let submapGeo = state.mapSource.features.filter((i) => i.id == `submap-${subMap.Id}`)?.[0]
+
+                    if (submapGeo) {
+                        this.map.fitBounds([
+                            [submapGeo.bbox[0], submapGeo.bbox[1]],
+                            [submapGeo.bbox[2], submapGeo.bbox[3]],
+                        ])
+                    }
+
+                    return { selectedSubmapId: subMap.Id, selectedDMapId: null }
+                },
+                () => {
+                    //set selected layer fill color as submap color
+                    this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'none')
+                    this.map.setFilter('submap-layer-highlight', ['all', ['==', 'sid', subMap.Id], ['==', 'type', 'submap']])
+                    this.map.setPaintProperty('submap-layer-highlight', 'line-color', `#${subMap.ColorString}`)
+                    this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'visible')
+
+                    return resolve()
+                }
+            )
+        })
+    }
+
+    onDMapSelect(dMap) {
+        if (!this.state.mapReady) {
+            return Promise.resolve()
+        }
+        if (this.state.selectedDMapId == dMap.Id) {
+            return Promise.resolve()
+        }
+        let subMap = this.props.campaign.SubMaps.filter((s) => s.Id == dMap.SubMapId)?.[0]
+        this.onSubmapSelect(subMap).then(() => {
+            this.setState({ selectedDMapId: dMap.Id })
+        })
+    }
+
+    onShapeSelect(e) {
+        if (!this.state.selectedSubmapId || !this.state.selectedDMapId) {
             return
         }
+        let subMapId = this.state.selectedSubmapId
+        let dMapId = this.state.selectedDMapId
+        // geojson is no id
+        // oid: shape primary key in database
+        // vid: classification + oid
+        // sid: submap id
+        let oid = e.features?.[0]?.properties?.oid
+        let vid = e.features?.[0]?.properties?.vid
+        let sid = e.features?.[0]?.properties?.sid
+        let classification = e.features?.[0]?.properties?.classification
+        if (sid != subMapId) {
+            return
+        }
+
+        // check layer is in not in other dmap
+        let submaps = this.props?.campaign?.SubMaps ?? []
+        let otherDMapAreas = submaps
+            .filter((s) => s.Id == subMapId)
+            .flatMap((s) => s.DMaps ?? [])
+            .filter((d) => d.Id != dMapId)
+            .flatMap((d) => d.DMapRecords ?? [])
+            .map((r) => r.AreaId)
+
+        if (new Set(otherDMapAreas).has(oid)) {
+            return
+        }
+
+        let currentDMapAreas = submaps
+            .filter((s) => s.Id == subMapId)
+            .flatMap((s) => s.DMaps ?? [])
+            .filter((d) => d.Id == dMapId)
+            .flatMap((d) => d.DMapRecords ?? [])
+            .map((r) => r.AreaId)
+
+        currentDMapAreas = new Set(currentDMapAreas)
 
         this.setState(
             (state) => {
-                let submapGeo = state.mapSource.features.filter((i) => i.id == `submap-${subMap.Id}`)?.[0]
-
-                if (submapGeo) {
-                    this.map.fitBounds([
-                        [submapGeo.bbox[0], submapGeo.bbox[1]],
-                        [submapGeo.bbox[2], submapGeo.bbox[3]],
-                    ])
+                let selectedShapes = new Map(state.selectedShapes)
+                if (selectedShapes.has(vid)) {
+                    selectedShapes.delete(vid)
+                } else {
+                    selectedShapes.set(vid, { Classification: classification, Id: oid, Value: !currentDMapAreas.has(oid) })
                 }
-
-                return { selectedSubmapId: subMap.Id }
+                return {
+                    selectedShapes: selectedShapes,
+                }
             },
             () => {
-                //set selected layer fill color as submap color
-                let highlightColor = color(`#${subMap.ColorString}`).darker(2).toString()
-                this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'none')
-                this.map.setFilter('submap-layer-highlight', [
-                    'and',
-                    [
-                        ['==', 'sid', subMap.Id],
-                        ['==', 'type', 'submap'],
-                    ],
-                ])
-                this.map.setPaintProperty('submap-layer-highlight', 'line-color', highlightColor)
-                this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'visible')
-
-                layers.forEach((item) => {
-                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', Array.from(this.state.selectedShapes.keys())]])
-                    this.map.setPaintProperty(`area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
-                })
+                let selectedShapeIds = Array.from(this.state.selectedShapes.keys())
+                this.map.setLayoutProperty(`area-layer-selected`, 'visibility', 'none')
+                this.map.setFilter(`area-layer-selected`, ['in', ['get', 'vid'], ['literal', selectedShapeIds]])
+                this.map.setLayoutProperty(`area-layer-selected`, 'visibility', 'visible')
             }
         )
+    }
+
+    onNewDMap() {
+        let subMaps = this.props?.campaign.SubMaps.map((s) => {
+            return {
+                Id: s.Id,
+                Name: s.Name,
+            }
+        })
+        let dMapCount = this.props?.campaign?.SubMaps.flatMap((i) => i.DMaps).length
+        let colorIndex = (this.props?.campaign?.Id ?? 0) + dMapCount ?? 0
+        let color = Helper.randomColor(colorIndex).replace('#', '')
+        let model = { CampaignId: this.props?.campaign?.Id, ColorString: color, SubMaps: subMaps }
+        Helper.publish('showDialog', {
+            view: <DMapEdit model={model} registeredTopic={{}} registeredEvents={[]} />,
+            options: {
+                size: 'tiny',
+            },
+        })
+    }
+
+    onEditDMap() {
+        if (!this.state.selectedDMapId) {
+            return
+        }
+        let subMaps = this.props?.campaign.SubMaps.map((s) => {
+            return {
+                Id: s.Id,
+                Name: s.Name,
+            }
+        })
+        let dMap = this.props.campaign.SubMaps.flatMap((i) => i.DMaps).filter((i) => i.Id == this.state.selectedDMapId)?.[0]
+        let model = {
+            SubMaps: subMaps,
+            CampaignId: this.props?.campaign?.Id,
+            Name: dMap.Name,
+            ColorString: dMap.ColorString,
+            SubMapId: dMap.SubMapId,
+            Id: this.state.selectedDMapId,
+        }
+        Helper.publish('showDialog', {
+            view: <DMapEdit model={model} registeredTopic={{}} registeredEvents={[]} />,
+            options: {
+                size: 'tiny',
+            },
+        })
+    }
+
+    onDeleteDMap() {
+        if (!this.state.selectedDMapId) {
+            return
+        }
+
+        let dMap = this.props.campaign.SubMaps.flatMap((i) => i.DMaps).filter((i) => i.Id == this.state.selectedDMapId)?.[0]
+
+        axios.delete(`campaign/${this.props.campaign.Id}/dmap/${dMap.Id}/delete`).then(() => {
+            this.onRefresh()
+        })
+    }
+
+    onSaveShapesToDMap() {
+        if (!this.state.selectedDMapId) {
+            return
+        }
+        if (this.state.selectedShapes.size == 0) {
+            return
+        }
+        let data = Array.from(this.state.selectedShapes.values()).map((i) => {
+            return {
+                Classification: i.Classification,
+                Id: i.Id,
+                Value: i.Value,
+            }
+        })
+        let url = `campaign/${this.props.campaign.Id}/dmap/${this.state.selectedDMapId}/merge`
+        axios.post(url, data).then((resp) => {
+            this.onRefresh()
+        })
     }
 
     render() {
@@ -381,22 +584,31 @@ export default class DMap extends React.Component {
                         </div>
                         <div className="columns small-12">
                             <div className="button-group no-gaps clear small tiny-button-group">
-                                <div className="button padding-horizontal-1 padding-vertical-0">New</div>
-                                <div className="button padding-horizontal-1 padding-vertical-0">Edit</div>
-                                <div className="button padding-horizontal-1 padding-vertical-0">Delete</div>
+                                <div className="button padding-horizontal-1 padding-vertical-0" onClick={this.onNewDMap}>
+                                    New
+                                </div>
+                                <div className="button padding-horizontal-1 padding-vertical-0" onClick={this.onEditDMap}>
+                                    Edit
+                                </div>
+                                <div className="button padding-horizontal-1 padding-vertical-0" onClick={this.onDeleteDMap}>
+                                    Delete
+                                </div>
+                                <div className="button padding-horizontal-1 padding-vertical-0" onClick={this.onSaveShapesToDMap}>
+                                    Save Shapes
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div ref={this.onInitMenuScrollbar} style={{ overflow: 'hidden scroll', height: '640px' }}>
                         <div className="row">
                             {submaps.flatMap((s, index) => {
-                                let boxStyle = {
+                                let subMapBoxStyle = {
                                     width: '28px',
                                     height: '28px',
                                     backgroundColor: `#${s.ColorString}`,
                                 }
-                                let desc = `Total: ${s.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${s.CountAdjustment} Pen: ${s.Penetration}`
-                                let buttonClassName = ClassNames('button expanded border-none padding-0 margin-0 text-left', {
+                                let subMapDesc = `Total: ${s.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${s.CountAdjustment} Pen: ${s.Penetration}`
+                                let subMapButtonClassName = ClassNames('button expanded border-none padding-0 margin-0 text-left', {
                                     hollow: this.state.selectedSubmapId != s.Id,
                                 })
                                 let result = [
@@ -407,38 +619,45 @@ export default class DMap extends React.Component {
                                         title={s.Id}
                                         onClick={() => this.onSubmapSelect(s)}
                                     >
-                                        <div className={buttonClassName}>
+                                        <div className={subMapButtonClassName}>
                                             <div className="grid-x align-middle">
                                                 <div className="cell shrink">
-                                                    <div style={boxStyle}></div>
+                                                    <div style={subMapBoxStyle}></div>
                                                 </div>
                                                 <div className="cell auto padding-left-1">
                                                     <div className="margin-0 padding-0 font-medium">{`${index + 1}. ${s.Name}`}</div>
-                                                    <div className="margin-0 padding-0 font-small">{desc}</div>
+                                                    <div className="margin-0 padding-0 font-small">{subMapDesc}</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>,
                                 ]
                                 s.DMaps.forEach((d) => {
-                                    boxStyle.backgroundColor = `#${d.ColorString}`
-                                    desc = `Total: ${d.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${d.TotalAdjustment} Pen: ${d.Penetration}`
+                                    let dMapBoxStyle = {
+                                        width: '28px',
+                                        height: '28px',
+                                        backgroundColor: `#${d.ColorString}`,
+                                    }
+                                    let dMapDesc = `Total: ${d.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${d.TotalAdjustment} Pen: ${d.Penetration}`
+                                    let dMapButtonClassName = ClassNames('button secondary expanded border-none padding-0 margin-0 text-left', {
+                                        hollow: this.state.selectedDMapId != d.Id,
+                                    })
                                     result.push(
                                         <div
                                             style={{ cursor: 'pointer', marginBottom: '5px' }}
                                             className="columns small-12 padding-left-2"
                                             key={`${s.Id}-${d.Id}`}
                                             title={d.Id}
-                                            onClick={() => this.onSubmapSelect(s)}
+                                            onClick={() => this.onDMapSelect(d)}
                                         >
-                                            <div className={buttonClassName}>
+                                            <div className={dMapButtonClassName}>
                                                 <div className="grid-x align-middle">
                                                     <div className="cell shrink">
-                                                        <div style={boxStyle}></div>
+                                                        <div style={dMapBoxStyle}></div>
                                                     </div>
                                                     <div className="cell auto padding-left-1">
                                                         <div className="margin-0 padding-0 font-medium">{d.Name}</div>
-                                                        <div className="margin-0 padding-0 font-small">{desc}</div>
+                                                        <div className="margin-0 padding-0 font-small">{dMapDesc}</div>
                                                     </div>
                                                 </div>
                                             </div>
