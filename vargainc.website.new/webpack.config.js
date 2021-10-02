@@ -64,6 +64,7 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             DEBUG: JSON.stringify(true),
+            RELEASE_VERSION: 'preview',
             MapboxToken: JSON.stringify('pk.eyJ1IjoiZ2hvc3R1eiIsImEiOiJjaXczc2tmc3cwMDEyMm9tb29pdDRwOXUzIn0.KPSiOO6DWTY59x1zHdvYSA'),
         }),
     ],

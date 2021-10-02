@@ -334,7 +334,7 @@ export default React.createBackboneClass({
         })
     },
     loadSubmapBoundary: function (campaignId, submapId) {
-        return $.getJSON(`../api/print/campaign/${campaignId}/submap/${submapId}/boundary`).then((response) => {
+        return $.getJSON(`api/print/campaign/${campaignId}/submap/${submapId}/boundary`).then((response) => {
             let data = {
                 type: 'Feature',
                 properties: {
@@ -355,7 +355,7 @@ export default React.createBackboneClass({
         })
     },
     loadDMapBoundary: function (task) {
-        let url = `../api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`
+        let url = `api/print/campaign/${task.get('CampaignId')}/submap/${task.get('SubMapId')}/dmap/${task.get('DMapId')}/boundary`
         return $.getJSON(url).then((response) => {
             var data = {
                 type: 'Feature',
