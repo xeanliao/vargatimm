@@ -17,7 +17,7 @@ const log = new Logger('views:campaign')
 const layers = [
     {
         layer: 'PremiumCRoute',
-        zoom: [11, 24],
+        zoom: [0, 24],
         fontScale: [0.75, 0.75],
         settings: [
             {
@@ -42,7 +42,7 @@ const layers = [
     },
     {
         layer: 'Z5',
-        zoom: [11, 24],
+        zoom: [0, 24],
         fontScale: [1, 0.75],
         settings: [
             {
@@ -67,7 +67,7 @@ const layers = [
     },
     {
         layer: 'Z3',
-        zoom: [11, 24],
+        zoom: [0, 24],
         fontScale: [1.25, 1],
         settings: [
             {
@@ -765,9 +765,6 @@ export default class Campaign extends React.Component {
                                 </div>
                                 <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onSaveShapesToSubmap}>
                                     Save Shapes
-                                </div>
-                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onEmptySubmap}>
-                                    Remove All Shapes
                                 </div>
                                 <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.clearSelectedShapes}>
                                     Deselect All Shapes
