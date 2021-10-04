@@ -34,7 +34,7 @@ namespace Vargainc.Timm.REST.Controllers
 
         private static readonly string CachePath = ConfigurationManager.AppSettings["TilesCachePath"];
 
-        private static readonly HashSet<Classifications> LAYERS = new HashSet<Classifications>() 
+        private static readonly HashSet<Classifications> LAYERS = new HashSet<Classifications>()
         {
             Classifications.Z3,
             Classifications.Z5,
@@ -93,7 +93,7 @@ namespace Vargainc.Timm.REST.Controllers
             long process = 0;
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            
+
             try
             {
                 var tile = new NetTopologySuite.IO.VectorTiles.Tiles.Tile(x, y, z);
@@ -139,9 +139,10 @@ namespace Vargainc.Timm.REST.Controllers
                 List<ViewModel.Tile> data = new List<ViewModel.Tile>();
 
                 var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
-                while(sqlReader.Read())
+                while (sqlReader.Read())
                 {
-                    data.Add(new ViewModel.Tile { 
+                    data.Add(new ViewModel.Tile
+                    {
                         Layer = layer.ToString(),
                         Id = sqlReader.GetInt32(0),
                         Name = sqlReader.GetString(1),
@@ -157,6 +158,7 @@ namespace Vargainc.Timm.REST.Controllers
                     });
                 }
 
+
                 database = watch.ElapsedMilliseconds;
                 watch.Restart();
 
@@ -170,7 +172,7 @@ namespace Vargainc.Timm.REST.Controllers
                         var center = geom.InteriorPoint;
                         i.Center = new double[] { center.X, center.Y };
                     }
-                    
+
                     return new Feature
                     {
                         Geometry = geom,
@@ -207,7 +209,7 @@ namespace Vargainc.Timm.REST.Controllers
                 tree.Add(features, z, layer.ToString());
 
                 response = new HttpResponseMessage(HttpStatusCode.OK);
-                
+
 
                 if (tree.Contains(tile.Id))
                 {
@@ -265,8 +267,8 @@ namespace Vargainc.Timm.REST.Controllers
                     response.Headers.CacheControl = new CacheControlHeaderValue
                     {
                         NoCache = true,
-                        NoStore= true,
-                        NoTransform= true
+                        NoStore = true,
+                        NoTransform = true
                     };
                 }
             }
@@ -362,7 +364,7 @@ namespace Vargainc.Timm.REST.Controllers
                             continue;
                         }
 
-                        
+
                         var dbItem = new Models.ThreeZipArea { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
                         mainTable.Attach(dbItem);
                         db.Entry(dbItem).Property("Geom").IsModified = true;

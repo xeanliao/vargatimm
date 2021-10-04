@@ -407,17 +407,25 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 throw new Exception("submap not exists!");
             }
-            
-            using (var transaction = db.Database.BeginTransaction())
+            try
             {
                 db.Database.Connection.Open();
+                using (var transaction = db.Database.BeginTransaction())
+                {
 
-                db.Database.ExecuteSqlCommand("delete from [dbo].[submaprecords] where [SubMapId] = @p0", submapId);
-                db.Database.ExecuteSqlCommand("delete from [dbo].[submapcoordinates] where [SubMapId] = @p0", submapId);
-                db.Database.ExecuteSqlCommand("delete from [dbo].[submaps] where [Id] = @p0", submapId);
 
-                transaction.Commit();
+                    db.Database.ExecuteSqlCommand("delete from [dbo].[submaprecords] where [SubMapId] = @p0", submapId);
+                    db.Database.ExecuteSqlCommand("delete from [dbo].[submapcoordinates] where [SubMapId] = @p0", submapId);
+                    db.Database.ExecuteSqlCommand("delete from [dbo].[submaps] where [Id] = @p0", submapId);
+
+                    transaction.Commit();
+                }
             }
+            finally
+            {
+                db.Database.Connection.Close();
+            }
+            
 
             return Json(new { success = true });
         }
