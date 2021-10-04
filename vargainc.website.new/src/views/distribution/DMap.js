@@ -196,14 +196,18 @@ export default class DMap extends React.Component {
         //     log.info(`map zoom: ${this.map.getZoom()}`)
         // })
 
-        this.setState(
-            {
-                mapLabelLayer: labelLayer,
-            },
-            () => {
-                this.loadCampaignGeojson()
-            }
-        )
+        this.map.loadImage('images/remove_pattern.png', (err, image) => {
+            this.map.addImage('remove_pattern', image)
+
+            this.setState(
+                {
+                    mapLabelLayer: labelLayer,
+                },
+                () => {
+                    this.loadCampaignGeojson()
+                }
+            )
+        })
     }
 
     loadCampaignGeojson() {
@@ -230,20 +234,6 @@ export default class DMap extends React.Component {
                 )
 
                 // dmap
-                this.map.addLayer(
-                    {
-                        id: 'submap-layer-line',
-                        type: 'line',
-                        source: 'map-source',
-                        layout: {},
-                        paint: {
-                            'line-color': ['get', 'color'],
-                            'line-width': 4,
-                        },
-                        filter: ['==', ['get', 'type'], 'submap'],
-                    },
-                    labelLayer
-                )
                 this.map.addLayer(
                     {
                         id: 'dmap-layer-fill',
@@ -308,7 +298,6 @@ export default class DMap extends React.Component {
                     },
                     labelLayer
                 )
-                let selectedColor = color(`hsl(156, 20%, 95%)`).darker(1)
                 this.map.addLayer(
                     {
                         id: 'area-layer-selected',
@@ -316,8 +305,21 @@ export default class DMap extends React.Component {
                         source: 'map-source',
                         layout: { visibility: 'none' },
                         paint: {
-                            'fill-color': selectedColor.formatHsl(),
-                            'fill-opacity': 0.3,
+                            'fill-color': '#ffffff',
+                            'fill-opacity': 0.5,
+                        },
+                        filter: ['==', 'id', ''],
+                    },
+                    labelLayer
+                )
+                this.map.addLayer(
+                    {
+                        id: 'area-layer-remove',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: { visibility: 'none' },
+                        paint: {
+                            'fill-pattern': 'remove_pattern',
                         },
                         filter: ['==', 'id', ''],
                     },
@@ -372,7 +374,8 @@ export default class DMap extends React.Component {
         this.loadCampaignGeojson()
         this.loadMapList()
         this.setState({ selectedShapes: new Map() }, () => {
-            this.map.setFilter(`area-layer-selected`, ['=', 'vid', ''])
+            this.map.setFilter(`area-layer-remove`, ['==', 'vid', ''])
+            this.map.setFilter(`area-layer-selected`, ['==', 'vid', ''])
         })
     }
 
@@ -419,7 +422,9 @@ export default class DMap extends React.Component {
         }
         let subMap = this.props.campaign.SubMaps.filter((s) => s.Id == dMap.SubMapId)?.[0]
         this.onSubmapSelect(subMap).then(() => {
-            this.setState({ selectedDMapId: dMap.Id })
+            this.setState({ selectedDMapId: dMap.Id }, () => {
+                this.map.setPaintProperty(`area-layer-selected`, 'fill-color', color(`#${dMap.ColorString}`).toString())
+            })
         })
     }
 
@@ -469,16 +474,22 @@ export default class DMap extends React.Component {
                 if (selectedShapes.has(vid)) {
                     selectedShapes.delete(vid)
                 } else {
-                    selectedShapes.set(vid, { Classification: classification, Id: oid, Value: !currentDMapAreas.has(oid) })
+                    selectedShapes.set(vid, { Classification: classification, Id: oid, Value: !currentDMapAreas.has(oid), vid: vid })
                 }
                 return {
                     selectedShapes: selectedShapes,
                 }
             },
             () => {
-                let selectedShapeIds = Array.from(this.state.selectedShapes.keys())
+                let shapes = Array.from(this.state.selectedShapes.values())
+                let addShapes = shapes.filter((i) => i.Value == true).map((i) => i.vid)
+                let removeShapes = shapes.filter((i) => i.Value == false).map((i) => i.vid)
+
+                this.map.setLayoutProperty(`area-layer-remove`, 'visibility', 'none')
                 this.map.setLayoutProperty(`area-layer-selected`, 'visibility', 'none')
-                this.map.setFilter(`area-layer-selected`, ['in', ['get', 'vid'], ['literal', selectedShapeIds]])
+                this.map.setFilter(`area-layer-remove`, ['in', ['get', 'vid'], ['literal', removeShapes]])
+                this.map.setFilter(`area-layer-selected`, ['in', ['get', 'vid'], ['literal', addShapes]])
+                this.map.setLayoutProperty(`area-layer-remove`, 'visibility', 'visible')
                 this.map.setLayoutProperty(`area-layer-selected`, 'visibility', 'visible')
             }
         )

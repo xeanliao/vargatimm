@@ -199,16 +199,20 @@ export default class Campaign extends React.Component {
         //     log.info(`map zoom: ${this.map.getZoom()}`)
         // })
 
-        this.setState(
-            {
-                mapLabelLayer: labelLayer,
-            },
-            () => {
-                this.initBackgroundLayer()
-                this.initCampaignLayer()
-                this.initPopup()
-            }
-        )
+        this.map.loadImage('images/remove_pattern.png', (err, image) => {
+            this.map.addImage('remove_pattern', image)
+
+            this.setState(
+                {
+                    mapLabelLayer: labelLayer,
+                },
+                () => {
+                    this.initBackgroundLayer()
+                    this.initCampaignLayer()
+                    this.initPopup()
+                }
+            )
+        })
     }
 
     initBackgroundLayer() {
@@ -256,7 +260,6 @@ export default class Campaign extends React.Component {
                 labelLayer
             )
 
-            let selectedColor = color(`hsl(156, 20%, 95%)`).darker(1)
             this.map.addLayer(
                 {
                     id: `area-layer-${item.layer}-selected`,
@@ -267,8 +270,25 @@ export default class Campaign extends React.Component {
                     maxzoom: item.zoom[1],
                     layout: { visibility: 'none' },
                     paint: {
-                        'fill-color': selectedColor.formatHsl(),
-                        'fill-opacity': 0.3,
+                        'fill-color': '#000000',
+                        'fill-opacity': 0.5,
+                    },
+                    filter: ['==', 'id', ''],
+                },
+                labelLayer
+            )
+
+            this.map.addLayer(
+                {
+                    id: `area-layer-${item.layer}-remove`,
+                    type: 'fill',
+                    source: `area-source-${item.layer}`,
+                    'source-layer': item.layer,
+                    minzoom: item.zoom[0],
+                    maxzoom: item.zoom[1],
+                    // layout: { visibility: 'none' },
+                    paint: {
+                        'fill-pattern': 'remove_pattern',
                     },
                     filter: ['==', 'id', ''],
                 },
@@ -464,8 +484,6 @@ export default class Campaign extends React.Component {
                     otherLayers.forEach((name) => {
                         this.map.setLayoutProperty(`area-layer-${item.layer}-${name}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
                     })
-
-                    // this.map.setFilter(`area-layer-${item.layer}-selected`, ['==', 'name', ''])
                 })
             }
         )
@@ -506,7 +524,8 @@ export default class Campaign extends React.Component {
                 this.map.setLayoutProperty('campaign-layer-highlight', 'visibility', 'visible')
 
                 layers.forEach((item) => {
-                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', Array.from(this.state.selectedShapes.keys())]])
+                    this.map.setFilter(`area-layer-${item.layer}-remove`, ['==', ['get', 'sid'], ''])
+                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['==', ['get', 'sid'], ''])
                     this.map.setPaintProperty(`area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
                 })
             }
@@ -570,8 +589,12 @@ export default class Campaign extends React.Component {
                 }
             },
             () => {
-                let selectedShapes = Array.from(this.state.selectedShapes.keys())
-                this.map.setFilter(`area-layer-${activeLayer}-selected`, ['in', ['get', 'id'], ['literal', selectedShapes]])
+                let shapes = Array.from(this.state.selectedShapes.values())
+                let addShapes = shapes.filter((i) => i.Value == true).map((i) => i.Id)
+                let removeShapes = shapes.filter((i) => i.Value == false).map((i) => i.Id)
+
+                this.map.setFilter(`area-layer-${activeLayer}-remove`, ['in', ['get', 'id'], ['literal', removeShapes]])
+                this.map.setFilter(`area-layer-${activeLayer}-selected`, ['in', ['get', 'id'], ['literal', addShapes]])
             }
         )
     }
@@ -617,6 +640,7 @@ export default class Campaign extends React.Component {
         axios.delete(`campaign/${submap.CampaignId}/submap/${submap.Id}/delete`).then(() => {
             this.setState({}, () => {
                 layers.forEach((item) => {
+                    this.map.setFilter(`area-layer-${item.layer}-remove`, ['=', 'id', ''])
                     this.map.setFilter(`area-layer-${item.layer}-selected`, ['=', 'id', ''])
                 })
 
@@ -678,6 +702,7 @@ export default class Campaign extends React.Component {
             },
             () => {
                 layers.forEach((item) => {
+                    this.map.setFilter(`area-layer-${item.layer}-remove`, ['=', 'id', ''])
                     this.map.setFilter(`area-layer-${item.layer}-selected`, ['==', 'id', ''])
                 })
             }
