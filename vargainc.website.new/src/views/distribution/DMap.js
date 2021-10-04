@@ -287,8 +287,6 @@ export default class DMap extends React.Component {
             }
             this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
         }
-
-        this.onMapLoad()
     }
 
     loadCampaignGeojson() {
@@ -444,10 +442,15 @@ export default class DMap extends React.Component {
                     [mapBbox[2], mapBbox[3]],
                 ])
             }
-            this.setState({
-                mapSource: resp.data,
-                mapReady: true,
-            })
+            this.setState(
+                {
+                    mapSource: resp.data,
+                    mapReady: true,
+                },
+                () => {
+                    this.onSwitchMapStyle('satellite')
+                }
+            )
         })
     }
 

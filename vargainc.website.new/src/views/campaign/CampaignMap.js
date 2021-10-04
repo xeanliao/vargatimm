@@ -133,6 +133,7 @@ export default class Campaign extends React.Component {
         this.onSaveShapesToSubmap = this.onSaveShapesToSubmap.bind(this)
         this.onEmptySubmap = this.onEmptySubmap.bind(this)
         this.clearSelectedShapes = this.clearSelectedShapes.bind(this)
+        this.onSelectAllScreenShapes = this.onSelectAllScreenShapes.bind(this)
 
         this.getActiveLayer = this.getActiveLayer.bind(this)
 
@@ -224,8 +225,8 @@ export default class Campaign extends React.Component {
             this.map.addSource(sourceName, {
                 type: 'vector',
                 tiles: [tileSource],
-                minzoom: item.zoom[0],
-                maxzoom: item.zoom[1],
+                minzoom: 24,
+                maxzoom: 24,
             })
             item.settings.forEach((setting) => {
                 setting.layout['visibility'] = 'none'
@@ -484,6 +485,13 @@ export default class Campaign extends React.Component {
                     otherLayers.forEach((name) => {
                         this.map.setLayoutProperty(`area-layer-${item.layer}-${name}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
                     })
+
+                    let source = this.map.getSource(`area-source-${item.layer}`)
+                    if (this.state.activeLayers.has(item.layer)) {
+                        source.minzoom = 0
+                    } else {
+                        source.minzoom = 24
+                    }
                 })
             }
         )
@@ -709,6 +717,54 @@ export default class Campaign extends React.Component {
         )
     }
 
+    onSelectAllScreenShapes() {
+        if (!this.state.selectedSubmapId) {
+            return
+        }
+
+        let activeLayer = this.getActiveLayer()
+        let features = this.map.queryRenderedFeatures({
+            layers: [`area-layer-${activeLayer}-fill`],
+        })
+        let submaps = this.props?.campaign?.SubMaps ?? []
+        let blockLayers = submaps
+            .filter((s) => s.Id != this.state.selectedSubmapId)
+            .flatMap((s) => (s.SubMapRecords ?? []).map((r) => `${Classification.get(r.Classification)}-${r.AreaId}`))
+        blockLayers = new Set(blockLayers)
+        this.setState(
+            (state) => {
+                let selectedShapes = new Map(state.selectedShapes)
+                features.forEach((f) => {
+                    let id = f.properties?.id
+
+                    if (blockLayers.has(id)) {
+                        return
+                    }
+
+                    if (selectedShapes.has(id)) {
+                        return
+                    }
+
+                    selectedShapes.set(id, { Classification: activeLayer, Id: id, Value: true })
+                })
+
+                let allowedLayers = new Set([activeLayer])
+                return {
+                    selectedShapes: selectedShapes,
+                    allowedLayers: allowedLayers,
+                }
+            },
+            () => {
+                let shapes = Array.from(this.state.selectedShapes.values())
+                let addShapes = shapes.filter((i) => i.Value == true).map((i) => i.Id)
+                let removeShapes = shapes.filter((i) => i.Value == false).map((i) => i.Id)
+
+                this.map.setFilter(`area-layer-${activeLayer}-remove`, ['in', ['get', 'id'], ['literal', removeShapes]])
+                this.map.setFilter(`area-layer-${activeLayer}-selected`, ['in', ['get', 'id'], ['literal', addShapes]])
+            }
+        )
+    }
+
     render() {
         return (
             <div className="campaign full-container">
@@ -790,6 +846,9 @@ export default class Campaign extends React.Component {
                                 </div>
                                 <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onSaveShapesToSubmap}>
                                     Save Shapes
+                                </div>
+                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onSelectAllScreenShapes}>
+                                    Select All Shapes
                                 </div>
                                 <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.clearSelectedShapes}>
                                     Deselect All Shapes
