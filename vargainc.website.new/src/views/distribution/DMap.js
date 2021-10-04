@@ -116,6 +116,7 @@ export default class DMap extends React.Component {
         this.onInitMenuScrollbar = this.onInitMenuScrollbar.bind(this)
         this.onInitMap = this.onInitMap.bind(this)
         this.onMapLoad = this.onMapLoad.bind(this)
+        this.onSwitchMapStyle = this.onSwitchMapStyle.bind(this)
         this.loadMapList = this.loadMapList.bind(this)
         this.loadCampaignGeojson = this.loadCampaignGeojson.bind(this)
         this.onRefresh = this.onRefresh.bind(this)
@@ -161,8 +162,9 @@ export default class DMap extends React.Component {
                         zoom: zoom,
                         maxZoom: 20,
                         center: center,
-                        // style: '/map/street.json',
+                        // style: './street.json',
                         style: 'mapbox://styles/mapbox/outdoors-v11',
+                        // style: 'mapbox://styles/mapbox/satellite-v9',
                         // style: 'mapbox://styles/mapbox/navigation-guidance-day-v4',
                         // style: 'mapbox://styles/mapbox/navigation-preview-night-v4',
                     })
@@ -182,6 +184,53 @@ export default class DMap extends React.Component {
     }
 
     onMapLoad() {
+        this.map.addSource('google-road-tiles', {
+            type: 'raster',
+            tiles: [
+                '//mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                '//mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                '//mt2.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                '//mt3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+            ],
+            tileSize: 256,
+        })
+        this.map.addSource('google-satellite-tiles', {
+            type: 'raster',
+            tiles: [
+                '//mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                '//mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                '//mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                '//mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+            ],
+            tileSize: 256,
+        })
+        this.map.addLayer(
+            {
+                id: 'timm-google-road-tiles-layer',
+                type: 'raster',
+                source: 'google-road-tiles',
+                minzoom: 0,
+                maxzoom: 21,
+                layout: {
+                    visibility: 'none',
+                },
+            },
+            'land'
+        )
+        this.map.addLayer(
+            {
+                id: 'timm-google-satellite-tiles-layer',
+                type: 'raster',
+                source: 'google-satellite-tiles',
+                minzoom: 0,
+                maxzoom: 21,
+                layout: {
+                    visibility: 'none',
+                },
+            },
+            'land'
+        )
+
         const layers = this.map.getStyle().layers
         // Find the index of the first symbol layer in the map style
         let labelLayer = null
@@ -210,6 +259,38 @@ export default class DMap extends React.Component {
         })
     }
 
+    onSwitchMapStyle(style) {
+        if (!this.state.mapReady) {
+            return
+        }
+        if (style == 'streets') {
+            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
+            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
+
+            // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
+            for (const layer of this.map.getStyle().layers) {
+                if (!layer.id.startsWith('timm')) {
+                    this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                }
+            }
+            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
+        } else {
+            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
+            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
+
+            // this.map.setStyle('mapbox://styles/mapbox/satellite-v9')
+
+            for (const layer of this.map.getStyle().layers) {
+                if (!layer.id.startsWith('timm')) {
+                    this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+                }
+            }
+            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+        }
+
+        this.onMapLoad()
+    }
+
     loadCampaignGeojson() {
         let labelLayer = this.state.mapLabelLayer
         axios.get(`campaign/${this.props.campaign.Id}/dmap/geojson`).then((resp) => {
@@ -220,7 +301,7 @@ export default class DMap extends React.Component {
                 // submap
                 this.map.addLayer(
                     {
-                        id: 'submap-layer-line',
+                        id: 'timm-submap-layer-line',
                         type: 'line',
                         source: 'map-source',
                         layout: {},
@@ -236,7 +317,7 @@ export default class DMap extends React.Component {
                 // dmap
                 this.map.addLayer(
                     {
-                        id: 'dmap-layer-fill',
+                        id: 'timm-dmap-layer-fill',
                         type: 'fill',
                         source: 'map-source',
                         layout: {},
@@ -250,7 +331,7 @@ export default class DMap extends React.Component {
                 )
                 this.map.addLayer(
                     {
-                        id: 'dmap-layer-line',
+                        id: 'timm-dmap-layer-line',
                         type: 'line',
                         source: 'map-source',
                         layout: {},
@@ -266,7 +347,7 @@ export default class DMap extends React.Component {
                 // area
                 this.map.addLayer(
                     {
-                        id: 'area-layer-line',
+                        id: 'timm-area-layer-line',
                         type: 'line',
                         source: 'map-source',
                         layout: {},
@@ -286,7 +367,7 @@ export default class DMap extends React.Component {
                 )
                 this.map.addLayer(
                     {
-                        id: 'area-layer-fill',
+                        id: 'timm-area-layer-fill',
                         type: 'fill',
                         source: 'map-source',
                         layout: {},
@@ -300,7 +381,7 @@ export default class DMap extends React.Component {
                 )
                 this.map.addLayer(
                     {
-                        id: 'area-layer-selected',
+                        id: 'timm-area-layer-selected',
                         type: 'fill',
                         source: 'map-source',
                         layout: { visibility: 'none' },
@@ -314,7 +395,7 @@ export default class DMap extends React.Component {
                 )
                 this.map.addLayer(
                     {
-                        id: 'area-layer-remove',
+                        id: 'timm-area-layer-remove',
                         type: 'fill',
                         source: 'map-source',
                         layout: { visibility: 'none' },
@@ -329,7 +410,7 @@ export default class DMap extends React.Component {
                 // submap highlight
                 this.map.addLayer(
                     {
-                        id: 'submap-layer-highlight',
+                        id: 'timm-submap-layer-highlight',
                         type: 'line',
                         source: 'map-source',
                         layout: {},
@@ -342,7 +423,7 @@ export default class DMap extends React.Component {
                 )
 
                 // event
-                this.map.on('click', `area-layer-fill`, this.onShapeSelect)
+                this.map.on('click', `timm-area-layer-fill`, this.onShapeSelect)
 
                 // fit all submap
                 let mapBbox = (resp.data.features ?? [])
@@ -374,8 +455,8 @@ export default class DMap extends React.Component {
         this.loadCampaignGeojson()
         this.loadMapList()
         this.setState({ selectedShapes: new Map() }, () => {
-            this.map.setFilter(`area-layer-remove`, ['==', 'vid', ''])
-            this.map.setFilter(`area-layer-selected`, ['==', 'vid', ''])
+            this.map.setFilter(`timm-area-layer-remove`, ['==', 'vid', ''])
+            this.map.setFilter(`timm-area-layer-selected`, ['==', 'vid', ''])
         })
     }
 
@@ -402,10 +483,10 @@ export default class DMap extends React.Component {
                 },
                 () => {
                     //set selected layer fill color as submap color
-                    this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'none')
-                    this.map.setFilter('submap-layer-highlight', ['all', ['==', 'sid', subMap.Id], ['==', 'type', 'submap']])
-                    this.map.setPaintProperty('submap-layer-highlight', 'line-color', `#${subMap.ColorString}`)
-                    this.map.setLayoutProperty('submap-layer-highlight', 'visibility', 'visible')
+                    this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'none')
+                    this.map.setFilter('timm-submap-layer-highlight', ['all', ['==', 'sid', subMap.Id], ['==', 'type', 'submap']])
+                    this.map.setPaintProperty('timm-submap-layer-highlight', 'line-color', `#${subMap.ColorString}`)
+                    this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'visible')
 
                     return resolve()
                 }
@@ -423,7 +504,7 @@ export default class DMap extends React.Component {
         let subMap = this.props.campaign.SubMaps.filter((s) => s.Id == dMap.SubMapId)?.[0]
         this.onSubmapSelect(subMap).then(() => {
             this.setState({ selectedDMapId: dMap.Id }, () => {
-                this.map.setPaintProperty(`area-layer-selected`, 'fill-color', color(`#${dMap.ColorString}`).toString())
+                this.map.setPaintProperty(`timm-area-layer-selected`, 'fill-color', color(`#${dMap.ColorString}`).toString())
             })
         })
     }
@@ -485,12 +566,12 @@ export default class DMap extends React.Component {
                 let addShapes = shapes.filter((i) => i.Value == true).map((i) => i.vid)
                 let removeShapes = shapes.filter((i) => i.Value == false).map((i) => i.vid)
 
-                this.map.setLayoutProperty(`area-layer-remove`, 'visibility', 'none')
-                this.map.setLayoutProperty(`area-layer-selected`, 'visibility', 'none')
-                this.map.setFilter(`area-layer-remove`, ['in', ['get', 'vid'], ['literal', removeShapes]])
-                this.map.setFilter(`area-layer-selected`, ['in', ['get', 'vid'], ['literal', addShapes]])
-                this.map.setLayoutProperty(`area-layer-remove`, 'visibility', 'visible')
-                this.map.setLayoutProperty(`area-layer-selected`, 'visibility', 'visible')
+                this.map.setLayoutProperty(`timm-area-layer-remove`, 'visibility', 'none')
+                this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'none')
+                this.map.setFilter(`timm-area-layer-remove`, ['in', ['get', 'vid'], ['literal', removeShapes]])
+                this.map.setFilter(`timm-area-layer-selected`, ['in', ['get', 'vid'], ['literal', addShapes]])
+                this.map.setLayoutProperty(`timm-area-layer-remove`, 'visibility', 'visible')
+                this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'visible')
             }
         )
     }
@@ -693,8 +774,18 @@ export default class DMap extends React.Component {
                 <div className="map-overlay">
                     <div className="mapboxgl-ctrl-top-left">
                         <div className="mapboxgl-ctrl mapboxgl-ctrl-group">
-                            <button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-stree"></button>
-                            <button className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-satellite"></button>
+                            <button
+                                className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-stree"
+                                onClick={() => {
+                                    this.onSwitchMapStyle('streets')
+                                }}
+                            ></button>
+                            <button
+                                className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-satellite"
+                                onClick={() => {
+                                    this.onSwitchMapStyle('satellite')
+                                }}
+                            ></button>
                         </div>
                     </div>
                 </div>
