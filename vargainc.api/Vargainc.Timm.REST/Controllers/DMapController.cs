@@ -21,7 +21,7 @@ using Vargainc.Timm.REST.ViewModel;
 
 namespace Vargainc.Timm.REST.Controllers
 {
-[RoutePrefix("campaign")]
+    [RoutePrefix("campaign")]
     public class DMapController : BaseController
     {
         [HttpGet]
@@ -42,7 +42,7 @@ namespace Vargainc.Timm.REST.Controllers
                 .ToListAsync()
                 .ConfigureAwait(false);
 
-            foreach(var item in subMaps)
+            foreach (var item in subMaps)
             {
                 var coorinates = subMapGeom.Where(i => i.SubMapId == item.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
                 if (!coorinates.First().Equals2D(coorinates.Last()))
@@ -73,24 +73,24 @@ namespace Vargainc.Timm.REST.Controllers
             }
 
             var dMaps = await db.DistributionMaps
-                .Where(i=> subMapIds.Contains(i.SubMapId))
-                .OrderBy(i=>i.SubMapId)
-                .ThenBy(i=>i.Id)
+                .Where(i => subMapIds.Contains(i.SubMapId))
+                .OrderBy(i => i.SubMapId)
+                .ThenBy(i => i.Id)
                 .ToListAsync()
                 .ConfigureAwait(false);
-            var dMapIds = dMaps.Select(i=>i.Id).ToList();
+            var dMapIds = dMaps.Select(i => i.Id).ToList();
             var dMapGeom = await db.DistributionMapCoordinates
-                .Where(i=>dMapIds.Contains(i.DistributionMapId))
-                .OrderBy(i=>i.DistributionMapId)
-                .ThenBy(i=>i.Id)
-                .Select(i=> new { i.DistributionMapId, i.Longitude, i.Latitude })
+                .Where(i => dMapIds.Contains(i.DistributionMapId))
+                .OrderBy(i => i.DistributionMapId)
+                .ThenBy(i => i.Id)
+                .Select(i => new { i.DistributionMapId, i.Longitude, i.Latitude })
                 .ToListAsync()
                 .ConfigureAwait(false);
 
             foreach (var item in dMaps)
             {
                 var coorinates = dMapGeom.Where(i => i.DistributionMapId == item.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
-                if(coorinates.Count == 0)
+                if (coorinates.Count == 0)
                 {
                     continue;
                 }
@@ -103,6 +103,10 @@ namespace Vargainc.Timm.REST.Controllers
                 if (!geom.IsValid)
                 {
                     geom = geom.Buffer(0) as Polygon;
+                }
+                if(geom == null)
+                {
+                    continue;
                 }
                 layers.Add(new Feature
                 {
@@ -122,7 +126,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             var recordGroup = subMapRecords
                 .GroupBy(i => i.Classification)
-                .ToDictionary(i => i.Key, i => i.Select(j=>j.AreaId).ToList());
+                .ToDictionary(i => i.Key, i => i.Select(j => j.AreaId).ToList());
 
             var recordSubMap = subMapRecords
                 .GroupBy(k => $"{(Classifications)k.Classification}-{k.AreaId}", v => v.SubMapId)
@@ -152,7 +156,7 @@ namespace Vargainc.Timm.REST.Controllers
                         sql.AppendLine($"WHERE [Id] IN ({string.Join(",", item.Value)})");
                         break;
                 }
-                
+
                 sqlCmd.CommandTimeout = 300;
                 sqlCmd.CommandText = sql.ToString();
 
@@ -278,7 +282,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             var removeAreas = records.Where(i => i.Value == false).Select(i => i.Id).ToList();
             var addAreas = records.Where(i => i.Value == true).Select(i => i.Id).ToList();
-            List<int> needRemoveRecords = records.Where(i=>i.Value == false).Select(i=>i.Id ?? 0).ToList();
+            List<int> needRemoveRecords = records.Where(i => i.Value == false).Select(i => i.Id ?? 0).ToList();
             List<int> needAddRecords = records.Where(i => i.Value != false).Select(i => i.Id ?? 0).ToList();
 
 
@@ -426,6 +430,7 @@ namespace Vargainc.Timm.REST.Controllers
                     break;
             }
 
+
             db.Configuration.AutoDetectChangesEnabled = false;
             using (var transaction = db.Database.BeginTransaction())
             {
@@ -476,16 +481,25 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 throw new Exception("submap not exists!");
             }
-
-            using (var transaction = db.Database.BeginTransaction())
+            try
             {
                 db.Database.Connection.Open();
 
-                db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmaprecords] where [SubMapId] = @p0", dMapId);
-                db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmapcoordinates] where [SubMapId] = @p0", dMapId);
-                db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmaps] where [Id] = @p0", dMapId);
+                using (var transaction = db.Database.BeginTransaction())
+                {
 
-                transaction.Commit();
+
+                    db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmaprecords] where [SubMapId] = @p0", dMapId);
+                    db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmapcoordinates] where [SubMapId] = @p0", dMapId);
+                    db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmaps] where [Id] = @p0", dMapId);
+
+                    transaction.Commit();
+                }
+
+            }
+            finally
+            {
+                db.Database.Connection.Close();
             }
 
             return Json(new { success = true });
