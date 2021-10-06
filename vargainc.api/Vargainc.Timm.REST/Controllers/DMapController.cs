@@ -51,9 +51,14 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 var geom = GeometryFactory.CreatePolygon(coorinates.ToArray());
                 geom.Normalize();
-                if (!geom.IsValid)
+                //if (!geom.IsValid)
+                //{
+                //    geom = geom.Buffer(0) as Polygon;
+                //}
+
+                if(geom == null)
                 {
-                    geom = geom.Buffer(0) as Polygon;
+                    continue;
                 }
 
                 layers.Add(new Feature

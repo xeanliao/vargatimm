@@ -79,10 +79,16 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 var polygon = GeometryFactory.CreatePolygon(points.ToArray());
                 polygon.Normalize();
-                if (!polygon.IsValid)
+                //if (!polygon.IsValid)
+                //{
+                //    polygon = polygon.Buffer(0) as Polygon;
+                //}
+
+                if(polygon == null)
                 {
-                    polygon = polygon.Buffer(0) as Polygon;
+                    continue;
                 }
+
                 layers.Add(new Feature { 
                     Geometry = polygon,
                     BoundingBox = polygon.EnvelopeInternal,
@@ -177,6 +183,7 @@ namespace Vargainc.Timm.REST.Controllers
         {
             var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
             var submap = await db.SubMaps.Where(i => i.Id == submapId && i.CampaignId == campaignId).FirstOrDefaultAsync().ConfigureAwait(false);
+            var otherSubMaps = await db.SubMaps.Where(i=>i.CampaignId == campaignId && i.Id != submapId).Select(i=>i.Id).ToListAsync().ConfigureAwait(false);
             if(campaign == null || submap == null)
             {
                 return BadRequest();
@@ -215,6 +222,12 @@ namespace Vargainc.Timm.REST.Controllers
             var needRemoveRecordsSet = needRemoveRecords.ToHashSet();
             var newRecords = subMapRecords.Where(i => !needRemoveRecordsSet.Contains(i)).ToList();
             newRecords.AddRange(needAddRecords);
+
+            // remove other submaps already added area
+            var targetClassificationInt = (int)targetClassification;
+            var otherAddedAreas = db.SubMapRecords.Where(i=> otherSubMaps.Contains(i.SubMapId) && i.Classification == targetClassificationInt).Select(i=>i.Id??0).ToHashSet();
+
+            newRecords = newRecords.Where(i => !otherAddedAreas.Contains(i)).ToList();
 
             List<AreaRecordRow> areaGeoms = null;
             switch (targetClassification)
