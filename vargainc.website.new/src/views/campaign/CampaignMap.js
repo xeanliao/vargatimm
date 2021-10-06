@@ -329,18 +329,6 @@ export default class Campaign extends React.Component {
                         },
                     ],
                 },
-                // paint: {
-                //     'text-halo-color': 'hsl(0, 0%, 100%)',
-                //     'text-halo-width': 0.5,
-                //     'text-halo-blur': 0.5,
-                //     'text-color': [
-                //         'step',
-                //         ['zoom'],
-                //         ['step', ['get', 'sizerank'], 'hsl(0, 0%, 66%)', 5, 'hsl(230, 0%, 56%)'],
-                //         17,
-                //         ['step', ['get', 'sizerank'], 'hsl(0, 0%, 66%)', 13, 'hsl(0, 0%, 56%)'],
-                //     ],
-                // },
                 paint: {
                     'text-color': 'hsl(0, 0%, 0%)',
                     'text-halo-color': ['interpolate', ['linear'], ['zoom'], 2, 'rgba(255, 255, 255, 0.75)', 3, 'rgb(255, 255, 255)'],
@@ -646,16 +634,24 @@ export default class Campaign extends React.Component {
         var submap = this.props.campaign.SubMaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]
 
         axios.delete(`campaign/${submap.CampaignId}/submap/${submap.Id}/delete`).then(() => {
-            this.setState({}, () => {
-                layers.forEach((item) => {
-                    this.map.setFilter(`area-layer-${item.layer}-remove`, ['=', 'id', ''])
-                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['=', 'id', ''])
-                })
+            this.setState(
+                {
+                    activeLayers: new Set(),
+                    allowedLayers: new Set(['Z3', 'Z5', 'PremiumCRoute']),
+                    selectedShapes: new Map(),
+                    selectedSubmapId: null,
+                },
+                () => {
+                    layers.forEach((item) => {
+                        this.map.setFilter(`area-layer-${item.layer}-remove`, ['in', ['get', 'id'], ['literal', []]])
+                        this.map.setFilter(`area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', []]])
+                    })
 
-                this.loadSubmapList()
-                this.initCampaignLayer()
-                this.clearSelectedShapes()
-            })
+                    this.loadSubmapList()
+                    this.initCampaignLayer()
+                    this.clearSelectedShapes()
+                }
+            )
         })
     }
 
@@ -710,8 +706,8 @@ export default class Campaign extends React.Component {
             },
             () => {
                 layers.forEach((item) => {
-                    this.map.setFilter(`area-layer-${item.layer}-remove`, ['=', 'id', ''])
-                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['==', 'id', ''])
+                    this.map.setFilter(`area-layer-${item.layer}-remove`, ['in', ['get', 'id'], ['literal', []]])
+                    this.map.setFilter(`area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', []]])
                 })
             }
         )
@@ -736,6 +732,11 @@ export default class Campaign extends React.Component {
                 let selectedShapes = new Map(state.selectedShapes)
                 features.forEach((f) => {
                     let id = f.properties?.id
+                    let name = f.properties?.name
+
+                    if (id.indexOf('label') > -1) {
+                        return
+                    }
 
                     if (blockLayers.has(id)) {
                         return
@@ -745,7 +746,7 @@ export default class Campaign extends React.Component {
                         return
                     }
 
-                    selectedShapes.set(id, { Classification: activeLayer, Id: id, Value: true })
+                    selectedShapes.set(id, { Classification: activeLayer, Id: id, Name: name, Value: true })
                 })
 
                 let allowedLayers = new Set([activeLayer])
