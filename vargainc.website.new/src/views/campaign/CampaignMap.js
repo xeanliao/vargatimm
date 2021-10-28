@@ -139,6 +139,7 @@ export default class Campaign extends React.Component {
         this.onSwitchMapStyle = this.onSwitchMapStyle.bind(this)
         this.onStyleChange = this.onStyleChange.bind(this)
         this.initCampaignLayers = this.initCampaignLayers.bind(this)
+        this.restoreMapSelection = this.restoreMapSelection.bind(this)
 
         this.getActiveLayer = this.getActiveLayer.bind(this)
 
@@ -369,11 +370,10 @@ export default class Campaign extends React.Component {
                 filter: ['==', ['geometry-type'], 'Point'],
             })
 
-            this.map.off('click', `timm-area-layer-${item.layer}-fill`)
+            this.map.off('click', `timm-area-layer-${item.layer}-fill`, this.onShapeSelect)
             this.map.on('click', `timm-area-layer-${item.layer}-fill`, this.onShapeSelect)
-
-            return Promise.resolve()
         })
+        return Promise.resolve()
     }
 
     loadCampaignGeojson() {
@@ -455,6 +455,53 @@ export default class Campaign extends React.Component {
             },
             labelLayer
         )
+
+        return Promise.resolve()
+    }
+
+    restoreMapSelection() {
+        // restore classfication
+        const otherLayers = ['fill', 'selected', 'label']
+        layers.forEach((item) => {
+            item.settings.forEach((setting) => {
+                let testLayer = this.map.getLayer(`timm-area-layer-${item.layer}-${setting.id}`)
+                this.map.setLayoutProperty(`timm-area-layer-${item.layer}-${setting.id}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
+            })
+            otherLayers.forEach((name) => {
+                this.map.setLayoutProperty(`timm-area-layer-${item.layer}-${name}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
+            })
+
+            let source = this.map.getSource(`area-source-${item.layer}`)
+            if (this.state.activeLayers.has(item.layer)) {
+                source.minzoom = 0
+            } else {
+                source.minzoom = 24
+            }
+        })
+
+        // restore Selected Shapes
+        let shapes = Array.from(this.state.selectedShapes.values())
+        let addShapes = shapes.filter((i) => i.Value == true).map((i) => i.Id)
+        let removeShapes = shapes.filter((i) => i.Value == false).map((i) => i.Id)
+
+        let activeLayer = this.getActiveLayer()
+        this.map.setFilter(`timm-area-layer-${activeLayer}-remove`, ['in', ['get', 'id'], ['literal', removeShapes]])
+        this.map.setFilter(`timm-area-layer-${activeLayer}-selected`, ['in', ['get', 'id'], ['literal', addShapes]])
+
+        // restore submap selected
+        let submaps = this.props?.campaign?.SubMaps ?? []
+        let submap = submaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]
+        if (submap) {
+            let highlightColor = color(`#${submap.ColorString}`).darker(2).toString()
+            this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'none')
+            this.map.setFilter('timm-campaign-layer-highlight', ['==', ['get', 'sid'], submap.Id])
+            this.map.setPaintProperty('timm-campaign-layer-highlight', 'line-color', highlightColor)
+            this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'visible')
+
+            layers.forEach((item) => {
+                this.map.setPaintProperty(`timm-area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
+            })
+        }
     }
 
     onRefresh() {
@@ -787,6 +834,9 @@ export default class Campaign extends React.Component {
         if (!this.state.mapReady) {
             return
         }
+
+        this.map.once('styledata', this.onStyleChange)
+        this.setState({ mapStyle: style })
         if (style == 'streets') {
             // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
             // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
@@ -811,7 +861,6 @@ export default class Campaign extends React.Component {
             // }
             // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
         }
-        this.onStyleChange()
     }
 
     onStyleChange() {
@@ -830,8 +879,22 @@ export default class Campaign extends React.Component {
                     mapLabelLayer: labelLayer,
                 },
                 () => {
-                    this.LoadBackgroundLayer()
-                    this.initCampaignLayers()
+                    return new Promise((resolve) => {
+                        this.map.loadImage('images/remove_pattern.png', (err, image) => {
+                            if (image) {
+                                this.map.addImage('remove_pattern', image)
+                                return resolve()
+                            }
+                        })
+                    }).then(() => {
+                        // this.LoadBackgroundLayer()
+                        // this.initCampaignLayers()
+                        // this.restoreMapSelection()
+                        // return Promise.resolve()
+                        return Promise.all([this.LoadBackgroundLayer(), this.initCampaignLayers()]).then(() => {
+                            setTimeout(this.restoreMapSelection, 500)
+                        })
+                    })
                 }
             )
         })
