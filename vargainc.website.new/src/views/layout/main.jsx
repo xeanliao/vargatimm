@@ -27,8 +27,10 @@ export default React.createBackboneClass({
             pageTitle: 'TIMM System',
             showMenu: null,
             showSearch: null,
+            showZipSearch: null,
             showUser: null,
             fullTextSearchTimeout: null,
+            zipSearchTimeout: null,
         }
     },
     componentDidMount: function () {
@@ -46,6 +48,7 @@ export default React.createBackboneClass({
                 pageTitle: has(options, 'pageTitle') ? options.pageTitle : 'TIMM System',
                 showMenu: has(options, 'showMenu') ? options.showMenu : true,
                 showSearch: has(options, 'showSearch') ? options.showSearch : true,
+                showZipSearch: has(options, 'showZipSearch') ? options.showZipSearch : true,
                 showUser: has(options, 'showUser') ? options.showUser : true,
                 mainView: data.view,
                 mainParams: data.params,
@@ -185,6 +188,29 @@ export default React.createBackboneClass({
             })
         }, 500)
     },
+    onKeyUpZipSearch: function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            var searchKey = e.currentTarget.value
+            clearTimeout(this.state.zipSearchTimeout)
+            this.publish({
+                channel: 'View',
+                topic: 'Search.Zip',
+                data: searchKey,
+            })
+        }
+    },
+    zipSearch: function (e) {
+        var self = this
+        clearTimeout(this.state.zipSearchTimeout)
+        var searchKey = e.currentTarget.value
+        this.state.zipSearchTimeout = setTimeout(function () {
+            self.publish({
+                channel: 'View',
+                topic: 'Search.Zip',
+                data: searchKey,
+            })
+        }, 500)
+    },
     menuSwitch: function () {
         this.refs.sideMenu && this.refs.sideMenu.switch()
     },
@@ -282,6 +308,22 @@ export default React.createBackboneClass({
             var user = null
         }
         var loadingDisplay = this.state.loading ? 'block' : 'none'
+
+        let zipSearch = null
+        if (this.state.showZipSearch) {
+            zipSearch = (
+                <span className="title-bar-center">
+                    <div className="row align-center">
+                        <div className="column small-4">
+                            <div className="topSearchBar hide-for-small-only">
+                                <input type="text" placeholder="Search zip code" onChange={this.zipSearch} onKeyUp={this.onKeyUpZipSearch} />
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            )
+        }
+
         return (
             <div>
                 {menu}
@@ -293,6 +335,7 @@ export default React.createBackboneClass({
                         </div>
                         {user}
                         {search}
+                        {zipSearch}
                     </div>
                     {mainView}
                     <div id="google-map-wrapper">

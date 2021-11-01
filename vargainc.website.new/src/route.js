@@ -68,6 +68,7 @@ export default Backbone.Router.extend({
                         showMenu: false,
                         showUser: true,
                         showSearch: false,
+                        showZipSearch: true,
                         pageTitle: `Campaign Map - ${campaignData.ClientCode} ${campaignData.ClientName}`,
                     },
                 },

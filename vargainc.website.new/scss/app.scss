@@ -151,6 +151,12 @@ $top-bar-height: 45px;
         width: 100vw;
         padding-top: $top-bar-height;
         overflow: hidden;
+
+        &.campaign {
+            top: $top-bar-height !important;
+            padding-top: 0 !important;
+            height: calc(100vh - #{$top-bar-height}) !important;
+        }
     }
 }
 
