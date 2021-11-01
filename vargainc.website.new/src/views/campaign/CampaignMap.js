@@ -183,6 +183,7 @@ export default class Campaign extends React.Component {
         this.restoreMapSelection = this.restoreMapSelection.bind(this)
 
         this.onSearchZip = this.onSearchZip.bind(this)
+        this.onPrint = this.onPrint.bind(this)
 
         this.getActiveLayer = this.getActiveLayer.bind(this)
 
@@ -1030,7 +1031,7 @@ export default class Campaign extends React.Component {
                 let lnglat = [resp.data.result.lng, resp.data.result.lat]
                 this.map.setCenter(lnglat)
                 let name = resp.data.result.name
-                let apt = resp.data.result.atp
+                let apt = resp.data.result.apt
                 let home = resp.data.result.home
                 let countRule = this.props.campaign.AreaDescription
                 let content = ''
@@ -1054,6 +1055,11 @@ export default class Campaign extends React.Component {
         })
     }
 
+    onPrint() {
+        let url = location.href.replace(location.hash, '')
+        window.open(`${url}#print/${this.props.campaign.Id}/campaign`, 'campaign-print')
+    }
+
     render() {
         return (
             <div className="campaign full-container">
@@ -1069,58 +1075,67 @@ export default class Campaign extends React.Component {
         let submaps = this.props?.campaign?.SubMaps ?? []
         return (
             <div className="grid-y" style={{ height: '100%' }}>
-                <div className="small-1 cell max-width-100 padding-horizontal-1">
-                    <legend>Classifications</legend>
-
-                    <div className="button-group stacked-for-small clear">
-                        <div>
-                            <input type="checkbox" name="Z3" id="Z3" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z3')} />
-                            <label
-                                htmlFor="Z3"
-                                className={ClassNames('margin-right-1', { 'font-bold': this.state.allowedLayers.has('Z3'), 'text-gray': !this.state.allowedLayers.has('Z3') })}
-                            >
-                                3 ZIP
-                            </label>
+                <div className="small-1 cell max-width-100">
+                    <div className="row small-collapse">
+                        <div className="columns small-6"></div>
+                        <div className="columns small-6">
+                            <button className="button expanded margin-0" onClick={this.onPrint}>
+                                Print
+                            </button>
                         </div>
-                        <div>
-                            <input type="checkbox" name="Z5" id="Z5" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z5')} />
-                            <label
-                                htmlFor="Z5"
-                                className={ClassNames('margin-right-1', {
-                                    'font-bold': this.state.allowedLayers.has('Z5'),
-                                    'text-gray': !this.state.allowedLayers.has('Z5'),
-                                })}
-                            >
-                                5 ZIP
-                            </label>
-                        </div>
-                        <div>
-                            <input
-                                type="checkbox"
-                                name="PremiumCRoute"
-                                id="PremiumCRoute"
-                                onChange={this.onClassificationsChange}
-                                checked={this.state.activeLayers.has('PremiumCRoute')}
-                            />
-                            <label
-                                htmlFor="PremiumCRoute"
-                                className={ClassNames('margin-right-1', {
-                                    'font-bold': this.state.allowedLayers.has('PremiumCRoute'),
-                                    'text-gray': !this.state.allowedLayers.has('PremiumCRoute'),
-                                })}
-                            >
-                                CRoute
-                            </label>
+                    </div>
+                    <div className="padding-horizontal-1">
+                        <legend>Classifications</legend>
+                        <div className="button-group stacked-for-small clear">
+                            <div>
+                                <input type="checkbox" name="Z3" id="Z3" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z3')} />
+                                <label
+                                    htmlFor="Z3"
+                                    className={ClassNames('margin-right-1', { 'font-bold': this.state.allowedLayers.has('Z3'), 'text-gray': !this.state.allowedLayers.has('Z3') })}
+                                >
+                                    3 ZIP
+                                </label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="Z5" id="Z5" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z5')} />
+                                <label
+                                    htmlFor="Z5"
+                                    className={ClassNames('margin-right-1', {
+                                        'font-bold': this.state.allowedLayers.has('Z5'),
+                                        'text-gray': !this.state.allowedLayers.has('Z5'),
+                                    })}
+                                >
+                                    5 ZIP
+                                </label>
+                            </div>
+                            <div>
+                                <input
+                                    type="checkbox"
+                                    name="PremiumCRoute"
+                                    id="PremiumCRoute"
+                                    onChange={this.onClassificationsChange}
+                                    checked={this.state.activeLayers.has('PremiumCRoute')}
+                                />
+                                <label
+                                    htmlFor="PremiumCRoute"
+                                    className={ClassNames('margin-right-1', {
+                                        'font-bold': this.state.allowedLayers.has('PremiumCRoute'),
+                                        'text-gray': !this.state.allowedLayers.has('PremiumCRoute'),
+                                    })}
+                                >
+                                    CRoute
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className="small-10 cell max-width-100 padding-top-1">
                     <div className="row small-collapse">
                         <div className="columns small-6">
-                            <button className="button expanded margin-0">SubMaps</button>
+                            <button className="button tiny expanded margin-0">SubMaps</button>
                         </div>
                         <div className="columns small-6">
-                            <button className="button expanded secondary margin-0">Address</button>
+                            <button className="button tiny expanded hollow margin-0">Address</button>
                         </div>
                         <div className="columns small-12">
                             <div className="button-group no-gaps clear small tiny-button-group">
