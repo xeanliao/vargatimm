@@ -290,6 +290,43 @@ namespace Vargainc.Timm.REST.Controllers
             return response;
         }
 
+        [Route("zip/{code}")]
+        [HttpGet]
+        public dynamic SearchZip(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                return BadRequest();
+            }
+            var searchKey = code.Trim();
+            if(searchKey.Length == 0)
+            {
+                return BadRequest();
+            }
+            Object result = null;
+            switch(searchKey.Length){
+                case 3:
+                    result = db.ThreeZipAreas
+                        .Where(i => i.Code == searchKey)
+                        .Select(i => new { name = i.Code, apt = i.APT_COUNT, home = i.HOME_COUNT, lat = i.Latitude, lng = i.Longitude })
+                        .FirstOrDefault();
+                    break;
+                    case 5:
+                    result = db.FiveZipAreas
+                        .Where(i=>i.Code == searchKey)
+                        .Select(i => new { name = i.Code, apt = i.APT_COUNT, home = i.HOME_COUNT, lat = i.Latitude, lng = i.Longitude })
+                        .FirstOrDefault();
+                    break;
+                    default:
+                    result = db.PremiumCRoutes
+                        .Where(i=>i.GEOCODE == searchKey)
+                        .Select(i => new { name = i.GEOCODE, apt = i.APT_COUNT, home = i.HOME_COUNT, lat = i.Latitude, lng = i.Longitude })
+                        .FirstOrDefault();
+                    break;
+            }
+            return new { success = result != null, result = result };
+        }
+
         [Route("tiles/3zip/build")]
         [HttpGet]
         public async Task<dynamic> Build3ZipTiles()
