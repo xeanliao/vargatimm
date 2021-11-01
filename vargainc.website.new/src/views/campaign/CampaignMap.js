@@ -182,6 +182,8 @@ export default class Campaign extends React.Component {
         this.initCampaignLayers = this.initCampaignLayers.bind(this)
         this.restoreMapSelection = this.restoreMapSelection.bind(this)
 
+        this.onSearchZip = this.onSearchZip.bind(this)
+
         this.getActiveLayer = this.getActiveLayer.bind(this)
 
         this.map = null
@@ -190,6 +192,7 @@ export default class Campaign extends React.Component {
         this.doUnsubscribe = Helper.doUnsubscribe.bind(this)
 
         this.subscribe('CampaignMap.Refresh', this.onRefresh)
+        this.subscribe('Search.Zip', this.onSearchZip)
 
         this.saveCampaignLocation = this.saveCampaignLocation.bind(this)
 
@@ -1015,6 +1018,39 @@ export default class Campaign extends React.Component {
                     })
                 }
             )
+        })
+    }
+
+    onSearchZip(searchKey) {
+        if (this.state.searchResultPopup) {
+            this.state.searchResultPopup.remove()
+        }
+        axios.get(`area/zip/${searchKey}`).then((resp) => {
+            if (resp.data.success) {
+                let lnglat = [resp.data.result.lng, resp.data.result.lat]
+                this.map.setCenter(lnglat)
+                let name = resp.data.result.name
+                let apt = resp.data.result.atp
+                let home = resp.data.result.home
+                let countRule = this.props.campaign.AreaDescription
+                let content = ''
+                switch (countRule) {
+                    case 'APT ONLY':
+                        content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)}`
+                        break
+                    case 'HOME ONLY':
+                        content = `SFDU:${new Intl.NumberFormat('en-US').format(home)}`
+                        break
+                    case 'APT + HOME':
+                        content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)} SFDU:${new Intl.NumberFormat('en-US').format(home)}<br />Total:${new Intl.NumberFormat(
+                            'en-US'
+                        ).format(apt + home)}`
+                        break
+                }
+
+                const popup = new mapboxgl.Popup({ closeOnClick: true }).setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
+                this.setState({ searchResultPopup: popup })
+            }
         })
     }
 
