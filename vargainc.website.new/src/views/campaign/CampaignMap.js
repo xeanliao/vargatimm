@@ -1,5 +1,6 @@
-// import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
-import mapboxgl from 'mapbox-gl'
+import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
+// import mapboxgl from 'mapbox-gl'
+import * as Turf from '@turf/turf'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { color } from 'd3-color'
@@ -13,7 +14,8 @@ import Helper from 'views/base'
 import SubmapEdit from './SubmapEdit'
 
 const log = new Logger('views:campaign')
-
+//streets
+//satellite
 const layers = [
     {
         layer: 'PremiumCRoute',
@@ -28,13 +30,25 @@ const layers = [
                     'line-cap': 'round',
                 },
                 paint: {
-                    'line-color': 'hsl(250, 76%, 67%)',
-                    'line-width': {
-                        base: 1.5,
-                        stops: [
-                            [5, 0.25],
-                            [18, 6],
-                        ],
+                    streets: {
+                        'line-color': 'hsl(250, 76%, 67%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.25],
+                                [18, 6],
+                            ],
+                        },
+                    },
+                    satellite: {
+                        'line-color': 'hsl(250, 76%, 90%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.25],
+                                [18, 6],
+                            ],
+                        },
                     },
                 },
             },
@@ -53,13 +67,25 @@ const layers = [
                     'line-cap': 'round',
                 },
                 paint: {
-                    'line-color': 'hsl(215, 36%, 59%)',
-                    'line-width': {
-                        base: 1.5,
-                        stops: [
-                            [5, 0.5],
-                            [18, 26],
-                        ],
+                    streets: {
+                        'line-color': 'hsl(215, 36%, 59%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.5],
+                                [18, 26],
+                            ],
+                        },
+                    },
+                    satellite: {
+                        'line-color': 'hsl(215, 36%, 90%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.5],
+                                [18, 26],
+                            ],
+                        },
                     },
                 },
             },
@@ -78,13 +104,25 @@ const layers = [
                     'line-join': 'round',
                 },
                 paint: {
-                    'line-color': 'hsl(215, 20%, 42%)',
-                    'line-width': {
-                        base: 1.5,
-                        stops: [
-                            [5, 1],
-                            [18, 32],
-                        ],
+                    streets: {
+                        'line-color': 'hsl(215, 20%, 42%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 1],
+                                [18, 32],
+                            ],
+                        },
+                    },
+                    satellite: {
+                        'line-color': 'hsl(215, 20%, 90%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 1],
+                                [18, 32],
+                            ],
+                        },
                     },
                 },
             },
@@ -113,6 +151,7 @@ export default class Campaign extends React.Component {
             selectedShapes: new Map(),
             selectedSubmapId: null,
             campaignSource: { features: [] },
+            mapStyle: 'streets',
         }
 
         this.onInitSubMapScrollbar = this.onInitSubMapScrollbar.bind(this)
@@ -126,6 +165,8 @@ export default class Campaign extends React.Component {
         this.onSubmapSelect = this.onSubmapSelect.bind(this)
         this.onClassificationsChange = this.onClassificationsChange.bind(this)
         this.onShapeSelect = this.onShapeSelect.bind(this)
+        this.onShowShapePopup = this.onShowShapePopup.bind(this)
+        this.onHideShapePopup = this.onHideShapePopup.bind(this)
 
         this.loadSubmapList = this.loadSubmapList.bind(this)
         this.onNewSubmap = this.onNewSubmap.bind(this)
@@ -238,6 +279,7 @@ export default class Campaign extends React.Component {
         let testLayerExist = null
         let labelLayer = this.state.mapLabelLayer
         let tileUrl = new URL('./api/area/tiles', `${location.protocol}//${location.host}${location.pathname}`)
+        let mapStyle = this.state.mapStyle
         layers.forEach((item) => {
             let tileSource = `${tileUrl}/${item.layer}/{z}/{x}/{y}`
             let sourceName = `area-source-${item.layer}`
@@ -264,7 +306,7 @@ export default class Campaign extends React.Component {
                         minzoom: item.zoom[0],
                         maxzoom: item.zoom[1],
                         layout: setting.layout,
-                        paint: setting.paint,
+                        paint: setting.paint[mapStyle],
                     },
                     labelLayer
                 )
@@ -329,6 +371,30 @@ export default class Campaign extends React.Component {
 
             testLayerExist = this.map.getLayer(`timm-area-layer-${item.layer}-label`)
             testLayerExist && this.map.removeLayer(`timm-area-layer-${item.layer}-label`)
+            let countRule = this.props.campaign.AreaDescription
+            let detail = ''
+            let total = ''
+            switch (countRule) {
+                case 'APT ONLY':
+                    detail = ['concat', 'MFDU:', ['number-format', ['get', 'apt'], { locale: 'en-Latn-US' }]]
+                    total = ''
+                    break
+                case 'HOME ONLY':
+                    detail = ['concat', 'SFDU:', ['number-format', ['get', 'home'], { locale: 'en-Latn-US' }]]
+                    total = ''
+                    break
+                case 'APT + HOME':
+                    detail = [
+                        'concat',
+                        'SFDU:',
+                        ['number-format', ['get', 'home'], { locale: 'en-Latn-US' }],
+                        ' ',
+                        'MFDU:',
+                        ['number-format', ['get', 'apt'], { locale: 'en-Latn-US' }],
+                    ]
+                    total = ['concat', 'Total:', ['number-format', ['+', ['get', 'home'], ['get', 'apt']], { locale: 'en-Latn-US' }]]
+                    break
+            }
             this.map.addLayer({
                 id: `timm-area-layer-${item.layer}-label`,
                 type: 'symbol',
@@ -344,26 +410,19 @@ export default class Campaign extends React.Component {
                         ['get', 'name'],
                         { 'font-scale': item.fontScale[0] },
                         '\n',
-                        [
-                            'concat',
-                            'SFDU:',
-                            ['number-format', ['get', 'home'], { locale: 'en-Latn-US' }],
-                            ' ',
-                            'MFDU:',
-                            ['number-format', ['get', 'apt'], { locale: 'en-Latn-US' }],
-                        ],
+                        detail,
                         {
                             'font-scale': item.fontScale[1],
                         },
                         '\n',
-                        ['concat', 'Total:', ['number-format', ['+', ['get', 'home'], ['get', 'apt']], { locale: 'en-Latn-US' }]],
+                        total,
                         {
                             'font-scale': item.fontScale[1],
                         },
                     ],
                 },
                 paint: {
-                    'text-color': 'hsl(0, 0%, 0%)',
+                    'text-color': mapStyle == 'streets' ? 'black' : 'white', //'hsl(0, 0%, 0%)',
                     'text-halo-color': ['interpolate', ['linear'], ['zoom'], 2, 'rgba(255, 255, 255, 0.75)', 3, 'rgb(255, 255, 255)'],
                     'text-halo-width': item.fontScale[1],
                 },
@@ -371,7 +430,11 @@ export default class Campaign extends React.Component {
             })
 
             this.map.off('click', `timm-area-layer-${item.layer}-fill`, this.onShapeSelect)
+            this.map.off('contextmenu', `timm-area-layer-${item.layer}-fill`, this.onShowShapePopup)
+            this.map.off('mousemove', `timm-area-layer-${item.layer}-fill`, this.onHideShapePopup)
             this.map.on('click', `timm-area-layer-${item.layer}-fill`, this.onShapeSelect)
+            this.map.on('contextmenu', `timm-area-layer-${item.layer}-fill`, this.onShowShapePopup)
+            this.map.on('mousemove', `timm-area-layer-${item.layer}-fill`, this.onHideShapePopup)
         })
         return Promise.resolve()
     }
@@ -659,6 +722,60 @@ export default class Campaign extends React.Component {
         )
     }
 
+    onShowShapePopup(e) {
+        let id = e.features?.[0]?.properties?.id
+        let activeLayer = this.getActiveLayer()
+        if (!id || id.indexOf(activeLayer) == -1) {
+            return
+        }
+
+        // this.onHideShapePopup()
+        const coordinates = e.features[0].geometry.coordinates.slice()
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+        }
+
+        let home = e.features[0].properties.home
+        let apt = e.features[0].properties.apt
+        let name = e.features[0].properties.name
+        let lnglat = e.lngLat
+
+        let popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+        })
+
+        let countRule = this.props.campaign.AreaDescription
+        let content = ''
+        switch (countRule) {
+            case 'APT ONLY':
+                content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)}`
+                break
+            case 'HOME ONLY':
+                content = `SFDU:${new Intl.NumberFormat('en-US').format(home)}`
+                break
+            case 'APT + HOME':
+                content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)} SFDU:${new Intl.NumberFormat('en-US').format(home)}<br />Total:${new Intl.NumberFormat(
+                    'en-US'
+                ).format(apt + home)}`
+                break
+        }
+
+        popup.setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
+
+        this.setState({ popup: popup })
+    }
+
+    onHideShapePopup() {
+        if (this.state.popup) {
+            this.state.popup.remove()
+            this.setState({ popup: null })
+        }
+    }
+
     loadSubmapList() {
         axios.get(`campaign/${this.props.campaign.Id}/submap`).then((resp) => {
             this.props.campaign.SubMaps = resp.data.data.SubMaps
@@ -836,31 +953,32 @@ export default class Campaign extends React.Component {
         }
 
         this.map.once('styledata', this.onStyleChange)
-        this.setState({ mapStyle: style })
-        if (style == 'streets') {
-            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
-            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
+        this.setState({ mapStyle: style }, () => {
+            if (style == 'streets') {
+                // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
+                // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
 
-            this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
-            // for (const layer of this.map.getStyle().layers) {
-            //     if (!layer.id.startsWith('timm')) {
-            //         this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
-            //     }
-            // }
-            // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
-        } else {
-            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
-            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
+                this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
+                // for (const layer of this.map.getStyle().layers) {
+                //     if (!layer.id.startsWith('timm')) {
+                //         this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                //     }
+                // }
+                // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
+            } else {
+                // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
+                // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
 
-            this.map.setStyle('mapbox://styles/mapbox/satellite-streets-v11')
+                this.map.setStyle('mapbox://styles/mapbox/satellite-streets-v11')
 
-            // for (const layer of this.map.getStyle().layers) {
-            //     if (!layer.id.startsWith('timm')) {
-            //         this.map.setLayoutProperty(layer.id, 'visibility', 'none')
-            //     }
-            // }
-            // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
-        }
+                // for (const layer of this.map.getStyle().layers) {
+                //     if (!layer.id.startsWith('timm')) {
+                //         this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+                //     }
+                // }
+                // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+            }
+        })
     }
 
     onStyleChange() {
