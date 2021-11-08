@@ -299,6 +299,7 @@ namespace Vargainc.Timm.REST.Controllers
                     i.CreatorName,
                     i.Longitude,
                     i.Latitude,
+                    i.AreaDescription,
                     i.ZoomLevel,
                     Addresses = i.Addresses.Select(a=>new 
                     { 
@@ -1282,6 +1283,23 @@ namespace Vargainc.Timm.REST.Controllers
 
             //dbCampaign.Addresses
             return Json(new { success = true, info = info.ToString() });
+        }
+
+        [Route("{campaignId:int}/location/{zoom:double}/{lng:double}/{lat:double}")]
+        [HttpPut]
+        public async Task<IHttpActionResult> UpdateCampaignLocation(int campaignId, double zoom, double lng, double lat)
+        {
+            var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
+            if(campaign != null)
+            {
+                campaign.ZoomLevel = (int)Math.Round(zoom);
+                campaign.Latitude = lat;
+                campaign.Longitude = lng;
+
+                await db.SaveChangesAsync().ConfigureAwait(false);
+            }
+
+            return Ok();
         }
 
         private async Task<bool> SaveImportCampaign(ViewModel.ImportCampaign campaign)
