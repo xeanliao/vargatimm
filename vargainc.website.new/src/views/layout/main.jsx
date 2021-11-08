@@ -48,7 +48,7 @@ export default React.createBackboneClass({
                 pageTitle: has(options, 'pageTitle') ? options.pageTitle : 'TIMM System',
                 showMenu: has(options, 'showMenu') ? options.showMenu : true,
                 showSearch: has(options, 'showSearch') ? options.showSearch : true,
-                showZipSearch: has(options, 'showZipSearch') ? options.showZipSearch : true,
+                showZipSearch: has(options, 'showZipSearch') ? options.showZipSearch : false,
                 showUser: has(options, 'showUser') ? options.showUser : true,
                 mainView: data.view,
                 mainParams: data.params,

@@ -130,12 +130,15 @@ export default class DMap extends React.Component {
         this.onDeleteDMap = this.onDeleteDMap.bind(this)
         this.onSaveShapesToDMap = this.onSaveShapesToDMap.bind(this)
 
+        this.onSearchZip = this.onSearchZip.bind(this)
+
         this.subscribe = Helper.subscribe.bind(this)
         this.doUnsubscribe = Helper.doUnsubscribe.bind(this)
 
         this.subscribe('DMap.Refresh', () => {
             this.onRefresh()
         })
+        this.subscribe('Search.Zip', this.onSearchZip)
     }
 
     componentWillUnmount() {
@@ -268,11 +271,13 @@ export default class DMap extends React.Component {
             // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
 
             // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
+
             for (const layer of this.map.getStyle().layers) {
                 if (!layer.id.startsWith('timm')) {
                     this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
                 }
             }
+
             this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
         } else {
             // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
@@ -285,6 +290,7 @@ export default class DMap extends React.Component {
                     this.map.setLayoutProperty(layer.id, 'visibility', 'none')
                 }
             }
+
             this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
         }
     }
@@ -657,6 +663,43 @@ export default class DMap extends React.Component {
         })
     }
 
+    onSearchZip(searchKey) {
+        if (searchKey == null || searchKey.trim().length != 5) {
+            return
+        }
+        axios.get(`area/zip/${searchKey}`).then((resp) => {
+            if (resp.data.success) {
+                let lnglat = [resp.data.result.lng, resp.data.result.lat]
+                this.map.setCenter(lnglat)
+                let name = resp.data.result.name
+                let apt = resp.data.result.apt
+                let home = resp.data.result.home
+                let countRule = this.props.campaign.AreaDescription
+                let content = ''
+                switch (countRule) {
+                    case 'APT ONLY':
+                        content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)}`
+                        break
+                    case 'HOME ONLY':
+                        content = `SFDU:${new Intl.NumberFormat('en-US').format(home)}`
+                        break
+                    case 'APT + HOME':
+                        content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)} SFDU:${new Intl.NumberFormat('en-US').format(home)}<br />Total:${new Intl.NumberFormat(
+                            'en-US'
+                        ).format(apt + home)}`
+                        break
+                }
+                this.clearPopup()
+                const popup = new mapboxgl.Popup({ closeOnClick: true }).setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
+                if (this.map.getZoom() < 10) {
+                    this.map.setZoom(10)
+                    this.map.setCenter(lnglat)
+                }
+                this.setState({ searchResultPopup: popup })
+            }
+        })
+    }
+
     render() {
         return (
             <div className="dmap full-container">
@@ -778,7 +821,7 @@ export default class DMap extends React.Component {
                     <div className="mapboxgl-ctrl-top-left">
                         <div className="mapboxgl-ctrl mapboxgl-ctrl-group">
                             <button
-                                className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-stree"
+                                className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-street"
                                 onClick={() => {
                                     this.onSwitchMapStyle('streets')
                                 }}

@@ -184,6 +184,7 @@ export default class Campaign extends React.Component {
 
         this.onSearchZip = this.onSearchZip.bind(this)
         this.onPrint = this.onPrint.bind(this)
+        this.clearPopup = this.clearPopup.bind(this)
 
         this.getActiveLayer = this.getActiveLayer.bind(this)
 
@@ -244,6 +245,53 @@ export default class Campaign extends React.Component {
     }
 
     onMapLoad() {
+        this.map.addSource('google-road-tiles', {
+            type: 'raster',
+            tiles: [
+                '//mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                '//mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                '//mt2.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                '//mt3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+            ],
+            tileSize: 256,
+        })
+        this.map.addSource('google-satellite-tiles', {
+            type: 'raster',
+            tiles: [
+                '//mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                '//mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                '//mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                '//mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+            ],
+            tileSize: 256,
+        })
+        this.map.addLayer(
+            {
+                id: 'timm-google-road-tiles-layer',
+                type: 'raster',
+                source: 'google-road-tiles',
+                minzoom: 0,
+                maxzoom: 21,
+                layout: {
+                    visibility: 'none',
+                },
+            },
+            'land'
+        )
+        this.map.addLayer(
+            {
+                id: 'timm-google-satellite-tiles-layer',
+                type: 'raster',
+                source: 'google-satellite-tiles',
+                minzoom: 0,
+                maxzoom: 21,
+                layout: {
+                    visibility: 'none',
+                },
+            },
+            'land'
+        )
+
         const layers = this.map.getStyle().layers
         // Find the index of the first symbol layer in the map style
         let labelLayer = null
@@ -732,7 +780,7 @@ export default class Campaign extends React.Component {
         if (!id || id.indexOf(activeLayer) == -1) {
             return
         }
-
+        this.clearPopup()
         // this.onHideShapePopup()
         const coordinates = e.features[0].geometry.coordinates.slice()
         // Ensure that if the map is zoomed out such that multiple
@@ -951,38 +999,85 @@ export default class Campaign extends React.Component {
         )
     }
 
+    // onSwitchMapStyle(style) {
+    //     if (!this.state.mapReady) {
+    //         return
+    //     }
+
+    //     // this.map.once('styledata', this.onStyleChange)
+    //     this.setState({ mapStyle: style }, () => {
+    //         if (style == 'streets') {
+    //             // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
+    //             // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
+
+    //             // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
+    //             // for (const layer of this.map.getStyle().layers) {
+    //             //     if (!layer.id.startsWith('timm')) {
+    //             //         this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+    //             //     }
+    //             // }
+    //             // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
+
+    //             for (const layer of this.map.getStyle().layers) {
+    //                 if (!layer.id.startsWith('timm')) {
+    //                     this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+    //                 }
+    //             }
+    //             this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
+    //         } else {
+    //             // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
+    //             // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
+
+    //             // this.map.setStyle('mapbox://styles/mapbox/satellite-streets-v11')
+
+    //             // for (const layer of this.map.getStyle().layers) {
+    //             //     if (!layer.id.startsWith('timm')) {
+    //             //         this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+    //             //     }
+    //             // }
+    //             // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+
+    //             for (const layer of this.map.getStyle().layers) {
+    //                 if (!layer.id.startsWith('timm')) {
+    //                     this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+    //                 }
+    //             }
+    //             this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+    //         }
+    //     })
+    // }
+
     onSwitchMapStyle(style) {
         if (!this.state.mapReady) {
             return
         }
+        if (style == 'streets') {
+            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
+            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
 
-        this.map.once('styledata', this.onStyleChange)
-        this.setState({ mapStyle: style }, () => {
-            if (style == 'streets') {
-                // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
-                // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
+            // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
 
-                this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
-                // for (const layer of this.map.getStyle().layers) {
-                //     if (!layer.id.startsWith('timm')) {
-                //         this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
-                //     }
-                // }
-                // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
-            } else {
-                // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
-                // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
-
-                this.map.setStyle('mapbox://styles/mapbox/satellite-streets-v11')
-
-                // for (const layer of this.map.getStyle().layers) {
-                //     if (!layer.id.startsWith('timm')) {
-                //         this.map.setLayoutProperty(layer.id, 'visibility', 'none')
-                //     }
-                // }
-                // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+            for (const layer of this.map.getStyle().layers) {
+                if (!layer.id.startsWith('timm')) {
+                    this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                }
             }
-        })
+
+            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
+        } else {
+            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
+            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
+
+            // this.map.setStyle('mapbox://styles/mapbox/satellite-v9')
+
+            for (const layer of this.map.getStyle().layers) {
+                if (!layer.id.startsWith('timm')) {
+                    this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+                }
+            }
+
+            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+        }
     }
 
     onStyleChange() {
@@ -1022,9 +1117,18 @@ export default class Campaign extends React.Component {
         })
     }
 
-    onSearchZip(searchKey) {
+    clearPopup() {
         if (this.state.searchResultPopup) {
             this.state.searchResultPopup.remove()
+        }
+        if (this.state.popup) {
+            this.state.popup.remove()
+        }
+    }
+
+    onSearchZip(searchKey) {
+        if (searchKey == null || searchKey.trim().length != 5) {
+            return
         }
         axios.get(`area/zip/${searchKey}`).then((resp) => {
             if (resp.data.success) {
@@ -1048,8 +1152,12 @@ export default class Campaign extends React.Component {
                         ).format(apt + home)}`
                         break
                 }
-
+                this.clearPopup()
                 const popup = new mapboxgl.Popup({ closeOnClick: true }).setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
+                if (this.map.getZoom() < 10) {
+                    this.map.setZoom(10)
+                    this.map.setCenter(lnglat)
+                }
                 this.setState({ searchResultPopup: popup })
             }
         })
@@ -1210,7 +1318,7 @@ export default class Campaign extends React.Component {
                     <div className="mapboxgl-ctrl-top-left">
                         <div className="mapboxgl-ctrl mapboxgl-ctrl-group">
                             <button
-                                className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-stree"
+                                className="mapboxgl-ctrl-icon mapboxgl-ctrl-img mapboxgl-ctrl-street"
                                 onClick={() => {
                                     this.onSwitchMapStyle('streets')
                                 }}
