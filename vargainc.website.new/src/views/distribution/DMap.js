@@ -721,7 +721,7 @@ export default class DMap extends React.Component {
                             <button className="button expanded margin-0">Distribution Maps</button>
                         </div>
                         <div className="columns small-12">
-                            <div className="button-group no-gaps clear small tiny-button-group">
+                            <div className="button-group no-gaps clear small tiny-button-group margin-top-1">
                                 <div className="button padding-horizontal-1 padding-vertical-0" onClick={this.onNewDMap}>
                                     New
                                 </div>
