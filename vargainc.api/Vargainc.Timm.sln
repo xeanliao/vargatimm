@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.REST", "Varga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.Extentions", "Vargainc.Timm.Extentions\Vargainc.Timm.Extentions.csproj", "{28DC8819-C55C-4D82-92BC-0481B847AEBC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTopologySuite.IO.VectorTiles", "NetTopologySuite.IO.VectorTiles\NetTopologySuite.IO.VectorTiles.csproj", "{8555A86A-D1CA-4D99-9E03-CA8213F6731A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetTopologySuite.IO.VectorTiles", "NetTopologySuite.IO.VectorTiles\NetTopologySuite.IO.VectorTiles.csproj", "{8555A86A-D1CA-4D99-9E03-CA8213F6731A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetTopologySuite.IO.VectorTiles.GeoJson", "NetTopologySuite.IO.VectorTiles.GeoJson\NetTopologySuite.IO.VectorTiles.GeoJson.csproj", "{0BC27854-1B8D-4806-B19E-A74BFEC2394B}"
 EndProject
