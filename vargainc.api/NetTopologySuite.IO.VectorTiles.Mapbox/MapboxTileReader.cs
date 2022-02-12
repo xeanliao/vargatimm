@@ -192,7 +192,7 @@ namespace NetTopologySuite.IO.VectorTiles.Mapbox
                 }
 
                 // Create sequence, add starting point
-                var sequence = _factory.CoordinateSequenceFactory.Create(1 + count + buffer, 2);
+                var sequence = _factory.CoordinateSequenceFactory.Create(1 + count + buffer, 2, 0);
                 int sequenceIndex = 0;
                 TransformOffsetAndAddToSequence(tgs, currentPosition, sequence, sequenceIndex++);
 
@@ -237,7 +237,7 @@ namespace NetTopologySuite.IO.VectorTiles.Mapbox
             var currentPosition = (currentX, currentY);
             for (int i = 0; i < numSequences; i++)
             {
-                res[i] = _factory.CoordinateSequenceFactory.Create(1, 2);
+                res[i] = _factory.CoordinateSequenceFactory.Create(1, 2, 0);
 
                 currentPosition = ParseOffset(currentPosition, geometry, ref currentIndex);
                 TransformOffsetAndAddToSequence(tgs, currentPosition, res[i], 0);

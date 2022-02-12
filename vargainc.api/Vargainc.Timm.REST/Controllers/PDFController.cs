@@ -212,7 +212,7 @@ namespace Vargainc.Timm.REST.Controllers
                 
             }
 
-            PdfDocumentRenderer renderer = new PdfDocumentRenderer(true, PdfSharp.Pdf.PdfFontEmbedding.Always);
+            PdfDocumentRenderer renderer = new PdfDocumentRenderer(true);
             renderer.Document = doc;
             renderer.RenderDocument();
 

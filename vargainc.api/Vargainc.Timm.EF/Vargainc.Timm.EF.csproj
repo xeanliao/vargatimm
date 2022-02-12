@@ -39,7 +39,7 @@
   
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" Version="6.4.4" />
-		<PackageReference Include="log4net" Version="2.0.12" />
+		<PackageReference Include="log4net" Version="2.0.14" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -100,20 +100,12 @@
     <Compile Include="TimmContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Vargainc.Timm.Models\Vargainc.Timm.Models.csproj">
-      <Project>{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}</Project>
-      <Name>Vargainc.Timm.Models</Name>
-    </ProjectReference>
+		<ProjectReference Include="..\Vargainc.Timm.Models\Vargainc.Timm.Models.csproj" />
   </ItemGroup>
 	
 	<Import Project="..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props')" />
+	
 	<Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-	<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 	<Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
 
 	<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

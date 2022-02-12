@@ -28,7 +28,8 @@ namespace NetTopologySuite.IO.VectorTiles.Tiles
             var factory = Factory;
 
             // Create and fill sequence
-            var cs = factory.CoordinateSequenceFactory.Create(5, 2);
+            
+            var cs = factory.CoordinateSequenceFactory.Create(5, 2, 0);
             cs.SetOrdinate(0, Ordinate.X, tile.Left - xMar);
             cs.SetOrdinate(0, Ordinate.Y, tile.Top + yMar);
             cs.SetOrdinate(1, Ordinate.X, tile.Right + xMar);
