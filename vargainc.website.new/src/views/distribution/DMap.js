@@ -6,16 +6,17 @@ import { color } from 'd3-color'
 import axios from 'axios'
 import Logger from 'logger.mjs'
 import ClassNames from 'classnames'
+import moment from 'moment'
 
 import Helper from 'views/base'
 import DMapEdit from './DMapEdit'
 
 const log = new Logger('views:campaign')
 
-const layers = [
+const layersDefine = [
     {
         layer: 'PremiumCRoute',
-        zoom: [11, 24],
+        zoom: [0, 24],
         fontScale: [0.75, 0.75],
         settings: [
             {
@@ -26,13 +27,25 @@ const layers = [
                     'line-cap': 'round',
                 },
                 paint: {
-                    'line-color': 'hsl(250, 76%, 67%)',
-                    'line-width': {
-                        base: 1.5,
-                        stops: [
-                            [5, 0.25],
-                            [18, 6],
-                        ],
+                    streets: {
+                        'line-color': 'hsl(250, 76%, 67%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.25],
+                                [18, 6],
+                            ],
+                        },
+                    },
+                    satellite: {
+                        'line-color': 'hsl(250, 76%, 90%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.25],
+                                [18, 6],
+                            ],
+                        },
                     },
                 },
             },
@@ -40,7 +53,7 @@ const layers = [
     },
     {
         layer: 'Z5',
-        zoom: [11, 24],
+        zoom: [0, 24],
         fontScale: [1, 0.75],
         settings: [
             {
@@ -51,13 +64,25 @@ const layers = [
                     'line-cap': 'round',
                 },
                 paint: {
-                    'line-color': 'hsl(215, 36%, 59%)',
-                    'line-width': {
-                        base: 1.5,
-                        stops: [
-                            [5, 0.5],
-                            [18, 26],
-                        ],
+                    streets: {
+                        'line-color': 'hsl(215, 36%, 59%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.5],
+                                [18, 26],
+                            ],
+                        },
+                    },
+                    satellite: {
+                        'line-color': 'hsl(215, 36%, 90%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 0.5],
+                                [18, 26],
+                            ],
+                        },
                     },
                 },
             },
@@ -65,7 +90,7 @@ const layers = [
     },
     {
         layer: 'Z3',
-        zoom: [11, 24],
+        zoom: [0, 24],
         fontScale: [1.25, 1],
         settings: [
             {
@@ -76,13 +101,25 @@ const layers = [
                     'line-join': 'round',
                 },
                 paint: {
-                    'line-color': 'hsl(215, 20%, 42%)',
-                    'line-width': {
-                        base: 1.5,
-                        stops: [
-                            [5, 1],
-                            [18, 32],
-                        ],
+                    streets: {
+                        'line-color': 'hsl(215, 20%, 42%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 1],
+                                [18, 32],
+                            ],
+                        },
+                    },
+                    satellite: {
+                        'line-color': 'hsl(215, 20%, 90%)',
+                        'line-width': {
+                            base: 1.5,
+                            stops: [
+                                [5, 1],
+                                [18, 32],
+                            ],
+                        },
                     },
                 },
             },
@@ -111,6 +148,7 @@ export default class DMap extends React.Component {
             selectedShapes: new Map(),
             selectedSubmapId: null,
             campaginSource: { features: [] },
+            mapStyle: 'satellite',
         }
 
         this.onInitMenuScrollbar = this.onInitMenuScrollbar.bind(this)
@@ -131,6 +169,7 @@ export default class DMap extends React.Component {
         this.onSaveShapesToDMap = this.onSaveShapesToDMap.bind(this)
 
         this.onSearchZip = this.onSearchZip.bind(this)
+        this.clearPopup = this.clearPopup.bind(this)
 
         this.subscribe = Helper.subscribe.bind(this)
         this.doUnsubscribe = Helper.doUnsubscribe.bind(this)
@@ -228,7 +267,7 @@ export default class DMap extends React.Component {
                 minzoom: 0,
                 maxzoom: 21,
                 layout: {
-                    visibility: 'none',
+                    visibility: this.state.mapStyle == 'streets' ? 'none' : 'visible',
                 },
             },
             'land'
@@ -266,33 +305,52 @@ export default class DMap extends React.Component {
         if (!this.state.mapReady) {
             return
         }
-        if (style == 'streets') {
-            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
-            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
+        this.setState(
+            {
+                mapStyle: style,
+            },
+            () => {
+                if (style == 'streets') {
+                    // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
+                    // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
 
-            // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
+                    // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
 
-            for (const layer of this.map.getStyle().layers) {
-                if (!layer.id.startsWith('timm')) {
-                    this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                    for (const layer of this.map.getStyle().layers) {
+                        if (!layer.id.startsWith('timm')) {
+                            this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                        }
+                    }
+
+                    this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
+                } else {
+                    // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
+                    // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
+
+                    // this.map.setStyle('mapbox://styles/mapbox/satellite-v9')
+
+                    for (const layer of this.map.getStyle().layers) {
+                        if (!layer.id.startsWith('timm')) {
+                            this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+                        }
+                    }
+
+                    this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+                }
+
+                // hide/show area by map style
+                let hideStyle = this.state.mapStyle == 'streets' ? 'satellite' : 'streets'
+                let showStyle = this.state.mapStyle == 'streets' ? 'streets' : 'satellite'
+
+                for (const layer of this.map.getStyle().layers) {
+                    if (layer.id.endsWith(hideStyle)) {
+                        this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+                    } else if (layer.id.endsWith(showStyle)) {
+                        this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                    }
                 }
             }
-
-            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
-        } else {
-            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
-            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
-
-            // this.map.setStyle('mapbox://styles/mapbox/satellite-v9')
-
-            for (const layer of this.map.getStyle().layers) {
-                if (!layer.id.startsWith('timm')) {
-                    this.map.setLayoutProperty(layer.id, 'visibility', 'none')
-                }
-            }
-
-            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
-        }
+        )
     }
 
     loadCampaignGeojson() {
@@ -311,7 +369,7 @@ export default class DMap extends React.Component {
                         layout: {},
                         paint: {
                             'line-color': ['get', 'color'],
-                            'line-width': 4,
+                            'line-width': 2,
                         },
                         filter: ['==', ['get', 'type'], 'submap'],
                     },
@@ -349,32 +407,51 @@ export default class DMap extends React.Component {
                 )
 
                 // area
-                this.map.addLayer(
-                    {
-                        id: 'timm-area-layer-line',
-                        type: 'line',
-                        source: 'map-source',
-                        layout: {},
-                        paint: {
-                            'line-color': 'hsl(250, 76%, 67%)',
-                            'line-width': {
-                                base: 1.5,
-                                stops: [
-                                    [5, 0.25],
-                                    [18, 6],
-                                ],
-                            },
-                        },
-                        filter: ['==', ['get', 'type'], 'area'],
-                    },
-                    labelLayer
-                )
+                let currentMapStyle = this.state.mapStyle
+                const mapStyles = ['streets', 'satellite']
+                layersDefine.forEach((item) => {
+                    item.settings.forEach((setting) => {
+                        mapStyles.forEach((style) => {
+                            let layout = Object.assign({}, setting.layout, { visibility: style == currentMapStyle ? 'visible' : 'none' })
+                            this.map.addLayer(
+                                {
+                                    id: `timm-area-layer-${item.layer}-${setting.id}-${style}`,
+                                    type: setting.type,
+                                    source: 'map-source',
+                                    layout: layout,
+                                    paint: setting.paint[style],
+                                    filter: ['all', ['==', ['get', 'type'], 'area'], ['==', ['get', 'classification'], item.layer]],
+                                },
+                                labelLayer
+                            )
+                        })
+                    })
+                })
+                // this.map.addLayer(
+                //     {
+                //         id: 'timm-area-layer-line',
+                //         type: 'line',
+                //         source: 'map-source',
+                //         layout: {},
+                //         paint: {
+                //             'line-color': 'hsl(250, 76%, 67%)',
+                //             'line-width': {
+                //                 base: 1.5,
+                //                 stops: [
+                //                     [5, 0.25],
+                //                     [18, 6],
+                //                 ],
+                //             },
+                //         },
+                //         filter: ['==', ['get', 'type'], 'area'],
+                //     },
+                //     labelLayer
+                // )
                 this.map.addLayer(
                     {
                         id: 'timm-area-layer-fill',
                         type: 'fill',
                         source: 'map-source',
-                        layout: {},
                         paint: {
                             'fill-color': 'white',
                             'fill-opacity': 0,
@@ -390,7 +467,7 @@ export default class DMap extends React.Component {
                         source: 'map-source',
                         layout: { visibility: 'none' },
                         paint: {
-                            'fill-color': '#ffffff',
+                            'fill-color': '#000000',
                             'fill-opacity': 0.5,
                         },
                         filter: ['==', 'id', ''],
@@ -419,7 +496,7 @@ export default class DMap extends React.Component {
                         source: 'map-source',
                         layout: {},
                         paint: {
-                            'line-width': 8,
+                            'line-width': 6,
                         },
                         filter: ['==', ['get', 'sid'], ''],
                     },
@@ -454,7 +531,7 @@ export default class DMap extends React.Component {
                     mapReady: true,
                 },
                 () => {
-                    this.onSwitchMapStyle('satellite')
+                    this.onSwitchMapStyle(this.state.mapStyle ?? 'satellite')
                 }
             )
         })
@@ -492,9 +569,10 @@ export default class DMap extends React.Component {
                 },
                 () => {
                     //set selected layer fill color as submap color
+                    let highlightColor = color(`#${subMap.ColorString}`).darker(2).toString()
                     this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'none')
                     this.map.setFilter('timm-submap-layer-highlight', ['all', ['==', 'sid', subMap.Id], ['==', 'type', 'submap']])
-                    this.map.setPaintProperty('timm-submap-layer-highlight', 'line-color', `#${subMap.ColorString}`)
+                    this.map.setPaintProperty('timm-submap-layer-highlight', 'line-color', highlightColor)
                     this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'visible')
 
                     return resolve()
@@ -658,7 +736,7 @@ export default class DMap extends React.Component {
             }
         })
         let url = `campaign/${this.props.campaign.Id}/dmap/${this.state.selectedDMapId}/merge`
-        axios.post(url, data).then((resp) => {
+        axios.post(url, data).then(() => {
             this.onRefresh()
         })
     }
@@ -690,7 +768,7 @@ export default class DMap extends React.Component {
                         break
                 }
                 this.clearPopup()
-                const popup = new mapboxgl.Popup({ closeOnClick: true }).setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
+                const popup = new mapboxgl.Popup({ closeOnClick: false }).setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
                 if (this.map.getZoom() < 10) {
                     this.map.setZoom(10)
                     this.map.setCenter(lnglat)
@@ -698,6 +776,15 @@ export default class DMap extends React.Component {
                 this.setState({ searchResultPopup: popup })
             }
         })
+    }
+
+    clearPopup() {
+        if (this.state.searchResultPopup) {
+            this.state.searchResultPopup.remove()
+        }
+        if (this.state.popup) {
+            this.state.popup.remove()
+        }
     }
 
     render() {

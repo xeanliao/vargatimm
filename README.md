@@ -1,3 +1,18 @@
+# Database restore
+1. scp database back file to mssql server
+scp -i ~/.ssh/varga.pem <replace to local bak file> root@13.57.187.203:/var/opt/mssql/data/
+
+2. the mssql IP you can get from EC
+
+
+3. ssh remote to MSSQL server
+ssh root@13.57.187.203 -i ~/.ssh/varga.pem
+
+4. run MSSQL restore command
+
+
+
+
 # Database Update
 
 1. 2021-07-24
