@@ -45,6 +45,11 @@ namespace Vargainc.Timm.REST.Controllers
             foreach (var item in subMaps)
             {
                 var coorinates = subMapGeom.Where(i => i.SubMapId == item.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
+                if(coorinates.Count == 0)
+                {
+                    continue;
+                }
+
                 if (!coorinates.First().Equals2D(coorinates.Last()))
                 {
                     coorinates.Add(coorinates.First());
@@ -188,7 +193,7 @@ namespace Vargainc.Timm.REST.Controllers
                             { "home", sqlReader.GetInt32(3) },
                             { "apt", sqlReader.GetInt32(5) },
                             { "business", sqlReader.GetInt32(4) },
-                            { "classification", item.Key }
+                            { "classification", ((Classifications)item.Key).ToString() }
                         }
                     });
                 }

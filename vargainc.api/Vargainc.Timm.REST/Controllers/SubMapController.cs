@@ -327,6 +327,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             int apt = 0;
             int home =0;
+            
             switch (targetClassification)
             {
                 case Classifications.Z3:
@@ -336,6 +337,7 @@ namespace Vargainc.Timm.REST.Controllers
                         .ToList();
                     apt = resultZ3.Sum(i => i.APT ?? 0);
                     home = resultZ3.Sum(i => i.HOME ?? 0);
+
                     break;
                 case Classifications.Z5:
                     var resultZ5 = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value))
