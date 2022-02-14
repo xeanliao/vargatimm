@@ -1,5 +1,5 @@
-import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
-// import mapboxgl from 'mapbox-gl'
+// import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
+import mapboxgl from 'mapbox-gl'
 import * as Turf from '@turf/turf'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -12,11 +12,12 @@ import ClassNames from 'classnames'
 
 import Helper from 'views/base'
 import SubmapEdit from './SubmapEdit'
+import moment from 'moment'
 
 const log = new Logger('views:campaign')
 //streets
 //satellite
-const layers = [
+const layersDefine = [
     {
         layer: 'PremiumCRoute',
         zoom: [0, 24],
@@ -178,7 +179,6 @@ export default class Campaign extends React.Component {
         this.onSelectAllScreenShapes = this.onSelectAllScreenShapes.bind(this)
 
         this.onSwitchMapStyle = this.onSwitchMapStyle.bind(this)
-        this.onStyleChange = this.onStyleChange.bind(this)
         this.initCampaignLayers = this.initCampaignLayers.bind(this)
         this.restoreMapSelection = this.restoreMapSelection.bind(this)
 
@@ -208,7 +208,7 @@ export default class Campaign extends React.Component {
     saveCampaignLocation() {
         let zoom = this.map.getZoom()
         let latlng = this.map.getCenter()
-        axios.put(`campaign/${this.props.campaign.Id}/location/${zoom}/${latlng.lat}/${latlng.lng}")`)
+        axios.put(`campaign/${this.props.campaign.Id}/location/${zoom}/${latlng.lat}/${latlng.lng}")`, null, { showLoading: false })
     }
 
     onInitSubMapScrollbar(el) {
@@ -302,10 +302,6 @@ export default class Campaign extends React.Component {
             }
         }
 
-        // this.map.on('zoom', () => {
-        //     log.info(`map zoom: ${this.map.getZoom()}`)
-        // })
-        // this.map.on('styledata', this.onStyleChange)
         this.map.loadImage('images/remove_pattern.png', (err, image) => {
             if (image) {
                 this.map.addImage('remove_pattern', image)
@@ -332,7 +328,7 @@ export default class Campaign extends React.Component {
         let labelLayer = this.state.mapLabelLayer
         let tileUrl = new URL('./api/area/tiles', `${location.protocol}//${location.host}${location.pathname}`)
         let mapStyle = this.state.mapStyle
-        layers.forEach((item) => {
+        layersDefine.forEach((item) => {
             let tileSource = `${tileUrl}/${item.layer}/{z}/{x}/{y}`
             let sourceName = `area-source-${item.layer}`
             testSourceExists = this.map.getSource(sourceName)
@@ -345,26 +341,29 @@ export default class Campaign extends React.Component {
                 })
             }
 
+            const mapStyles = ['streets', 'satellite']
             item.settings.forEach((setting) => {
-                setting.layout['visibility'] = 'none'
-                testLayerExist = this.map.getLayer(`timm-area-layer-${item.layer}-${setting.id}`)
-                testLayerExist && this.map.removeLayer(`timm-area-layer-${item.layer}-${setting.id}`)
-                this.map.addLayer(
-                    {
-                        id: `timm-area-layer-${item.layer}-${setting.id}`,
-                        type: setting.type,
-                        source: sourceName,
-                        'source-layer': item.layer,
-                        minzoom: item.zoom[0],
-                        maxzoom: item.zoom[1],
-                        layout: setting.layout,
-                        paint: setting.paint[mapStyle],
-                    },
-                    labelLayer
-                )
+                mapStyles.forEach((style) => {
+                    setting.layout['visibility'] = 'none'
+                    // testLayerExist = this.map.getLayer(`timm-area-layer-${item.layer}-${setting.id}-${style}`)
+                    // testLayerExist && this.map.removeLayer(`timm-area-layer-${item.layer}-${setting.id}-${style}`)
+                    this.map.addLayer(
+                        {
+                            id: `timm-area-layer-${item.layer}-${setting.id}-${style}`,
+                            type: setting.type,
+                            source: sourceName,
+                            'source-layer': item.layer,
+                            minzoom: item.zoom[0],
+                            maxzoom: item.zoom[1],
+                            layout: setting.layout,
+                            paint: setting.paint[style],
+                        },
+                        labelLayer
+                    )
+                })
             })
-            testLayerExist = this.map.getLayer(`timm-area-layer-${item.layer}-fill`)
-            testLayerExist && this.map.removeLayer(`timm-area-layer-${item.layer}-fill`)
+            // testLayerExist = this.map.getLayer(`timm-area-layer-${item.layer}-fill`)
+            // testLayerExist && this.map.removeLayer(`timm-area-layer-${item.layer}-fill`)
             this.map.addLayer(
                 {
                     id: `timm-area-layer-${item.layer}-fill`,
@@ -577,9 +576,8 @@ export default class Campaign extends React.Component {
     restoreMapSelection() {
         // restore classfication
         const otherLayers = ['fill', 'selected', 'label']
-        layers.forEach((item) => {
+        layersDefine.forEach((item) => {
             item.settings.forEach((setting) => {
-                let testLayer = this.map.getLayer(`timm-area-layer-${item.layer}-${setting.id}`)
                 this.map.setLayoutProperty(`timm-area-layer-${item.layer}-${setting.id}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
             })
             otherLayers.forEach((name) => {
@@ -613,7 +611,7 @@ export default class Campaign extends React.Component {
             this.map.setPaintProperty('timm-campaign-layer-highlight', 'line-color', highlightColor)
             this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'visible')
 
-            layers.forEach((item) => {
+            layersDefine.forEach((item) => {
                 this.map.setPaintProperty(`timm-area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
             })
         }
@@ -645,9 +643,14 @@ export default class Campaign extends React.Component {
             },
             () => {
                 const otherLayers = ['fill', 'selected', 'label']
-                layers.forEach((item) => {
+                let mapStyle = this.state.mapStyle
+                layersDefine.forEach((item) => {
                     item.settings.forEach((setting) => {
-                        this.map.setLayoutProperty(`timm-area-layer-${item.layer}-${setting.id}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
+                        this.map.setLayoutProperty(
+                            `timm-area-layer-${item.layer}-${setting.id}-${mapStyle}`,
+                            'visibility',
+                            this.state.activeLayers.has(item.layer) ? 'visible' : 'none'
+                        )
                     })
                     otherLayers.forEach((name) => {
                         this.map.setLayoutProperty(`timm-area-layer-${item.layer}-${name}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
@@ -698,7 +701,7 @@ export default class Campaign extends React.Component {
                 this.map.setPaintProperty('timm-campaign-layer-highlight', 'line-color', highlightColor)
                 this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'visible')
 
-                layers.forEach((item) => {
+                layersDefine.forEach((item) => {
                     this.map.setFilter(`timm-area-layer-${item.layer}-remove`, ['==', ['get', 'sid'], ''])
                     this.map.setFilter(`timm-area-layer-${item.layer}-selected`, ['==', ['get', 'sid'], ''])
                     this.map.setPaintProperty(`timm-area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
@@ -756,7 +759,7 @@ export default class Campaign extends React.Component {
                 let allowedLayers = new Set([activeLayer])
                 //if submap is empty allow all layers
                 if (selectedShapes.size == 0 && currentShapes.size == 0) {
-                    allowedLayers = new Set(layers.map((i) => i.layer))
+                    allowedLayers = new Set(layersDefine.map((i) => i.layer))
                 }
                 return {
                     selectedShapes: selectedShapes,
@@ -875,7 +878,7 @@ export default class Campaign extends React.Component {
                     selectedSubmapId: null,
                 },
                 () => {
-                    layers.forEach((item) => {
+                    layersDefine.forEach((item) => {
                         this.map.setFilter(`timm-area-layer-${item.layer}-remove`, ['in', ['get', 'id'], ['literal', []]])
                         this.map.setFilter(`timm-area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', []]])
                     })
@@ -931,14 +934,14 @@ export default class Campaign extends React.Component {
             (state) => {
                 let submaps = this.props?.campaign?.SubMaps ?? []
                 let subMapRecords = submaps.filter((i) => i.Id == state.selectedSubmapId)?.[0]?.SubMapRecords ?? []
-                let allowedLayers = new Set(layers.map((i) => i.layer))
+                let allowedLayers = new Set(layersDefine.map((i) => i.layer))
                 if (subMapRecords.length > 0) {
                     allowedLayers = new Set([Classification.get(subMapRecords[0].Classification)])
                 }
                 return { selectedShapes: new Map(), allowedLayers: allowedLayers }
             },
             () => {
-                layers.forEach((item) => {
+                layersDefine.forEach((item) => {
                     this.map.setFilter(`timm-area-layer-${item.layer}-remove`, ['in', ['get', 'id'], ['literal', []]])
                     this.map.setFilter(`timm-area-layer-${item.layer}-selected`, ['in', ['get', 'id'], ['literal', []]])
                 })
@@ -999,122 +1002,56 @@ export default class Campaign extends React.Component {
         )
     }
 
-    // onSwitchMapStyle(style) {
-    //     if (!this.state.mapReady) {
-    //         return
-    //     }
-
-    //     // this.map.once('styledata', this.onStyleChange)
-    //     this.setState({ mapStyle: style }, () => {
-    //         if (style == 'streets') {
-    //             // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
-    //             // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
-
-    //             // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
-    //             // for (const layer of this.map.getStyle().layers) {
-    //             //     if (!layer.id.startsWith('timm')) {
-    //             //         this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
-    //             //     }
-    //             // }
-    //             // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
-
-    //             for (const layer of this.map.getStyle().layers) {
-    //                 if (!layer.id.startsWith('timm')) {
-    //                     this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
-    //                 }
-    //             }
-    //             this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
-    //         } else {
-    //             // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
-    //             // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
-
-    //             // this.map.setStyle('mapbox://styles/mapbox/satellite-streets-v11')
-
-    //             // for (const layer of this.map.getStyle().layers) {
-    //             //     if (!layer.id.startsWith('timm')) {
-    //             //         this.map.setLayoutProperty(layer.id, 'visibility', 'none')
-    //             //     }
-    //             // }
-    //             // this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
-
-    //             for (const layer of this.map.getStyle().layers) {
-    //                 if (!layer.id.startsWith('timm')) {
-    //                     this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
-    //                 }
-    //             }
-    //             this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
-    //         }
-    //     })
-    // }
-
     onSwitchMapStyle(style) {
         if (!this.state.mapReady) {
             return
         }
-        if (style == 'streets') {
-            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
-            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
+        this.setState(
+            {
+                mapStyle: style,
+            },
+            () => {
+                if (style == 'streets') {
+                    // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'visible')
+                    // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'none')
 
-            // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
+                    // this.map.setStyle('mapbox://styles/mapbox/outdoors-v11')
 
-            for (const layer of this.map.getStyle().layers) {
-                if (!layer.id.startsWith('timm')) {
-                    this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                    for (const layer of this.map.getStyle().layers) {
+                        if (!layer.id.startsWith('timm')) {
+                            this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                        }
+                    }
+
+                    this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
+                } else {
+                    // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
+                    // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
+
+                    // this.map.setStyle('mapbox://styles/mapbox/satellite-v9')
+
+                    for (const layer of this.map.getStyle().layers) {
+                        if (!layer.id.startsWith('timm')) {
+                            this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+                        }
+                    }
+
+                    this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
+                }
+
+                // hide/show area by map style
+                let hideStyle = this.state.mapStyle == 'streets' ? 'satellite' : 'streets'
+                let showStyle = this.state.mapStyle == 'streets' ? 'streets' : 'satellite'
+
+                for (const layer of this.map.getStyle().layers) {
+                    if (layer.id.endsWith(hideStyle)) {
+                        this.map.setLayoutProperty(layer.id, 'visibility', 'none')
+                    } else if (layer.id.endsWith(showStyle)) {
+                        this.map.setLayoutProperty(layer.id, 'visibility', 'visible')
+                    }
                 }
             }
-
-            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'none')
-        } else {
-            // this.map.setLayoutProperty('google-road-tiles-layer', 'visibility', 'none')
-            // this.map.setLayoutProperty('google-satellite-tiles-layer', 'visibility', 'visible')
-
-            // this.map.setStyle('mapbox://styles/mapbox/satellite-v9')
-
-            for (const layer of this.map.getStyle().layers) {
-                if (!layer.id.startsWith('timm')) {
-                    this.map.setLayoutProperty(layer.id, 'visibility', 'none')
-                }
-            }
-
-            this.map.setLayoutProperty('timm-google-satellite-tiles-layer', 'visibility', 'visible')
-        }
-    }
-
-    onStyleChange() {
-        const layers = this.map.getStyle().layers
-        let labelLayer = null
-
-        for (const layer of layers) {
-            if (labelLayer == null && layer.id.indexOf('label') > -1) {
-                labelLayer = layer.id
-            }
-        }
-
-        this.setState({ mapLabelLayer: labelLayer }, () => {
-            this.setState(
-                {
-                    mapLabelLayer: labelLayer,
-                },
-                () => {
-                    return new Promise((resolve) => {
-                        this.map.loadImage('images/remove_pattern.png', (err, image) => {
-                            if (image) {
-                                this.map.addImage('remove_pattern', image)
-                                return resolve()
-                            }
-                        })
-                    }).then(() => {
-                        // this.LoadBackgroundLayer()
-                        // this.initCampaignLayers()
-                        // this.restoreMapSelection()
-                        // return Promise.resolve()
-                        return Promise.all([this.LoadBackgroundLayer(), this.initCampaignLayers()]).then(() => {
-                            setTimeout(this.restoreMapSelection, 500)
-                        })
-                    })
-                }
-            )
-        })
+        )
     }
 
     clearPopup() {
@@ -1153,7 +1090,7 @@ export default class Campaign extends React.Component {
                         break
                 }
                 this.clearPopup()
-                const popup = new mapboxgl.Popup({ closeOnClick: true }).setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
+                const popup = new mapboxgl.Popup({ closeOnClick: false }).setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
                 if (this.map.getZoom() < 10) {
                     this.map.setZoom(10)
                     this.map.setCenter(lnglat)

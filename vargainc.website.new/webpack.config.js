@@ -33,18 +33,18 @@ module.exports = {
         serveIndex: true,
         hot: true,
         proxy: {
-            '/api/**': {
-                target: 'https://timm.vargainc.com/',
-                pathRewrite: { '^/api': '/preview/api' },
-                secure: false,
-                changeOrigin: true,
-            },
             // '/api/**': {
-            //     target: 'http://localhost:8091',
-            //     pathRewrite: { '^/api': '' },
-            //     agent: new ProxyAgent(),
+            //     target: 'https://timm.vargainc.com/',
+            //     pathRewrite: { '^/api': '/preview/api' },
+            //     secure: false,
             //     changeOrigin: true,
             // },
+            '/api/**': {
+                target: 'http://localhost:8091',
+                pathRewrite: { '^/api': '' },
+                agent: new ProxyAgent(),
+                changeOrigin: true,
+            },
             '/map/street.json': {
                 target: 'https://timm.vargainc.com',
                 changeOrigin: true,
