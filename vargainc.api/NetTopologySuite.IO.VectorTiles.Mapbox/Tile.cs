@@ -213,7 +213,6 @@ namespace NetTopologySuite.IO.VectorTiles.Mapbox
         [ProtoBuf.ProtoContract(Name = @"GeomType")]
         public enum GeomType
         {
-
             [ProtoBuf.ProtoEnum(Name = @"Unknown", Value = 0)]
             Unknown = 0,
 

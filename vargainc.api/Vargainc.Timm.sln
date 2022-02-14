@@ -3,19 +3,24 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31521.260
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.Models", "Vargainc.Timm.Models\Vargainc.Timm.Models.csproj", "{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vargainc.Timm.Models", "Vargainc.Timm.Models\Vargainc.Timm.Models.csproj", "{E7A4A1E9-18DE-4D62-828F-3BE02E913B10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.EF", "Vargainc.Timm.EF\Vargainc.Timm.EF.csproj", "{51901696-9A1D-4B06-9B8E-8185A33F984F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vargainc.Timm.EF", "Vargainc.Timm.EF\Vargainc.Timm.EF.csproj", "{51901696-9A1D-4B06-9B8E-8185A33F984F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.REST", "Vargainc.Timm.REST\Vargainc.Timm.REST.csproj", "{668345C6-4A4B-46DC-B1D5-B20080337C04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vargainc.Timm.Extentions", "Vargainc.Timm.Extentions\Vargainc.Timm.Extentions.csproj", "{28DC8819-C55C-4D82-92BC-0481B847AEBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vargainc.Timm.Extentions", "Vargainc.Timm.Extentions\Vargainc.Timm.Extentions.csproj", "{28DC8819-C55C-4D82-92BC-0481B847AEBC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTopologySuite.IO.VectorTiles", "NetTopologySuite.IO.VectorTiles\NetTopologySuite.IO.VectorTiles.csproj", "{8555A86A-D1CA-4D99-9E03-CA8213F6731A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTopologySuite.IO.VectorTiles", "NetTopologySuite.IO.VectorTiles\NetTopologySuite.IO.VectorTiles.csproj", "{805BD8B4-4A0D-4527-955C-C169E43F6F0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetTopologySuite.IO.VectorTiles.GeoJson", "NetTopologySuite.IO.VectorTiles.GeoJson\NetTopologySuite.IO.VectorTiles.GeoJson.csproj", "{0BC27854-1B8D-4806-B19E-A74BFEC2394B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTopologySuite.IO.VectorTiles.GeoJson", "NetTopologySuite.IO.VectorTiles.GeoJson\NetTopologySuite.IO.VectorTiles.GeoJson.csproj", "{6351762B-1FE3-420F-8E95-6D11E30212A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetTopologySuite.IO.VectorTiles.Mapbox", "NetTopologySuite.IO.VectorTiles.Mapbox\NetTopologySuite.IO.VectorTiles.Mapbox.csproj", "{7EA551D0-8B36-41BA-8BE7-D231752E9E68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTopologySuite.IO.VectorTiles.Mapbox", "NetTopologySuite.IO.VectorTiles.Mapbox\NetTopologySuite.IO.VectorTiles.Mapbox.csproj", "{EB5999AD-2B9E-46A9-A3AF-C70F46C9CF7B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4F245164-029F-40C6-8D2D-99D964C97CCC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,18 +44,18 @@ Global
 		{28DC8819-C55C-4D82-92BC-0481B847AEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28DC8819-C55C-4D82-92BC-0481B847AEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28DC8819-C55C-4D82-92BC-0481B847AEBC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8555A86A-D1CA-4D99-9E03-CA8213F6731A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8555A86A-D1CA-4D99-9E03-CA8213F6731A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8555A86A-D1CA-4D99-9E03-CA8213F6731A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8555A86A-D1CA-4D99-9E03-CA8213F6731A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0BC27854-1B8D-4806-B19E-A74BFEC2394B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0BC27854-1B8D-4806-B19E-A74BFEC2394B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0BC27854-1B8D-4806-B19E-A74BFEC2394B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0BC27854-1B8D-4806-B19E-A74BFEC2394B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EA551D0-8B36-41BA-8BE7-D231752E9E68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EA551D0-8B36-41BA-8BE7-D231752E9E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EA551D0-8B36-41BA-8BE7-D231752E9E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EA551D0-8B36-41BA-8BE7-D231752E9E68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{805BD8B4-4A0D-4527-955C-C169E43F6F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{805BD8B4-4A0D-4527-955C-C169E43F6F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{805BD8B4-4A0D-4527-955C-C169E43F6F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{805BD8B4-4A0D-4527-955C-C169E43F6F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6351762B-1FE3-420F-8E95-6D11E30212A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6351762B-1FE3-420F-8E95-6D11E30212A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6351762B-1FE3-420F-8E95-6D11E30212A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6351762B-1FE3-420F-8E95-6D11E30212A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB5999AD-2B9E-46A9-A3AF-C70F46C9CF7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB5999AD-2B9E-46A9-A3AF-C70F46C9CF7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB5999AD-2B9E-46A9-A3AF-C70F46C9CF7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB5999AD-2B9E-46A9-A3AF-C70F46C9CF7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

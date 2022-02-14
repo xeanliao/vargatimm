@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -328,6 +327,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             int apt = 0;
             int home =0;
+            
             switch (targetClassification)
             {
                 case Classifications.Z3:
@@ -337,6 +337,7 @@ namespace Vargainc.Timm.REST.Controllers
                         .ToList();
                     apt = resultZ3.Sum(i => i.APT ?? 0);
                     home = resultZ3.Sum(i => i.HOME ?? 0);
+
                     break;
                 case Classifications.Z5:
                     var resultZ5 = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value))

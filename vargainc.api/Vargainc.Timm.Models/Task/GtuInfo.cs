@@ -14,7 +14,7 @@ namespace Vargainc.Timm.Models
         //public double Longitude { get; set; }
         #endregion
         [DefaultValue(0)]
-        public long? Id
+        public new long? Id
         {
             get;
             set;
