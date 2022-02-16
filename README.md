@@ -71,7 +71,7 @@ Database 'Timm202202' running the upgrade step from version 903 to version 904.
 RESTORE DATABASE successfully processed 1386419 pages in 796.762 seconds (13.594 MB/sec)
 ```
 # Run Database 3zip/5zip/croute build sql
-
+Tips: the linux mssql 2019 you can used new `Azure Data Studio` to connect to and run sql command. you can download [here](https://docs.microsoft.com/en-us/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver15) BTW. there have mac version
 1. 2021-07-24
 
 ```sql
