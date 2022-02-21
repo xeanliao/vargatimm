@@ -14,14 +14,6 @@ namespace Vargainc.Timm.Models
         [DefaultValue(0)]
         public int? OTotal { get; set; }
         public string StateCode { get; set; }
-        [DefaultValue(0)]
-        public int? APT_COUNT { get; set; }
-        [DefaultValue(0)]
-        public int? BUSINESS_COUNT { get; set; }
-        [DefaultValue(0)]
-        public int? HOME_COUNT { get; set; }
-        [DefaultValue(0)]
-        public int? TOTAL_COUNT { get; set; }
 
         public DbGeometry Geom { get; set; }
         public virtual ICollection<ThreeZipCoordinate> Locations { get; set; }

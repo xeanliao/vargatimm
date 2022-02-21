@@ -118,6 +118,7 @@ namespace Vargainc.Timm.REST.Controllers
         static PDFController()
         {
             TempFolder = ConfigurationManager.AppSettings["TempPath"];
+
             if (!System.IO.Directory.Exists(TempFolder))
             {
                 System.IO.Directory.CreateDirectory(TempFolder);
@@ -631,9 +632,9 @@ namespace Vargainc.Timm.REST.Controllers
                         {
                             s.OrderId,
                             s.Name,
-                            TotalHouseHold = s.Total ?? 0 + s.TotalAdjustment ?? 0,
-                            TargetHouseHold = s.Penetration ?? 0 + s.CountAdjustment ?? 0,
-                            Penetration = (s.Total ?? 0 + s.TotalAdjustment ?? 0) > 0 ? (float)(s.Penetration ?? 0 + s.CountAdjustment ?? 0) / (float)(s.Total ?? 0 + s.TotalAdjustment ?? 0) : 0
+                            TotalHouseHold = (s.Total ?? 0) + (s.TotalAdjustment ?? 0),
+                            TargetHouseHold = (s.Penetration ?? 0) + (s.CountAdjustment ?? 0),
+                            Penetration = (s.Total ?? 0) + (s.TotalAdjustment ?? 0) > 0 ? (float)((s.Penetration ?? 0) + (s.CountAdjustment ?? 0)) / (float)((s.Total ?? 0) + (s.TotalAdjustment ?? 0)) : 0.0
                         }).ToArray();
 
                         var column = table.AddColumn(Unit.FromPoint(30));

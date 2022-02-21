@@ -318,7 +318,7 @@ namespace Vargainc.Timm.REST.Controllers
                         s.CountAdjustment, 
                         s.Name, 
                         s.OrderId, 
-                        s.Total, 
+                        s.Total,
                         s.Penetration, 
                         s.Percentage, 
                         s.TotalAdjustment,
@@ -369,6 +369,7 @@ namespace Vargainc.Timm.REST.Controllers
                     d.Penetration,
                     d.Percentage,
                     d.TotalAdjustment,
+                    d.CountAdjustment,
                     DMapRecords = d.DistributionMapRecords.Select(r => new { Classification = s.SubMapRecords.First().Classification ,r.AreaId })
                 })
             }).OrderBy(s=>s.OrderId).ToList();
@@ -383,6 +384,7 @@ namespace Vargainc.Timm.REST.Controllers
                 campaign.Longitude,
                 campaign.Latitude,
                 campaign.ZoomLevel,
+                campaign.AreaDescription,
                 SubMaps = submapResults
             };
             return Json(new { success = true, data = result });

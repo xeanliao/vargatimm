@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Vargainc.Timm.Models;
+using Vargainc.Timm.REST.Helper;
 using Vargainc.Timm.REST.ViewModel;
 
 namespace Vargainc.Timm.REST.Controllers
@@ -97,6 +98,7 @@ namespace Vargainc.Timm.REST.Controllers
                 .ToListAsync()
                 .ConfigureAwait(false);
 
+            var dMapPolygon = new List<Polygon>();
             foreach (var item in dMaps)
             {
                 var coorinates = dMapGeom.Where(i => i.DistributionMapId == item.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
@@ -118,6 +120,23 @@ namespace Vargainc.Timm.REST.Controllers
                 {
                     continue;
                 }
+                dMapPolygon.Add(geom);
+                layers.Add(new Feature
+                {
+                    Geometry = geom.Centroid,
+                    Attributes = new AttributesTable
+                    {
+                        { "type", "dmap" },
+                        { "id", $"dmap-centroid-{item.Id}" },
+                        { "oid", item.Id },
+                        { "sid", item.Id },
+                        { "name", item.Name },
+                        { "color", $"#{item.ColorString}" },
+                        { "total", (item.Total ?? 0) + (item.TotalAdjustment ?? 0)},
+                        { "count", (item.Penetration ?? 0) + (item.CountAdjustment ?? 0)},
+                        { "pen", AreaHelper.CalcPercent(item.Total, item.TotalAdjustment, item.Penetration, item.CountAdjustment)}
+                    }
+                });
                 layers.Add(new Feature
                 {
                     Geometry = geom,
@@ -130,9 +149,42 @@ namespace Vargainc.Timm.REST.Controllers
                         { "sid", item.Id },
                         { "name", item.Name },
                         { "color", $"#{item.ColorString}" },
+                        
                     }
                 });
             }
+            var dMapIntersectionLine = new List<LineString>();
+            for (var i = 0; i < dMapPolygon.Count; i++)
+            {
+                var current = dMapPolygon[i];
+                for(var j = i + 1; j < dMapPolygon.Count; j++)
+                {
+                    var intersectionLine = current.Intersection(dMapPolygon[j]);
+                    if(intersectionLine is LineString)
+                    {
+                        dMapIntersectionLine.Add((LineString)intersectionLine);
+                    }
+                    else if(intersectionLine is MultiLineString)
+                    {
+                        dMapIntersectionLine.AddRange(((MultiLineString)intersectionLine).Geometries.Select(p => (LineString)p));
+                    }
+                }
+            }
+            Geometry dMapIntersectionMultiLine = GeometryFactory.CreateMultiLineString(dMapIntersectionLine.ToArray());
+            for (var i = 0; i < dMapPolygon.Count; i++)
+            {
+                var boundary = GeometryFactory.CreateLineString(dMapPolygon[i].Boundary.Coordinates);
+                dMapIntersectionMultiLine = dMapIntersectionMultiLine.Union(boundary);
+            }
+            layers.Add(new Feature
+            {
+                Geometry = dMapIntersectionMultiLine,
+                Attributes = new AttributesTable
+                    {
+                        { "type", "dmap-intersection" },
+                        { "id", $"dmap-intersection" },
+                    }
+            });
 
             var recordGroup = subMapRecords
                 .GroupBy(i => i.Classification)
@@ -196,6 +248,24 @@ namespace Vargainc.Timm.REST.Controllers
                             { "classification", ((Classifications)item.Key).ToString() }
                         }
                     });
+                    layers.Add(new Feature
+                    {
+                        Geometry = geom.Centroid,
+                        Attributes = new AttributesTable
+                        {
+                            { "type", "area" },
+                            { "id", $"area-centroid-{areaId}" },
+                            { "oid", id },
+                            { "vid", areaId },
+                            { "sid", recordSubMap[areaId] },
+                            { "name", sqlReader.GetString(1) },
+                            { "zip", sqlReader.GetString(2) },
+                            { "home", sqlReader.GetInt32(3) },
+                            { "apt", sqlReader.GetInt32(5) },
+                            { "business", sqlReader.GetInt32(4) },
+                            { "classification", ((Classifications)item.Key).ToString() }
+                        }
+                    });
                 }
                 sqlReader.Close();
             }
@@ -225,7 +295,7 @@ namespace Vargainc.Timm.REST.Controllers
 
         [HttpPost]
         [Route("{campaignId:int}/{subMapId:int}/dmap/edit")]
-        public async Task<IHttpActionResult> NewDMap(int subMapId, [FromBody] DistributionMap data)
+        public async Task<IHttpActionResult> EditDMap(int subMapId, [FromBody] DistributionMap data)
         {
             var subMap = await db.SubMaps.FindAsync(subMapId).ConfigureAwait(false);
             if (subMap == null)
@@ -246,6 +316,8 @@ namespace Vargainc.Timm.REST.Controllers
                 dMap.ColorR = data.ColorR;
                 dMap.ColorG = data.ColorG;
                 dMap.ColorB = data.ColorB;
+                dMap.TotalAdjustment = data.TotalAdjustment ?? 0;
+                dMap.CountAdjustment = data.CountAdjustment ?? 0;
             }
             else
             {
@@ -454,7 +526,7 @@ namespace Vargainc.Timm.REST.Controllers
                         Classification = (int)targetClassification,
                         DistributionMapId = dMapId,
                         AreaId = record,
-                        Value = true
+                        Value = true,
                     });
                 }
 

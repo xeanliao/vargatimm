@@ -126,7 +126,7 @@ namespace Vargainc.Timm.REST.Controllers
 
         [HttpPost]
         [Route("{campaignId:int}/submap/edit")]
-        public async Task<IHttpActionResult> NewSubmap(int campaignId, [FromBody] SubMap data)
+        public async Task<IHttpActionResult> EditSubmap(int campaignId, [FromBody] SubMap data)
         {
             var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
             if (campaign == null)
@@ -148,6 +148,8 @@ namespace Vargainc.Timm.REST.Controllers
                 dbSubmap.ColorR = data.ColorR;
                 dbSubmap.ColorG = data.ColorG;
                 dbSubmap.ColorB = data.ColorB;
+                dbSubmap.TotalAdjustment = data.TotalAdjustment ?? 0;
+                dbSubmap.CountAdjustment = data.CountAdjustment ?? 0;
             }
             else
             {

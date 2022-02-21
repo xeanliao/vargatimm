@@ -26,6 +26,15 @@ namespace Vargainc.Timm.Models
         [DefaultValue(0.0)]
         public double? MinLongitude { get; set; }
 
+        [DefaultValue(0)]
+        public int? APT_COUNT { get; set; }
+        [DefaultValue(0)]
+        public int? BUSINESS_COUNT { get; set; }
+        [DefaultValue(0)]
+        public int? HOME_COUNT { get; set; }
+        [DefaultValue(0)]
+        public int? TOTAL_COUNT { get; set; }
+
         [Column("IsEnabled")]
         public int? _IsEnabled { get; set; }
 
