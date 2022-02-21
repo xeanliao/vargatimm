@@ -618,10 +618,10 @@ export default class Campaign extends React.Component {
         let submap = submaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]
         if (submap) {
             let highlightColor = color(`#${submap.ColorString}`).darker(2).toString()
-            this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'none')
-            this.map.setFilter('timm-campaign-layer-highlight', ['==', ['get', 'sid'], submap.Id])
-            this.map.setPaintProperty('timm-campaign-layer-highlight', 'line-color', highlightColor)
-            this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'visible')
+            this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'none')
+            this.map.setFilter('timm-submap-layer-highlight', ['==', ['get', 'sid'], submap.Id])
+            this.map.setPaintProperty('timm-submap-layer-highlight', 'line-color', highlightColor)
+            this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'visible')
 
             layersDefine.forEach((item) => {
                 this.map.setPaintProperty(`timm-area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
@@ -694,7 +694,7 @@ export default class Campaign extends React.Component {
                     allowedLayers = [fixClassification]
                 }
 
-                let submapGeo = state.campaignSource.features.filter((i) => i.id == submap.Id)?.[0]
+                let submapGeo = state.campaignSource.features.filter((i) => i?.properties?.sid == submap.Id)?.[0]
 
                 if (submapGeo) {
                     this.map.fitBounds([
@@ -708,10 +708,10 @@ export default class Campaign extends React.Component {
             () => {
                 //set selected layer fill color as submap color
                 let highlightColor = color(`#${submap.ColorString}`).darker(2).toString()
-                this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'none')
-                this.map.setFilter('timm-campaign-layer-highlight', ['==', ['get', 'sid'], submap.Id])
-                this.map.setPaintProperty('timm-campaign-layer-highlight', 'line-color', highlightColor)
-                this.map.setLayoutProperty('timm-campaign-layer-highlight', 'visibility', 'visible')
+                this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'none')
+                this.map.setFilter('timm-submap-layer-highlight', ['==', ['get', 'sid'], submap.Id])
+                this.map.setPaintProperty('timm-submap-layer-highlight', 'line-color', highlightColor)
+                this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'visible')
 
                 layersDefine.forEach((item) => {
                     this.map.setFilter(`timm-area-layer-${item.layer}-remove`, ['==', ['get', 'sid'], ''])
