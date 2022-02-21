@@ -7,6 +7,7 @@ import axios from 'axios'
 import Logger from 'logger.mjs'
 import ClassNames from 'classnames'
 import moment from 'moment'
+import { ceil } from 'lodash'
 
 import Helper from 'views/base'
 import DMapEdit from './DMapEdit'
@@ -162,6 +163,8 @@ export default class DMap extends React.Component {
         this.onSubmapSelect = this.onSubmapSelect.bind(this)
         this.onDMapSelect = this.onDMapSelect.bind(this)
         this.onShapeSelect = this.onShapeSelect.bind(this)
+        this.onShowShapePopup = this.onShowShapePopup.bind(this)
+        this.onHideShapePopup = this.onHideShapePopup.bind(this)
 
         this.onNewDMap = this.onNewDMap.bind(this)
         this.onEditDMap = this.onEditDMap.bind(this)
@@ -360,21 +363,6 @@ export default class DMap extends React.Component {
                 this.map.getSource('map-source').setData(resp.data)
             } else {
                 this.map.addSource('map-source', { type: 'geojson', data: resp.data })
-                // submap
-                this.map.addLayer(
-                    {
-                        id: 'timm-submap-layer-line',
-                        type: 'line',
-                        source: 'map-source',
-                        layout: {},
-                        paint: {
-                            'line-color': ['get', 'color'],
-                            'line-width': 2,
-                        },
-                        filter: ['==', ['get', 'type'], 'submap'],
-                    },
-                    labelLayer
-                )
 
                 // dmap
                 this.map.addLayer(
@@ -391,75 +379,7 @@ export default class DMap extends React.Component {
                     },
                     labelLayer
                 )
-                this.map.addLayer(
-                    {
-                        id: 'timm-dmap-layer-line',
-                        type: 'line',
-                        source: 'map-source',
-                        layout: {},
-                        paint: {
-                            'line-color': ['get', 'color'],
-                            'line-width': 2,
-                        },
-                        filter: ['==', ['get', 'type'], 'dmap'],
-                    },
-                    labelLayer
-                )
 
-                // area
-                let currentMapStyle = this.state.mapStyle
-                const mapStyles = ['streets', 'satellite']
-                layersDefine.forEach((item) => {
-                    item.settings.forEach((setting) => {
-                        mapStyles.forEach((style) => {
-                            let layout = Object.assign({}, setting.layout, { visibility: style == currentMapStyle ? 'visible' : 'none' })
-                            this.map.addLayer(
-                                {
-                                    id: `timm-area-layer-${item.layer}-${setting.id}-${style}`,
-                                    type: setting.type,
-                                    source: 'map-source',
-                                    layout: layout,
-                                    paint: setting.paint[style],
-                                    filter: ['all', ['==', ['get', 'type'], 'area'], ['==', ['get', 'classification'], item.layer]],
-                                },
-                                labelLayer
-                            )
-                        })
-                    })
-                })
-                // this.map.addLayer(
-                //     {
-                //         id: 'timm-area-layer-line',
-                //         type: 'line',
-                //         source: 'map-source',
-                //         layout: {},
-                //         paint: {
-                //             'line-color': 'hsl(250, 76%, 67%)',
-                //             'line-width': {
-                //                 base: 1.5,
-                //                 stops: [
-                //                     [5, 0.25],
-                //                     [18, 6],
-                //                 ],
-                //             },
-                //         },
-                //         filter: ['==', ['get', 'type'], 'area'],
-                //     },
-                //     labelLayer
-                // )
-                this.map.addLayer(
-                    {
-                        id: 'timm-area-layer-fill',
-                        type: 'fill',
-                        source: 'map-source',
-                        paint: {
-                            'fill-color': 'white',
-                            'fill-opacity': 0,
-                        },
-                        filter: ['==', ['get', 'type'], 'area'],
-                    },
-                    labelLayer
-                )
                 this.map.addLayer(
                     {
                         id: 'timm-area-layer-selected',
@@ -488,6 +408,169 @@ export default class DMap extends React.Component {
                     labelLayer
                 )
 
+                // area line
+                let currentMapStyle = this.state.mapStyle
+                const mapStyles = ['streets', 'satellite']
+                layersDefine.forEach((item) => {
+                    item.settings.forEach((setting) => {
+                        mapStyles.forEach((style) => {
+                            let layout = Object.assign({}, setting.layout, { visibility: style == currentMapStyle ? 'visible' : 'none' })
+                            this.map.addLayer(
+                                {
+                                    id: `timm-area-layer-${item.layer}-${setting.id}-${style}`,
+                                    type: setting.type,
+                                    source: 'map-source',
+                                    layout: layout,
+                                    paint: setting.paint[style],
+                                    filter: ['all', ['==', ['get', 'type'], 'area'], ['==', ['get', 'classification'], item.layer]],
+                                },
+                                labelLayer
+                            )
+                        })
+                    })
+                })
+
+                // area label
+                mapStyles.forEach((style) => {
+                    let countRule = this.props.campaign.AreaDescription
+                    let detail = ''
+                    let total = ''
+                    switch (countRule) {
+                        case 'APT ONLY':
+                            detail = ['concat', 'MFDU:', ['number-format', ['get', 'apt'], { locale: 'en-US' }]]
+                            total = ''
+                            break
+                        case 'HOME ONLY':
+                            detail = ['concat', 'SFDU:', ['number-format', ['get', 'home'], { locale: 'en-US' }]]
+                            total = ''
+                            break
+                        case 'APT + HOME':
+                            detail = [
+                                'concat',
+                                'SFDU:',
+                                ['number-format', ['get', 'home'], { locale: 'en-US' }],
+                                ' ',
+                                'MFDU:',
+                                ['number-format', ['get', 'apt'], { locale: 'en-US' }],
+                            ]
+                            total = ['concat', 'Total:', ['number-format', ['+', ['get', 'home'], ['get', 'apt']], { locale: 'en-US' }]]
+                            break
+                    }
+
+                    this.map.addLayer({
+                        id: `timm-area-layer-label-${style}`,
+                        type: 'symbol',
+                        source: 'map-source',
+                        layout: {
+                            visibility: style == currentMapStyle ? 'visible' : 'none',
+                            'text-max-width': 200,
+                            'text-field': [
+                                'format',
+                                ['get', 'name'],
+                                { 'font-scale': 1 },
+                                '\n',
+                                detail,
+                                {
+                                    'font-scale': 0.75,
+                                },
+                                '\n',
+                                total,
+                                {
+                                    'font-scale': 0.75,
+                                },
+                            ],
+                        },
+                        paint:
+                            style == 'streets'
+                                ? {
+                                      'text-color': 'black',
+                                      'text-halo-color': ['interpolate', ['linear'], ['zoom'], 2, 'rgba(255, 255, 255, 0.75)', 3, 'rgb(255, 255, 255)'],
+                                      'text-halo-width': 1,
+                                  }
+                                : {
+                                      'text-color': 'white',
+                                      'text-halo-color': ['interpolate', ['linear'], ['zoom'], 2, 'rgba(0, 0, 0, 0.75)', 3, 'rgb(0, 0, 0)'],
+                                      'text-halo-width': 1,
+                                  },
+                        filter: ['all', ['==', ['geometry-type'], 'Point'], ['==', ['get', 'type'], 'area']],
+                    })
+
+                    // dmap label
+                    this.map.addLayer({
+                        id: `timm-dmap-layer-label-${style}`,
+                        type: 'symbol',
+                        source: 'map-source',
+                        layout: {
+                            'text-max-width': 200,
+                            'text-field': [
+                                'format',
+                                ['get', 'name'],
+                                { 'font-scale': 1.25 },
+                                '\n',
+                                {},
+                                'Total: ',
+                                { 'font-scale': 1 },
+                                ['number-format', ['get', 'total'], { locale: 'en-US', 'min-fraction-digits': 0 }],
+                                { 'font-scale': 1 },
+                                ' Count: ',
+                                { 'font-scale': 1 },
+                                ['number-format', ['get', 'count'], { locale: 'en-US', 'min-fraction-digits': 0 }],
+                                { 'font-scale': 1 },
+                                ' Pen: ',
+                                { 'font-scale': 1 },
+                                ['get', 'pen'],
+                                { 'font-scale': 1 },
+                            ],
+                        },
+                        paint:
+                            style == 'streets'
+                                ? {
+                                      'text-color': 'black',
+                                      'text-halo-color': ['interpolate', ['linear'], ['zoom'], 2, 'rgba(255, 255, 255, 0.75)', 3, 'rgb(255, 255, 255)'],
+                                      'text-halo-width': 1,
+                                  }
+                                : {
+                                      'text-color': 'white',
+                                      'text-halo-color': ['interpolate', ['linear'], ['zoom'], 2, 'rgba(0, 0, 0, 0.75)', 3, 'rgb(0, 0, 0)'],
+                                      'text-halo-width': 1,
+                                  },
+                        filter: ['all', ['==', ['geometry-type'], 'Point'], ['==', ['get', 'type'], 'dmap']],
+                    })
+                })
+
+                // dmap line
+                this.map.addLayer(
+                    {
+                        id: 'timm-dmap-layer-intersection',
+                        type: 'line',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'line-color': 'black',
+                            'line-width': 2,
+                            'line-dasharray': [2, 1],
+                        },
+                        filter: ['==', ['get', 'type'], 'dmap-intersection'],
+                    },
+                    labelLayer
+                )
+
+                // submap
+                this.map.addLayer(
+                    {
+                        id: 'timm-submap-layer-line',
+                        type: 'line',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'line-color': ['get', 'color'],
+                            'line-width': 6,
+                        },
+                        filter: ['==', ['get', 'type'], 'submap'],
+                    },
+                    labelLayer
+                )
+
                 // submap highlight
                 this.map.addLayer(
                     {
@@ -496,15 +579,35 @@ export default class DMap extends React.Component {
                         source: 'map-source',
                         layout: {},
                         paint: {
-                            'line-width': 6,
+                            'line-width': 8,
                         },
                         filter: ['==', ['get', 'sid'], ''],
                     },
                     labelLayer
                 )
 
+                // area selection transparent layer
+                this.map.addLayer(
+                    {
+                        id: 'timm-area-layer-fill',
+                        type: 'fill',
+                        source: 'map-source',
+                        paint: {
+                            'fill-color': 'white',
+                            'fill-opacity': 0,
+                        },
+                        filter: ['==', ['get', 'type'], 'area'],
+                    },
+                    labelLayer
+                )
+
                 // event
                 this.map.on('click', `timm-area-layer-fill`, this.onShapeSelect)
+
+                this.map.off('contextmenu', `timm-area-layer-fill`, this.onShowShapePopup)
+                this.map.off('mousemove', `timm-area-layer-fill`, this.onHideShapePopup)
+                this.map.on('contextmenu', `timm-area-layer-fill`, this.onShowShapePopup)
+                this.map.on('mousemove', `timm-area-layer-fill`, this.onHideShapePopup)
 
                 // fit all submap
                 let mapBbox = (resp.data.features ?? [])
@@ -661,6 +764,55 @@ export default class DMap extends React.Component {
                 this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'visible')
             }
         )
+    }
+
+    onShowShapePopup(e) {
+        this.clearPopup()
+        // this.onHideShapePopup()
+        const coordinates = e.features[0].geometry.coordinates.slice()
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+        }
+
+        let home = e.features[0].properties.home
+        let apt = e.features[0].properties.apt
+        let name = e.features[0].properties.name
+        let lnglat = e.lngLat
+
+        let popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+        })
+
+        let countRule = this.props.campaign.AreaDescription
+        let content = ''
+        switch (countRule) {
+            case 'APT ONLY':
+                content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)}`
+                break
+            case 'HOME ONLY':
+                content = `SFDU:${new Intl.NumberFormat('en-US').format(home)}`
+                break
+            case 'APT + HOME':
+                content = `MFDU:${new Intl.NumberFormat('en-US').format(apt)} SFDU:${new Intl.NumberFormat('en-US').format(home)}<br />Total:${new Intl.NumberFormat(
+                    'en-US'
+                ).format(apt + home)}`
+                break
+        }
+
+        popup.setLngLat(lnglat).setHTML(`<h6>${name}</h6><p>${content}</p>`).addTo(this.map)
+
+        this.setState({ popup: popup })
+    }
+
+    onHideShapePopup() {
+        if (this.state.popup) {
+            this.state.popup.remove()
+            this.setState({ popup: null })
+        }
     }
 
     onNewDMap() {
@@ -832,7 +984,13 @@ export default class DMap extends React.Component {
                                     height: '28px',
                                     backgroundColor: `#${s.ColorString}`,
                                 }
-                                let subMapDesc = `Total: ${s.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${s.CountAdjustment} Pen: ${s.Penetration}`
+                                let fixTotal = (s.Total ?? 0) + (s.TotalAdjustment ?? 0)
+                                let fixTarget = (s.Penetration ?? 0) + (s.CountAdjustment ?? 0)
+                                let fixPercent = fixTotal > 0 ? ceil(fixTarget / fixTotal, 4) : 0
+                                let fixTotalWithFormat = fixTotal.toLocaleString('en-US', { minimumFractionDigits: 0 })
+                                let fixTargetWithFormat = fixTarget.toLocaleString('en-US', { minimumFractionDigits: 0 })
+                                let fixPercentWithFormat = fixPercent.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2 })
+                                let subMapDesc = `Total: ${fixTotalWithFormat} Count: ${fixTargetWithFormat} Pen: ${fixPercentWithFormat}`
                                 let subMapButtonClassName = ClassNames('button expanded border-none padding-0 margin-0 text-left', {
                                     hollow: this.state.selectedSubmapId != s.Id,
                                 })
@@ -863,7 +1021,13 @@ export default class DMap extends React.Component {
                                         height: '28px',
                                         backgroundColor: `#${d.ColorString}`,
                                     }
-                                    let dMapDesc = `Total: ${d.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${d.TotalAdjustment} Pen: ${d.Penetration}`
+                                    let fixTotal = (d.Total ?? 0) + (d.TotalAdjustment ?? 0)
+                                    let fixTarget = (d.Penetration ?? 0) + (d.CountAdjustment ?? 0)
+                                    let fixPercent = fixTotal > 0 ? ceil(fixTarget / fixTotal, 4) : 0
+                                    let fixTotalWithFormat = fixTotal.toLocaleString('en-US', { minimumFractionDigits: 0 })
+                                    let fixTargetWithFormat = fixTarget.toLocaleString('en-US', { minimumFractionDigits: 0 })
+                                    let fixPercentWithFormat = fixPercent.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2 })
+                                    let dMapDesc = `Total: ${fixTotalWithFormat} Count: ${fixTargetWithFormat} Pen: ${fixPercentWithFormat}`
                                     let dMapButtonClassName = ClassNames('button secondary expanded border-none padding-0 margin-0 text-left', {
                                         hollow: this.state.selectedDMapId != d.Id,
                                     })

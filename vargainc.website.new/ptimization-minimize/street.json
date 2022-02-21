@@ -1,0 +1,97 @@
+{
+    "created": 0,
+    "draft": false,
+    "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+    "id": "streets-v9",
+    "layers": [],
+    "metadata": {
+        "mapbox:autocomposite": true,
+        "mapbox:groups": {
+            "1444855769305.6016": {
+                "collapsed": true,
+                "name": "Tunnels"
+            },
+            "1444855786460.0557": {
+                "collapsed": true,
+                "name": "Roads"
+            },
+            "1444855799204.86": {
+                "collapsed": true,
+                "name": "Bridges"
+            },
+            "1444856087950.3635": {
+                "collapsed": true,
+                "name": "Marine labels"
+            },
+            "1444856144497.7825": {
+                "collapsed": true,
+                "name": "Country labels"
+            },
+            "1444856151690.9143": {
+                "collapsed": true,
+                "name": "State labels"
+            },
+            "1444862510685.128": {
+                "collapsed": true,
+                "name": "City labels"
+            },
+            "1444933322393.2852": {
+                "collapsed": true,
+                "name": "POI labels  (scalerank 1)"
+            },
+            "1444933358918.2366": {
+                "collapsed": true,
+                "name": "POI labels (scalerank 2)"
+            },
+            "1444933372896.5967": {
+                "collapsed": true,
+                "name": "POI labels (scalerank 3)"
+            },
+            "1444933456003.5437": {
+                "collapsed": true,
+                "name": "POI labels (scalerank 4)"
+            },
+            "1444933575858.6992": {
+                "collapsed": true,
+                "name": "Highway shields"
+            },
+            "1444933721429.3076": {
+                "collapsed": true,
+                "name": "Road labels"
+            },
+            "1444933808272.805": {
+                "collapsed": true,
+                "name": "Water labels"
+            },
+            "1444934295202.7542": {
+                "collapsed": true,
+                "name": "Admin boundaries"
+            },
+            "1444934828655.3389": {
+                "collapsed": true,
+                "name": "Aeroways"
+            },
+            "1456969573402.7817": {
+                "collapsed": true,
+                "name": "Hillshading"
+            },
+            "1456970288113.8113": {
+                "collapsed": true,
+                "name": "Landcover"
+            }
+        },
+        "mapbox:type": "default"
+    },
+    "modified": 0,
+    "name": "Mapbox Streets",
+    "owner": "mapbox",
+    "sources": {
+        "composite": {
+            "type": "vector",
+            "url": "mapbox://mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7"
+        }
+    },
+    "sprite": "https://timm.vargainc.com/map/sprite",
+    "version": 8,
+    "visibility": "public"
+}

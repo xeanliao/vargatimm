@@ -91,6 +91,20 @@ export default class DMapEdit extends React.Component {
                         </label>
                     </div>
                 </div>
+                <div className="row">
+                    <div className="small-6 columns">
+                        <label>
+                            Adjust Total
+                            <input onChange={this.onChange} name="TotalAdjustment" type="number" defaultValue={model.TotalAdjustment} />
+                        </label>
+                    </div>
+                    <div className="small-6 columns">
+                        <label>
+                            Adjust Count
+                            <input onChange={this.onChange} name="CountAdjustment" type="number" defaultValue={model.CountAdjustment} />
+                        </label>
+                    </div>
+                </div>
                 <div className="small-12 columns">
                     <div className="button-group float-right">
                         <button type="submit" className="success button">

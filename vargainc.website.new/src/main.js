@@ -33,7 +33,7 @@ $(document).ajaxComplete(function (event, xhr, settings) {
 
 Axios.interceptors.request.use(
     function (config) {
-        const showLoading = config?.showLoading ?? false
+        const showLoading = config?.showLoading ?? true
         if (showLoading) {
             Topic.publish({
                 channel: 'View',
