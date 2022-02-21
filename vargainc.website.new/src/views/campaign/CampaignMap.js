@@ -500,7 +500,7 @@ export default class Campaign extends React.Component {
                     },
                     () => {
                         if (this.state.mapReady == true) {
-                            this.map.getSource('campaign-source').setData(resp.data)
+                            this.map.getSource('map-source').setData(resp.data)
                         } else {
                             this.initCampaignLayers()
                         }
@@ -513,22 +513,16 @@ export default class Campaign extends React.Component {
     }
 
     initCampaignLayers() {
-        let testSourceExists = null
-        let testLayerExist = null
         let labelLayer = this.state.mapLabelLayer
 
-        testSourceExists = this.map.getSource('campaign-source')
-        if (!testSourceExists) {
-            this.map.addSource('campaign-source', { type: 'geojson', data: this.state.campaignSource })
-        }
+        this.map.addSource('map-source', { type: 'geojson', data: this.state.campaignSource })
 
-        testLayerExist = this.map.getLayer('timm-campaign-layer-fill')
-        testLayerExist && this.map.removeLayer('timm-campaign-layer-fill')
+        // submap fill
         this.map.addLayer(
             {
-                id: 'timm-campaign-layer-fill',
+                id: 'timm-submap-layer-fill',
                 type: 'fill',
-                source: 'campaign-source',
+                source: 'map-source',
                 layout: {},
                 paint: {
                     'fill-color': ['get', 'color'],
@@ -538,29 +532,27 @@ export default class Campaign extends React.Component {
             labelLayer
         )
 
-        testLayerExist = this.map.getLayer('timm-campaign-layer-line')
-        testLayerExist && this.map.removeLayer('timm-campaign-layer-line')
+        // submap line
         this.map.addLayer(
             {
-                id: 'timm-campaign-layer-line',
+                id: 'timm-submap-layer-line',
                 type: 'line',
-                source: 'campaign-source',
+                source: 'map-source',
                 layout: {},
                 paint: {
                     'line-color': ['get', 'color'],
-                    'line-width': 2,
+                    'line-width': 6,
                 },
             },
             labelLayer
         )
 
-        testLayerExist = this.map.getLayer('timm-campaign-layer-line')
-        testLayerExist && this.map.removeLayer('timm-campaign-layer-line')
+        // submap highlight
         this.map.addLayer(
             {
-                id: 'timm-campaign-layer-highlight',
+                id: 'timm-submap-layer-highlight',
                 type: 'line',
-                source: 'campaign-source',
+                source: 'map-source',
                 layout: {},
                 paint: {
                     'line-color': '#000000',
@@ -570,6 +562,25 @@ export default class Campaign extends React.Component {
             },
             labelLayer
         )
+
+        // fit all submap
+        let mapBbox = (this.state.campaignSource.features ?? [])
+            .filter((i) => i.properties?.type == 'submap')
+            .reduce(
+                (bbox, item) => {
+                    return [
+                        bbox[0] ? Math.min(bbox[0], item.bbox[0]) : item.bbox[0],
+                        bbox[1] ? Math.min(bbox[1], item.bbox[1]) : item.bbox[1],
+                        bbox[2] ? Math.max(bbox[2], item.bbox[2]) : item.bbox[2],
+                        bbox[3] ? Math.max(bbox[3], item.bbox[3]) : item.bbox[3],
+                    ]
+                },
+                [null, null, null, null]
+            )
+        this.map.fitBounds([
+            [mapBbox[0], mapBbox[1]],
+            [mapBbox[2], mapBbox[3]],
+        ])
 
         return Promise.resolve()
     }

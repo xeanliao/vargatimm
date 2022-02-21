@@ -1,5 +1,5 @@
-// import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
-import mapboxgl from 'mapbox-gl'
+import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
+// import mapboxgl from 'mapbox-gl'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { color } from 'd3-color'
@@ -149,7 +149,8 @@ export default class DMap extends React.Component {
             selectedShapes: new Map(),
             selectedSubmapId: null,
             campaginSource: { features: [] },
-            mapStyle: 'satellite',
+            // mapStyle: 'satellite',
+            mapStyle: 'streets',
         }
 
         this.onInitMenuScrollbar = this.onInitMenuScrollbar.bind(this)
@@ -365,48 +366,51 @@ export default class DMap extends React.Component {
                 this.map.addSource('map-source', { type: 'geojson', data: resp.data })
 
                 // dmap
-                this.map.addLayer(
-                    {
-                        id: 'timm-dmap-layer-fill',
-                        type: 'fill',
-                        source: 'map-source',
-                        layout: {},
-                        paint: {
-                            'fill-color': ['get', 'color'],
-                            'fill-opacity': 0.5,
-                        },
-                        filter: ['==', ['get', 'type'], 'dmap'],
-                    },
-                    labelLayer
-                )
+                // this.map.addLayer(
+                //     {
+                //         id: 'timm-dmap-layer-fill',
+                //         type: 'fill',
+                //         source: 'map-source',
+                //         layout: {},
+                //         paint: {
+                //             'fill-color': ['get', 'color'],
+                //             'fill-opacity': 0.5,
+                //         },
+                //         filter: ['==', ['get', 'type'], 'dmap'],
+                //     },
+                //     labelLayer
+                // )
 
-                this.map.addLayer(
-                    {
-                        id: 'timm-area-layer-selected',
-                        type: 'fill',
-                        source: 'map-source',
-                        layout: { visibility: 'none' },
-                        paint: {
-                            'fill-color': '#000000',
-                            'fill-opacity': 0.5,
-                        },
-                        filter: ['==', 'id', ''],
-                    },
-                    labelLayer
-                )
-                this.map.addLayer(
-                    {
-                        id: 'timm-area-layer-remove',
-                        type: 'fill',
-                        source: 'map-source',
-                        layout: { visibility: 'none' },
-                        paint: {
-                            'fill-pattern': 'remove_pattern',
-                        },
-                        filter: ['==', 'id', ''],
-                    },
-                    labelLayer
-                )
+                // area selected to add
+                // this.map.addLayer(
+                //     {
+                //         id: 'timm-area-layer-selected',
+                //         type: 'fill',
+                //         source: 'map-source',
+                //         layout: { visibility: 'none' },
+                //         paint: {
+                //             'fill-color': '#000000',
+                //             'fill-opacity': 0.5,
+                //         },
+                //         filter: ['==', 'id', ''],
+                //     },
+                //     labelLayer
+                // )
+
+                // area selected to remove
+                // this.map.addLayer(
+                //     {
+                //         id: 'timm-area-layer-remove',
+                //         type: 'fill',
+                //         source: 'map-source',
+                //         layout: { visibility: 'none' },
+                //         paint: {
+                //             'fill-pattern': 'remove_pattern',
+                //         },
+                //         filter: ['==', 'id', ''],
+                //     },
+                //     labelLayer
+                // )
 
                 // area line
                 let currentMapStyle = this.state.mapStyle
@@ -430,7 +434,7 @@ export default class DMap extends React.Component {
                     })
                 })
 
-                // area label
+                // area and dmap label
                 mapStyles.forEach((style) => {
                     let countRule = this.props.campaign.AreaDescription
                     let detail = ''
@@ -456,7 +460,7 @@ export default class DMap extends React.Component {
                             total = ['concat', 'Total:', ['number-format', ['+', ['get', 'home'], ['get', 'apt']], { locale: 'en-US' }]]
                             break
                     }
-
+                    // area label
                     this.map.addLayer({
                         id: `timm-area-layer-label-${style}`,
                         type: 'symbol',
@@ -555,7 +559,7 @@ export default class DMap extends React.Component {
                     labelLayer
                 )
 
-                // submap
+                // submap line
                 this.map.addLayer(
                     {
                         id: 'timm-submap-layer-line',
@@ -586,7 +590,7 @@ export default class DMap extends React.Component {
                     labelLayer
                 )
 
-                // area selection transparent layer
+                // area selection transparent layer for events
                 this.map.addLayer(
                     {
                         id: 'timm-area-layer-fill',
@@ -603,7 +607,6 @@ export default class DMap extends React.Component {
 
                 // event
                 this.map.on('click', `timm-area-layer-fill`, this.onShapeSelect)
-
                 this.map.off('contextmenu', `timm-area-layer-fill`, this.onShowShapePopup)
                 this.map.off('mousemove', `timm-area-layer-fill`, this.onHideShapePopup)
                 this.map.on('contextmenu', `timm-area-layer-fill`, this.onShowShapePopup)
@@ -634,7 +637,7 @@ export default class DMap extends React.Component {
                     mapReady: true,
                 },
                 () => {
-                    this.onSwitchMapStyle(this.state.mapStyle ?? 'satellite')
+                    // this.onSwitchMapStyle(this.state.mapStyle ?? 'satellite')
                 }
             )
         })
