@@ -1,5 +1,5 @@
-import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
-// import mapboxgl from 'mapbox-gl'
+// import mapboxgl from '!mapbox-gl/dist/mapbox-gl-dev'
+import mapboxgl from 'mapbox-gl'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { color } from 'd3-color'
