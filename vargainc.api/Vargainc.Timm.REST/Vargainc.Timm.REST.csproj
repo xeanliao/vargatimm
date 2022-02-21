@@ -213,6 +213,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helper\AreaHelper.cs" />
     <Compile Include="Helper\CampaignLogFix.cs" />
     <Compile Include="Helper\PublicAccessFilter.cs" />
     <Compile Include="Helper\UserManager.cs" />
