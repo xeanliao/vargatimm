@@ -81,18 +81,12 @@ Backbone.sync = function (method, model, options) {
         options.url = model.urlRoot
     }
     options.url = './api/' + options.url
-    if (typeof RELEASE_VERSION !== 'undefined') {
-        options.url = '//timm.vargainc.com/' + RELEASE_VERSION + '/api/' + options.url
-    }
+
     return backboneSync(method, model, options)
 }
 
-if (typeof RELEASE_VERSION !== 'undefined') {
-    Axios.defaults.baseURL = '//timm.vargainc.com/' + RELEASE_VERSION + '/api/'
-} else {
-    let baseUrl = new URL('./api/', `${location.protocol}//${location.host}${location.pathname}`)
-    Axios.defaults.baseURL = baseUrl.toString()
-}
+let baseUrl = new URL('./api/', `${location.protocol}//${location.host}${location.pathname}`)
+Axios.defaults.baseURL = baseUrl.toString()
 
 var userModel = new UserModel()
 userModel.fetchCurrentUser().then(function (isSuccess) {
