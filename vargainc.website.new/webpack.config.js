@@ -104,7 +104,7 @@ module.exports = (env, args) => {
         case 'development':
             config.devtool = 'eval-source-map'
             config.devServer = {
-                contentBase: './wwwroot',
+                contentBase: './public/',
                 host: '0.0.0.0',
                 port: 8090,
                 serveIndex: true,

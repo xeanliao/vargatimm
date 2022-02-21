@@ -291,7 +291,7 @@ export default class DMap extends React.Component {
         //     log.info(`map zoom: ${this.map.getZoom()}`)
         // })
 
-        this.map.loadImage('images/remove_pattern.png', (err, image) => {
+        this.map.loadImage('./images/remove_pattern.png', (err, image) => {
             this.map.addImage('remove_pattern', image)
 
             this.setState(
@@ -366,51 +366,51 @@ export default class DMap extends React.Component {
                 this.map.addSource('map-source', { type: 'geojson', data: resp.data })
 
                 // dmap
-                // this.map.addLayer(
-                //     {
-                //         id: 'timm-dmap-layer-fill',
-                //         type: 'fill',
-                //         source: 'map-source',
-                //         layout: {},
-                //         paint: {
-                //             'fill-color': ['get', 'color'],
-                //             'fill-opacity': 0.5,
-                //         },
-                //         filter: ['==', ['get', 'type'], 'dmap'],
-                //     },
-                //     labelLayer
-                // )
+                this.map.addLayer(
+                    {
+                        id: 'timm-dmap-layer-fill',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'fill-color': ['get', 'color'],
+                            'fill-opacity': 0.5,
+                        },
+                        filter: ['==', ['get', 'type'], 'dmap'],
+                    },
+                    labelLayer
+                )
 
                 // area selected to add
-                // this.map.addLayer(
-                //     {
-                //         id: 'timm-area-layer-selected',
-                //         type: 'fill',
-                //         source: 'map-source',
-                //         layout: { visibility: 'none' },
-                //         paint: {
-                //             'fill-color': '#000000',
-                //             'fill-opacity': 0.5,
-                //         },
-                //         filter: ['==', 'id', ''],
-                //     },
-                //     labelLayer
-                // )
+                this.map.addLayer(
+                    {
+                        id: 'timm-area-layer-selected',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: { visibility: 'none' },
+                        paint: {
+                            'fill-color': '#000000',
+                            'fill-opacity': 0.5,
+                        },
+                        filter: ['==', 'id', ''],
+                    },
+                    labelLayer
+                )
 
                 // area selected to remove
-                // this.map.addLayer(
-                //     {
-                //         id: 'timm-area-layer-remove',
-                //         type: 'fill',
-                //         source: 'map-source',
-                //         layout: { visibility: 'none' },
-                //         paint: {
-                //             'fill-pattern': 'remove_pattern',
-                //         },
-                //         filter: ['==', 'id', ''],
-                //     },
-                //     labelLayer
-                // )
+                this.map.addLayer(
+                    {
+                        id: 'timm-area-layer-remove',
+                        type: 'fill',
+                        source: 'map-source',
+                        layout: { visibility: 'none' },
+                        paint: {
+                            'fill-pattern': 'remove_pattern',
+                        },
+                        filter: ['==', 'id', ''],
+                    },
+                    labelLayer
+                )
 
                 // area line
                 let currentMapStyle = this.state.mapStyle
