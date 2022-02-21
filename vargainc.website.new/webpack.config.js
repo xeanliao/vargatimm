@@ -40,11 +40,17 @@ module.exports = {
             //     changeOrigin: true,
             // },
             '/api/**': {
-                target: 'http://localhost:8091',
-                pathRewrite: { '^/api': '' },
-                agent: new ProxyAgent(),
+                target: 'http://ec2-18-144-35-101.us-west-1.compute.amazonaws.com/',
+                pathRewrite: { '^/api': '/202202/api' },
+                secure: false,
                 changeOrigin: true,
             },
+            // '/api/**': {
+            //     target: 'http://localhost:8091',
+            //     pathRewrite: { '^/api': '' },
+            //     agent: new ProxyAgent(),
+            //     changeOrigin: true,
+            // },
             '/map/street.json': {
                 target: 'https://timm.vargainc.com',
                 changeOrigin: true,
