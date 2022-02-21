@@ -13,6 +13,7 @@ import ClassNames from 'classnames'
 import Helper from 'views/base'
 import SubmapEdit from './SubmapEdit'
 import moment from 'moment'
+import { ceil } from 'lodash'
 
 const log = new Logger('views:campaign')
 //streets
@@ -1109,8 +1110,8 @@ export default class Campaign extends React.Component {
         return (
             <div className="campaign full-container">
                 <div className="grid-x grid-margin-x medium-margin-collapse" style={{ height: '100%' }}>
-                    <div className="small-10 cell">{this.renderMapbox()}</div>
-                    <div className="small-2 cell">{this.renderRightMenu()}</div>
+                    <div className="small-8 medium-9 large-10 cell">{this.renderMapbox()}</div>
+                    <div className="small-4 medium-3 large-2 cell">{this.renderRightMenu()}</div>
                 </div>
             </div>
         )
@@ -1128,48 +1129,53 @@ export default class Campaign extends React.Component {
                                 Print
                             </button>
                         </div>
-                    </div>
-                    <div className="padding-horizontal-1">
-                        <legend>Classifications</legend>
-                        <div className="button-group stacked-for-small clear">
-                            <div>
-                                <input type="checkbox" name="Z3" id="Z3" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z3')} />
-                                <label
-                                    htmlFor="Z3"
-                                    className={ClassNames('margin-right-1', { 'font-bold': this.state.allowedLayers.has('Z3'), 'text-gray': !this.state.allowedLayers.has('Z3') })}
-                                >
-                                    3 ZIP
-                                </label>
-                            </div>
-                            <div>
-                                <input type="checkbox" name="Z5" id="Z5" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z5')} />
-                                <label
-                                    htmlFor="Z5"
-                                    className={ClassNames('margin-right-1', {
-                                        'font-bold': this.state.allowedLayers.has('Z5'),
-                                        'text-gray': !this.state.allowedLayers.has('Z5'),
-                                    })}
-                                >
-                                    5 ZIP
-                                </label>
-                            </div>
-                            <div>
-                                <input
-                                    type="checkbox"
-                                    name="PremiumCRoute"
-                                    id="PremiumCRoute"
-                                    onChange={this.onClassificationsChange}
-                                    checked={this.state.activeLayers.has('PremiumCRoute')}
-                                />
-                                <label
-                                    htmlFor="PremiumCRoute"
-                                    className={ClassNames('margin-right-1', {
-                                        'font-bold': this.state.allowedLayers.has('PremiumCRoute'),
-                                        'text-gray': !this.state.allowedLayers.has('PremiumCRoute'),
-                                    })}
-                                >
-                                    CRoute
-                                </label>
+                        <div className="columns small-12 align-self-middle">
+                            <div className="padding-horizontal-1">
+                                <legend>Classifications</legend>
+                                <div className="button-group stacked-for-small clear">
+                                    <div>
+                                        <input type="checkbox" name="Z3" id="Z3" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z3')} />
+                                        <label
+                                            htmlFor="Z3"
+                                            className={ClassNames('margin-right-1', {
+                                                'font-bold': this.state.allowedLayers.has('Z3'),
+                                                'text-gray': !this.state.allowedLayers.has('Z3'),
+                                            })}
+                                        >
+                                            3 ZIP
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" name="Z5" id="Z5" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z5')} />
+                                        <label
+                                            htmlFor="Z5"
+                                            className={ClassNames('margin-right-1', {
+                                                'font-bold': this.state.allowedLayers.has('Z5'),
+                                                'text-gray': !this.state.allowedLayers.has('Z5'),
+                                            })}
+                                        >
+                                            5 ZIP
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="checkbox"
+                                            name="PremiumCRoute"
+                                            id="PremiumCRoute"
+                                            onChange={this.onClassificationsChange}
+                                            checked={this.state.activeLayers.has('PremiumCRoute')}
+                                        />
+                                        <label
+                                            htmlFor="PremiumCRoute"
+                                            className={ClassNames('margin-right-1', {
+                                                'font-bold': this.state.allowedLayers.has('PremiumCRoute'),
+                                                'text-gray': !this.state.allowedLayers.has('PremiumCRoute'),
+                                            })}
+                                        >
+                                            CRoute
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1213,7 +1219,13 @@ export default class Campaign extends React.Component {
                                     height: '28px',
                                     backgroundColor: `#${s.ColorString}`,
                                 }
-                                let desc = `Total: ${s.Total.toLocaleString('en-US', { minimumFractionDigits: 0 })} Count: ${s.CountAdjustment} Pen: ${s.Penetration}`
+                                let fixTotal = (s.Total ?? 0) + (s.TotalAdjustment ?? 0)
+                                let fixTarget = (s.Penetration ?? 0) + (s.CountAdjustment ?? 0)
+                                let fixPercent = fixTotal > 0 ? ceil(fixTarget / fixTotal, 4) : 0
+                                let fixTotalWithFormat = fixTotal.toLocaleString('en-US', { minimumFractionDigits: 0 })
+                                let fixTargetWithFormat = fixTarget.toLocaleString('en-US', { minimumFractionDigits: 0 })
+                                let fixPercentWithFormat = fixPercent.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2 })
+                                let desc = `Total: ${fixTotalWithFormat} Count: ${fixTargetWithFormat} Pen: ${fixPercentWithFormat}`
                                 let buttonClassName = ClassNames('button expanded border-none padding-0 margin-0 text-left', {
                                     hollow: this.state.selectedSubmapId != s.Id,
                                 })

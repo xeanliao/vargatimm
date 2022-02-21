@@ -3,6 +3,12 @@
 // Global
 // ---------
 $global-width: rem-calc(1400);
+$breakpoints: (
+    small: 0,
+    medium: 1444px,
+    large: 1700px
+);
+
 $foundation-palette: (
     primary: #2199e8,
     secondary: #777,
