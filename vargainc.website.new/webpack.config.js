@@ -3,7 +3,7 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FileManagerPlugin = require('filemanager-webpack-plugin')
-const output = path.resolve(__dirname, '../publish/wwwroot')
+const output = path.resolve(__dirname, '../publish/website')
 const config = {
     entry: ['./src/main.js', './scss/app.scss', './scss/library.scss'],
     output: {
