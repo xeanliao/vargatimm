@@ -13,7 +13,7 @@ import ClassNames from 'classnames'
 import Helper from 'views/base'
 import SubmapEdit from './SubmapEdit'
 import moment from 'moment'
-import { ceil } from 'lodash'
+import { ceil, every } from 'lodash'
 
 const log = new Logger('views:campaign')
 //streets
@@ -577,10 +577,12 @@ export default class Campaign extends React.Component {
                 },
                 [null, null, null, null]
             )
-        this.map.fitBounds([
-            [mapBbox[0], mapBbox[1]],
-            [mapBbox[2], mapBbox[3]],
-        ])
+        if (every(mapBbox)) {
+            this.map.fitBounds([
+                [mapBbox[0], mapBbox[1]],
+                [mapBbox[2], mapBbox[3]],
+            ])
+        }
 
         return Promise.resolve()
     }
