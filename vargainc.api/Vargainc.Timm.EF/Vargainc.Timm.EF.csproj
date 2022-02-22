@@ -104,7 +104,6 @@
   </ItemGroup>
 	
 	<Import Project="..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.10.0\build\Microsoft.Net.Compilers.Toolset.props')" />
-	
 	<Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
 	<Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
 

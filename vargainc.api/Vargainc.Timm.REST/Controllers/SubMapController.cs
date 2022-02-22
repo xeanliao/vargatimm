@@ -354,44 +354,32 @@ namespace Vargainc.Timm.REST.Controllers
                     break;
             }
 
-            db.Configuration.AutoDetectChangesEnabled = false;
             using (var transaction = db.Database.BeginTransaction())
             {
-                //db.Database.ExecuteSqlCommand($"delete from [dbo].[submaprecords] where [SubMapId] = @p0", submapId);
-                //db.Database.ExecuteSqlCommand($"delete from [dbo].[submapcoordinates] where [SubMapId] = @p0", submapId);
-
                 await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync();
-
-                foreach(var record in newRecords)
+                var toAddRecords = newRecords.Select(record => new SubMapRecord
                 {
-                    db.SubMapRecords.Add(new SubMapRecord { 
-                        Classification = (int)targetClassification,
-                        SubMapId = submapId,
-                        AreaId = record,
-                        Value = true
-                    });
-                }
-
+                    Classification = (int)targetClassification,
+                    SubMapId = submapId,
+                    AreaId = record,
+                    Value = true
+                });
+                await db.SubMapRecords.BulkInsertAsync(toAddRecords).ConfigureAwait(false);
+                
                 await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync();
-                foreach (var coordinate in mergedPolygon.Coordinates)
+                var toAddCoordinates = mergedPolygon.Coordinates.Select(coordinate => new SubMapCoordinate
                 {
-                    db.SubMapCoordinates.Add(new SubMapCoordinate
-                    {
-                        SubMapId = submapId,
-                        Longitude = coordinate.X,
-                        Latitude = coordinate.Y,
-                    });
-                }
+                    SubMapId = submapId,
+                    Longitude = coordinate.X,
+                    Latitude = coordinate.Y,
+                });
+                await db.SubMapCoordinates.BulkInsertAsync(toAddCoordinates).ConfigureAwait(false);
 
                 submap.Total = total;
-
-                db.Entry(submap).Property(i => i.Total).IsModified = true;
-
                 db.SaveChanges();
 
                 transaction.Commit();
             }
-            db.Configuration.AutoDetectChangesEnabled = true;
 
             return Json(new { sucess = true });
         }
@@ -405,25 +393,15 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 throw new Exception("submap not exists!");
             }
-            try
+
+            using (var tran = db.Database.BeginTransaction())
             {
-                db.Database.Connection.Open();
-                using (var transaction = db.Database.BeginTransaction())
-                {
+                await db.SubMapRecords.Where(i=>i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.SubMaps.Where(i => i.Id == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
 
-
-                    db.Database.ExecuteSqlCommand("delete from [dbo].[submaprecords] where [SubMapId] = @p0", submapId);
-                    db.Database.ExecuteSqlCommand("delete from [dbo].[submapcoordinates] where [SubMapId] = @p0", submapId);
-                    db.Database.ExecuteSqlCommand("delete from [dbo].[submaps] where [Id] = @p0", submapId);
-
-                    transaction.Commit();
-                }
+                tran.Commit();
             }
-            finally
-            {
-                db.Database.Connection.Close();
-            }
-            
 
             return Json(new { success = true });
         }
@@ -437,16 +415,16 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 throw new Exception("submap not exists!");
             }
-            using (var transaction = db.Database.BeginTransaction())
+
+            using (var tran = db.Database.BeginTransaction())
             {
-                db.Database.ExecuteSqlCommand("delete from [dbo].[submaprecords] where [SubMapId] = @p0", submapId);
-                db.Database.ExecuteSqlCommand("delete from [dbo].[submapcoordinates] where [SubMapId] = @p0", submapId);
-
+                await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                
                 submap.Total = 0;
-
                 db.SaveChanges();
 
-                transaction.Commit();
+                tran.Commit();
             }
 
             return Json(new { success = true });

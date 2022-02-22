@@ -39,16 +39,19 @@
 
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.4" />
+		<PackageReference Include="log4net" Version="2.0.14" />
 		<PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="NetTopologySuite" Version="2.4.0" />
 		<PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
   </ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\NetTopologySuite.IO.VectorTiles.Mapbox\NetTopologySuite.IO.VectorTiles.Mapbox.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
-
-
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -67,9 +70,11 @@
     <Compile Include="DateTimeParameterAttribute.cs" />
     <Compile Include="DateTimeParameterBinding.cs" />
     <Compile Include="DESHelper.cs" />
+    <Compile Include="EmptyWithNoCacheMapboxTileResponse.cs" />
     <Compile Include="FileResult.cs" />
     <Compile Include="GeoJsonResponse.cs" />
     <Compile Include="ImageResult.cs" />
+    <Compile Include="MapboxTileResponse.cs" />
     <Compile Include="PDFResult.cs" />
   </ItemGroup>
 

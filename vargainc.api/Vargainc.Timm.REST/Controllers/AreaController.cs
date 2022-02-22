@@ -22,7 +22,7 @@ using System.Diagnostics;
 using Vargainc.Timm.REST.ViewModel;
 using System.Configuration;
 using log4net;
-
+using Vargainc.Timm.Extentions;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -46,52 +46,19 @@ namespace Vargainc.Timm.REST.Controllers
         /// <returns></returns>
         [Route("tiles/{layer}/{z}/{x}/{y}")]
         [HttpGet]
-        public async Task<HttpResponseMessage> GetTiles(Classifications layer, int z, int x, int y)
+        public async Task<IHttpActionResult> GetTiles(Classifications layer, int z, int x, int y)
         {
             if (!LAYERS.Contains(layer))
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                return BadRequest($"bad layer type {layer}, only allowed Z3 Z5 PremiumCRoute");
             }
-            HttpResponseMessage response = null;
 
             var cacheFile = Path.Combine(CachePath, layer.ToString(), z.ToString(), $"{x}.{y}.pbf");
-            //try
-            //{
-            //    if (File.Exists(cacheFile))
-            //    {
-            //        byte[] content = File.ReadAllBytes(cacheFile);
-            //        string eTag = null;
-            //        eTag = GenerateETag(content);
-            //        var eTagCheck = GetETag();
-            //        if (eTag == eTagCheck)
-            //        {
-            //            return new HttpResponseMessage(HttpStatusCode.NotModified);
-            //        }
-
-            //        response = new HttpResponseMessage(HttpStatusCode.OK);
-            //        response.Headers.TryAddWithoutValidation("ETag", eTag);
-            //        response.Headers.TryAddWithoutValidation("profile", "cache");
-            //        response.Content = new ByteArrayContent(content);
-            //        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-protobuf");
-
-            //        response.Headers.CacheControl = new CacheControlHeaderValue()
-            //        {
-            //            Public = true,
-            //            MaxAge = new TimeSpan(365, 0, 0, 0),
-            //        };
-
-            //        return response;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    logger.Error("Load cache file failed. continue...", ex);
-            //}
-
-            long database = 0;
-            long process = 0;
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
+            var eTag = GetETag();
+            if (File.Exists(cacheFile))
+            {
+                return new MapboxTileResponse(cacheFile, eTag);
+            }
 
             try
             {
@@ -157,10 +124,6 @@ namespace Vargainc.Timm.REST.Controllers
                     });
                 }
 
-
-                database = watch.ElapsedMilliseconds;
-                watch.Restart();
-
                 var tree = new VectorTileTree();
 
                 var polygons = data.Select(i =>
@@ -207,86 +170,21 @@ namespace Vargainc.Timm.REST.Controllers
                 var features = polygons.Concat(points);
                 tree.Add(features, z, layer.ToString());
 
-                response = new HttpResponseMessage(HttpStatusCode.OK);
-
-
                 if (tree.Contains(tile.Id))
                 {
-                    byte[] content = null;
-                    string eTag = null;
-                    using (var ms = new MemoryStream())
-                    {
-                        tree[tile.Id].Write(ms);
-                        ms.Seek(0, SeekOrigin.Begin);
-                        content = ms.ToArray();
-                    }
-
-                    //try
-                    //{
-                    //    if (!Directory.Exists(Path.GetDirectoryName(cacheFile)))
-                    //    {
-                    //        Directory.CreateDirectory(Path.GetDirectoryName(cacheFile));
-                    //    }
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    logger.Error("Create cache file directory failed. continue...", ex);
-                    //}
-
-                    //try
-                    //{
-                    //    File.WriteAllBytes(cacheFile, content);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    logger.Error("Create cache file failed. continue...", ex);
-                    //}
-
-                    eTag = GenerateETag(content);
-                    var eTagCheck = GetETag();
-                    if (eTag == eTagCheck)
-                    {
-                        return new HttpResponseMessage(HttpStatusCode.NotModified);
-                    }
-                    response.Headers.TryAddWithoutValidation("ETag", eTag);
-                    response.Headers.TryAddWithoutValidation("profile", "database");
-                    response.Content = new ByteArrayContent(content);
-                    response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-protobuf");
-
-                    response.Headers.CacheControl = new CacheControlHeaderValue()
-                    {
-                        Public = true,
-                        MaxAge = new TimeSpan(365, 0, 0, 0),
-                    };
-                }
-                else
-                {
-                    response.Content = new StringContent(string.Empty, Encoding.UTF8, "application/x-protobuf");
-
-                    response.Headers.CacheControl = new CacheControlHeaderValue
-                    {
-                        NoCache = true,
-                        NoStore = true,
-                        NoTransform = true
-                    };
+                    return new MapboxTileResponse(tree[tile.Id], cacheFile, eTag);
                 }
             }
             catch (Exception ex)
             {
-                response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
-                response.Content = new StringContent(ex.ToString(), Encoding.UTF8, "html/text");
+                logger.Error($"build tile for tiles/{layer}/{z}/{x}/{y} failed", ex);
             }
             finally
             {
                 db.Database.Connection.Close();
             }
 
-            watch.Stop();
-            process = watch.ElapsedMilliseconds;
-            response.Headers.TryAddWithoutValidation("profile-database", database.ToString());
-            response.Headers.TryAddWithoutValidation("profile-process", process.ToString());
-
-            return response;
+            return new EmptyWithNoCacheMapboxTileResponse();
         }
 
         [Route("zip/{code}")]

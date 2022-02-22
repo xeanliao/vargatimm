@@ -483,43 +483,34 @@ namespace Vargainc.Timm.REST.Controllers
             }
 
 
-            db.Configuration.AutoDetectChangesEnabled = false;
             using (var transaction = db.Database.BeginTransaction())
             {
-                db.Database.ExecuteSqlCommand($"delete from [dbo].[distributionmaprecords] where [DistributionMapId] = @p0", dMapId);
-                db.Database.ExecuteSqlCommand($"delete from [dbo].[distributionmapcoordinates] where [DistributionMapId] = @p0", dMapId);
+                await db.DistributionMapRecords.Where(i=>i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
 
-                foreach (var record in newRecords)
+                var toAddRecords = newRecords.Select(record => new DistributionMapRecord
                 {
-                    db.DistributionMapRecords.Add(new DistributionMapRecord
-                    {
-                        Classification = (int)targetClassification,
-                        DistributionMapId = dMapId,
-                        AreaId = record,
-                        Value = true,
-                    });
-                }
+                    Classification = (int)targetClassification,
+                    DistributionMapId = dMapId,
+                    AreaId = record,
+                    Value = true,
+                });
+                await db.DistributionMapRecords.BulkInsertAsync(toAddRecords).ConfigureAwait(false);
 
-
-                foreach (var coordinate in mergedPolygon.Coordinates)
+                var toAddCoordinate = mergedPolygon.Coordinates.Select(coordinate => new DistributionMapCoordinate
                 {
-                    db.DistributionMapCoordinates.Add(new DistributionMapCoordinate
-                    {
-                        DistributionMapId = dMapId,
-                        Longitude = coordinate.X,
-                        Latitude = coordinate.Y
-                    });
-                }
+                    DistributionMapId = dMapId,
+                    Longitude = coordinate.X,
+                    Latitude = coordinate.Y
+                });
+                await db.DistributionMapCoordinates.BulkInsertAsync(toAddCoordinate).ConfigureAwait(false);
 
                 dMap.Total = total;
-
-                db.Entry(dMap).Property(i => i.Total).IsModified = true;
 
                 db.SaveChanges();
 
                 transaction.Commit();
             }
-            db.Configuration.AutoDetectChangesEnabled = true;
 
             return Json(new { sucess = true });
         }
@@ -533,25 +524,14 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 throw new Exception("submap not exists!");
             }
-            try
+
+            using (var tran = db.Database.BeginTransaction())
             {
-                db.Database.Connection.Open();
+                await db.DistributionMapRecords.Where(i => i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.DistributionMaps.Where(i => i.Id == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
 
-                using (var transaction = db.Database.BeginTransaction())
-                {
-
-
-                    db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmaprecords] where [SubMapId] = @p0", dMapId);
-                    db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmapcoordinates] where [SubMapId] = @p0", dMapId);
-                    db.Database.ExecuteSqlCommand("delete from [dbo].[distributionmaps] where [Id] = @p0", dMapId);
-
-                    transaction.Commit();
-                }
-
-            }
-            finally
-            {
-                db.Database.Connection.Close();
+                tran.Commit();
             }
 
             return Json(new { success = true });
