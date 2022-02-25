@@ -16,6 +16,8 @@ using NetTopologySuite.IO.KML;
 using Vargainc.Timm.REST.ViewModel.ControlCenter;
 using Vargainc.Timm.REST.Helper;
 using Vargainc.Timm.REST.ViewModel;
+using System.IO;
+using Vargainc.Timm.Extentions;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -1309,46 +1311,108 @@ namespace Vargainc.Timm.REST.Controllers
         public async Task<IHttpActionResult> ExportCampaign(int campaignId)
         {
             var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
-            if(campaign == null)
+            if (campaign == null)
             {
                 return NotFound();
             }
-            Dictionary<Classifications, List<AbstractArea>> result = new Dictionary<Classifications, List<AbstractArea>>();
-            foreach(var subMap in campaign.SubMaps)
+
+            var result = new Dictionary<Classifications, List<ImportArea>>();
+            foreach (var subMap in campaign.SubMaps)
             {
                 var firstArea = subMap.SubMapRecords.FirstOrDefault();
-                if(firstArea == null)
+                if (firstArea == null)
                 {
                     continue;
                 }
                 var classification = (Classifications)firstArea.Classification;
                 var areaIdArray = subMap.SubMapRecords.Select(i => i.AreaId).ToArray();
+                List<ImportArea> data = new List<ImportArea>();
                 switch (classification)
                 {
                     case Classifications.Z5:
-                        db.FiveZipAreas.WhereBulkContains(areaIdArray)
-                            .Select(i => new FiveZipArea 
-                            { 
-                                Code = i.Code, 
-                                APT_COUNT = i.APT_COUNT, 
-                                HOME_COUNT = i.HOME_COUNT 
+                        data = db.FiveZipAreas.WhereBulkContains(areaIdArray)
+                            .Select(i => new ImportArea
+                            {
+                                Name = i.Code,
+                                APT = i.APT_COUNT,
+                                HOME = i.HOME_COUNT,
                             })
                             .ToList();
                         break;
                     case Classifications.PremiumCRoute:
-                        db.PremiumCRoutes.WhereBulkContains(areaIdArray)
-                            .Select(i=>new PremiumCRoute { 
-                                GEOCODE = i.GEOCODE, 
-                                CROUTE = i.CROUTE,
-                                APT_COUNT = i.APT_COUNT,
-                                HOME_COUNT = i.HOME_COUNT
-                            })
+                        data = db.PremiumCRoutes.WhereBulkContains(areaIdArray)
+                           .Select(i => new ImportArea
+                           {
+                               Name = i.CROUTE,
+                               APT = i.APT_COUNT,
+                               HOME = i.HOME_COUNT,
+                           })
                             .ToList();
                         break;
                     default:
                         break;
                 }
+
+                if (!result.ContainsKey(classification))
+                {
+                    result.Add(classification, new List<ImportArea>());
+                }
+                result[classification].AddRange(data);
             }
+
+            var wb = new NanoXLSX.Workbook($"{campaign.Name}.xlsx");
+            foreach (var item in result)
+            {
+                var sheetName = item.Key.ToString();
+                wb.AddWorksheet(sheetName);
+                wb.SetCurrentWorksheet(sheetName);
+                var addHeader = true;
+                foreach (var row in item.Value)
+                {
+                    if (addHeader)
+                    {
+                        switch (item.Key)
+                        {
+                            case Classifications.Z5:
+                                wb.CurrentWorksheet.AddNextCell("ZIP");
+
+                                break;
+                            case Classifications.PremiumCRoute:
+                                wb.CurrentWorksheet.AddNextCell("PREMIUMCROUTE");
+                                break;
+                        }
+                        wb.CurrentWorksheet.AddNextCell("APT");
+                        wb.CurrentWorksheet.AddNextCell("HOME");
+                        wb.CurrentWorksheet.AddNextCell("TOTAL");
+                        wb.CurrentWorksheet.AddNextCell("PENETRATION");
+
+                        addHeader = false;
+                        wb.CurrentWorksheet.GoToNextRow();
+                    }
+
+
+                    wb.CurrentWorksheet.AddNextCell(row.Name);
+                    wb.CurrentWorksheet.AddNextCell(row.APT);
+                    wb.CurrentWorksheet.AddNextCell(row.HOME);
+                    switch (campaign.AreaDescription)
+                    {
+                        case "APT ONLY":
+                            wb.CurrentWorksheet.AddNextCell(row.APT ?? 0);
+                            break;
+                        case "HOME ONLY":
+                            wb.CurrentWorksheet.AddNextCell(row.HOME ?? 0);
+                            break;
+                        case "APT + HOME":
+                        default:
+                            wb.CurrentWorksheet.AddNextCell((row.APT ?? 0) + (row.HOME ?? 0));
+                            break;
+                    }
+                    wb.CurrentWorksheet.AddNextCell(row.Penetration);
+                }
+            }
+            MemoryStream ms = new MemoryStream();
+            await wb.SaveAsStreamAsync(ms, true).ConfigureAwait(false);
+            return new ExcelResult(wb.Filename, ms);
         }
 
         private async Task<bool> SaveImportCampaign(ViewModel.ImportCampaign campaign)

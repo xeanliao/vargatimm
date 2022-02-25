@@ -85,6 +85,9 @@
     <Reference Include="MigraDoc.RtfRendering-gdi, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <HintPath>..\packages\PDFsharp-MigraDoc-gdi.1.50.5147\lib\net20\MigraDoc.RtfRendering-gdi.dll</HintPath>
     </Reference>
+    <Reference Include="NanoXLSX, Version=1.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NanoXLSX.1.8.2\lib\net45\NanoXLSX.dll</HintPath>
+    </Reference>
     <Reference Include="NetTopologySuite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
       <HintPath>..\packages\NetTopologySuite.2.4.0\lib\netstandard2.0\NetTopologySuite.dll</HintPath>
     </Reference>
@@ -116,6 +119,7 @@
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
     </Reference>
@@ -159,6 +163,7 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
     <Reference Include="Z.EntityFramework.Extensions, Version=6.13.9.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
       <HintPath>..\packages\Z.EntityFramework.Extensions.6.13.9\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
     </Reference>
@@ -226,6 +231,7 @@
     <Compile Include="ViewModel\ControlCenter\CampaignViewModel.cs" />
     <Compile Include="ViewModel\ControlCenter\TaskViewModel.cs" />
     <Compile Include="ViewModel\CustomGTUPoint.cs" />
+    <Compile Include="ViewModel\ImportArea.cs" />
     <Compile Include="ViewModel\ImportCampaign.cs" />
     <Compile Include="ViewModel\LatLngViewModel.cs" />
     <Compile Include="ViewModel\Location.cs" />

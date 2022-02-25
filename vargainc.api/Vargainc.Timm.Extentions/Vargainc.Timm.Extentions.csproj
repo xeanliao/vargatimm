@@ -71,6 +71,7 @@
     <Compile Include="DateTimeParameterBinding.cs" />
     <Compile Include="DESHelper.cs" />
     <Compile Include="EmptyWithNoCacheMapboxTileResponse.cs" />
+    <Compile Include="ExcelResult.cs" />
     <Compile Include="FileResult.cs" />
     <Compile Include="GeoJsonResponse.cs" />
     <Compile Include="ImageResult.cs" />
