@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPSWebService", "GPSMonitor\GPSWebService.csproj", "{F87F4F06-71A9-43F2-9910-7B0E4B8A5AAD}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "GPSServiceSetup", "GPSMonitorSetup\GPSMonitorSetup.vdproj", "{60E14C29-976C-45F1-AC69-9B381106750A}"
@@ -56,5 +58,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C6795B4D-F0CB-4D0E-A052-B057C345F2DD}
 	EndGlobalSection
 EndGlobal

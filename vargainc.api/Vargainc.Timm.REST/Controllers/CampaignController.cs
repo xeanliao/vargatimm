@@ -1304,6 +1304,53 @@ namespace Vargainc.Timm.REST.Controllers
             return Ok();
         }
 
+        [Route("{campaignId:int}/export")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ExportCampaign(int campaignId)
+        {
+            var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
+            if(campaign == null)
+            {
+                return NotFound();
+            }
+            Dictionary<Classifications, List<AbstractArea>> result = new Dictionary<Classifications, List<AbstractArea>>();
+            foreach(var subMap in campaign.SubMaps)
+            {
+                var firstArea = subMap.SubMapRecords.FirstOrDefault();
+                if(firstArea == null)
+                {
+                    continue;
+                }
+                var classification = (Classifications)firstArea.Classification;
+                var areaIdArray = subMap.SubMapRecords.Select(i => i.AreaId).ToArray();
+                switch (classification)
+                {
+                    case Classifications.Z5:
+                        db.FiveZipAreas.WhereBulkContains(areaIdArray)
+                            .Select(i => new FiveZipArea 
+                            { 
+                                Code = i.Code, 
+                                APT_COUNT = i.APT_COUNT, 
+                                HOME_COUNT = i.HOME_COUNT 
+                            })
+                            .ToList();
+                        break;
+                    case Classifications.PremiumCRoute:
+                        db.PremiumCRoutes.WhereBulkContains(areaIdArray)
+                            .Select(i=>new PremiumCRoute { 
+                                GEOCODE = i.GEOCODE, 
+                                CROUTE = i.CROUTE,
+                                APT_COUNT = i.APT_COUNT,
+                                HOME_COUNT = i.HOME_COUNT
+                            })
+                            .ToList();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         private async Task<bool> SaveImportCampaign(ViewModel.ImportCampaign campaign)
         {
             db.Configuration.AutoDetectChangesEnabled = false;
