@@ -685,16 +685,11 @@ export default class Campaign extends React.Component {
         if (!this.state.mapReady) {
             return
         }
-        if (this.state.selectedSubmapId == submap.Id) {
-            return
-        }
+
         this.setState(
             (state) => {
-                let allowedLayers = Array.from(Classification.values())
                 let fixClassification = Classification.get(submap.SubMapRecords?.[0]?.Classification)
-                if (fixClassification) {
-                    allowedLayers = [fixClassification]
-                }
+                let allowedLayers = fixClassification ? [fixClassification] : Array.from(Classification.values())
 
                 let submapGeo = state.campaignSource.features.filter((i) => i?.properties?.sid == submap.Id)?.[0]
 
@@ -864,11 +859,12 @@ export default class Campaign extends React.Component {
         })
     }
 
-    onEditSubmap() {
-        if (!this.state.selectedSubmapId) {
+    onEditSubmap(submapId) {
+        if (!this.state.selectedSubmapId && !submapId) {
             return
         }
-        var submap = this.props.campaign.SubMaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]
+        var editSbmapId = submapId ?? this.state.selectedSubmapId
+        var submap = this.props.campaign.SubMaps.filter((i) => i.Id == editSbmapId)?.[0]
         Helper.publish('showDialog', {
             view: <SubmapEdit model={submap} registeredTopic={{}} registeredEvents={[]} />,
             options: {
@@ -969,6 +965,9 @@ export default class Campaign extends React.Component {
         }
 
         let activeLayer = this.getActiveLayer()
+        if (!activeLayer) {
+            return false
+        }
         let features = this.map.queryRenderedFeatures({
             layers: [`timm-area-layer-${activeLayer}-fill`],
         })
@@ -1133,95 +1132,139 @@ export default class Campaign extends React.Component {
     renderRightMenu() {
         let submaps = this.props?.campaign?.SubMaps ?? []
         return (
-            <div className="grid-y" style={{ height: '100%' }}>
-                <div className="small-1 cell max-width-100">
+            <div className="grid-y grid-frame">
+                <div className="cell shrink">
                     <div className="row small-collapse">
-                        <div className="columns small-6"></div>
-                        <div className="columns small-6">
-                            <button className="button expanded margin-0" onClick={this.onPrint}>
-                                Print
-                            </button>
+                        <div className="columns small-12">
+                            <ul className="menu icons icon-left align-center">
+                                <li>
+                                    <a href="javascript:void" onClick={this.onPrint}>
+                                        <i className="fa fa-print fi-list"></i> <span>Print</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void" onClick={this.onPrint}>
+                                        <i className="fa fa-cloud-download fi-list"></i> <span>Export</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void" onClick={this.onPrint}>
+                                        <i className="fa fa-cloud-upload fi-list"></i> <span>Import</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-                        <div className="columns small-12 align-self-middle">
-                            <div className="padding-horizontal-1">
-                                <legend>Classifications</legend>
-                                <div className="button-group stacked-for-small clear">
-                                    <div>
-                                        <input type="checkbox" name="Z3" id="Z3" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z3')} />
-                                        <label
-                                            htmlFor="Z3"
-                                            className={ClassNames('margin-right-1', {
-                                                'font-bold': this.state.allowedLayers.has('Z3'),
-                                                'text-gray': !this.state.allowedLayers.has('Z3'),
-                                            })}
-                                        >
-                                            3 ZIP
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <input type="checkbox" name="Z5" id="Z5" onChange={this.onClassificationsChange} checked={this.state.activeLayers.has('Z5')} />
-                                        <label
-                                            htmlFor="Z5"
-                                            className={ClassNames('margin-right-1', {
-                                                'font-bold': this.state.allowedLayers.has('Z5'),
-                                                'text-gray': !this.state.allowedLayers.has('Z5'),
-                                            })}
-                                        >
-                                            5 ZIP
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="checkbox"
-                                            name="PremiumCRoute"
-                                            id="PremiumCRoute"
-                                            onChange={this.onClassificationsChange}
-                                            checked={this.state.activeLayers.has('PremiumCRoute')}
-                                        />
-                                        <label
-                                            htmlFor="PremiumCRoute"
-                                            className={ClassNames('margin-right-1', {
-                                                'font-bold': this.state.allowedLayers.has('PremiumCRoute'),
-                                                'text-gray': !this.state.allowedLayers.has('PremiumCRoute'),
-                                            })}
-                                        >
-                                            CRoute
-                                        </label>
+                        <div className="columns small-12">
+                            <div className="row">
+                                <div className="columns small-12">
+                                    <button className="button tiny expanded margin-0">Classifications</button>
+                                </div>
+                                <div className="columns small-12">
+                                    <div className="button-group stacked-for-small clear align-spaced" style={{ margin: '0.5rem 0' }}>
+                                        <div>
+                                            <input
+                                                type="checkbox"
+                                                className="margin-0"
+                                                name="Z3"
+                                                id="Z3"
+                                                onChange={this.onClassificationsChange}
+                                                checked={this.state.activeLayers.has('Z3')}
+                                            />
+                                            <label
+                                                htmlFor="Z3"
+                                                className={ClassNames('margin-right-1', {
+                                                    'font-bold': this.state.allowedLayers.has('Z3'),
+                                                    'text-gray': !this.state.allowedLayers.has('Z3'),
+                                                })}
+                                            >
+                                                3 ZIP
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <input
+                                                type="checkbox"
+                                                className="margin-0"
+                                                name="Z5"
+                                                id="Z5"
+                                                onChange={this.onClassificationsChange}
+                                                checked={this.state.activeLayers.has('Z5')}
+                                            />
+                                            <label
+                                                htmlFor="Z5"
+                                                className={ClassNames('margin-right-1', {
+                                                    'font-bold': this.state.allowedLayers.has('Z5'),
+                                                    'text-gray': !this.state.allowedLayers.has('Z5'),
+                                                })}
+                                            >
+                                                5 ZIP
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <input
+                                                type="checkbox"
+                                                className="margin-0"
+                                                name="PremiumCRoute"
+                                                id="PremiumCRoute"
+                                                onChange={this.onClassificationsChange}
+                                                checked={this.state.activeLayers.has('PremiumCRoute')}
+                                            />
+                                            <label
+                                                htmlFor="PremiumCRoute"
+                                                className={ClassNames('margin-right-1', {
+                                                    'font-bold': this.state.allowedLayers.has('PremiumCRoute'),
+                                                    'text-gray': !this.state.allowedLayers.has('PremiumCRoute'),
+                                                })}
+                                            >
+                                                CRoute
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="small-10 cell max-width-100 padding-top-1">
+                <div className="cell auto">
                     <div className="row small-collapse">
                         <div className="columns small-6">
-                            <button className="button tiny expanded margin-0">SubMaps</button>
+                            <button className="button small expanded margin-0">SubMaps</button>
                         </div>
                         <div className="columns small-6">
-                            <button className="button tiny expanded hollow margin-0">Address</button>
+                            <button className="button small expanded hollow margin-0">Address</button>
                         </div>
                         <div className="columns small-12">
-                            <div className="button-group no-gaps clear small tiny-button-group">
-                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onNewSubmap}>
-                                    New
-                                </div>
-                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onEditSubmap}>
-                                    Edit
-                                </div>
-                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onDeleteSubmap}>
-                                    Delete
-                                </div>
-                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onSaveShapesToSubmap}>
-                                    Save Shapes
-                                </div>
-                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.onSelectAllScreenShapes}>
-                                    Select All Shapes
-                                </div>
-                                <div className="button padding-horizontal-1 padding-vertical-0 " onClick={this.clearSelectedShapes}>
-                                    Deselect All Shapes
-                                </div>
-                            </div>
+                            <ul className="menu icons icon-left align-spaced">
+                                <li>
+                                    <a className="button clear" href="javascript:void" onClick={this.onNewSubmap} title="New">
+                                        <i className="fa fa-file-text-o fi-list"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="button clear" href="javascript:void" onClick={this.onEditSubmap} title="Edit">
+                                        <i className="fa fa-pencil-square-o fi-list"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="button clear" href="javascript:void" onClick={this.onDeleteSubmap} title="Delete">
+                                        <i className="fa fa-trash-o fi-list"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="button clear" href="javascript:void" onClick={this.onSaveShapesToSubmap} title="Save">
+                                        <i className="fa fa-floppy-o fi-list"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="button clear" href="javascript:void" onClick={this.onSelectAllScreenShapes} title="Select All to Current Submap">
+                                        <i className="fa fa-object-group fi-list"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="button clear" href="javascript:void" onClick={this.clearSelectedShapes} title="Deselect All to Current Submap">
+                                        <i className="fa fa-object-ungroup fi-list"></i>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div ref={this.onInitSubMapScrollbar} style={{ overflow: 'hidden scroll', height: '640px' }}>
@@ -1253,7 +1296,12 @@ export default class Campaign extends React.Component {
                                         <div className={buttonClassName}>
                                             <div className="grid-x align-middle">
                                                 <div className="cell shrink">
-                                                    <div style={boxStyle}></div>
+                                                    <div
+                                                        style={boxStyle}
+                                                        onClick={(evt) => {
+                                                            this.onEditSubmap(s.Id)
+                                                        }}
+                                                    ></div>
                                                 </div>
                                                 <div className="cell auto padding-left-1">
                                                     <div className="margin-0 padding-0 font-medium">{`${index + 1}. ${s.Name}`}</div>
@@ -1267,7 +1315,6 @@ export default class Campaign extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="small-1 cell max-width-100"></div>
             </div>
         )
     }
