@@ -185,6 +185,8 @@ export default class Campaign extends React.Component {
 
         this.onSearchZip = this.onSearchZip.bind(this)
         this.onPrint = this.onPrint.bind(this)
+        this.onDownloadExcel = this.onDownloadExcel.bind(this)
+        this.onUploadExcel = this.onUploadExcel.bind(this)
         this.clearPopup = this.clearPopup.bind(this)
 
         this.getActiveLayer = this.getActiveLayer.bind(this)
@@ -863,7 +865,7 @@ export default class Campaign extends React.Component {
         if (!this.state.selectedSubmapId && !submapId) {
             return
         }
-        var editSbmapId = submapId ?? this.state.selectedSubmapId
+        var editSbmapId = typeof submapId !== 'number' ? this.state.selectedSubmapId : submapId
         var submap = this.props.campaign.SubMaps.filter((i) => i.Id == editSbmapId)?.[0]
         Helper.publish('showDialog', {
             view: <SubmapEdit model={submap} registeredTopic={{}} registeredEvents={[]} />,
@@ -1118,6 +1120,19 @@ export default class Campaign extends React.Component {
         window.open(`${url}#print/${this.props.campaign.Id}/campaign`, 'campaign-print')
     }
 
+    onUploadExcel(evt) {
+        let form = evt.target.parentNode
+        let formData = new FormData(form)
+        axios.post(`campaign/${this.props?.campaign?.Id}/penetration`, formData).finally(() => {
+            form.reset()
+            this.onRefresh()
+        })
+    }
+
+    onDownloadExcel() {
+        window.open(`api/campaign/${this.props?.campaign?.Id}/penetration`)
+    }
+
     render() {
         return (
             <div className="campaign full-container">
@@ -1143,14 +1158,29 @@ export default class Campaign extends React.Component {
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void" onClick={this.onPrint}>
+                                    <a href="javascript:void" onClick={this.onDownloadExcel}>
                                         <i className="fa fa-cloud-download fi-list"></i> <span>Export</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void" onClick={this.onPrint}>
-                                        <i className="fa fa-cloud-upload fi-list"></i> <span>Import</span>
+                                    <a href="javascript:void">
+                                        <label
+                                            htmlFor="import"
+                                            style={{ display: 'inherit', 'font-size': 'inherit', 'font-weight': 'inherit', 'line-height': 'inherit', color: 'inherit' }}
+                                        >
+                                            <i className="fa fa-cloud-upload"></i> Import
+                                        </label>
                                     </a>
+                                    <form encType="multipart/form-data">
+                                        <input
+                                            id="import"
+                                            type="file"
+                                            className="hide"
+                                            name="file"
+                                            accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                            onChange={this.onUploadExcel}
+                                        />
+                                    </form>
                                 </li>
                             </ul>
                         </div>
