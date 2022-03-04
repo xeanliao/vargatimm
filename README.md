@@ -203,3 +203,12 @@ CREATE SPATIAL INDEX [premiumcroutes_spatial_index]
     BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
   );
 ```
+
+2. 2022-03-01
+```sql
+ALTER TABLE [dbo].[submaprecords]
+ADD [Code] NVARCHAR(10);
+
+ALTER TABLE [dbo].[distributionmaprecords]
+ADD [Code] NVARCHAR(10);
+```
