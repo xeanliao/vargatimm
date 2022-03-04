@@ -38,6 +38,8 @@ namespace Vargainc.Timm.Models
         [Column("IsEnabled")]
         public int? _IsEnabled { get; set; }
 
+        public bool? IsMaster { get; set; }
+
         [NotMapped]
         public bool? IsEnabled {
             get

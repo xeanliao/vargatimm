@@ -18,6 +18,8 @@ using Vargainc.Timm.REST.Helper;
 using Vargainc.Timm.REST.ViewModel;
 using System.IO;
 using Vargainc.Timm.Extentions;
+using Z.EntityFramework.Plus;
+using System.Net.Http;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -30,6 +32,8 @@ namespace Vargainc.Timm.REST.Controllers
         private const string HOME = "HOME ONLY";
         private const string APT_HOME = "APT + HOME";
         #endregion
+
+        private readonly string TempPath = ConfigurationManager.AppSettings["TempPath"];
 
         private void FixLogoPath(List<Campaign> result)
         {
@@ -1306,9 +1310,9 @@ namespace Vargainc.Timm.REST.Controllers
             return Ok();
         }
 
-        [Route("{campaignId:int}/export")]
+        [Route("{campaignId:int}/penetration")]
         [HttpGet]
-        public async Task<IHttpActionResult> ExportCampaign(int campaignId)
+        public async Task<IHttpActionResult> ExportCampaignPenetration(int campaignId)
         {
             var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
             if (campaign == null)
@@ -1327,10 +1331,12 @@ namespace Vargainc.Timm.REST.Controllers
                 var classification = (Classifications)firstArea.Classification;
                 var areaIdArray = subMap.SubMapRecords.Select(i => i.AreaId).ToArray();
                 List<ImportArea> data = new List<ImportArea>();
+                List<string> codes = null;
                 switch (classification)
                 {
                     case Classifications.Z5:
-                        data = db.FiveZipAreas.WhereBulkContains(areaIdArray)
+                         codes = db.FiveZipAreas.Where(i => areaIdArray.Contains(i.Id)).Select(i => i.Code).ToList();
+                        data = db.FiveZipAreas.Where(i=> codes.Contains(i.Code) && i.IsInnerShape == 0 && i.IsMaster == true)
                             .Select(i => new ImportArea
                             {
                                 Name = i.Code,
@@ -1340,7 +1346,8 @@ namespace Vargainc.Timm.REST.Controllers
                             .ToList();
                         break;
                     case Classifications.PremiumCRoute:
-                        data = db.PremiumCRoutes.WhereBulkContains(areaIdArray)
+                         codes = db.PremiumCRoutes.Where(i => areaIdArray.Contains(i.Id)).Select(i=>i.GEOCODE).ToList();
+                        data = db.PremiumCRoutes.Where(i=> codes.Contains(i.GEOCODE) && i.IsInnerShape == 0 && i.IsMaster == true)
                            .Select(i => new ImportArea
                            {
                                Name = i.CROUTE,
@@ -1360,7 +1367,7 @@ namespace Vargainc.Timm.REST.Controllers
                 result[classification].AddRange(data);
             }
 
-            var wb = new NanoXLSX.Workbook($"{campaign.Name}.xlsx");
+            var wb = new NanoXLSX.Workbook(false);
             foreach (var item in result)
             {
                 var sheetName = item.Key.ToString();
@@ -1408,11 +1415,163 @@ namespace Vargainc.Timm.REST.Controllers
                             break;
                     }
                     wb.CurrentWorksheet.AddNextCell(row.Penetration);
+                    wb.CurrentWorksheet.GoToNextRow();
                 }
             }
             MemoryStream ms = new MemoryStream();
             await wb.SaveAsStreamAsync(ms, true).ConfigureAwait(false);
-            return new ExcelResult(wb.Filename, ms);
+            return new ExcelResult($"{campaign.Name}.xlsx", ms);
+        }
+
+        [Route("{campaignId:int}/penetration")]
+        [HttpPost]
+        public async Task<dynamic> ImportCampaignPenetration(int campaignId)
+        {
+            var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
+            if (campaign == null)
+            {
+                return NotFound();
+            }
+
+            MultipartFormDataStreamProvider provider = null;
+            try
+            {
+                provider = new MultipartFormDataStreamProvider(TempPath);
+                await Request.Content.ReadAsMultipartAsync(provider).ConfigureAwait(false);
+            }
+            catch
+            {
+
+            }
+
+            if (provider == null)
+            {
+                return NotFound();
+            }
+
+            var postedFile = provider.FileData.FirstOrDefault();
+
+            if (postedFile == null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                var wb = NanoXLSX.Workbook.Load(postedFile.LocalFileName);
+                var totalRows = wb.CurrentWorksheet.GetLastDataRowNumber();
+                List<ImportArea> z5Data = new List<ImportArea>();
+                List<ImportArea> cRouteData = new List<ImportArea>();
+                for (var rowIndex = 1; rowIndex <= totalRows; rowIndex++)
+                {
+                    var name = wb.CurrentWorksheet.GetCell(0, rowIndex)?.Value?.ToString() ?? String.Empty;
+                    var totalValue = wb.CurrentWorksheet.GetCell(3, rowIndex)?.Value?.ToString() ?? "0";
+                    var penetrationValue = wb.CurrentWorksheet.GetCell(4, rowIndex)?.Value?.ToString() ?? "0";
+                    int.TryParse(totalValue, out int total);
+                    int.TryParse(penetrationValue, out int penetration);
+                    if (name.Length == 5)
+                    {
+                        z5Data.Add(new ImportArea
+                        {
+                            Name = name,
+                            Penetration = penetration,
+                            Total = total
+                        });
+                    }
+                    else
+                    {
+                        cRouteData.Add(new ImportArea
+                        {
+                            Name = name,
+                            Penetration = penetration,
+                            Total = total
+                        });
+                    }
+
+                }
+
+                db.Configuration.AutoDetectChangesEnabled = false;
+
+                using (var tran = db.Database.BeginTransaction())
+                {
+
+                    await db.CampaignFiveZipImporteds.Where(i => i.CampaignId == campaignId).DeleteAsync().ConfigureAwait(false);
+                    await db.CampaignCRouteImporteds.Where(i => i.CampaignId == campaignId).DeleteAsync().ConfigureAwait(false);
+
+                    if (z5Data.Count > 0)
+                    {
+                        var ids = z5Data.Select(i => i.Name).Distinct().ToArray();
+                        var fixZ5Data = db.FiveZipAreas.Where(i => ids.Contains(i.Code) && i.IsInnerRing == 0 && i.IsMaster == true).ToList();
+                        var fixIds = fixZ5Data.Select(i=>i.Code).Distinct().ToArray();
+                        var importZ5Data = db.CampaignFiveZipImporteds.Where(i=>i.CampaignId == campaignId && fixIds.Contains(i.))
+                        var importData = fixZ5Data.Select(i => new CampaignFiveZipImported
+                        {
+                            CampaignId = campaignId,
+                            FiveZipAreaId = i.Id,
+                            Penetration = i.Penetration,
+                            Total = i.Total
+                        });
+
+                        db.CampaignFiveZipImporteds.AddRange(importData);
+
+                        await db.SaveChangesAsync().ConfigureAwait(false);
+                    }
+
+                    if (cRouteData.Count > 0)
+                    {
+                        var ids = cRouteData.Select(i => i.Name).Distinct().ToArray();
+                        var kv = db.PremiumCRoutes.Where(i => ids.Contains(i.CROUTE) && i.IsInnerRing == 0 && i.IsMaster == true).ToDictionary(i => i.CROUTE, i => i.Id);
+                        var importData = cRouteData.Select(i => new CampaignCRouteImported
+                        {
+                            CampaignId = campaignId,
+                            PremiumCRouteId = kv[i.Name],
+                            Penetration = i.Penetration,
+                            Total = i.Total
+                        });
+
+                        db.CampaignCRouteImporteds.AddRange(importData);
+                        await db.SaveChangesAsync().ConfigureAwait(false);
+                    }
+
+                    tran.Commit();
+                }
+
+                db.Configuration.AutoDetectChangesEnabled = true;
+
+                // fix submap penetration
+                foreach (var subMap in campaign.SubMaps)
+                {
+                    var classifications = (Classifications)subMap.SubMapRecords.FirstOrDefault()?.Classification;
+                    List<string> codes;
+                    int? target = null;
+                    switch (classifications)
+                    {
+                        case Classifications.Z5:
+                            codes = subMap.SubMapRecords.Select(i=>i.Code).Distinct().ToList();
+                            target = z5Data.Where(i => codes.Contains(i.Name)).Sum(i => i.Penetration ?? 0);
+                            break;
+                        case Classifications.PremiumCRoute:
+                            codes = subMap.SubMapRecords.Select(i => i.Code).Distinct().ToList();
+                            target = cRouteData.Where(i => codes.Contains(i.Name)).Sum(i => i.Penetration ?? 0);
+                            break;
+                    }
+                    if (target.HasValue)
+                    {
+                        subMap.Penetration = target.Value;
+                    }
+                }
+                await db.SaveChangesAsync().ConfigureAwait(false);
+            }
+            finally
+            {
+                try
+                {
+                    File.Delete(postedFile.LocalFileName);
+                }
+                catch { }
+
+            }
+
+            return new { success = true };
         }
 
         private async Task<bool> SaveImportCampaign(ViewModel.ImportCampaign campaign)
