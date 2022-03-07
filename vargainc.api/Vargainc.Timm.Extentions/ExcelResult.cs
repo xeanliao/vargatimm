@@ -36,7 +36,7 @@ namespace Vargainc.Timm.Extentions
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
             this.OutputStream.Seek(0, SeekOrigin.Begin);
             result.Content = new StreamContent(this.OutputStream);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             result.Content.Headers.TryAddWithoutValidation("Content-Disposition", string.Format("attachment; filename={0}", this.FileName));
             return Task.FromResult(result);
         }

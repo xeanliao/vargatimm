@@ -1,22 +1,19 @@
-﻿using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+
+using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using Z.EntityFramework.Plus;
+
 using Vargainc.Timm.Extentions;
 using Vargainc.Timm.Models;
 using Vargainc.Timm.REST.ViewModel;
+
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -162,12 +159,12 @@ namespace Vargainc.Timm.REST.Controllers
 
         [HttpPost]
         [Route("{campaignId:int}/submap/{submapId:int}/merge")]
-        public async Task<IHttpActionResult> MergeAreas(int campaignId, int submapId, [FromBody]List<AreaRecord> records)
+        public async Task<IHttpActionResult> MergeAreas(int campaignId, int submapId, [FromBody] List<AreaRecord> records)
         {
             var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
             var submap = await db.SubMaps.Where(i => i.Id == submapId && i.CampaignId == campaignId).FirstOrDefaultAsync().ConfigureAwait(false);
-            var otherSubMaps = await db.SubMaps.Where(i=>i.CampaignId == campaignId && i.Id != submapId).Select(i=>i.Id).ToListAsync().ConfigureAwait(false);
-            if(campaign == null || submap == null)
+            var otherSubMaps = await db.SubMaps.Where(i => i.CampaignId == campaignId && i.Id != submapId).Select(i => i.Id).ToListAsync().ConfigureAwait(false);
+            if (campaign == null || submap == null)
             {
                 return BadRequest();
             }
@@ -197,7 +194,7 @@ namespace Vargainc.Timm.REST.Controllers
                     needAddRecords = await db.PremiumCRoutes.Where(i => addAreas.Contains(i.GEOCODE)).Select(i => i.Id ?? 0).ToListAsync().ConfigureAwait(false);
                     break;
             }
-            if(needRemoveRecords.Count ==0 && needAddRecords.Count == 0)
+            if (needRemoveRecords.Count == 0 && needAddRecords.Count == 0)
             {
                 return BadRequest();
             }
@@ -208,7 +205,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             // remove other submaps already added area
             var targetClassificationInt = (int)targetClassification;
-            var otherAddedAreas = db.SubMapRecords.Where(i=> otherSubMaps.Contains(i.SubMapId) && i.Classification == targetClassificationInt).Select(i=>i.Id??0).ToHashSet();
+            var otherAddedAreas = db.SubMapRecords.Where(i => otherSubMaps.Contains(i.SubMapId) && i.Classification == targetClassificationInt).Select(i => i.Id ?? 0).ToHashSet();
 
             newRecords = newRecords.Where(i => !otherAddedAreas.Contains(i)).ToList();
 
@@ -310,34 +307,25 @@ namespace Vargainc.Timm.REST.Controllers
             }
 
             int apt = 0;
-            int home =0;
-            
+            int home = 0;
+
+            List<FiveZipArea> fixedZ5 = new List<FiveZipArea>();
+            List<PremiumCRoute> fixedCRoute = new List<PremiumCRoute>();
+
             switch (targetClassification)
             {
-                case Classifications.Z3:
-                    var resultZ3 = db.ThreeZipAreas.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.Code)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    apt = resultZ3.Sum(i => i.APT ?? 0);
-                    home = resultZ3.Sum(i => i.HOME ?? 0);
+                case Classifications.Z5:
+                    var z5Codes = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value)).Select(i => i.Code).Distinct().ToArray();
+                    fixedZ5 = db.FiveZipAreas.Where(i => z5Codes.Contains(i.Code) && i.IsInnerRing == 0 && i.IsMaster == true).ToList();
+                    apt = fixedZ5.Sum(i => i.APT_COUNT ?? 0);
+                    home = fixedZ5.Sum(i => i.HOME_COUNT ?? 0);
 
                     break;
-                case Classifications.Z5:
-                    var resultZ5 = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.Code)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    apt = resultZ5.Sum(i => i.APT ?? 0);
-                    home = resultZ5.Sum(i => i.HOME ?? 0);
-                    break;
                 case Classifications.PremiumCRoute:
-                    var resultCRoute = db.PremiumCRoutes.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.GEOCODE)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    apt = resultCRoute.Sum(i => i.APT ?? 0);
-                    home = resultCRoute.Sum(i => i.HOME ?? 0);
+                    var cRouteCodes = db.PremiumCRoutes.Where(i => newRecords.Contains(i.Id.Value)).Select(i=>i.GEOCODE).Distinct().ToArray();
+                    fixedCRoute = db.PremiumCRoutes.Where(i=>cRouteCodes.Contains(i.GEOCODE) && i.IsInnerRing == 0 && i.IsMaster == true).ToList();
+                    apt = fixedCRoute.Sum(i => i.APT_COUNT ?? 0);
+                    home = fixedCRoute.Sum(i => i.HOME_COUNT ?? 0);
                     break;
             }
             int total = 0;
@@ -356,27 +344,45 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var transaction = db.Database.BeginTransaction())
             {
-                await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync();
-                var toAddRecords = newRecords.Select(record => new SubMapRecord
+                await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteAsync();
+                List<SubMapRecord> toAddRecords = new List<SubMapRecord>();
+                switch (targetClassification)
                 {
-                    Classification = (int)targetClassification,
-                    SubMapId = submapId,
-                    AreaId = record,
-                    Value = true
-                });
-                await db.SubMapRecords.BulkInsertAsync(toAddRecords).ConfigureAwait(false);
+                    case Classifications.Z5:
+                        toAddRecords = fixedZ5.Select(record => new SubMapRecord
+                        {
+                            Classification = (int)targetClassification,
+                            SubMapId = submapId,
+                            AreaId = record.Id,
+                            Value = true,
+                            Code = record.Code
+                        }).ToList();
+                        break;
+                    case Classifications.PremiumCRoute:
+                        toAddRecords = fixedCRoute.Select(record => new SubMapRecord
+                        {
+                            Classification = (int)targetClassification,
+                            SubMapId = submapId,
+                            AreaId = record.Id,
+                            Value = true,
+                            Code = record.GEOCODE
+                        }).ToList();
+                        break;
+                }
                 
-                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync();
+                db.SubMapRecords.AddRange(toAddRecords);
+
+                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteAsync();
                 var toAddCoordinates = mergedPolygon.Coordinates.Select(coordinate => new SubMapCoordinate
                 {
                     SubMapId = submapId,
                     Longitude = coordinate.X,
                     Latitude = coordinate.Y,
                 });
-                await db.SubMapCoordinates.BulkInsertAsync(toAddCoordinates).ConfigureAwait(false);
+                db.SubMapCoordinates.AddRange(toAddCoordinates);
 
                 submap.Total = total;
-                db.SaveChanges();
+                await db.SaveChangesAsync();
 
                 transaction.Commit();
             }
@@ -396,9 +402,9 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var tran = db.Database.BeginTransaction())
             {
-                await db.SubMapRecords.Where(i=>i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
-                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
-                await db.SubMaps.Where(i => i.Id == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.SubMapRecords.Where(i=>i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
+                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
+                await db.SubMaps.Where(i => i.Id == submapId).DeleteAsync().ConfigureAwait(false);
 
                 tran.Commit();
             }
@@ -418,8 +424,8 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var tran = db.Database.BeginTransaction())
             {
-                await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
-                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
+                await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
                 
                 submap.Total = 0;
                 db.SaveChanges();

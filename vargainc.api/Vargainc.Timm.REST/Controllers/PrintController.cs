@@ -576,9 +576,9 @@ namespace Vargainc.Timm.REST.Controllers
 
             var record = campaign.SubMaps.FirstOrDefault(i => i.Id == submapId).SubMapRecords.FirstOrDefault(i => i.Value == true);
             IQueryable<ViewModel.Record> query = null;
-            switch (record.Classification)
+            switch ((ViewModel.Classifications)record.Classification)
             {
-                case 15: //PremiumCRoutes
+                case ViewModel.Classifications.PremiumCRoute: //PremiumCRoutes
                     {
                         query = from submapRecord in db.SubMapRecords
                                 join area in db.PremiumCRoutes on submapRecord.AreaId equals area.Id
@@ -607,6 +607,35 @@ namespace Vargainc.Timm.REST.Controllers
                                 };
                     }
                     break;
+                case ViewModel.Classifications.Z5:
+                    {
+                        query = from submapRecord in db.SubMapRecords
+                                join area in db.FiveZipAreas on submapRecord.AreaId equals area.Id
+                                where submapRecord.SubMapId == submapId && submapRecord.Value == true
+                                select new
+                                {
+                                    AreaId = area.Id,
+                                    CampaignId = campaign.Id,
+                                    Name = area.Code,
+                                    area.APT_COUNT,
+                                    area.HOME_COUNT
+                                }
+                                into combo
+                                join imported in db.CampaignFiveZipImporteds.Where(i => i.CampaignId == campaign.Id)
+                                on combo.AreaId equals imported.FiveZipAreaId into left
+                                from r in left.DefaultIfEmpty()
+                                orderby combo.AreaId
+                                select new ViewModel.Record
+                                {
+                                    Id = combo.AreaId,
+                                    Name = combo.Name,
+                                    APT = combo.APT_COUNT,
+                                    Home = combo.HOME_COUNT,
+                                    TotalHouseHold = 0,
+                                    TargetHouseHold = r.Penetration
+                                };
+                    }
+                    break;
                 default:
                     break;
             }
@@ -622,24 +651,21 @@ namespace Vargainc.Timm.REST.Controllers
             var debug = query.ToString();
             foreach (var item in query)
             {
-                if (record.Classification == 15)
+                switch (areaDesc)
                 {
-                    switch (areaDesc)
-                    {
-                        case APT:
-                            item.TotalHouseHold = item.APT;
-                            break;
-                        case HOME:
-                            item.TotalHouseHold = item.Home;
-                            break;
-                        case APT_HOME:
-                            item.TotalHouseHold = item.APT + item.Home;
-                            break;
-                        default:
-                            break;
-                    }
-                    item.TotalHouseHold = Math.Round(item.TotalHouseHold ?? 0, 0);
+                    case APT:
+                        item.TotalHouseHold = item.APT;
+                        break;
+                    case HOME:
+                        item.TotalHouseHold = item.Home;
+                        break;
+                    case APT_HOME:
+                        item.TotalHouseHold = item.APT + item.Home;
+                        break;
+                    default:
+                        break;
                 }
+                item.TotalHouseHold = Math.Round(item.TotalHouseHold ?? 0, 0);
                 result.Add(item);
             }
             return result;

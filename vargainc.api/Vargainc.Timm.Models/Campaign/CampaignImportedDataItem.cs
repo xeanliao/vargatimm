@@ -11,5 +11,6 @@ namespace Vargainc.Timm.Models
         [DefaultValue(0)]
         public int? Total { get; set; }
         public int CampaignId { get; set; }
+        public string Code { get; set; }
     }
 }

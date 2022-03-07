@@ -10,6 +10,7 @@ namespace Vargainc.Timm.Models
         public int? Classification { get; set; }
         [DefaultValue(0)]
         public int? AreaId { get; set; }
+        public string Code { get; set; }
         [DefaultValue(false)]
         public bool? Value { get; set; }
         [DefaultValue(0)]

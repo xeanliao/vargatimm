@@ -20,6 +20,7 @@ using Vargainc.Timm.Extentions;
 using Vargainc.Timm.Models;
 using Vargainc.Timm.REST.Helper;
 using Vargainc.Timm.REST.ViewModel;
+using Z.EntityFramework.Plus;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -485,8 +486,8 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var transaction = db.Database.BeginTransaction())
             {
-                await db.DistributionMapRecords.Where(i=>i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
-                await db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.DistributionMapRecords.Where(i=>i.DistributionMapId == dMapId).DeleteAsync().ConfigureAwait(false);
+                await db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dMapId).DeleteAsync().ConfigureAwait(false);
 
                 var toAddRecords = newRecords.Select(record => new DistributionMapRecord
                 {
@@ -495,7 +496,8 @@ namespace Vargainc.Timm.REST.Controllers
                     AreaId = record,
                     Value = true,
                 });
-                await db.DistributionMapRecords.BulkInsertAsync(toAddRecords).ConfigureAwait(false);
+
+                db.DistributionMapRecords.AddRange(toAddRecords);
 
                 var toAddCoordinate = mergedPolygon.Coordinates.Select(coordinate => new DistributionMapCoordinate
                 {
@@ -503,11 +505,11 @@ namespace Vargainc.Timm.REST.Controllers
                     Longitude = coordinate.X,
                     Latitude = coordinate.Y
                 });
-                await db.DistributionMapCoordinates.BulkInsertAsync(toAddCoordinate).ConfigureAwait(false);
+                db.DistributionMapCoordinates.AddRange(toAddCoordinate);
 
                 dMap.Total = total;
 
-                db.SaveChanges();
+                await db.SaveChangesAsync().ConfigureAwait(false);
 
                 transaction.Commit();
             }
@@ -527,9 +529,9 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var tran = db.Database.BeginTransaction())
             {
-                await db.DistributionMapRecords.Where(i => i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
-                await db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
-                await db.DistributionMaps.Where(i => i.Id == dMapId).DeleteFromQueryAsync().ConfigureAwait(false);
+                await db.DistributionMapRecords.Where(i => i.DistributionMapId == dMapId).DeleteAsync().ConfigureAwait(false);
+                await db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dMapId).DeleteAsync().ConfigureAwait(false);
+                await db.DistributionMaps.Where(i => i.Id == dMapId).DeleteAsync().ConfigureAwait(false);
 
                 tran.Commit();
             }
