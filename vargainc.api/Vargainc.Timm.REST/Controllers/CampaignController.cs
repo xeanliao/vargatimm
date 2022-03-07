@@ -1489,53 +1489,50 @@ namespace Vargainc.Timm.REST.Controllers
 
                 }
 
-                db.Configuration.AutoDetectChangesEnabled = false;
-
                 using (var tran = db.Database.BeginTransaction())
                 {
-
                     await db.CampaignFiveZipImporteds.Where(i => i.CampaignId == campaignId).DeleteAsync().ConfigureAwait(false);
                     await db.CampaignCRouteImporteds.Where(i => i.CampaignId == campaignId).DeleteAsync().ConfigureAwait(false);
 
                     if (z5Data.Count > 0)
                     {
                         var ids = z5Data.Select(i => i.Name).Distinct().ToArray();
-                        var fixZ5Data = db.FiveZipAreas.Where(i => ids.Contains(i.Code) && i.IsInnerRing == 0 && i.IsMaster == true).ToList();
-                        var fixIds = fixZ5Data.Select(i=>i.Code).Distinct().ToArray();
-                        var importZ5Data = db.CampaignFiveZipImporteds.Where(i=>i.CampaignId == campaignId && fixIds.Contains(i.))
-                        var importData = fixZ5Data.Select(i => new CampaignFiveZipImported
+                        var kv = db.FiveZipAreas.Where(i => ids.Contains(i.Code) && i.IsInnerRing == 0 && i.IsMaster == true)
+                            .Select(i => new { i.Code, i.Id })
+                            .ToDictionary(i => i.Code, i => i.Id);
+                        var importData = z5Data.Select(i => new CampaignFiveZipImported
                         {
                             CampaignId = campaignId,
-                            FiveZipAreaId = i.Id,
+                            FiveZipAreaId = kv[i.Name],
                             Penetration = i.Penetration,
+                            Code = i.Name,
                             Total = i.Total
                         });
 
                         db.CampaignFiveZipImporteds.AddRange(importData);
-
-                        await db.SaveChangesAsync().ConfigureAwait(false);
                     }
 
-                    if (cRouteData.Count > 0)
-                    {
-                        var ids = cRouteData.Select(i => i.Name).Distinct().ToArray();
-                        var kv = db.PremiumCRoutes.Where(i => ids.Contains(i.CROUTE) && i.IsInnerRing == 0 && i.IsMaster == true).ToDictionary(i => i.CROUTE, i => i.Id);
-                        var importData = cRouteData.Select(i => new CampaignCRouteImported
-                        {
-                            CampaignId = campaignId,
-                            PremiumCRouteId = kv[i.Name],
-                            Penetration = i.Penetration,
-                            Total = i.Total
-                        });
+                    //if (cRouteData.Count > 0)
+                    //{
+                    //    var ids = cRouteData.Select(i => i.Name).Distinct().ToArray();
+                    //    var kv = db.PremiumCRoutes.Where(i => ids.Contains(i.CROUTE) && i.IsInnerRing == 0 && i.IsMaster == true).ToDictionary(i => i.CROUTE, i => i.Id);
+                    //    var importData = cRouteData.Select(i => new CampaignCRouteImported
+                    //    {
+                    //        CampaignId = campaignId,
+                    //        PremiumCRouteId = kv[i.Name],
+                    //        Penetration = i.Penetration,
+                    //        Code = i.Name,
+                    //        Total = i.Total
+                    //    });
 
-                        db.CampaignCRouteImporteds.AddRange(importData);
-                        await db.SaveChangesAsync().ConfigureAwait(false);
-                    }
+                    //    db.CampaignCRouteImporteds.AddRange(importData);
+                    //    await db.SaveChangesAsync().ConfigureAwait(false);
+                    //}
+
+                    await db.SaveChangesAsync().ConfigureAwait(false);
 
                     tran.Commit();
                 }
-
-                db.Configuration.AutoDetectChangesEnabled = true;
 
                 // fix submap penetration
                 foreach (var subMap in campaign.SubMaps)

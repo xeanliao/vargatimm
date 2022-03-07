@@ -309,30 +309,23 @@ namespace Vargainc.Timm.REST.Controllers
             int apt = 0;
             int home = 0;
 
-            Dictionary<int?, string> cache = new Dictionary<int?, string>();
-
+            List<FiveZipArea> fixedZ5 = new List<FiveZipArea>();
+            List<PremiumCRoute> fixedCRoute = new List<PremiumCRoute>();
 
             switch (targetClassification)
             {
                 case Classifications.Z5:
-                    var resultZ5 = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.Code)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    cache = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value)).Select(i => new { i.Id, i.Code }).ToDictionary(i => i.Id, i => i.Code);
-                    apt = resultZ5.Sum(i => i.APT ?? 0);
-                    home = resultZ5.Sum(i => i.HOME ?? 0);
+                    var z5Codes = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value)).Select(i => i.Code).Distinct().ToArray();
+                    fixedZ5 = db.FiveZipAreas.Where(i => z5Codes.Contains(i.Code) && i.IsInnerRing == 0 && i.IsMaster == true).ToList();
+                    apt = fixedZ5.Sum(i => i.APT_COUNT ?? 0);
+                    home = fixedZ5.Sum(i => i.HOME_COUNT ?? 0);
 
                     break;
                 case Classifications.PremiumCRoute:
-                    var resultCRoute = db.PremiumCRoutes.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.GEOCODE)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    cache = db.PremiumCRoutes.Where(i => newRecords.Contains(i.Id.Value)).Select(i => new { i.Id, i.GEOCODE }).ToDictionary(i => i.Id, i => i.GEOCODE);
-                    apt = resultCRoute.Sum(i => i.APT ?? 0);
-                    home = resultCRoute.Sum(i => i.HOME ?? 0);
-
+                    var cRouteCodes = db.PremiumCRoutes.Where(i => newRecords.Contains(i.Id.Value)).Select(i=>i.GEOCODE).Distinct().ToArray();
+                    fixedCRoute = db.PremiumCRoutes.Where(i=>cRouteCodes.Contains(i.GEOCODE) && i.IsInnerRing == 0 && i.IsMaster == true).ToList();
+                    apt = fixedCRoute.Sum(i => i.APT_COUNT ?? 0);
+                    home = fixedCRoute.Sum(i => i.HOME_COUNT ?? 0);
                     break;
             }
             int total = 0;
@@ -352,14 +345,31 @@ namespace Vargainc.Timm.REST.Controllers
             using (var transaction = db.Database.BeginTransaction())
             {
                 await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteAsync();
-                var toAddRecords = newRecords.Select(record => new SubMapRecord
+                List<SubMapRecord> toAddRecords = new List<SubMapRecord>();
+                switch (targetClassification)
                 {
-                    Classification = (int)targetClassification,
-                    SubMapId = submapId,
-                    AreaId = record,
-                    Value = true,
-                    Code = cache[record]
-                });
+                    case Classifications.Z5:
+                        toAddRecords = fixedZ5.Select(record => new SubMapRecord
+                        {
+                            Classification = (int)targetClassification,
+                            SubMapId = submapId,
+                            AreaId = record.Id,
+                            Value = true,
+                            Code = record.Code
+                        }).ToList();
+                        break;
+                    case Classifications.PremiumCRoute:
+                        toAddRecords = fixedCRoute.Select(record => new SubMapRecord
+                        {
+                            Classification = (int)targetClassification,
+                            SubMapId = submapId,
+                            AreaId = record.Id,
+                            Value = true,
+                            Code = record.GEOCODE
+                        }).ToList();
+                        break;
+                }
+                
                 db.SubMapRecords.AddRange(toAddRecords);
 
                 await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteAsync();

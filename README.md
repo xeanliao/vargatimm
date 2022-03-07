@@ -211,4 +211,16 @@ ADD [Code] NVARCHAR(10);
 
 ALTER TABLE [dbo].[distributionmaprecords]
 ADD [Code] NVARCHAR(10);
+
+ALTER TABLE [dbo].[campaignfivezipimported]
+ADD [Code] NVARCHAR(10);
+
+ALTER TABLE [dbo].[campaigncrouteimported]
+ADD [Code] NVARCHAR(10);
+
+ALTER TABLE [dbo].[campaignblockgroupimported]
+ADD [Code] NVARCHAR(10);
+
+ALTER TABLE [dbo].[campaigntractimported]
+ADD [Code] NVARCHAR(10);
 ```
