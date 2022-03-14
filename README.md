@@ -77,7 +77,7 @@ Tips: the linux mssql 2019 you can used new `Azure Data Studio` to connect to an
 ```sql
 -- 3zip
 
-DROP INDEX IF EXISTS [threezipareas_spatial_index] ON [dbo].[threezipareas]
+DROP INDEX IF EXISTS [threezipareas_spatial_index] ON [dbo].[threezipareas];
 
 IF EXISTS (SELECT 1
                FROM   INFORMATION_SCHEMA.COLUMNS
@@ -102,13 +102,13 @@ WHERE Id IN (
       SELECT Code, Max(SqMile) AS SqMile
       FROM [dbo].[threezipareas]
       GROUP by Code
-    ) AS A INNER JOIN [dbo].[threezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile
-)
+    ) AS A INNER JOIN [dbo].[threezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile AND [IsInnerRing] = 0
+);
 
 CREATE INDEX [threezipareas_IsInnerRing_index] ON [dbo].[threezipareas]
 (
 	[IsInnerRing] ASC
-)
+);
 
 CREATE SPATIAL INDEX [threezipareas_spatial_index]
   ON [dbo].[threezipareas](Geom)
@@ -119,7 +119,7 @@ CREATE SPATIAL INDEX [threezipareas_spatial_index]
 
 -- 5zip
 
-DROP INDEX IF EXISTS [fivezipareas_spatial_index] ON [dbo].[fivezipareas]
+DROP INDEX IF EXISTS [fivezipareas_spatial_index] ON [dbo].[fivezipareas];
 
 IF EXISTS (SELECT 1
                FROM   INFORMATION_SCHEMA.COLUMNS
@@ -145,13 +145,13 @@ WHERE Id IN (
       SELECT Code, Max(SqMile) AS SqMile
       FROM [dbo].[fivezipareas]
       GROUP by Code
-    ) AS A INNER JOIN [dbo].[fivezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile
-)
+    ) AS A INNER JOIN [dbo].[fivezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile AND [IsInnerRing] = 0
+);
 
 CREATE INDEX [fivezipareas_IsInnerRing_index] ON [dbo].[fivezipareas]
 (
 	[IsInnerRing] ASC
-)
+);
 
 CREATE SPATIAL INDEX [fivezipareas_spatial_index]
   ON [dbo].[fivezipareas](Geom)
@@ -163,7 +163,7 @@ CREATE SPATIAL INDEX [fivezipareas_spatial_index]
 
 -- croute
 
-DROP INDEX IF EXISTS [premiumcroutes_spatial_index] ON [dbo].[premiumcroutes]
+DROP INDEX IF EXISTS [premiumcroutes_spatial_index] ON [dbo].[premiumcroutes];
 
 IF EXISTS (SELECT 1
                FROM   INFORMATION_SCHEMA.COLUMNS
@@ -188,13 +188,13 @@ WHERE Id IN (
       SELECT GEOCODE, Max(SqMile) AS SqMile
       FROM [dbo].[premiumcroutes]
       GROUP by GEOCODE
-    ) AS A INNER JOIN [dbo].[premiumcroutes] B ON A.GEOCODE = B.GEOCODE AND A.SqMile = B.SqMile
-)
+    ) AS A INNER JOIN [dbo].[premiumcroutes] B ON A.GEOCODE = B.GEOCODE AND A.SqMile = B.SqMile AND [IsInnerRing] = 0
+);
 
 CREATE INDEX [premiumcroutes_IsInnerRing_index] ON [dbo].[premiumcroutes]
 (
 	[IsInnerRing] ASC
-)
+);
 
 CREATE SPATIAL INDEX [premiumcroutes_spatial_index]
   ON [dbo].[premiumcroutes](Geom)
