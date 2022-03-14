@@ -1350,7 +1350,7 @@ namespace Vargainc.Timm.REST.Controllers
                         data = db.PremiumCRoutes.Where(i=> codes.Contains(i.GEOCODE) && i.IsInnerShape == 0 && i.IsMaster == true)
                            .Select(i => new ImportArea
                            {
-                               Name = i.CROUTE,
+                               Name = i.GEOCODE,
                                APT = i.APT_COUNT,
                                HOME = i.HOME_COUNT,
                            })
@@ -1512,22 +1512,22 @@ namespace Vargainc.Timm.REST.Controllers
                         db.CampaignFiveZipImporteds.AddRange(importData);
                     }
 
-                    //if (cRouteData.Count > 0)
-                    //{
-                    //    var ids = cRouteData.Select(i => i.Name).Distinct().ToArray();
-                    //    var kv = db.PremiumCRoutes.Where(i => ids.Contains(i.CROUTE) && i.IsInnerRing == 0 && i.IsMaster == true).ToDictionary(i => i.CROUTE, i => i.Id);
-                    //    var importData = cRouteData.Select(i => new CampaignCRouteImported
-                    //    {
-                    //        CampaignId = campaignId,
-                    //        PremiumCRouteId = kv[i.Name],
-                    //        Penetration = i.Penetration,
-                    //        Code = i.Name,
-                    //        Total = i.Total
-                    //    });
+                    if (cRouteData.Count > 0)
+                    {
+                        var ids = cRouteData.Select(i => i.Name).Distinct().ToArray();
+                        var kv = db.PremiumCRoutes.Where(i => ids.Contains(i.GEOCODE) && i.IsInnerRing == 0 && i.IsMaster == true).ToDictionary(i => i.GEOCODE, i => i.Id);
+                        var importData = cRouteData.Select(i => new CampaignCRouteImported
+                        {
+                            CampaignId = campaignId,
+                            PremiumCRouteId = kv[i.Name],
+                            Penetration = i.Penetration,
+                            Code = i.Name,
+                            Total = i.Total
+                        });
 
-                    //    db.CampaignCRouteImporteds.AddRange(importData);
-                    //    await db.SaveChangesAsync().ConfigureAwait(false);
-                    //}
+                        db.CampaignCRouteImporteds.AddRange(importData);
+                        await db.SaveChangesAsync().ConfigureAwait(false);
+                    }
 
                     await db.SaveChangesAsync().ConfigureAwait(false);
 
