@@ -11,5 +11,6 @@ services:
       SA_PASSWORD: harry4h#
     volumes:
       - mssql-database:/var/opt/mssql/
+    restart: always
 volumes:
   mssql-database:
