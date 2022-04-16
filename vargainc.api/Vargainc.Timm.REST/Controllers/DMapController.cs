@@ -5,6 +5,7 @@ using NetTopologySuite.IO;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Spatial;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace Vargainc.Timm.REST.Controllers
             var subMaps = await db.SubMaps.Include(i => i.SubMapRecords).Where(i => i.CampaignId == campaignId).ToListAsync().ConfigureAwait(false);
             var subMapIds = subMaps.Select(i => i.Id).ToList();
             var subMapRecords = subMaps.SelectMany(i => i.SubMapRecords.Select(j => new { j.Classification, j.AreaId, j.SubMapId })).ToList();
-
+            Dictionary<string, Polygon> recordsInSubmap = new Dictionary<string, Polygon>();
             foreach (var item in subMaps)
             {
                 var points = item.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
@@ -70,6 +71,14 @@ namespace Vargainc.Timm.REST.Controllers
                         { "sid", item.Id },
                         { "name", item.Name },
                         { "color", $"#{item.ColorString}" },
+                    }
+                });
+
+                item.SubMapRecords.ToList().ForEach(record =>
+                {
+                    if (!recordsInSubmap.ContainsKey(record.Code))
+                    {
+                        recordsInSubmap.Add(record.Code, polygon);
                     }
                 });
             }
@@ -184,41 +193,55 @@ namespace Vargainc.Timm.REST.Controllers
                 .GroupBy(k => $"{(Classifications)k.Classification}-{k.AreaId}", v => v.SubMapId)
                 .ToDictionary(k => k.Key, v => v.FirstOrDefault());
 
-            db.Database.Connection.Open();
-            var sqlCmd = db.Database.Connection.CreateCommand();
 
             foreach (var item in recordGroup)
             {
-                StringBuilder sql = new StringBuilder();
+                List<Record> records = new List<Record>();
+                var areaIds = item.Value;
+
                 switch (item.Key)
                 {
-                    case (int)Classifications.Z3:
-                        sql.AppendLine("SELECT [Id],[Code] AS [Name],'' AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing], [Latitude],[Longitude],[Geom]");
-                        sql.AppendLine("FROM [dbo].[threezipareas]");
-                        sql.AppendLine($"WHERE [Id] IN ({string.Join(",", item.Value)})");
-                        break;
                     case (int)Classifications.Z5:
-                        sql.AppendLine("SELECT [Id],[Code] AS [Name],[Code] AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing],[Latitude],[Longitude],[Geom]");
-                        sql.AppendLine("FROM [dbo].[fivezipareas]");
-                        sql.AppendLine($"WHERE [Id] IN ({string.Join(",", item.Value)})");
+                        records = await db.FiveZipAreas
+                            .Where(i => areaIds.Contains(i.Id)).Select(i => new Record
+                            {
+                                Id = i.Id,
+                                Code = i.Code,
+                                Name = i.Name,
+                                Zip = i.Zip,
+                                Home = i.HOME_COUNT,
+                                APT = i.APT_COUNT,
+                                Geom = i.Geom
+                            })
+                            .ToListAsync()
+                            .ConfigureAwait(false);
+
                         break;
                     case (int)Classifications.PremiumCRoute:
-                        sql.AppendLine("SELECT [Id],[GEOCODE] AS [Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing],[Latitude],[Longitude],[Geom]");
-                        sql.AppendLine("FROM [dbo].[premiumcroutes]");
-                        sql.AppendLine($"WHERE [Id] IN ({string.Join(",", item.Value)})");
+                        records = await db.PremiumCRoutes
+                            .Where(i => areaIds.Contains(i.Id))
+                            .Select(i => new Record
+                            {
+                                Id = i.Id,
+                                Code = i.Code,
+                                Name = i.Name,
+                                Zip = i.Zip,
+                                Home = i.HOME_COUNT,
+                                APT = i.APT_COUNT,
+                                Business = i.BUSINESS_COUNT,
+                                Geom = i.Geom
+                            })
+                            .ToListAsync()
+                            .ConfigureAwait(false);
                         break;
                 }
 
-                sqlCmd.CommandTimeout = 300;
-                sqlCmd.CommandText = sql.ToString();
-
-                var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
-                while (sqlReader.Read())
+                records.ForEach(recordItem =>
                 {
-                    var geomWKT = ((SqlGeometry)sqlReader.GetValue(10)).ToString();
-                    var geom = WKTReader.Read(geomWKT);
-                    var id = sqlReader.GetInt32(0);
-                    var areaId = $"{((Classifications)item.Key).ToString()}-{id}";
+                    var geom = WKTReader.Read(recordItem.Geom.AsText());
+                    var submapPolygon = recordsInSubmap[recordItem.Code];
+                    geom = geom.Intersection(submapPolygon);
+                    var areaId = $"{((Classifications)item.Key).ToString()}-{recordItem.Id}";
                     layers.Add(new Feature
                     {
                         Geometry = geom,
@@ -227,37 +250,36 @@ namespace Vargainc.Timm.REST.Controllers
                         {
                             { "type", "area" },
                             { "id", areaId },
-                            { "oid", id },
+                            { "oid", recordItem.Id },
                             { "vid", areaId },
                             { "sid", recordSubMap[areaId] },
-                            { "name", sqlReader.GetString(1) },
-                            { "zip", sqlReader.GetString(2) },
-                            { "home", sqlReader.GetInt32(3) },
-                            { "apt", sqlReader.GetInt32(5) },
-                            { "business", sqlReader.GetInt32(4) },
+                            { "name", recordItem.Name },
+                            { "zip", recordItem.Zip },
+                            { "home", recordItem.Home },
+                            { "apt", recordItem.APT },
+                            { "business", recordItem.Business },
                             { "classification", ((Classifications)item.Key).ToString() }
                         }
                     });
                     layers.Add(new Feature
                     {
-                        Geometry = geom.Centroid,
+                        Geometry = geom.InteriorPoint,
                         Attributes = new AttributesTable
                         {
                             { "type", "area" },
                             { "id", $"area-centroid-{areaId}" },
-                            { "oid", id },
+                            { "oid", recordItem.Id },
                             { "vid", areaId },
                             { "sid", recordSubMap[areaId] },
-                            { "name", sqlReader.GetString(1) },
-                            { "zip", sqlReader.GetString(2) },
-                            { "home", sqlReader.GetInt32(3) },
-                            { "apt", sqlReader.GetInt32(5) },
-                            { "business", sqlReader.GetInt32(4) },
+                            { "name", recordItem.Name },
+                            { "zip", recordItem.Zip },
+                            { "home", recordItem.Home },
+                            { "apt", recordItem.APT },
+                            { "business", recordItem.Business },
                             { "classification", ((Classifications)item.Key).ToString() }
                         }
                     });
-                }
-                sqlReader.Close();
+                });
             }
 
             var eTag = GetETag();
@@ -315,6 +337,14 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { success = true });
         }
 
+        /// <summary>
+        /// Records is area Id
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <param name="dMapId"></param>
+        /// <param name="records"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         [HttpPost]
         [Route("{campaignId:int}/dmap/{dMapId:int}/merge")]
         public async Task<IHttpActionResult> MergeAreas(int campaignId, int dMapId, [FromBody] List<AreaRecord> records)
@@ -326,150 +356,142 @@ namespace Vargainc.Timm.REST.Controllers
                 return BadRequest();
             }
 
-
-            var dMapRecords = dMap.DistributionMapRecords
-                .Select(i => i.AreaId ?? 0)
-                .ToList();
-
             var targetClassification = records.FirstOrDefault().Classification;
 
-            var removeAreas = records.Where(i => i.Value == false).Select(i => i.Id).ToList();
-            var addAreas = records.Where(i => i.Value == true).Select(i => i.Id).ToList();
-            List<int> needRemoveRecords = records.Where(i => i.Value == false).Select(i => i.Id ?? 0).ToList();
-            List<int> needAddRecords = records.Where(i => i.Value != false).Select(i => i.Id ?? 0).ToList();
+            var needRemoveRecords = records.Where(i => i.Value == false).Select(i => i.Id).ToList();
+            var needAddRecords = records.Where(i => i.Value == true).Select(i => i.Id).ToList();
 
+            if (needRemoveRecords.Count == 0 && needAddRecords.Count == 0)
+            {
+                return BadRequest();
+            }
+
+            var dMapRecords = dMap.DistributionMapRecords
+                .Select(i => i.AreaId)
+                .ToList();
 
             var needRemoveRecordsSet = needRemoveRecords.ToHashSet();
             var newRecords = dMapRecords.Where(i => !needRemoveRecordsSet.Contains(i)).ToList();
             newRecords.AddRange(needAddRecords);
 
-            List<AreaRecordRow> areaGeoms = null;
+            // id code apt home geom
+            List<Tuple<int?, string, int?, int?, DbGeometry>> dbGeoms = new List<Tuple<int?, string, int?, int?, DbGeometry>>();
             switch (targetClassification)
             {
-                case Classifications.Z3:
-                    areaGeoms = db.ThreeZipCoordinates
-                        .Where(i => newRecords.Contains(i.ThreeZipAreaId.Value))
-                        .OrderBy(i => i.ThreeZipAreaId)
-                        .ThenBy(i => i.Id)
-                        .Select(i => new { i.ThreeZipAreaId, i.Longitude, i.Latitude })
-                        .AsEnumerable()
-                        .Select(i => new AreaRecordRow { Id = i.ThreeZipAreaId, Coordinate = new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0) })
-                        .ToList();
-                    break;
                 case Classifications.Z5:
-                    areaGeoms = db.FiveZipCoordinates
-                        .Where(i => newRecords.Contains(i.FiveZipAreaId.Value))
-                        .OrderBy(i => i.FiveZipAreaId)
-                        .ThenBy(i => i.Id)
-                        .Select(i => new { i.FiveZipAreaId, i.Longitude, i.Latitude })
-                        .AsEnumerable()
-                        .Select(i => new AreaRecordRow { Id = i.FiveZipAreaId, Coordinate = new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0) })
-                        .ToList();
+                    {
+                        var dbData = await db.FiveZipAreas
+                            .Where(i => newRecords.Contains(i.Id))
+                            .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                            .ToListAsync()
+                            .ConfigureAwait(false);
+
+                        dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+
+                    }
                     break;
                 case Classifications.PremiumCRoute:
-                    areaGeoms = db.PremiumCRouteCoordinates
-                        .Where(i => newRecords.Contains(i.PreminumCRouteId.Value))
-                        .OrderBy(i => i.PreminumCRouteId)
-                        .ThenBy(i => i.Id)
-                        .Select(i => new { i.PreminumCRouteId, i.Longitude, i.Latitude })
-                        .AsEnumerable()
-                        .Select(i => new AreaRecordRow { Id = i.PreminumCRouteId, Coordinate = new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0) })
-                        .ToList();
+                    {
+                        var dbData = await db.PremiumCRoutes
+                            .Where(i => newRecords.Contains(i.Id))
+                            .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                            .ToListAsync()
+                            .ConfigureAwait(false);
+
+                        dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+                    }
                     break;
             }
+            List<Geometry> cachedGeometry = new List<Geometry>();
+            Geometry mergedPolygon = null;
 
-            var data = areaGeoms.GroupBy(i => i.Id, o => o.Coordinate).ToDictionary(i => i.Key, o => o.ToArray());
-            Geometry mergeGeom = null;
-            Dictionary<int?, Geometry> areaGeometry = new Dictionary<int?, Geometry>();
-            foreach (var item in data)
+            dbGeoms.ForEach(i =>
             {
-                Geometry polygon = GeometryFactory.CreatePolygon(item.Value);
-                if (!polygon.IsValid)
+                var geom = WKTReader.Read(i.Item5.AsText());
+                geom = geom.Buffer(0);
+                geom.Normalize();
+
+                geom.UserData = new Record
                 {
-                    polygon = polygon.Buffer(0);
-                }
-                polygon.Normalize();
-                areaGeometry.Add(item.Key, polygon);
-                if (mergeGeom == null)
+                    Id = i.Item1,
+                    Code = i.Item2,
+                    APT = i.Item3,
+                    Home = i.Item4,
+                };
+                cachedGeometry.Add(geom);
+                if (mergedPolygon == null)
                 {
-                    mergeGeom = polygon;
+                    mergedPolygon = geom;
                 }
                 else
                 {
-                    mergeGeom = mergeGeom.Union(polygon);
+                    mergedPolygon = mergedPolygon.Union(geom);
                 }
-            }
+            });
 
-            Polygon mergedPolygon = GeometryFactory.CreatePolygon();
-
-            if (mergeGeom != null)
+            // find max area polygon
+            Polygon finalPolygon = null;
+            if (mergedPolygon.GeometryType == "MultiPolygon")
             {
-                // get max area polygon when merged have more than 1 polygons
-                if (mergeGeom.NumGeometries > 1)
+                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
                 {
-                    Polygon maxArea = null;
-                    for (var i = 0; i < mergeGeom.NumGeometries; i++)
+                    Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                    if (geom.IsValid && !geom.IsEmpty)
                     {
-                        if (mergeGeom.GetGeometryN(i).GeometryType == "Polygon")
+                        if (finalPolygon == null)
                         {
-                            Polygon p = mergeGeom.GetGeometryN(i) as Polygon;
-                            if (maxArea == null || p.Area > maxArea.Area)
-                            {
-                                maxArea = p;
-                            }
+                            finalPolygon = geom;
                         }
-                    }
-
-                    mergedPolygon = maxArea;
-
-                    foreach (var item in areaGeometry)
-                    {
-                        if (!maxArea.Contains(item.Value))
+                        else
                         {
-                            newRecords.Remove(item.Key.Value);
+                            finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
                         }
                     }
                 }
-                else
-                {
-                    mergedPolygon = mergeGeom as Polygon;
-                    if (mergedPolygon == null)
-                    {
-                        throw new Exception("merge failed. the merge area is not polygon");
-                    }
-                }
+            }
+            else if (mergedPolygon.GeometryType == "Polygon")
+            {
+                finalPolygon = (Polygon)mergedPolygon;
             }
 
-            int apt = 0;
-            int home = 0;
-            switch (targetClassification)
+            // dmap should in submap
+            var submapId = dMap.SubMapId;
+            var submapCoordinates = db.SubMapCoordinates
+                .Where(i => i.SubMapId == submapId)
+                .OrderBy(i => i.Id)
+                .Select(i => new { i.Longitude, i.Latitude })
+                .ToList()
+                .Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0))
+                .ToArray();
+
+            var dmapPolygon = GeometryFactory.CreatePolygon(submapCoordinates);
+
+            finalPolygon = (Polygon)dmapPolygon.Intersection(finalPolygon);
+
+            // fill holes
+            finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+
+            if (finalPolygon == null)
             {
-                case Classifications.Z3:
-                    var resultZ3 = db.ThreeZipAreas.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.Code)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    apt = resultZ3.Sum(i => i.APT ?? 0);
-                    home = resultZ3.Sum(i => i.HOME ?? 0);
-                    break;
-                case Classifications.Z5:
-                    var resultZ5 = db.FiveZipAreas.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.Code)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    apt = resultZ5.Sum(i => i.APT ?? 0);
-                    home = resultZ5.Sum(i => i.HOME ?? 0);
-                    break;
-                case Classifications.PremiumCRoute:
-                    var resultCRoute = db.PremiumCRoutes.Where(i => newRecords.Contains(i.Id.Value))
-                        .GroupBy(i => i.GEOCODE)
-                        .Select(g => new { APT = g.Max(i => i.APT_COUNT), HOME = g.Max(i => i.HOME_COUNT) })
-                        .ToList();
-                    apt = resultCRoute.Sum(i => i.APT ?? 0);
-                    home = resultCRoute.Sum(i => i.HOME ?? 0);
-                    break;
+                throw new Exception("merge failed. the merge area is not polygon");
             }
-            int total = 0;
+
+            // calc apt home
+            float? apt = 0;
+            float? home = 0;
+            List<Tuple<int?, string>> fixedRecords = new List<Tuple<int?, string>>();
+            cachedGeometry.ForEach(i =>
+            {
+                if (finalPolygon.Intersects(i))
+                {
+                    Record userData = (Record)i.UserData;
+                    apt += userData.APT;
+                    home += userData.Home;
+                    fixedRecords.Add(new Tuple<int?, string>(userData.Id, userData.Code));
+                }
+            });
+
+            float? total = 0;
             switch (campaign.AreaDescription)
             {
                 case "APT + HOME":
@@ -484,22 +506,24 @@ namespace Vargainc.Timm.REST.Controllers
             }
 
 
+
             using (var transaction = db.Database.BeginTransaction())
             {
                 await db.DistributionMapRecords.Where(i=>i.DistributionMapId == dMapId).DeleteAsync().ConfigureAwait(false);
                 await db.DistributionMapCoordinates.Where(i => i.DistributionMapId == dMapId).DeleteAsync().ConfigureAwait(false);
 
-                var toAddRecords = newRecords.Select(record => new DistributionMapRecord
+                var toAddRecords = fixedRecords.Select(record => new DistributionMapRecord
                 {
                     Classification = (int)targetClassification,
                     DistributionMapId = dMapId,
-                    AreaId = record,
+                    AreaId = record.Item1,
+                    Code = record.Item2,
                     Value = true,
                 });
 
                 db.DistributionMapRecords.AddRange(toAddRecords);
 
-                var toAddCoordinate = mergedPolygon.Coordinates.Select(coordinate => new DistributionMapCoordinate
+                var toAddCoordinate = finalPolygon.Coordinates.Select(coordinate => new DistributionMapCoordinate
                 {
                     DistributionMapId = dMapId,
                     Longitude = coordinate.X,
@@ -507,7 +531,7 @@ namespace Vargainc.Timm.REST.Controllers
                 });
                 db.DistributionMapCoordinates.AddRange(toAddCoordinate);
 
-                dMap.Total = total;
+                dMap.Total = (int)total;
 
                 await db.SaveChangesAsync().ConfigureAwait(false);
 

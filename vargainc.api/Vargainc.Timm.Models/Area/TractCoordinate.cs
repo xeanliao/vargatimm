@@ -2,9 +2,9 @@
 
 namespace Vargainc.Timm.Models
 {
-    public class TractCoordinate : Location
-    {
-        [DefaultValue(0)]
-        public int? TractId { get; set; }
-    }
+    //public class TractCoordinate : Location
+    //{
+    //    [DefaultValue(0)]
+    //    public int? TractId { get; set; }
+    //}
 }

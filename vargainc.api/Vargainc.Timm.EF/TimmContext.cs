@@ -24,15 +24,15 @@ namespace Vargainc.Timm.EF
             //modelBuilder.Conventions.AddAfter<IdKeyDiscoveryConvention>(new DateTime2Convention());
 
             modelBuilder.Configurations.Add(new ThreeZipAreaConfig());
-            modelBuilder.Configurations.Add(new ThreeZipCoordinateConfig());
+            //modelBuilder.Configurations.Add(new ThreeZipCoordinateConfig());
             modelBuilder.Configurations.Add(new FiveZipAreaConfig());
-            modelBuilder.Configurations.Add(new FiveZipCoordinateConfig());
+            //modelBuilder.Configurations.Add(new FiveZipCoordinateConfig());
             modelBuilder.Configurations.Add(new BlockGroupConfig());
-            modelBuilder.Configurations.Add(new BlockGroupCoordinateConfig());
+            //modelBuilder.Configurations.Add(new BlockGroupCoordinateConfig());
             modelBuilder.Configurations.Add(new PremiumCRouteConfig());
-            modelBuilder.Configurations.Add(new PremiumCRouteCoordinateConfig());
+            //modelBuilder.Configurations.Add(new PremiumCRouteCoordinateConfig());
             modelBuilder.Configurations.Add(new TractConfig());
-            modelBuilder.Configurations.Add(new TractCoordinateConfig());
+            //modelBuilder.Configurations.Add(new TractCoordinateConfig());
 
             modelBuilder.Configurations.Add(new CampaignBlockGroupImportedConfig());
             modelBuilder.Configurations.Add(new CampaignCRouteImportedConfig());
@@ -73,15 +73,15 @@ namespace Vargainc.Timm.EF
         }
 
         public DbSet<ThreeZipArea> ThreeZipAreas { get; set; }
-        public DbSet<ThreeZipCoordinate> ThreeZipCoordinates { get; set; }
+        //public DbSet<ThreeZipCoordinate> ThreeZipCoordinates { get; set; }
         public DbSet<FiveZipArea> FiveZipAreas { get; set; }
-        public DbSet<FiveZipCoordinate> FiveZipCoordinates { get; set; }
+        //public DbSet<FiveZipCoordinate> FiveZipCoordinates { get; set; }
         public DbSet<BlockGroup> BlockGroups { get; set; }
-        public DbSet<BlockGroupCoordinate> BlockGroupCoordinates { get; set; }
+        //public DbSet<BlockGroupCoordinate> BlockGroupCoordinates { get; set; }
         public DbSet<PremiumCRoute> PremiumCRoutes { get; set; }
-        public DbSet<PremiumCRouteCoordinate> PremiumCRouteCoordinates { get; set; }
+        //public DbSet<PremiumCRouteCoordinate> PremiumCRouteCoordinates { get; set; }
         public DbSet<Tract> Tracts { get; set; }
-        public DbSet<TractCoordinate> TractCoordinates { get; set; }
+        //public DbSet<TractCoordinate> TractCoordinates { get; set; }
 
         public DbSet<CampaignFiveZipImported> CampaignFiveZipImporteds { get; set; }
         public DbSet<CampaignCRouteImported> CampaignCRouteImporteds { get; set; }

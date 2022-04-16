@@ -3,11 +3,11 @@ using Vargainc.Timm.Models;
 
 namespace Vargainc.Timm.EF.Config
 {
-    class BlockGroupCoordinateConfig : EntityTypeConfiguration<BlockGroupCoordinate>
-    {
-        public BlockGroupCoordinateConfig()
-        {
-            HasKey(i => i.Id).ToTable("blockgroupcoordinates");
-        }
-    }
+    //class BlockGroupCoordinateConfig : EntityTypeConfiguration<BlockGroupCoordinate>
+    //{
+    //    public BlockGroupCoordinateConfig()
+    //    {
+    //        HasKey(i => i.Id).ToTable("blockgroupcoordinates");
+    //    }
+    //}
 }

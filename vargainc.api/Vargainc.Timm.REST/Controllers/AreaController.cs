@@ -75,18 +75,18 @@ namespace Vargainc.Timm.REST.Controllers
                 switch (layer)
                 {
                     case Classifications.Z3:
-                        sql.AppendLine("SELECT [Id],[Code] AS [Name],'' AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing], [Latitude],[Longitude],[Geom]");
-                        sql.AppendLine("FROM [dbo].[threezipareas] WITH(INDEX(threezipareas_spatial_index))");
+                        sql.AppendLine("SELECT [Id],[Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[Geom]");
+                        sql.AppendLine("FROM [dbo].[threezipareas_all] WITH(INDEX(IX_threezipareas_all_Geom))");
                         sql.AppendLine("WHERE geom.STIntersects(@g) = 1");
                         break;
                     case Classifications.Z5:
-                        sql.AppendLine("SELECT [Id],[Code] AS [Name],[Code] AS [ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing],[Latitude],[Longitude],[Geom]");
-                        sql.AppendLine("FROM [dbo].[fivezipareas] WITH(INDEX(fivezipareas_spatial_index))");
+                        sql.AppendLine("SELECT [Id],[Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[Geom]");
+                        sql.AppendLine("FROM [dbo].[fivezipareas_all] WITH(INDEX(IX_fivezipareas_all_Geom))");
                         sql.AppendLine("WHERE geom.STIntersects(@g) = 1");
                         break;
                     case Classifications.PremiumCRoute:
-                        sql.AppendLine("SELECT [Id],[GEOCODE] AS [Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[IsMaster],[IsInnerRing],[Latitude],[Longitude],[Geom]");
-                        sql.AppendLine("FROM [dbo].[premiumcroutes] WITH(INDEX(premiumcroutes_spatial_index))");
+                        sql.AppendLine("SELECT [Id],[Name],[ZIP],[HOME_COUNT],[BUSINESS_COUNT],[APT_COUNT],[Geom]");
+                        sql.AppendLine("FROM [dbo].[premiumcroutes_all] WITH(INDEX(IX_premiumcroutes_all_Geom))");
                         sql.AppendLine("WHERE geom.STIntersects(@g) = 1");
                         break;
                 }
@@ -116,58 +116,61 @@ namespace Vargainc.Timm.REST.Controllers
                         HOME_COUNT = sqlReader.GetInt32(3),
                         BUSINESS_COUNT = sqlReader.GetInt32(4),
                         APT_COUNT = sqlReader.GetInt32(5),
-                        IsMaster = sqlReader.IsDBNull(6) ? false : sqlReader.GetBoolean(6),
-                        IsInnerRing = sqlReader.IsDBNull(7) ? false : sqlReader.GetByte(7) == 1,
-                        Latitude = sqlReader.GetDouble(8),
-                        Longitude = sqlReader.GetDouble(9),
-                        Geom = (SqlGeometry)sqlReader.GetValue(10),
+                        Geom = (SqlGeometry)sqlReader.GetValue(6),
                     });
                 }
 
                 var tree = new VectorTileTree();
-
-                var polygons = data.Select(i =>
+                List<Feature> features = new List<Feature>();
+                data.ForEach(i =>
                 {
                     var geom = WKTReader.Read(i.Geom.ToString());
-                    if (i.IsMaster)
+                    List<Polygon> areaPolygons = new List<Polygon>();
+                    if(geom.GeometryType == "MultiPolygon")
                     {
-                        var center = geom.InteriorPoint;
-                        i.Center = new double[] { center.X, center.Y };
+                        areaPolygons = GeometryFactory.ToPolygonArray((geom as MultiPolygon).ToArray()).ToList();
+                    }
+                    else
+                    {
+                        areaPolygons = new List<Polygon> { (geom as Polygon) };
                     }
 
-                    return new Feature
-                    {
-                        Geometry = geom,
-                        Attributes = new AttributesTable
-                        {
-                            { "id", $"{i.Layer}-{i.Id}" },
-                            { "name", i.Name },
-                            { "zip", i.ZIP },
-                            { "home", i.HOME_COUNT },
-                            { "apt", i.APT_COUNT },
-                            { "business", i.BUSINESS_COUNT },
-                        }
-                    };
-                }).ToList();
+                    areaPolygons.ForEach(polygon => {
+                        var fixedPolygon = polygon.Buffer(0);
+                        fixedPolygon.Normalize();
 
-                var points = data.Where(i => i.IsMaster == true).Select(i =>
-                {
-                    return new Feature
-                    {
-                        Geometry = GeometryFactory.CreatePoint(new Coordinate(i.Center[0], i.Center[1])),
-                        Attributes = new AttributesTable
+                        var polygonFeature = new Feature
                         {
-                            { "id", $"{i.Layer}-label-{i.Id}" },
-                            { "name", i.Name },
-                            { "zip", i.ZIP },
-                            { "home", i.HOME_COUNT },
-                            { "apt", i.APT_COUNT },
-                            { "business", i.BUSINESS_COUNT },
-                        }
-                    };
-                }).ToList();
+                            Geometry = fixedPolygon,
+                            Attributes = new AttributesTable
+                            {
+                                { "id", $"{i.Layer}-{i.Id}" },
+                                { "name", i.Name },
+                                { "zip", i.ZIP },
+                                { "home", i.HOME_COUNT },
+                                { "apt", i.APT_COUNT },
+                                { "business", i.BUSINESS_COUNT },
+                            }
+                        };
+                        var pointFeature = new Feature
+                        {
+                            Geometry = fixedPolygon.InteriorPoint,
+                            Attributes = new AttributesTable
+                            {
+                                { "id", $"{i.Layer}-label-{i.Id}" },
+                                { "name", i.Name },
+                                { "zip", i.ZIP },
+                                { "home", i.HOME_COUNT },
+                                { "apt", i.APT_COUNT },
+                                { "business", i.BUSINESS_COUNT },
+                            }
+                        };
 
-                var features = polygons.Concat(points);
+                        features.Add(polygonFeature);
+                        features.Add(pointFeature);
+                    });
+                });
+
                 tree.Add(features, z, layer.ToString());
 
                 if (tree.Contains(tile.Id))
@@ -196,323 +199,354 @@ namespace Vargainc.Timm.REST.Controllers
                 return BadRequest();
             }
             var searchKey = code.Trim();
-            if(searchKey.Length == 0)
+            if (searchKey.Length == 0)
             {
                 return BadRequest();
             }
-            Object result = null;
-            switch(searchKey.Length){
+            Record result = null;
+            switch (searchKey.Length)
+            {
                 case 3:
                     result = db.ThreeZipAreas
                         .Where(i => i.Code == searchKey)
-                        .Select(i => new { name = i.Code, apt = i.APT_COUNT, home = i.HOME_COUNT, lat = i.Latitude, lng = i.Longitude })
+                        .Select(i => new Record { Name = i.Name, APT = i.APT_COUNT, Home = i.HOME_COUNT, Geom = i.Geom })
                         .FirstOrDefault();
                     break;
-                    case 5:
+                case 5:
                     result = db.FiveZipAreas
-                        .Where(i=>i.Code == searchKey)
-                        .Select(i => new { name = i.Code, apt = i.APT_COUNT, home = i.HOME_COUNT, lat = i.Latitude, lng = i.Longitude })
+                        .Where(i => i.Code == searchKey)
+                        .Select(i => new Record { Name = i.Name, APT = i.APT_COUNT, Home = i.HOME_COUNT, Geom = i.Geom })
                         .FirstOrDefault();
                     break;
-                    default:
+                default:
                     result = db.PremiumCRoutes
-                        .Where(i=>i.GEOCODE == searchKey)
-                        .Select(i => new { name = i.GEOCODE, apt = i.APT_COUNT, home = i.HOME_COUNT, lat = i.Latitude, lng = i.Longitude })
+                        .Where(i => i.Code == searchKey)
+                         .Select(i => new Record { Name = i.Name, APT = i.APT_COUNT, Home = i.HOME_COUNT, Geom = i.Geom })
                         .FirstOrDefault();
                     break;
             }
-            return new { success = result != null, result = result };
-        }
-
-        [Route("tiles/3zip/build")]
-        [HttpGet]
-        public async Task<dynamic> Build3ZipTiles()
-        {
-            db.Configuration.AutoDetectChangesEnabled = false;
-
-            var mainTable = db.ThreeZipAreas;
-            var detailTable = db.ThreeZipCoordinates;
-
-            var batchSize = 1000;
-            var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
-            var loops = (int)Math.Ceiling((double)count / (double)batchSize);
-            int failed = 0;
-            for (var j = 0; j < loops; j++)
+            if (result.Geom != null)
             {
-                var areas = mainTable.Where(i => i.Geom == null)
-                    .OrderBy(i => i.Id)
-                    .Select(i => new { i.Id, i.IsInnerRing })
-                    .Take(batchSize)
-                    .Skip(failed)
-                    .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
-
-                Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
-                var ids = areas.Keys.ToList();
-                var query = detailTable.Where(i => ids.Contains(i.ThreeZipAreaId))
-                    .OrderBy(i => i.ThreeZipAreaId)
-                    .ThenBy(i => i.Id)
-                    .Select(i => new { AreaId = i.ThreeZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
-
-                foreach (var item in query)
+                var geom = WKTReader.Read(result.Geom.AsText());
+                if (geom.GeometryType == "Polygon")
                 {
-                    if (!updateData.ContainsKey(item.AreaId))
+                    return new
                     {
-                        var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
-                        updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
-                    }
-                    updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
+                        success = true,
+                        result = new
+                        {
+                            name = result.Name,
+                            apt = result.APT,
+                            home = result.Home,
+                            lat = geom.Centroid.Y,
+                            lng = geom.Centroid.X,
+                        }
+                    };
                 }
-
-
-                foreach (var item in updateData)
+                else if (geom.GeometryType == "MultiPolygon")
                 {
-                    try
-                    {
-                        Geometry geom = null;
-
-                        if (!item.Value.Key)
-                        {
-                            //polygon
-                            var startPoint = item.Value.Value.FirstOrDefault();
-                            var endPoint = item.Value.Value.LastOrDefault();
-                            if (!startPoint.Equals2D(endPoint))
-                            {
-                                item.Value.Value.Add(endPoint);
-                            }
-                            geom = GeometryFactory.CreatePolygon(item.Value.Value.ToArray());
-                            if (!geom.IsValid)
-                            {
-                                geom = geom.Buffer(0);
-                            }
-                        }
-                        else
-                        {
-                            geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
-                        }
-
-                        geom.Normalize();
-
-                        if (geom == null)
-                        {
-                            failed++;
-                            continue;
-                        }
-
-
-                        var dbItem = new Models.ThreeZipArea { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
-                        mainTable.Attach(dbItem);
-                        db.Entry(dbItem).Property("Geom").IsModified = true;
-                    }
-                    catch
-                    {
-                        failed++;
-                    }
+                    var data = ((MultiPolygon)geom).ToArray().Select(p => new {
+                        name = result.Name,
+                        apt = result.APT,
+                        home = result.Home,
+                        lat = p.Centroid.Y,
+                        lng = p.Centroid.X,
+                    });
+                    return new { success = true, result = data };
                 }
-                db.SaveChanges();
             }
-
-            var total = await mainTable.CountAsync().ConfigureAwait(false);
-            var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
-            var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
-            db.Configuration.AutoDetectChangesEnabled = true;
-
-            return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
+            return new { success = false };
         }
 
-        [Route("tiles/5zip/build")]
-        [HttpGet]
-        public async Task<dynamic> Build5ZipTiles()
-        {
-            db.Configuration.AutoDetectChangesEnabled = false;
+        //[Route("tiles/3zip/build")]
+        //[HttpGet]
+        //public async Task<dynamic> Build3ZipTiles()
+        //{
+        //    db.Configuration.AutoDetectChangesEnabled = false;
 
-            var mainTable = db.FiveZipAreas;
-            var detailTable = db.FiveZipCoordinates;
+        //    var mainTable = db.ThreeZipAreas;
+        //    var detailTable = db.ThreeZipCoordinates;
 
-            var batchSize = 1000;
-            var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
-            var loops = (int)Math.Ceiling((double)count / (double)batchSize);
-            int failed = 0;
-            for (var j = 0; j < loops; j++)
-            {
-                var areas = mainTable.Where(i => i.Geom == null)
-                    .OrderBy(i => i.Id)
-                    .Select(i => new { i.Id, i.IsInnerRing })
-                    .Take(batchSize)
-                    .Skip(failed)
-                    .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
+        //    var batchSize = 1000;
+        //    var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
+        //    var loops = (int)Math.Ceiling((double)count / (double)batchSize);
+        //    int failed = 0;
+        //    for (var j = 0; j < loops; j++)
+        //    {
+        //        var areas = mainTable.Where(i => i.Geom == null)
+        //            .OrderBy(i => i.Id)
+        //            .Select(i => new { i.Id, i.IsInnerRing })
+        //            .Take(batchSize)
+        //            .Skip(failed)
+        //            .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
 
-                Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
-                var ids = areas.Keys.ToList();
-                var query = detailTable.Where(i => ids.Contains(i.FiveZipAreaId))
-                    .OrderBy(i => i.FiveZipAreaId)
-                    .ThenBy(i => i.Id)
-                    .Select(i => new { AreaId = i.FiveZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
+        //        Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
+        //        var ids = areas.Keys.ToList();
+        //        var query = detailTable.Where(i => ids.Contains(i.ThreeZipAreaId))
+        //            .OrderBy(i => i.ThreeZipAreaId)
+        //            .ThenBy(i => i.Id)
+        //            .Select(i => new { AreaId = i.ThreeZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
 
-                foreach (var item in query)
-                {
-                    if (!updateData.ContainsKey(item.AreaId))
-                    {
-                        var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
-                        updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
-                    }
-                    updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
-                }
-
-
-                foreach (var item in updateData)
-                {
-                    try
-                    {
-                        Geometry geom = null;
-
-                        if (!item.Value.Key)
-                        {
-                            //polygon
-                            var startPoint = item.Value.Value.FirstOrDefault();
-                            var endPoint = item.Value.Value.LastOrDefault();
-                            if (!startPoint.Equals2D(endPoint))
-                            {
-                                item.Value.Value.Add(endPoint);
-                            }
-                            geom = GeometryFactory.CreatePolygon(item.Value.Value.ToArray());
-                            if (!geom.IsValid)
-                            {
-                                geom = geom.Buffer(0);
-                            }
-                        }
-                        else
-                        {
-                            geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
-                        }
-
-                        geom.Normalize();
-
-                        if (geom == null)
-                        {
-                            failed++;
-                            continue;
-                        }
+        //        foreach (var item in query)
+        //        {
+        //            if (!updateData.ContainsKey(item.AreaId))
+        //            {
+        //                var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
+        //                updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
+        //            }
+        //            updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
+        //        }
 
 
-                        var dbItem = new Models.FiveZipArea { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
-                        mainTable.Attach(dbItem);
-                        db.Entry(dbItem).Property("Geom").IsModified = true;
-                    }
-                    catch
-                    {
-                        failed++;
-                    }
-                }
-                db.SaveChanges();
-            }
+        //        foreach (var item in updateData)
+        //        {
+        //            try
+        //            {
+        //                Geometry geom = null;
 
-            var total = await mainTable.CountAsync().ConfigureAwait(false);
-            var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
-            var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
-            db.Configuration.AutoDetectChangesEnabled = true;
+        //                if (!item.Value.Key)
+        //                {
+        //                    //polygon
+        //                    var startPoint = item.Value.Value.FirstOrDefault();
+        //                    var endPoint = item.Value.Value.LastOrDefault();
+        //                    if (!startPoint.Equals2D(endPoint))
+        //                    {
+        //                        item.Value.Value.Add(endPoint);
+        //                    }
+        //                    geom = GeometryFactory.CreatePolygon(item.Value.Value.ToArray());
+        //                    if (!geom.IsValid)
+        //                    {
+        //                        geom = geom.Buffer(0);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
+        //                }
 
-            return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
-        }
+        //                geom.Normalize();
 
-        [Route("tiles/croute/build")]
-        [HttpGet]
-        public async Task<dynamic> BuildCRouteTiles()
-        {
-            db.Configuration.AutoDetectChangesEnabled = false;
-
-            var mainTable = db.PremiumCRoutes;
-            var detailTable = db.PremiumCRouteCoordinates;
-
-            var batchSize = 1000;
-            var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
-            var loops = (int)Math.Ceiling((double)count / (double)batchSize);
-            int failed = 0;
-            for (var j = 0; j < loops; j++)
-            {
-                var areas = mainTable.Where(i => i.Geom == null)
-                    .OrderBy(i => i.Id)
-                    .Select(i => new { i.Id, i.IsInnerRing })
-                    .Take(batchSize)
-                    .Skip(failed)
-                    .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
-
-                Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
-                var ids = areas.Keys.ToList();
-                var query = detailTable.Where(i => ids.Contains(i.PreminumCRouteId))
-                    .OrderBy(i => i.PreminumCRouteId)
-                    .ThenBy(i => i.Id)
-                    .Select(i => new { AreaId = i.PreminumCRouteId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
-
-                foreach (var item in query)
-                {
-                    if (!updateData.ContainsKey(item.AreaId))
-                    {
-                        var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
-                        updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
-                    }
-                    updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
-                }
+        //                if (geom == null)
+        //                {
+        //                    failed++;
+        //                    continue;
+        //                }
 
 
-                foreach (var item in updateData)
-                {
-                    try
-                    {
-                        Geometry geom = null;
+        //                var dbItem = new Models.ThreeZipArea { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
+        //                mainTable.Attach(dbItem);
+        //                db.Entry(dbItem).Property("Geom").IsModified = true;
+        //            }
+        //            catch
+        //            {
+        //                failed++;
+        //            }
+        //        }
+        //        db.SaveChanges();
+        //    }
 
-                        if (!item.Value.Key)
-                        {
-                            //polygon
-                            var temp = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
-                            if (!temp.IsClosed)
-                            {
-                                temp.Normalize();
-                                var coordinates = temp.Coordinates.ToList();
-                                coordinates.Add(coordinates[0]);
-                                geom = GeometryFactory.CreatePolygon(coordinates.ToArray());
-                            }
-                            else
-                            {
-                                geom = GeometryFactory.CreatePolygon(temp.Coordinates);
-                            }
+        //    var total = await mainTable.CountAsync().ConfigureAwait(false);
+        //    var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
+        //    var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
+        //    db.Configuration.AutoDetectChangesEnabled = true;
 
-                            if (!geom.IsValid)
-                            {
-                                geom = geom.Buffer(0);
-                            }
-                        }
-                        else
-                        {
-                            geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
-                        }
+        //    return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
+        //}
 
-                        geom.Normalize();
+        //[Route("tiles/5zip/build")]
+        //[HttpGet]
+        //public async Task<dynamic> Build5ZipTiles()
+        //{
+        //    db.Configuration.AutoDetectChangesEnabled = false;
 
-                        if (geom == null)
-                        {
-                            failed++;
-                            continue;
-                        }
+        //    var mainTable = db.FiveZipAreas;
+        //    var detailTable = db.FiveZipCoordinates;
+
+        //    var batchSize = 1000;
+        //    var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
+        //    var loops = (int)Math.Ceiling((double)count / (double)batchSize);
+        //    int failed = 0;
+        //    for (var j = 0; j < loops; j++)
+        //    {
+        //        var areas = mainTable.Where(i => i.Geom == null)
+        //            .OrderBy(i => i.Id)
+        //            .Select(i => new { i.Id, i.IsInnerRing })
+        //            .Take(batchSize)
+        //            .Skip(failed)
+        //            .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
+
+        //        Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
+        //        var ids = areas.Keys.ToList();
+        //        var query = detailTable.Where(i => ids.Contains(i.FiveZipAreaId))
+        //            .OrderBy(i => i.FiveZipAreaId)
+        //            .ThenBy(i => i.Id)
+        //            .Select(i => new { AreaId = i.FiveZipAreaId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
+
+        //        foreach (var item in query)
+        //        {
+        //            if (!updateData.ContainsKey(item.AreaId))
+        //            {
+        //                var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
+        //                updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
+        //            }
+        //            updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
+        //        }
 
 
-                        var dbItem = new Models.PremiumCRoute { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
-                        mainTable.Attach(dbItem);
-                        db.Entry(dbItem).Property("Geom").IsModified = true;
-                    }
-                    catch
-                    {
-                        failed++;
-                    }
-                }
-                db.SaveChanges();
-            }
+        //        foreach (var item in updateData)
+        //        {
+        //            try
+        //            {
+        //                Geometry geom = null;
 
-            var total = await mainTable.CountAsync().ConfigureAwait(false);
-            var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
-            var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
-            db.Configuration.AutoDetectChangesEnabled = true;
+        //                if (!item.Value.Key)
+        //                {
+        //                    //polygon
+        //                    var startPoint = item.Value.Value.FirstOrDefault();
+        //                    var endPoint = item.Value.Value.LastOrDefault();
+        //                    if (!startPoint.Equals2D(endPoint))
+        //                    {
+        //                        item.Value.Value.Add(endPoint);
+        //                    }
+        //                    geom = GeometryFactory.CreatePolygon(item.Value.Value.ToArray());
+        //                    if (!geom.IsValid)
+        //                    {
+        //                        geom = geom.Buffer(0);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
+        //                }
 
-            return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
-        }
+        //                geom.Normalize();
+
+        //                if (geom == null)
+        //                {
+        //                    failed++;
+        //                    continue;
+        //                }
+
+
+        //                var dbItem = new Models.FiveZipArea { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
+        //                mainTable.Attach(dbItem);
+        //                db.Entry(dbItem).Property("Geom").IsModified = true;
+        //            }
+        //            catch
+        //            {
+        //                failed++;
+        //            }
+        //        }
+        //        db.SaveChanges();
+        //    }
+
+        //    var total = await mainTable.CountAsync().ConfigureAwait(false);
+        //    var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
+        //    var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
+        //    db.Configuration.AutoDetectChangesEnabled = true;
+
+        //    return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
+        //}
+
+        //[Route("tiles/croute/build")]
+        //[HttpGet]
+        //public async Task<dynamic> BuildCRouteTiles()
+        //{
+        //    db.Configuration.AutoDetectChangesEnabled = false;
+
+        //    var mainTable = db.PremiumCRoutes;
+        //    var detailTable = db.PremiumCRouteCoordinates;
+
+        //    var batchSize = 1000;
+        //    var count = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
+        //    var loops = (int)Math.Ceiling((double)count / (double)batchSize);
+        //    int failed = 0;
+        //    for (var j = 0; j < loops; j++)
+        //    {
+        //        var areas = mainTable.Where(i => i.Geom == null)
+        //            .OrderBy(i => i.Id)
+        //            .Select(i => new { i.Id, i.IsInnerRing })
+        //            .Take(batchSize)
+        //            .Skip(failed)
+        //            .ToDictionary(i => i.Id, i => i.IsInnerRing == 1 ? true : false);
+
+        //        Dictionary<int?, KeyValuePair<bool, List<Coordinate>>> updateData = new Dictionary<int?, KeyValuePair<bool, List<Coordinate>>>();
+        //        var ids = areas.Keys.ToList();
+        //        var query = detailTable.Where(i => ids.Contains(i.PreminumCRouteId))
+        //            .OrderBy(i => i.PreminumCRouteId)
+        //            .ThenBy(i => i.Id)
+        //            .Select(i => new { AreaId = i.PreminumCRouteId, Longitude = i.Longitude ?? 0, Latitude = i.Latitude ?? 0 });
+
+        //        foreach (var item in query)
+        //        {
+        //            if (!updateData.ContainsKey(item.AreaId))
+        //            {
+        //                var isRing = areas.ContainsKey(item.AreaId) ? areas[item.AreaId] : false;
+        //                updateData.Add(item.AreaId, new KeyValuePair<bool, List<Coordinate>>(isRing, new List<Coordinate>()));
+        //            }
+        //            updateData[item.AreaId].Value.Add(new Coordinate(item.Longitude, item.Latitude));
+        //        }
+
+
+        //        foreach (var item in updateData)
+        //        {
+        //            try
+        //            {
+        //                Geometry geom = null;
+
+        //                if (!item.Value.Key)
+        //                {
+        //                    //polygon
+        //                    var temp = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
+        //                    if (!temp.IsClosed)
+        //                    {
+        //                        temp.Normalize();
+        //                        var coordinates = temp.Coordinates.ToList();
+        //                        coordinates.Add(coordinates[0]);
+        //                        geom = GeometryFactory.CreatePolygon(coordinates.ToArray());
+        //                    }
+        //                    else
+        //                    {
+        //                        geom = GeometryFactory.CreatePolygon(temp.Coordinates);
+        //                    }
+
+        //                    if (!geom.IsValid)
+        //                    {
+        //                        geom = geom.Buffer(0);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    geom = GeometryFactory.CreateLineString(item.Value.Value.ToArray());
+        //                }
+
+        //                geom.Normalize();
+
+        //                if (geom == null)
+        //                {
+        //                    failed++;
+        //                    continue;
+        //                }
+
+
+        //                var dbItem = new Models.PremiumCRoute { Id = item.Key, Geom = DbGeometry.FromText(geom.AsText(), SRID_DB) };
+        //                mainTable.Attach(dbItem);
+        //                db.Entry(dbItem).Property("Geom").IsModified = true;
+        //            }
+        //            catch
+        //            {
+        //                failed++;
+        //            }
+        //        }
+        //        db.SaveChanges();
+        //    }
+
+        //    var total = await mainTable.CountAsync().ConfigureAwait(false);
+        //    var valid = await mainTable.Where(i => i.Geom.IsValid).CountAsync().ConfigureAwait(false);
+        //    var empty = await mainTable.Where(i => i.Geom == null).CountAsync().ConfigureAwait(false);
+        //    db.Configuration.AutoDetectChangesEnabled = true;
+
+        //    return new { success = true, total = total, empty = empty, valid = valid, failed = failed };
+        //}
     }
 }

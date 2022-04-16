@@ -19,10 +19,8 @@ namespace Vargainc.Timm.REST.Controllers
     /// Lat = Y Long = X
     /// </summary>
     [RoutePrefix("print")]
-    public class PrintController : ApiController
+    public class PrintController : BaseController
     {
-        private TimmContext db = new TimmContext();
-
         [HttpGet]
         [Route("ndaddress")]
         public IHttpActionResult GetNDAddress()
@@ -245,10 +243,10 @@ namespace Vargainc.Timm.REST.Controllers
 
         [HttpGet]
         [Route("campaign/{campaignId:int}/submap/{submapId:int}/location")]
-        public IHttpActionResult GetSubmapLocation(int campaignId, int submapId)
-        {            
-            var submap = db.Campaigns.FirstOrDefault(i => i.Id == campaignId).SubMaps.FirstOrDefault(i=>i.Id == submapId);
-            if(submap == null)
+        public async Task<IHttpActionResult> GetSubmapLocation(int campaignId, int submapId)
+        {
+            var submap = await db.SubMaps.Where(i => i.Id == submapId).FirstOrDefaultAsync().ConfigureAwait(false);
+            if(submap == null || submap.CampaignId != campaignId)
             {
                 return NotFound();
             }
@@ -259,84 +257,57 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 return Json(new { });
             }
-            IQueryable<ViewModel.Location> query = null;
-            switch (record.Classification)
-            {
-                case 15: //PremiumCRoutes
-                    {
-                        query = from l in db.PremiumCRouteCoordinates
-                                    join r in db.PremiumCRoutes on l.PreminumCRouteId equals r.Id
-                                    join s in db.SubMapRecords on r.Id equals s.AreaId
-                                    where s.SubMapId == submapId && s.Value == true
-                                    orderby r.Id, l.Id
-                                    select new ViewModel.Location
-                                    {
-                                        Id = s.Id,
-                                        Longitude = l.Longitude ?? 0.0,
-                                        Latitude = l.Latitude ?? 0.0
-                                    };
-                    }
-                    break;
-                case 1: //FiveZips
-                    {
-                        query = from l in db.FiveZipCoordinates
-                                    join r in db.FiveZipAreas on l.FiveZipAreaId equals r.Id
-                                    join s in db.SubMapRecords on r.Id equals s.AreaId
-                                    where s.SubMapId == submapId && s.Value == true
-                                    orderby r.Id, l.Id
-                                    select new ViewModel.Location
-                                    {
-                                        Id = s.Id,
-                                        Longitude = l.Longitude ?? 0.0,
-                                        Latitude = l.Latitude ?? 0.0
-                                    };
-                    }
-                    break;
-                case 2: //Tracts
-                    {
-                        query = from l in db.TractCoordinates
-                                    join r in db.Tracts on l.TractId equals r.Id
-                                    join s in db.SubMapRecords on r.Id equals s.AreaId
-                                    where s.SubMapId == submapId && s.Value == true
-                                    orderby r.Id, l.Id
-                                    select new ViewModel.Location
-                                    {
-                                        Id = s.Id,
-                                        Longitude = l.Longitude ?? 0.0,
-                                        Latitude = l.Latitude ?? 0.0
-                                    };
-                    }
-                    break;
-                case 3: //BlockGroups
-                    {
-                        query = from l in db.BlockGroupCoordinates
-                                    join r in db.BlockGroups on l.BlockGroupId equals r.Id
-                                    join s in db.SubMapRecords on r.Id equals s.AreaId
-                                    where s.SubMapId == submapId && s.Value == true
-                                    orderby r.Id, l.Id
-                                    select new ViewModel.Location
-                                    {
-                                        Id = s.Id,
-                                        Longitude = l.Longitude ?? 0.0,
-                                        Latitude = l.Latitude ?? 0.0
-                                    };
-                    }
-                    break;
-                default:
-                    break;
-            }
-            
-            var polygon = FormatLocationGroup(query);
-            var boundary = GetSubMapBoundary(campaignId, submapId);
+            //IQueryable<ViewModel.Location> query = null;
+            //switch (record.Classification)
+            //{
+            //    case 15: //PremiumCRoutes
+            //        {
+            //            query = from l in db.PremiumCRouteCoordinates
+            //                        join r in db.PremiumCRoutes on l.PreminumCRouteId equals r.Id
+            //                        join s in db.SubMapRecords on r.Id equals s.AreaId
+            //                        where s.SubMapId == submapId && s.Value == true
+            //                        orderby r.Id, l.Id
+            //                        select new ViewModel.Location
+            //                        {
+            //                            Id = s.Id,
+            //                            Longitude = l.Longitude ?? 0.0,
+            //                            Latitude = l.Latitude ?? 0.0
+            //                        };
+            //        }
+            //        break;
+            //    case 1: //FiveZips
+            //        {
+            //            query = from l in db.FiveZipCoordinates
+            //                        join r in db.FiveZipAreas on l.FiveZipAreaId equals r.Id
+            //                        join s in db.SubMapRecords on r.Id equals s.AreaId
+            //                        where s.SubMapId == submapId && s.Value == true
+            //                        orderby r.Id, l.Id
+            //                        select new ViewModel.Location
+            //                        {
+            //                            Id = s.Id,
+            //                            Longitude = l.Longitude ?? 0.0,
+            //                            Latitude = l.Latitude ?? 0.0
+            //                        };
+            //        }
+            //        break;
+            //    default:
+            //        break;
+            //}
+            var coordinates = await db.SubMapCoordinates.Where(i => i.SubMapId == submap.Id)
+                .OrderBy(i => i.Id)
+                .Select(i=> new Coordinate { X = i.Longitude ?? 0, Y = i.Latitude ?? 0 })
+                .ToArrayAsync()
+                .ConfigureAwait(false);
+
+            var polygon = GeometryFactory.CreatePolygon(coordinates);
             return Json(new {
                 color = new {
                     r = submap.ColorR,
                     g = submap.ColorG,
                     b = submap.ColorB
                 },
-                polygon = polygon,
-                boundary = boundary,
-
+                polygon = coordinates.Select(i=>new ViewModel.Location { Longitude = i.X, Latitude = i.Y}),
+                boundary = polygon.Boundary.Coordinates.Select(i=> new ViewModel.Location { Longitude = i.X, Latitude = i.Y }),
             });
         }
 
@@ -587,7 +558,7 @@ namespace Vargainc.Timm.REST.Controllers
                                 {
                                     AreaId = area.Id,
                                     CampaignId = campaign.Id,
-                                    Name = area.GEOCODE,
+                                    Name = area.Name,
                                     area.APT_COUNT,
                                     area.HOME_COUNT
                                 }
@@ -809,13 +780,6 @@ namespace Vargainc.Timm.REST.Controllers
             return polygon.Buffer(0);
         }
         #endregion
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+
     }
 }

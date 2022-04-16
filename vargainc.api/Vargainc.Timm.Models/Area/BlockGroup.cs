@@ -17,6 +17,6 @@ namespace Vargainc.Timm.Models
         public string Description { get; set; }
         public string ArbitraryUniqueCode { get; set; }
 
-        public virtual ICollection<BlockGroupCoordinate> Locations { get; set; }
+        //public virtual ICollection<BlockGroupCoordinate> Locations { get; set; }
     }
 }

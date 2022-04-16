@@ -16,6 +16,6 @@ namespace Vargainc.Timm.Models
         public string StateCode { get; set; }
         public string ArbitraryUniqueCode { get; set; }
 
-        public virtual ICollection<TractCoordinate> Locations { get; set; }
+        //public virtual ICollection<TractCoordinate> Locations { get; set; }
     }
 }

@@ -242,6 +242,7 @@
     <Compile Include="ViewModel\NDAddressViewModel.cs" />
     <Compile Include="ViewModel\Record.cs" />
     <Compile Include="ViewModel\LoginUser.cs" />
+    <Compile Include="ViewModel\TaskReport.cs" />
     <Compile Include="ViewModel\Tile.cs" />
     <Compile Include="ViewModel\ViewEmplyee.cs" />
     <Compile Include="ViewModel\ViewGTU.cs" />

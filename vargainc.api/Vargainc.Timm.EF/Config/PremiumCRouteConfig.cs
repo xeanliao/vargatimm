@@ -7,15 +7,15 @@ namespace Vargainc.Timm.EF.Config
     {
         public PremiumCRouteConfig()
         {
-            ToTable("premiumcroutes");
+            ToTable("premiumcroutes_all");
             HasKey(i => i.Id);
-            Property(i => i._IsEnabled).HasColumnName("IsEnabled");
-            Ignore(i => i.IsEnabled);
-            Ignore(i => i.HasMultipleParts);
+            //Property(i => i._IsEnabled).HasColumnName("IsEnabled");
+            //Ignore(i => i.IsEnabled);
+            //Ignore(i => i.HasMultipleParts);
 
-            HasMany(i => i.Locations)
-                .WithRequired()
-                .HasForeignKey(i => i.PreminumCRouteId);
+            //HasMany(i => i.Locations)
+            //    .WithRequired()
+            //    .HasForeignKey(i => i.PreminumCRouteId);
         }
     }
 }

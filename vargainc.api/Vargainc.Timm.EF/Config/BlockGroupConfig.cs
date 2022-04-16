@@ -12,9 +12,9 @@ namespace Vargainc.Timm.EF.Config
             Ignore(i => i.IsEnabled);
             Ignore(i => i.HasMultipleParts);
 
-            HasMany(i => i.Locations)
-                .WithRequired()
-                .HasForeignKey(i => i.BlockGroupId);
+            //HasMany(i => i.Locations)
+            //    .WithRequired()
+            //    .HasForeignKey(i => i.BlockGroupId);
         }
     }
 }

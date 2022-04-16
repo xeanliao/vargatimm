@@ -1054,244 +1054,244 @@ namespace Vargainc.Timm.REST.Controllers
             }));
         }
 
-        [Route("{campaignId:int}/export")]
-        [HttpGet]
-        public async Task<IHttpActionResult> Export(int campaignId)
-        {
-            var campaign = await db.Campaigns.FindAsync(campaignId);
-            if (campaign == null)
-            {
-                return NotFound();
-            }
-            var submaps = campaign.SubMaps.OrderBy(i => i.OrderId)
-                .Select(s => new
-                {
-                    s.Name,
-                    s.ColorR,
-                    s.ColorG,
-                    s.ColorB,
-                    s.ColorString,
-                    s.CountAdjustment,
-                    s.TotalAdjustment,
-                    SubMapCRoutes = s.SubMapRecords.Where(i => i.Classification == 15 && i.Value == true).Select(i => i.AreaId).ToList(),
-                    SubMapGeoCode = new List<string>(),
-                    //SubMapAreas = new List<ViewModel.ImportCRoute>(),
-                    Boundary = s.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new { Latitude = i.Latitude, Longitude = i.Longitude }).ToList()
-                }).ToArray();
+        //[Route("{campaignId:int}/export")]
+        //[HttpGet]
+        //public async Task<IHttpActionResult> Export(int campaignId)
+        //{
+        //    var campaign = await db.Campaigns.FindAsync(campaignId);
+        //    if (campaign == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var submaps = campaign.SubMaps.OrderBy(i => i.OrderId)
+        //        .Select(s => new
+        //        {
+        //            s.Name,
+        //            s.ColorR,
+        //            s.ColorG,
+        //            s.ColorB,
+        //            s.ColorString,
+        //            s.CountAdjustment,
+        //            s.TotalAdjustment,
+        //            SubMapCRoutes = s.SubMapRecords.Where(i => i.Classification == 15 && i.Value == true).Select(i => i.AreaId).ToList(),
+        //            SubMapGeoCode = new List<string>(),
+        //            //SubMapAreas = new List<ViewModel.ImportCRoute>(),
+        //            Boundary = s.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new { Latitude = i.Latitude, Longitude = i.Longitude }).ToList()
+        //        }).ToArray();
 
-            var address = campaign.Addresses.Select(i => new
-            {
-                i.AddressName,
-                i.Color,
-                i.Latitude,
-                i.Longitude,
-                i.OriginalLatitude,
-                i.OriginalLongitude,
-                i.Picture,
-                i.ZipCode,
-                Radiuses = i.Radiuses.Select(r => new { r.Length, r.LengthMeasuresId, r.IsDisplay }).ToList()
-            });
-            var userId = await db.Status.Where(i => i.CampaignId == campaign.Id).OrderBy(i => i.Status).Select(i => i.UserId).FirstOrDefaultAsync();
-            var user = db.Users.FirstOrDefault(i => i.Id == userId);
-            var classifications = campaign.CampaignClassifications.Select(i => i.Classification).ToList();
+        //    var address = campaign.Addresses.Select(i => new
+        //    {
+        //        i.AddressName,
+        //        i.Color,
+        //        i.Latitude,
+        //        i.Longitude,
+        //        i.OriginalLatitude,
+        //        i.OriginalLongitude,
+        //        i.Picture,
+        //        i.ZipCode,
+        //        Radiuses = i.Radiuses.Select(r => new { r.Length, r.LengthMeasuresId, r.IsDisplay }).ToList()
+        //    });
+        //    var userId = await db.Status.Where(i => i.CampaignId == campaign.Id).OrderBy(i => i.Status).Select(i => i.UserId).FirstOrDefaultAsync();
+        //    var user = db.Users.FirstOrDefault(i => i.Id == userId);
+        //    var classifications = campaign.CampaignClassifications.Select(i => i.Classification).ToList();
 
-            var allAreas = submaps.SelectMany(i => i.SubMapCRoutes).ToList();
-            var allAreaMap = await QueryCRoutesById(allAreas);
-            HashSet<string> allGeoCode = new HashSet<string>();
-            foreach (var item in submaps)
-            {
-                foreach (var id in item.SubMapCRoutes)
-                {
-                    if (id.HasValue && allAreaMap.ContainsKey(id.Value) && !allGeoCode.Contains(allAreaMap[id.Value].GEOCODE))
-                    {
-                        //item.SubMapAreas.Add(allAreaMap[id.Value]);
-                        item.SubMapGeoCode.Add(allAreaMap[id.Value].GEOCODE);
-                        allGeoCode.Add(allAreaMap[id.Value].GEOCODE);
-                    }
-                }
-            }
-            var colors = campaign.CampaignPercentageColors.Select(i => new
-            {
-                i.ColorId,
-                i.Max,
-                i.Min
-            }).ToList();
+        //    var allAreas = submaps.SelectMany(i => i.SubMapCRoutes).ToList();
+        //    var allAreaMap = await QueryCRoutesById(allAreas);
+        //    HashSet<string> allGeoCode = new HashSet<string>();
+        //    foreach (var item in submaps)
+        //    {
+        //        foreach (var id in item.SubMapCRoutes)
+        //        {
+        //            if (id.HasValue && allAreaMap.ContainsKey(id.Value) && !allGeoCode.Contains(allAreaMap[id.Value].GEOCODE))
+        //            {
+        //                //item.SubMapAreas.Add(allAreaMap[id.Value]);
+        //                item.SubMapGeoCode.Add(allAreaMap[id.Value].GEOCODE);
+        //                allGeoCode.Add(allAreaMap[id.Value].GEOCODE);
+        //            }
+        //        }
+        //    }
+        //    var colors = campaign.CampaignPercentageColors.Select(i => new
+        //    {
+        //        i.ColorId,
+        //        i.Max,
+        //        i.Min
+        //    }).ToList();
 
-            var cRouteImporteds = await QueryPenetrationByCampaignId(campaignId);
+        //    var cRouteImporteds = await QueryPenetrationByCampaignId(campaignId);
 
-            return Json(new
-            {
-                campaign.AreaDescription,
-                campaign.ClientCode,
-                campaign.ClientName,
-                campaign.ContactName,
-                campaign.CreatorName,
-                campaign.CustemerName,
-                campaign.Date,
-                campaign.Description,
-                campaign.Latitude,
-                campaign.Longitude,
-                campaign.Logo,
-                campaign.Name,
-                campaign.ZoomLevel,
-                campaign.UserName,
-                UserStatus = user.UserName,
-                Address = address,
-                Classifications = classifications,
-                SubMap = submaps != null ? submaps.Select(s => new
-                {
-                    s.ColorR,
-                    s.ColorG,
-                    s.ColorB,
-                    s.ColorString,
-                    s.Name,
-                    s.CountAdjustment,
-                    s.TotalAdjustment,
-                    s.Boundary,
-                    s.SubMapGeoCode
-                }) : null,
-                PercentageColors = colors,
-                //Penetration = cRouteImporteds
-            });
+        //    return Json(new
+        //    {
+        //        campaign.AreaDescription,
+        //        campaign.ClientCode,
+        //        campaign.ClientName,
+        //        campaign.ContactName,
+        //        campaign.CreatorName,
+        //        campaign.CustemerName,
+        //        campaign.Date,
+        //        campaign.Description,
+        //        campaign.Latitude,
+        //        campaign.Longitude,
+        //        campaign.Logo,
+        //        campaign.Name,
+        //        campaign.ZoomLevel,
+        //        campaign.UserName,
+        //        UserStatus = user.UserName,
+        //        Address = address,
+        //        Classifications = classifications,
+        //        SubMap = submaps != null ? submaps.Select(s => new
+        //        {
+        //            s.ColorR,
+        //            s.ColorG,
+        //            s.ColorB,
+        //            s.ColorString,
+        //            s.Name,
+        //            s.CountAdjustment,
+        //            s.TotalAdjustment,
+        //            s.Boundary,
+        //            s.SubMapGeoCode
+        //        }) : null,
+        //        PercentageColors = colors,
+        //        //Penetration = cRouteImporteds
+        //    });
 
-        }
+        //}
 
-        [Route("import")]
-        [HttpPost]
-        public async Task<IHttpActionResult> Import([FromBody]ViewModel.ImportCampaign campaign)
-        {
-            StringBuilder info = new StringBuilder();
-            //var crouteGeoCode = campaign.SubMap.SelectMany(i => i.CRoutes).Select(i=>i.GEOCODE).ToList();
-            //var allCRoutes = await QueryCRoutesByGeoCode(crouteGeoCode);
+        //[Route("import")]
+        //[HttpPost]
+        //public async Task<IHttpActionResult> Import([FromBody]ViewModel.ImportCampaign campaign)
+        //{
+        //    StringBuilder info = new StringBuilder();
+        //    //var crouteGeoCode = campaign.SubMap.SelectMany(i => i.CRoutes).Select(i=>i.GEOCODE).ToList();
+        //    //var allCRoutes = await QueryCRoutesByGeoCode(crouteGeoCode);
 
-            #region Check
-            List<Models.Location> boundary = null;
-            List<int> addedCRoute = new List<int>();
-            StringBuilder message = null;
-            List<int> systemCRoutes = new List<int>();
-            HashSet<int> alreadyAddToSubMapCRoute = new HashSet<int>();
-            foreach (var submap in campaign.SubMap)
-            {
-                if (submap.Boundary == null || submap.Boundary.Count == 0)
-                {
-                    continue;
-                }
+        //    #region Check
+        //    List<Models.Location> boundary = null;
+        //    List<int> addedCRoute = new List<int>();
+        //    StringBuilder message = null;
+        //    List<int> systemCRoutes = new List<int>();
+        //    HashSet<int> alreadyAddToSubMapCRoute = new HashSet<int>();
+        //    foreach (var submap in campaign.SubMap)
+        //    {
+        //        if (submap.Boundary == null || submap.Boundary.Count == 0)
+        //        {
+        //            continue;
+        //        }
 
-                #region Check SubMAP
-                //build oringal boundary
-                var orginalLinearRing = submap.Boundary.Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
-                orginalLinearRing.Add(new Coordinate(orginalLinearRing[0].X, orginalLinearRing[0].Y));
-                var orignalPolygon = new Polygon(new LinearRing(orginalLinearRing.ToArray()));
-                orignalPolygon.Buffer(0);
-                double? topRightLat = null, topRightLng = null, bottomLeftLat = null, bottomLeftLng = null;
-                foreach (var latlng in orignalPolygon.Envelope.Coordinates)
-                {
-                    topRightLat = !topRightLat.HasValue || latlng.Y > topRightLat ? latlng.Y : topRightLat;
-                    topRightLng = !topRightLng.HasValue || latlng.X > topRightLng ? latlng.X : topRightLng;
-                    bottomLeftLat = !bottomLeftLat.HasValue || latlng.Y < bottomLeftLat ? latlng.Y : bottomLeftLat;
-                    bottomLeftLng = !bottomLeftLng.HasValue || latlng.X < bottomLeftLng ? latlng.X : bottomLeftLng;
+        //        #region Check SubMAP
+        //        //build oringal boundary
+        //        var orginalLinearRing = submap.Boundary.Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
+        //        orginalLinearRing.Add(new Coordinate(orginalLinearRing[0].X, orginalLinearRing[0].Y));
+        //        var orignalPolygon = new Polygon(new LinearRing(orginalLinearRing.ToArray()));
+        //        orignalPolygon.Buffer(0);
+        //        double? topRightLat = null, topRightLng = null, bottomLeftLat = null, bottomLeftLng = null;
+        //        foreach (var latlng in orignalPolygon.Envelope.Coordinates)
+        //        {
+        //            topRightLat = !topRightLat.HasValue || latlng.Y > topRightLat ? latlng.Y : topRightLat;
+        //            topRightLng = !topRightLng.HasValue || latlng.X > topRightLng ? latlng.X : topRightLng;
+        //            bottomLeftLat = !bottomLeftLat.HasValue || latlng.Y < bottomLeftLat ? latlng.Y : bottomLeftLat;
+        //            bottomLeftLng = !bottomLeftLng.HasValue || latlng.X < bottomLeftLng ? latlng.X : bottomLeftLng;
 
-                }
+        //        }
 
-                List<int> cRoutes = await QueryCRouteInBox(topRightLat.Value, topRightLng.Value, bottomLeftLat.Value, bottomLeftLng.Value);
-                HashSet<string> subMapGeoCode = new HashSet<string>();
-                foreach (var item in submap.SubMapGeoCode)
-                {
-                    if (!subMapGeoCode.Contains(item))
-                    {
-                        subMapGeoCode.Add(item);
-                    }
-                }
-                if (!ValidateCRouteArea(orignalPolygon, alreadyAddToSubMapCRoute, subMapGeoCode, cRoutes, out addedCRoute, out boundary, out message))
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        info = string.Format("validate croute in submap {0} failed.\r\n{1}", submap.Name, message)
-                    });
-                }
-                submap.SubMapCoordinate = boundary;
-                submap.PremiumCRoutes = addedCRoute;
-                foreach (var id in addedCRoute)
-                {
-                    if (!alreadyAddToSubMapCRoute.Contains(id))
-                    {
-                        alreadyAddToSubMapCRoute.Add(id);
-                    }
-                }
+        //        List<int?> cRoutes = await QueryCRouteInBox(topRightLat.Value, topRightLng.Value, bottomLeftLat.Value, bottomLeftLng.Value);
+        //        HashSet<string> subMapGeoCode = new HashSet<string>();
+        //        foreach (var item in submap.SubMapGeoCode)
+        //        {
+        //            if (!subMapGeoCode.Contains(item))
+        //            {
+        //                subMapGeoCode.Add(item);
+        //            }
+        //        }
+        //        if (!ValidateCRouteArea(orignalPolygon, alreadyAddToSubMapCRoute, subMapGeoCode, cRoutes, out addedCRoute, out boundary, out message))
+        //        {
+        //            return Json(new
+        //            {
+        //                success = false,
+        //                info = string.Format("validate croute in submap {0} failed.\r\n{1}", submap.Name, message)
+        //            });
+        //        }
+        //        submap.SubMapCoordinate = boundary;
+        //        submap.PremiumCRoutes = addedCRoute;
+        //        foreach (var id in addedCRoute)
+        //        {
+        //            if (!alreadyAddToSubMapCRoute.Contains(id))
+        //            {
+        //                alreadyAddToSubMapCRoute.Add(id);
+        //            }
+        //        }
 
-                #endregion
+        //        #endregion
 
-                #region Check DMap
-                //if (submap.DMap != null && submap.DMap.Count > 0)
-                //{
-                //    foreach (var dmap in submap.DMap)
-                //    {
-                //        systemCRoutes.Clear();
-                //        if (dmap.CRoutes == null || dmap.CRoutes.Count == 0)
-                //        {
-                //            continue;
-                //        }
-                //        foreach (var item in dmap.CRoutes)
-                //        {
-                //            if (!allCRoutes.ContainsKey(item.GEOCODE))
-                //            {
-                //                return Json(new
-                //                {
-                //                    success = false,
-                //                    info = string.Format("Find GEOCODE {0} {1}/{2} failed in DMAP, the geocode is not exist", item.GEOCODE, item.PartCount, item.PartTotal)
-                //                });
-                //            }
-                //            var currentCode = allCRoutes[item.GEOCODE];
-                //            if (item.PartTotal != currentCode.Count)
-                //            {
-                //                return Json(new
-                //                {
-                //                    success = false,
-                //                    info = string.Format("Find GEOCODE {0} {1}/{2} failed in DMAP, the croute partcount changed", item.GEOCODE, item.PartCount, item.PartTotal)
-                //                });
-                //            }
-                //            var geoCode = currentCode.Where(i => i.PartCount == item.PartCount).FirstOrDefault();
-                //            if (geoCode == null)
-                //            {
-                //                return Json(new
-                //                {
-                //                    success = false,
-                //                    info = string.Format("Find GEOCODE {0} {1}/{2} failed in DMAP, the current part croute is not exist", item.GEOCODE, item.PartCount, item.PartTotal)
-                //                });
-                //            }
-                //            systemCRoutes.Add(geoCode.Id.Value);
-                //        }
-                //        if (!ValidateCRouteArea(systemCRoutes, out boundary, out message))
-                //        {
-                //            return Json(new
-                //            {
-                //                success = false,
-                //                info = string.Format("validate croute in submap {0} failed.\r\n{1}", submap.Name, message)
-                //            });
-                //        }
-                //        dmap.PremiumCRoutes = systemCRoutes;
-                //        dmap.Boundary = boundary;
-                //    }
-                //}
-                #endregion
-            }
+        //        #region Check DMap
+        //        //if (submap.DMap != null && submap.DMap.Count > 0)
+        //        //{
+        //        //    foreach (var dmap in submap.DMap)
+        //        //    {
+        //        //        systemCRoutes.Clear();
+        //        //        if (dmap.CRoutes == null || dmap.CRoutes.Count == 0)
+        //        //        {
+        //        //            continue;
+        //        //        }
+        //        //        foreach (var item in dmap.CRoutes)
+        //        //        {
+        //        //            if (!allCRoutes.ContainsKey(item.GEOCODE))
+        //        //            {
+        //        //                return Json(new
+        //        //                {
+        //        //                    success = false,
+        //        //                    info = string.Format("Find GEOCODE {0} {1}/{2} failed in DMAP, the geocode is not exist", item.GEOCODE, item.PartCount, item.PartTotal)
+        //        //                });
+        //        //            }
+        //        //            var currentCode = allCRoutes[item.GEOCODE];
+        //        //            if (item.PartTotal != currentCode.Count)
+        //        //            {
+        //        //                return Json(new
+        //        //                {
+        //        //                    success = false,
+        //        //                    info = string.Format("Find GEOCODE {0} {1}/{2} failed in DMAP, the croute partcount changed", item.GEOCODE, item.PartCount, item.PartTotal)
+        //        //                });
+        //        //            }
+        //        //            var geoCode = currentCode.Where(i => i.PartCount == item.PartCount).FirstOrDefault();
+        //        //            if (geoCode == null)
+        //        //            {
+        //        //                return Json(new
+        //        //                {
+        //        //                    success = false,
+        //        //                    info = string.Format("Find GEOCODE {0} {1}/{2} failed in DMAP, the current part croute is not exist", item.GEOCODE, item.PartCount, item.PartTotal)
+        //        //                });
+        //        //            }
+        //        //            systemCRoutes.Add(geoCode.Id.Value);
+        //        //        }
+        //        //        if (!ValidateCRouteArea(systemCRoutes, out boundary, out message))
+        //        //        {
+        //        //            return Json(new
+        //        //            {
+        //        //                success = false,
+        //        //                info = string.Format("validate croute in submap {0} failed.\r\n{1}", submap.Name, message)
+        //        //            });
+        //        //        }
+        //        //        dmap.PremiumCRoutes = systemCRoutes;
+        //        //        dmap.Boundary = boundary;
+        //        //    }
+        //        //}
+        //        #endregion
+        //    }
 
 
-            #endregion
+        //    #endregion
 
-            try
-            {
-                await SaveImportCampaign(campaign);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, info = ex.ToString() });
-            }
+        //    try
+        //    {
+        //        await SaveImportCampaign(campaign);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { success = false, info = ex.ToString() });
+        //    }
 
-            //dbCampaign.Addresses
-            return Json(new { success = true, info = info.ToString() });
-        }
+        //    //dbCampaign.Addresses
+        //    return Json(new { success = true, info = info.ToString() });
+        //}
 
         [Route("{campaignId:int}/location/{zoom:double}/{lng:double}/{lat:double}")]
         [HttpPut]
@@ -1336,7 +1336,7 @@ namespace Vargainc.Timm.REST.Controllers
                 {
                     case Classifications.Z5:
                          codes = db.FiveZipAreas.Where(i => areaIdArray.Contains(i.Id)).Select(i => i.Code).ToList();
-                        data = db.FiveZipAreas.Where(i=> codes.Contains(i.Code) && i.IsInnerShape == 0 && i.IsMaster == true)
+                        data = db.FiveZipAreas.Where(i=> codes.Contains(i.Code))
                             .Select(i => new ImportArea
                             {
                                 Name = i.Code,
@@ -1346,11 +1346,11 @@ namespace Vargainc.Timm.REST.Controllers
                             .ToList();
                         break;
                     case Classifications.PremiumCRoute:
-                         codes = db.PremiumCRoutes.Where(i => areaIdArray.Contains(i.Id)).Select(i=>i.GEOCODE).ToList();
-                        data = db.PremiumCRoutes.Where(i=> codes.Contains(i.GEOCODE) && i.IsInnerShape == 0 && i.IsMaster == true)
+                         codes = db.PremiumCRoutes.Where(i => areaIdArray.Contains(i.Id)).Select(i=>i.Code).ToList();
+                        data = db.PremiumCRoutes.Where(i=> codes.Contains(i.Code) )
                            .Select(i => new ImportArea
                            {
-                               Name = i.GEOCODE,
+                               Name = i.Code,
                                APT = i.APT_COUNT,
                                HOME = i.HOME_COUNT,
                            })
@@ -1497,7 +1497,7 @@ namespace Vargainc.Timm.REST.Controllers
                     if (z5Data.Count > 0)
                     {
                         var ids = z5Data.Select(i => i.Name).Distinct().ToArray();
-                        var kv = db.FiveZipAreas.Where(i => ids.Contains(i.Code) && i.IsInnerRing == 0 && i.IsMaster == true)
+                        var kv = db.FiveZipAreas.Where(i => ids.Contains(i.Code))
                             .Select(i => new { i.Code, i.Id })
                             .ToDictionary(i => i.Code, i => i.Id);
                         var importData = z5Data.Select(i => new CampaignFiveZipImported
@@ -1515,7 +1515,7 @@ namespace Vargainc.Timm.REST.Controllers
                     if (cRouteData.Count > 0)
                     {
                         var ids = cRouteData.Select(i => i.Name).Distinct().ToArray();
-                        var kv = db.PremiumCRoutes.Where(i => ids.Contains(i.GEOCODE) && i.IsInnerRing == 0 && i.IsMaster == true).ToDictionary(i => i.GEOCODE, i => i.Id);
+                        var kv = db.PremiumCRoutes.Where(i => ids.Contains(i.Code) ).ToDictionary(i => i.Code, i => i.Id);
                         var importData = cRouteData.Select(i => new CampaignCRouteImported
                         {
                             CampaignId = campaignId,
@@ -1891,183 +1891,193 @@ namespace Vargainc.Timm.REST.Controllers
             var result = await db.Database.SqlQuery<ViewModel.ImportPenetration>(sql, new SqlParameter("@CampaignId", campaignId)).ToListAsync();
             return result;
         }
-        private bool ValidateCRouteArea(Polygon orignalBoundary, HashSet<int> cRouteInOtherSubMap, HashSet<string> submapGeoCode, List<int> area, out List<int> addedArea, out List<Models.Location> boundary, out StringBuilder message)
-        {
-            boundary = new List<Models.Location>();
-            addedArea = new List<int>();
-            message = new StringBuilder();
+        //private bool ValidateCRouteArea(Polygon orignalBoundary, HashSet<int> cRouteInOtherSubMap, HashSet<string> submapGeoCode, List<int?> area, out List<int> addedArea, out List<Models.Location> boundary, out StringBuilder message)
+        //{
+        //    boundary = new List<Models.Location>();
+        //    addedArea = new List<int>();
+        //    message = new StringBuilder();
 
-            #region build croute polygon
-            var values = new StringBuilder();
-            values.AppendFormat("{0}", area[0]);
-            for (int i = 1; i < area.Count; i++)
-            {
-                values.AppendFormat(", '{0}'", area[i]);
-            }
-            var sql = string.Format("SELECT * FROM [dbo].[premiumcroutecoordinates] WHERE [PreminumCRouteId] in ({0}) ORDER BY [PreminumCRouteId], [Id]", values);
-            var result = db.Database.SqlQuery<Models.PremiumCRouteCoordinate>(sql);
-            int? lastAddedId = null;
-            List<Coordinate> crouteCoordinate = new List<Coordinate>();
-            List<Polygon> croutePolygon = new List<Polygon>();
-            var enumerator = result.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                if (lastAddedId.HasValue && lastAddedId != enumerator.Current.PreminumCRouteId)
-                {
-                    crouteCoordinate.Add(crouteCoordinate[0]);
-                    Polygon polygon = new Polygon(new LinearRing(crouteCoordinate.ToArray()));
-                    polygon.Buffer(0);
-                    polygon.UserData = lastAddedId.Value;
-                    if (polygon.IsSimple && polygon.IsValid)
-                    {
-                        croutePolygon.Add(polygon);
-                    }
+        //    #region build croute polygon
+        //    List<Geometry> croutePolygon = new List<Geometry>();
+        //    var croutes = db.PremiumCRoutes.Where(i => area.Contains(i.Id)).ToDictionary(k => k.Id, v => v.Geom);
+        //    foreach(var item in croutes)
+        //    {
+        //        var geom = WKTReader.Read(item.Value.AsText());
+        //        geom.UserData = item.Key;
+        //        croutePolygon.Add(geom);
+        //    }
+        //    //var values = new StringBuilder();
+        //    //values.AppendFormat("{0}", area[0]);
+        //    //for (int i = 1; i < area.Count; i++)
+        //    //{
+        //    //    values.AppendFormat(", '{0}'", area[i]);
+        //    //}
+        //    //var sql = string.Format("SELECT * FROM [dbo].[premiumcroutecoordinates] WHERE [PreminumCRouteId] in ({0}) ORDER BY [PreminumCRouteId], [Id]", values);
+        //    //var result = db.Database.SqlQuery<Models.PremiumCRouteCoordinate>(sql);
+        //    //int? lastAddedId = null;
+        //    //List<Coordinate> crouteCoordinate = new List<Coordinate>();
+            
+        //    //var enumerator = result.GetEnumerator();
+        //    //while (enumerator.MoveNext())
+        //    //{
+        //    //    if (lastAddedId.HasValue && lastAddedId != enumerator.Current.PreminumCRouteId)
+        //    //    {
+        //    //        crouteCoordinate.Add(crouteCoordinate[0]);
+        //    //        Polygon polygon = new Polygon(new LinearRing(crouteCoordinate.ToArray()));
+        //    //        polygon.Buffer(0);
+        //    //        polygon.UserData = lastAddedId.Value;
+        //    //        if (polygon.IsSimple && polygon.IsValid)
+        //    //        {
+        //    //            croutePolygon.Add(polygon);
+        //    //        }
 
-                    crouteCoordinate.Clear();
-                }
-                crouteCoordinate.Add(new Coordinate { Y = enumerator.Current.Latitude.Value, X = enumerator.Current.Longitude.Value });
-                lastAddedId = enumerator.Current.PreminumCRouteId;
+        //    //        crouteCoordinate.Clear();
+        //    //    }
+        //    //    crouteCoordinate.Add(new Coordinate { Y = enumerator.Current.Latitude.Value, X = enumerator.Current.Longitude.Value });
+        //    //    lastAddedId = enumerator.Current.PreminumCRouteId;
 
-            }
-            //polygon must contant more than 2 points.
-            if (crouteCoordinate.Count > 1)
-            {
-                crouteCoordinate.Add(crouteCoordinate[0]);
-                Polygon polygon = new Polygon(new LinearRing(crouteCoordinate.ToArray()));
-                polygon.Buffer(0);
-                polygon.UserData = lastAddedId.Value;
-                if (polygon.IsSimple && polygon.IsValid)
-                {
-                    croutePolygon.Add(polygon);
-                }
-            }
-            #endregion
+        //    //}
+        //    ////polygon must contant more than 2 points.
+        //    //if (crouteCoordinate.Count > 1)
+        //    //{
+        //    //    crouteCoordinate.Add(crouteCoordinate[0]);
+        //    //    Polygon polygon = new Polygon(new LinearRing(crouteCoordinate.ToArray()));
+        //    //    polygon.Buffer(0);
+        //    //    polygon.UserData = lastAddedId.Value;
+        //    //    if (polygon.IsSimple && polygon.IsValid)
+        //    //    {
+        //    //        croutePolygon.Add(polygon);
+        //    //    }
+        //    //}
+        //    #endregion
 
-            #region check the orignal boundary must contains these croute or if these croute have intersection with oringal boudnary then these croute geocode must in oringal submap croute geocodes
-            List<Polygon> validatedPolygon = new List<Polygon>();
-            foreach (Polygon item in croutePolygon)
-            {
-                if (cRouteInOtherSubMap.Contains((int)item.UserData))
-                {
-                    continue;
-                }
-                if (orignalBoundary.Contains(item))
-                {
-                    validatedPolygon.Add(item);
-                }
-                else
-                {
-                    var intersection = orignalBoundary.Intersection(item);
-                    bool haveIntersectionPolygon = false;
-                    if (intersection.IsEmpty)
-                    {
-                        haveIntersectionPolygon = false;
-                    }
-                    else if (intersection.GeometryType == "Polygon")
-                    {
-                        haveIntersectionPolygon = true;
-                    }
-                    else
-                    {
-                        for (var i = 0; i < intersection.NumGeometries; i++)
-                        {
-                            if (intersection.GetGeometryN(i).GeometryType == "Polygon")
-                            {
-                                haveIntersectionPolygon = true;
-                            }
-                        }
-                    }
+        //    // remove other 
 
-                    if (haveIntersectionPolygon)
-                    {
-                        var itemCRoute = db.PremiumCRoutes.Find((int)item.UserData);
-                        if (itemCRoute != null && submapGeoCode.Contains(itemCRoute.GEOCODE))
-                        {
-                            validatedPolygon.Add(item);
-                        }
-                    }
-                }
-            }
-            #endregion
+        //    #region check the orignal boundary must contains these croute or if these croute have intersection with oringal boudnary then these croute geocode must in oringal submap croute geocodes
+        //    //List<Geometry> validatedPolygon = new List<Geometry>();
+        //    //foreach (Polygon item in croutePolygon)
+        //    //{
+        //    //    if (cRouteInOtherSubMap.Contains((int)item.UserData))
+        //    //    {
+        //    //        continue;
+        //    //    }
+        //    //    if (orignalBoundary.Contains(item))
+        //    //    {
+        //    //        validatedPolygon.Add(item);
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        var intersection = orignalBoundary.Intersection(item);
+        //    //        bool haveIntersectionPolygon = false;
+        //    //        if (intersection.IsEmpty)
+        //    //        {
+        //    //            haveIntersectionPolygon = false;
+        //    //        }
+        //    //        else if (intersection.GeometryType == "Polygon")
+        //    //        {
+        //    //            haveIntersectionPolygon = true;
+        //    //        }
+        //    //        else
+        //    //        {
+        //    //            for (var i = 0; i < intersection.NumGeometries; i++)
+        //    //            {
+        //    //                if (intersection.GetGeometryN(i).GeometryType == "Polygon")
+        //    //                {
+        //    //                    haveIntersectionPolygon = true;
+        //    //                }
+        //    //            }
+        //    //        }
 
-            #region Union
-            Polygon resultPolygon = null;
-            Geometry unionPolygon = null;
-            MultiPolygon cRouteCollection = null;
-            try
-            {
-                cRouteCollection = new MultiPolygon(validatedPolygon.ToArray());
-                unionPolygon = cRouteCollection.Union();
-            }
-            catch (Exception ex)
-            {
-                message.AppendFormat("union failed. {0}", ex.ToString());
-                message.AppendFormat("already unioned Polygon: {0}", KMLWriter.WriteGeometry(cRouteCollection, 0));
-                return false;
-            }
+        //    //        if (haveIntersectionPolygon)
+        //    //        {
+        //    //            var itemCRoute = db.PremiumCRoutes.Find((int)item.UserData);
+        //    //            if (itemCRoute != null && submapGeoCode.Contains(itemCRoute.GEOCODE))
+        //    //            {
+        //    //                validatedPolygon.Add(item);
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //}
+        //    #endregion
+
+        //    #region Union
+        //    Polygon resultPolygon = null;
+        //    Geometry unionPolygon = null;
+        //    MultiPolygon cRouteCollection = null;
+        //    try
+        //    {
+        //        cRouteCollection = new MultiPolygon(validatedPolygon.ToArray());
+        //        unionPolygon = cRouteCollection.Union();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        message.AppendFormat("union failed. {0}", ex.ToString());
+        //        message.AppendFormat("already unioned Polygon: {0}", KMLWriter.WriteGeometry(cRouteCollection, 0));
+        //        return false;
+        //    }
 
 
-            if (unionPolygon.NumGeometries > 1)
-            {
-                try
-                {
-                    double maxArea = 0;
-                    for (var index = 0; index < unionPolygon.NumGeometries; index++)
-                    {
-                        var testPolygon = unionPolygon.GetGeometryN(index) as Polygon;
-                        resultPolygon = testPolygon != null && testPolygon.Area > maxArea ? testPolygon : resultPolygon;
-                        maxArea = resultPolygon.Area;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    message.AppendLine("find unioned max area polygon failed.");
-                    message.AppendLine(ex.ToString());
-                    return false;
-                }
-            }
-            else if (unionPolygon.NumGeometries == 1)
-            {
-                resultPolygon = unionPolygon.GetGeometryN(0) as Polygon;
-            }
-            #endregion
+        //    if (unionPolygon.NumGeometries > 1)
+        //    {
+        //        try
+        //        {
+        //            double maxArea = 0;
+        //            for (var index = 0; index < unionPolygon.NumGeometries; index++)
+        //            {
+        //                var testPolygon = unionPolygon.GetGeometryN(index) as Polygon;
+        //                resultPolygon = testPolygon != null && testPolygon.Area > maxArea ? testPolygon : resultPolygon;
+        //                maxArea = resultPolygon.Area;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            message.AppendLine("find unioned max area polygon failed.");
+        //            message.AppendLine(ex.ToString());
+        //            return false;
+        //        }
+        //    }
+        //    else if (unionPolygon.NumGeometries == 1)
+        //    {
+        //        resultPolygon = unionPolygon.GetGeometryN(0) as Polygon;
+        //    }
+        //    #endregion
 
-            if (resultPolygon == null)
-            {
-                message.AppendFormat("union croute should be polygon, but this area is {0}", unionPolygon.GetGeometryN(0).GeometryType);
-                return false;
-            }
-            //if(resultPolygon.Holes.Length > 0)
-            //{
-            //    message = "unionPolygon croute have holes";
-            //    return false;
-            //}
-            foreach (var cRoute in validatedPolygon)
-            {
-                if (cRoute != null && resultPolygon.Contains(cRoute))
-                {
-                    addedArea.Add((int)cRoute.UserData);
-                }
-            }
-            boundary = resultPolygon.ExteriorRing.Coordinates.Select(i => new Models.Location
-            {
-                Latitude = i.Y,
-                Longitude = i.X
-            }).ToList();
-            return true;
+        //    if (resultPolygon == null)
+        //    {
+        //        message.AppendFormat("union croute should be polygon, but this area is {0}", unionPolygon.GetGeometryN(0).GeometryType);
+        //        return false;
+        //    }
+        //    //if(resultPolygon.Holes.Length > 0)
+        //    //{
+        //    //    message = "unionPolygon croute have holes";
+        //    //    return false;
+        //    //}
+        //    foreach (var cRoute in validatedPolygon)
+        //    {
+        //        if (cRoute != null && resultPolygon.Contains(cRoute))
+        //        {
+        //            addedArea.Add((int)cRoute.UserData);
+        //        }
+        //    }
+        //    boundary = resultPolygon.ExteriorRing.Coordinates.Select(i => new Models.Location
+        //    {
+        //        Latitude = i.Y,
+        //        Longitude = i.X
+        //    }).ToList();
+        //    return true;
 
-        }
-        private async Task<List<int>> QueryCRouteInBox(double topRightLat, double topRightLng, double bottomLeftLat, double bottomLeftLng)
-        {
-            string sql = @"SELECT PreminumCRouteId FROM premiumcroutecoordinates WHERE Latitude <= @TopRightLat AND Latitude >= @BottomLeftLat AND Longitude >= @BottomLeftLng AND Longitude < @TopRightLng GROUP BY PreminumCRouteId";
-            SqlParameter[] param = new SqlParameter[4];
-            param[0] = new SqlParameter("@TopRightLat", topRightLat);
-            param[1] = new SqlParameter("@TopRightLng", topRightLng);
-            param[2] = new SqlParameter("@BottomLeftLat", bottomLeftLat);
-            param[3] = new SqlParameter("@BottomLeftLng", bottomLeftLng);
-            var result = await db.Database.SqlQuery<int>(sql, param).ToListAsync();
-            return result;
-        }
+        //}
+        //private async Task<List<int>> QueryCRouteInBox(double topRightLat, double topRightLng, double bottomLeftLat, double bottomLeftLng)
+        //{
+        //    string sql = @"SELECT PreminumCRouteId FROM premiumcroutecoordinates WHERE Latitude <= @TopRightLat AND Latitude >= @BottomLeftLat AND Longitude >= @BottomLeftLng AND Longitude < @TopRightLng GROUP BY PreminumCRouteId";
+        //    SqlParameter[] param = new SqlParameter[4];
+        //    param[0] = new SqlParameter("@TopRightLat", topRightLat);
+        //    param[1] = new SqlParameter("@TopRightLng", topRightLng);
+        //    param[2] = new SqlParameter("@BottomLeftLat", bottomLeftLat);
+        //    param[3] = new SqlParameter("@BottomLeftLng", bottomLeftLng);
+        //    var result = await db.Database.SqlQuery<int>(sql, param).ToListAsync();
+        //    return result;
+        //}
         private static int CalcTotal(string areaDescription, ViewModel.ImportCRoute croute)
         {
             switch (areaDescription)
