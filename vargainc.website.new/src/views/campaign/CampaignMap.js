@@ -1267,21 +1267,19 @@ export default class Campaign extends React.Component {
                                 <li>
                                     <a className="button clear" href="javascript:void" onClick={this.onNewSubmap} title="New">
                                         <i className="fa fa-file-text-o fi-list"></i>
+                                        <span>NEW</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a className="button clear" href="javascript:void" onClick={this.onEditSubmap} title="Edit">
                                         <i className="fa fa-pencil-square-o fi-list"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a className="button clear" href="javascript:void" onClick={this.onDeleteSubmap} title="Delete">
-                                        <i className="fa fa-trash-o fi-list"></i>
+                                        <span>EDIT</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a className="button clear" href="javascript:void" onClick={this.onSaveShapesToSubmap} title="Save">
                                         <i className="fa fa-floppy-o fi-list"></i>
+                                        <span>SAVE</span>
                                     </a>
                                 </li>
                                 <li>
@@ -1292,6 +1290,11 @@ export default class Campaign extends React.Component {
                                 <li>
                                     <a className="button clear" href="javascript:void" onClick={this.clearSelectedShapes} title="Deselect All to Current Submap">
                                         <i className="fa fa-object-ungroup fi-list"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="button clear" href="javascript:void" onClick={this.onDeleteSubmap} title="Delete">
+                                        <i className="fa fa-trash-o fi-list"></i>
                                     </a>
                                 </li>
                             </ul>

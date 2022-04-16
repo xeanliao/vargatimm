@@ -35,6 +35,19 @@ Or you can use any sftp tools e.g. FileZilla to upload to mssql server
 
 2. ssh remote to MSSQL server
 `ssh root@13.57.187.203 -i ~/.ssh/varga.pem`
+
+3. run sql command to check the backup files
+```sql
+/opt/mssql-tools/bin/sqlcmd \
+   -S localhost -U sa -P '<repace to password>' \
+   -Q 'RESTORE FILELISTONLY FROM DISK = "/var/opt/mssql/backup/timm202202.bak"' | tr -s ' ' | cut -d ' ' -f 1-2
+```
+You can get some mssql data filename and log filename
+```bash
+timm D:\MSSQL\Data\timm202202.mdf
+timm_log D:\MSSQL\Data\timm202202.ldf
+```
+You will use these file name in the next sql command `MOVE` part
 4. run restore sql command
 ```sql
 /opt/mssql-tools/bin/sqlcmd \
@@ -70,141 +83,216 @@ Database 'Timm202202' running the upgrade step from version 706 to version 770.
 Database 'Timm202202' running the upgrade step from version 903 to version 904.
 RESTORE DATABASE successfully processed 1386419 pages in 796.762 seconds (13.594 MB/sec)
 ```
-# Run Database 3zip/5zip/croute build sql
-Tips: the linux mssql 2019 you can used new `Azure Data Studio` to connect to and run sql command. you can download [here](https://docs.microsoft.com/en-us/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver15) BTW. there have mac version
-1. 2021-07-24
 
-```sql
--- 3zip
-
-DROP INDEX IF EXISTS [threezipareas_spatial_index] ON [dbo].[threezipareas];
-
-IF EXISTS (SELECT 1
-               FROM   INFORMATION_SCHEMA.COLUMNS
-               WHERE  TABLE_NAME = 'threezipareas'
-                      AND COLUMN_NAME = 'Geom'
-                      AND TABLE_SCHEMA='DBO')
-  BEGIN
-      ALTER TABLE [dbo].[threezipareas]
-        DROP COLUMN Geom
-  END
-GO
-
-ALTER TABLE [dbo].[threezipareas]
-ADD Geom geometry, IsMaster bit;
-
-UPDATE [dbo].[threezipareas]
-SET [IsMaster] = 1
-WHERE Id IN (
-  SELECT B.Id
-  FROM
-    (
-      SELECT Code, Max(SqMile) AS SqMile
-      FROM [dbo].[threezipareas]
-      GROUP by Code
-    ) AS A INNER JOIN [dbo].[threezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile AND [IsInnerRing] = 0
-);
-
-CREATE INDEX [threezipareas_IsInnerRing_index] ON [dbo].[threezipareas]
-(
-	[IsInnerRing] ASC
-);
-
-CREATE SPATIAL INDEX [threezipareas_spatial_index]
-  ON [dbo].[threezipareas](Geom)
-  USING GEOMETRY_AUTO_GRID
-  WITH ( 
-    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
-  );
-
--- 5zip
-
-DROP INDEX IF EXISTS [fivezipareas_spatial_index] ON [dbo].[fivezipareas];
-
-IF EXISTS (SELECT 1
-               FROM   INFORMATION_SCHEMA.COLUMNS
-               WHERE  TABLE_NAME = 'fivezipareas'
-                      AND COLUMN_NAME = 'Geom'
-                      AND TABLE_SCHEMA='DBO')
-  BEGIN
-      ALTER TABLE [dbo].[fivezipareas]
-        DROP COLUMN Geom
-  END
-GO
-
-
-ALTER TABLE [dbo].[fivezipareas]
-ADD Geom geometry, IsMaster bit;
-
-UPDATE [dbo].[fivezipareas]
-SET [IsMaster] = 1
-WHERE Id IN (
-  SELECT B.Id
-  FROM
-    (
-      SELECT Code, Max(SqMile) AS SqMile
-      FROM [dbo].[fivezipareas]
-      GROUP by Code
-    ) AS A INNER JOIN [dbo].[fivezipareas] B ON A.Code = B.Code AND A.SqMile = B.SqMile AND [IsInnerRing] = 0
-);
-
-CREATE INDEX [fivezipareas_IsInnerRing_index] ON [dbo].[fivezipareas]
-(
-	[IsInnerRing] ASC
-);
-
-CREATE SPATIAL INDEX [fivezipareas_spatial_index]
-  ON [dbo].[fivezipareas](Geom)
-  USING GEOMETRY_AUTO_GRID
-  WITH ( 
-    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
-  );
-
-
--- croute
-
-DROP INDEX IF EXISTS [premiumcroutes_spatial_index] ON [dbo].[premiumcroutes];
-
-IF EXISTS (SELECT 1
-               FROM   INFORMATION_SCHEMA.COLUMNS
-               WHERE  TABLE_NAME = 'premiumcroutes'
-                      AND COLUMN_NAME = 'Geom'
-                      AND TABLE_SCHEMA='DBO')
-  BEGIN
-      ALTER TABLE [dbo].[premiumcroutes]
-        DROP COLUMN Geom
-  END
-GO
-
-ALTER TABLE [dbo].[premiumcroutes]
-ADD Geom geometry, IsMaster bit;
-
-UPDATE [dbo].[premiumcroutes]
-SET [IsMaster] = 1
-WHERE Id IN (
-  SELECT B.Id
-  FROM
-    (
-      SELECT GEOCODE, Max(SqMile) AS SqMile
-      FROM [dbo].[premiumcroutes]
-      GROUP by GEOCODE
-    ) AS A INNER JOIN [dbo].[premiumcroutes] B ON A.GEOCODE = B.GEOCODE AND A.SqMile = B.SqMile AND [IsInnerRing] = 0
-);
-
-CREATE INDEX [premiumcroutes_IsInnerRing_index] ON [dbo].[premiumcroutes]
-(
-	[IsInnerRing] ASC
-);
-
-CREATE SPATIAL INDEX [premiumcroutes_spatial_index]
-  ON [dbo].[premiumcroutes](Geom)
-  USING GEOMETRY_AUTO_GRID
-  WITH ( 
-    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
-  );
+6. Import shape file into database. you need upload all shape files into MSSQl server. use scp or sftp.
+```bash
+scp Varga_Final.dbf Varga_Final.prj  Varga_Final.shp Varga_Final.shx root@<Replace to MSSQL server ip>:/root/ -i <Replace to Varga SSH private pem file>
+```
+Then run these command on the remote mssql server
+```bash
+ogr2ogr -overwrite -lco "GEOM_TYPE=geometry" -a_srs "EPSG:4326" -f MSSQLSpatial "MSSQL:server=127.0.0.1;database=Timm202202;driver=ODBC Driver 17 for SQL Server;UID=SA;PWD=<Replace to MSSQL Password>" /root/Varga_Final.shx
 ```
 
-2. 2022-03-01
+Then fix the geom data
+```sql
+ALTER TABLE [dbo].[varga_final]
+ADD [geom] GEOMETRY
+
+GO
+
+UPDATE [dbo].[varga_final]
+SET [geom] = [ogr_geometry].STBuffer(0).MakeValid()
+```
+
+7. build croute
+```sql
+CREATE TABLE [dbo].[premiumcroutes_all](
+	[Id] INT PRIMARY KEY,
+	[Name] NVARCHAR(64) NOT NULL,
+	[Code] NVARCHAR(64) NOT NULL,
+  [Zip] NVARCHAR(64) NOT NULL,
+	[HOME_COUNT] INT NOT NULL,
+	[BUSINESS_COUNT] INT NOT NULL,
+	[APT_COUNT] INT NOT NULL,
+	[TOTAL_COUNT] INT NOT NULL,
+	[Geom] GEOMETRY NULL
+)
+GO
+
+CREATE INDEX [IX_premiumcroutes_all_Code] ON [dbo].[premiumcroutes_all]
+(
+	[Code] ASC
+)
+GO
+
+CREATE SPATIAL INDEX [IX_premiumcroutes_all_Geom]
+  ON [dbo].[premiumcroutes_all](Geom)
+  USING GEOMETRY_AUTO_GRID
+  WITH ( 
+    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
+  );
+GO
+```
+
+From import shape table to croute table
+```sql
+INSERT INTO [dbo].[premiumcroutes_all]
+    ([id],
+    [name],
+    [code],
+    [zip],
+    [home_count],
+    [business_count],
+    [apt_count],
+    [total_count],
+    [geom])
+SELECT Row_number() OVER(ORDER BY geocode ASC) Id,
+    geocode                   NAME,
+    geocode                   Code,
+    zip,
+    home_count                HOME_COUNT,
+    business_c                BUSINESS_COUNT,
+    apt_count                 APT_COUNT,
+    total_coun                TOTAL_COUNT,
+    geom
+FROM (SELECT geocode,
+        Max(zip)                                 zip,
+        Max(home_count)                          home_count,
+        Max(business_c)                          business_c,
+        Max(apt_count)                           apt_count,
+        Max(total_coun)                          total_coun,
+        geometry::UnionAggregate([geom]).STBuffer(0).MakeValid() Geom
+    FROM varga_final
+    GROUP  BY geocode) AS T
+ORDER  BY T.geocode 
+```
+8. build 5zip
+```sql
+CREATE TABLE [dbo].[fivezipareas_all](
+	[Id] INT PRIMARY KEY,
+	[Name] NVARCHAR(64) NOT NULL,
+	[Code] NVARCHAR(64) NOT NULL,
+  [Zip] NVARCHAR(64) NOT NULL,
+	[HOME_COUNT] INT NOT NULL,
+	[BUSINESS_COUNT] INT NOT NULL,
+	[APT_COUNT] INT NOT NULL,
+	[TOTAL_COUNT] INT NOT NULL,
+	[Geom] GEOMETRY NULL
+)
+GO
+
+CREATE INDEX [IX_fivezipareas_all_Code] ON [dbo].[fivezipareas_all]
+(
+	[Code] ASC
+)
+GO
+
+CREATE SPATIAL INDEX [IX_fivezipareas_all_Geom]
+  ON [dbo].[fivezipareas_all](Geom)
+  USING GEOMETRY_AUTO_GRID
+  WITH ( 
+    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
+  );
+GO
+```
+
+From import shape table to 5zip table
+```sql
+INSERT INTO [dbo].[fivezipareas_all]
+    ([id],
+    [name],
+    [code],
+    [zip],
+    [home_count],
+    [business_count],
+    [apt_count],
+    [total_count],
+    [geom])
+SELECT Row_number() OVER( ORDER BY ZIP ASC) Id,
+    ZIP                       NAME,
+    ZIP                       Code,
+    ZIP,
+    HOME_COUNT,
+    BUSINESS_COUNT,
+    APT_COUNT,
+    TOTAL_COUNT,
+    geom
+FROM (SELECT ZIP,
+        SUM(HOME_COUNT)                          HOME_COUNT,
+        SUM(BUSINESS_COUNT)                      BUSINESS_COUNT,
+        SUM(APT_COUNT)                           APT_COUNT,
+        SUM(TOTAL_COUNT)                         TOTAL_COUNT,
+        geometry::UnionAggregate([geom]).MakeValid() Geom
+    FROM premiumcroutes_all
+    GROUP  BY ZIP) AS T
+ORDER  BY T.ZIP 
+```
+
+9. build 3zip
+```sql
+CREATE TABLE [dbo].[threezipareas_all](
+	[Id] INT PRIMARY KEY,
+	[Name] NVARCHAR(64) NOT NULL,
+	[Code] NVARCHAR(64) NOT NULL,
+  [Zip] NVARCHAR(64) NOT NULL,
+	[HOME_COUNT] INT NOT NULL,
+	[BUSINESS_COUNT] INT NOT NULL,
+	[APT_COUNT] INT NOT NULL,
+	[TOTAL_COUNT] INT NOT NULL,
+	[Geom] GEOMETRY NULL
+)
+GO
+
+CREATE INDEX [IX_threezipareas_all_Code] ON [dbo].[threezipareas_all]
+(
+	[Code] ASC
+)
+GO
+
+CREATE SPATIAL INDEX [IX_threezipareas_all_Geom]
+  ON [dbo].[threezipareas_all](Geom)
+  USING GEOMETRY_AUTO_GRID
+  WITH ( 
+    BOUNDING_BOX= (xmin=-180, ymin=-90, xmax=180, ymax=90) 
+  );
+GO
+```
+
+From import shape table to 3zip table
+```sql
+INSERT INTO [dbo].[threezipareas_all]
+    ([id],
+    [name],
+    [code],
+    [zip],
+    [home_count],
+    [business_count],
+    [apt_count],
+    [total_count],
+    [geom])
+SELECT Row_number() OVER( ORDER BY ZIP ASC) Id,
+    ZIP                       NAME,
+    ZIP                       Code,
+    ZIP,
+    HOME_COUNT,
+    BUSINESS_COUNT,
+    APT_COUNT,
+    TOTAL_COUNT,
+    geom
+FROM (SELECT SUBSTRING(ZIP, 3,3)                      Zip,
+        SUM(HOME_COUNT)                          HOME_COUNT,
+        SUM(BUSINESS_COUNT)                      BUSINESS_COUNT,
+        SUM(APT_COUNT)                           APT_COUNT,
+        SUM(TOTAL_COUNT)                         TOTAL_COUNT,
+        geometry::UnionAggregate([geom]).MakeValid() Geom
+    FROM premiumcroutes_all
+    GROUP  BY SUBSTRING(ZIP, 3,3)) AS T
+ORDER  BY T.Zip 
+```
+
+# Update SQL
+
+1. 2022-03-01
 ```sql
 ALTER TABLE [dbo].[submaprecords]
 ADD [Code] NVARCHAR(10);
