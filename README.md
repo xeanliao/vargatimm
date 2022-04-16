@@ -290,9 +290,9 @@ FROM (SELECT SUBSTRING(ZIP, 3,3)                      Zip,
 ORDER  BY T.Zip 
 ```
 
-# Update SQL
+# Update SQL Only need run once!!!
 
-1. 2022-03-01
+1. 2022-03-01 already apply to timm202202
 ```sql
 ALTER TABLE [dbo].[submaprecords]
 ADD [Code] NVARCHAR(10);
