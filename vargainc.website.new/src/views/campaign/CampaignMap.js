@@ -646,14 +646,14 @@ export default class Campaign extends React.Component {
         let layerId = evt.currentTarget.id
         this.setState(
             (state) => {
-                let activeLayers = new Set(state.activeLayers)
-                if (activeLayers.has(layerId)) {
-                    activeLayers.delete(layerId)
-                } else {
-                    activeLayers.add(layerId)
-                }
+                // let activeLayers = new Set(state.activeLayers)
+                // if (activeLayers.has(layerId)) {
+                //     activeLayers.delete(layerId)
+                // } else {
+                //     activeLayers.add(layerId)
+                // }
                 return {
-                    activeLayers: activeLayers,
+                    activeLayers: new Set([layerId]),
                     // selectedShapes: new Map(),
                 }
             },
@@ -869,7 +869,13 @@ export default class Campaign extends React.Component {
     loadSubmapList() {
         axios.get(`campaign/${this.props.campaign.Id}/submap`).then((resp) => {
             this.props.campaign.SubMaps = resp.data.data.SubMaps
-            this.forceUpdate()
+
+            this.forceUpdate(() => {
+                let submap = this.props.campaign.SubMaps.filter((i) => i.Id == this.state.selectedSubmapId)?.[0]
+                if (submap) {
+                    this.onSubmapSelect(submap)
+                }
+            })
         })
     }
 
@@ -1170,7 +1176,6 @@ export default class Campaign extends React.Component {
 
     renderRightMenu() {
         let submaps = this.props?.campaign?.SubMaps ?? []
-        let activeLayers = this.getActiveLayer()
         return (
             <div className="grid-y grid-frame">
                 <div className="cell shrink">
@@ -1213,11 +1218,11 @@ export default class Campaign extends React.Component {
                                 </div>
                                 <div className="columns small-12">
                                     <div className="button-group stacked-for-small clear align-spaced" style={{ margin: '0.5rem 0' }}>
-                                        <div>
+                                        {/* <div>
                                             <input
-                                                type="checkbox"
+                                                type="radio"
                                                 className="margin-0"
-                                                name="Z3"
+                                                name="area"
                                                 id="Z3"
                                                 onChange={this.onClassificationsChange}
                                                 checked={this.state.activeLayers.has('Z3')}
@@ -1232,12 +1237,12 @@ export default class Campaign extends React.Component {
                                             >
                                                 3 ZIP
                                             </label>
-                                        </div>
+                                        </div> */}
                                         <div>
                                             <input
-                                                type="checkbox"
+                                                type="radio"
                                                 className="margin-0"
-                                                name="Z5"
+                                                name="area"
                                                 id="Z5"
                                                 onChange={this.onClassificationsChange}
                                                 checked={this.state.activeLayers.has('Z5')}
@@ -1255,9 +1260,9 @@ export default class Campaign extends React.Component {
                                         </div>
                                         <div>
                                             <input
-                                                type="checkbox"
+                                                type="radio"
                                                 className="margin-0"
-                                                name="PremiumCRoute"
+                                                name="area"
                                                 id="PremiumCRoute"
                                                 onChange={this.onClassificationsChange}
                                                 checked={this.state.activeLayers.has('PremiumCRoute')}
