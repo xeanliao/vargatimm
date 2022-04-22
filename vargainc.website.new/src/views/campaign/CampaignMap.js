@@ -21,7 +21,7 @@ const log = new Logger('views:campaign')
 const layersDefine = [
     {
         layer: 'PremiumCRoute',
-        zoom: [0, 24],
+        zoom: [9, 24],
         fontScale: [0.75, 0.75],
         settings: [
             {
@@ -58,7 +58,7 @@ const layersDefine = [
     },
     {
         layer: 'Z5',
-        zoom: [0, 24],
+        zoom: [8, 24],
         fontScale: [1, 0.75],
         settings: [
             {
@@ -95,7 +95,7 @@ const layersDefine = [
     },
     {
         layer: 'Z3',
-        zoom: [0, 24],
+        zoom: [7, 24],
         fontScale: [1.25, 1],
         settings: [
             {
