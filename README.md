@@ -162,7 +162,7 @@ FROM (SELECT geocode,
         Max(apt_count)                           apt_count,
         Max(total_coun)                          total_coun,
         geometry::UnionAggregate([geom]).STBuffer(0).MakeValid() Geom
-    FROM varga_final
+    FROM [varga_final]
     GROUP  BY geocode) AS T
 ORDER  BY T.geocode 
 ```
@@ -223,7 +223,7 @@ FROM (SELECT ZIP,
         SUM(APT_COUNT)                           APT_COUNT,
         SUM(TOTAL_COUNT)                         TOTAL_COUNT,
         geometry::UnionAggregate([geom]).MakeValid() Geom
-    FROM premiumcroutes_all
+    FROM [premiumcroutes_all]
     GROUP  BY ZIP) AS T
 ORDER  BY T.ZIP 
 ```
@@ -279,14 +279,14 @@ SELECT Row_number() OVER( ORDER BY ZIP ASC) Id,
     APT_COUNT,
     TOTAL_COUNT,
     geom
-FROM (SELECT SUBSTRING(ZIP, 3,3)                      Zip,
+FROM (SELECT SUBSTRING(ZIP, 0,4)                      Zip,
         SUM(HOME_COUNT)                          HOME_COUNT,
         SUM(BUSINESS_COUNT)                      BUSINESS_COUNT,
         SUM(APT_COUNT)                           APT_COUNT,
         SUM(TOTAL_COUNT)                         TOTAL_COUNT,
         geometry::UnionAggregate([geom]).MakeValid() Geom
-    FROM premiumcroutes_all
-    GROUP  BY SUBSTRING(ZIP, 3,3)) AS T
+    FROM [fivezipareas_all]
+    GROUP  BY SUBSTRING(ZIP, 0,4)) AS T
 ORDER  BY T.Zip 
 ```
 
