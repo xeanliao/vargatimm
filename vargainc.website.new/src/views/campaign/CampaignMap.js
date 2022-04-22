@@ -691,7 +691,11 @@ export default class Campaign extends React.Component {
         this.setState(
             (state) => {
                 let fixClassification = Classification.get(submap.SubMapRecords?.[0]?.Classification)
-                let allowedLayers = fixClassification ? [fixClassification] : Array.from(Classification.values())
+                let allowedLayers = new Set(fixClassification ? [fixClassification] : Array.from(Classification.values()))
+                let activeLayers = new Set(Array.from(state.activeLayers).filter((i) => allowedLayers.has(i)))
+                if (activeLayers.size == 0 && fixClassification) {
+                    activeLayers = new Set([fixClassification])
+                }
 
                 let submapGeo = state.campaignSource.features.filter((i) => i?.properties?.sid == submap.Id)?.[0]
 
@@ -702,7 +706,7 @@ export default class Campaign extends React.Component {
                     ])
                 }
 
-                return { selectedSubmapId: submap.Id, allowedLayers: new Set(allowedLayers), selectedShapes: new Map() }
+                return { selectedSubmapId: submap.Id, allowedLayers: allowedLayers, activeLayers: activeLayers, selectedShapes: new Map() }
             },
             () => {
                 //set selected layer fill color as submap color
@@ -712,10 +716,30 @@ export default class Campaign extends React.Component {
                 this.map.setPaintProperty('timm-submap-layer-highlight', 'line-color', highlightColor)
                 this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'visible')
 
+                const otherLayers = ['fill', 'selected', 'label']
+                const mapStyle = this.state.mapStyle
                 layersDefine.forEach((item) => {
                     this.map.setFilter(`timm-area-layer-${item.layer}-remove`, ['==', ['get', 'sid'], ''])
                     this.map.setFilter(`timm-area-layer-${item.layer}-selected`, ['==', ['get', 'sid'], ''])
                     this.map.setPaintProperty(`timm-area-layer-${item.layer}-selected`, 'fill-color', color(`#${submap.ColorString}`).toString())
+                    //switch active layers
+                    item.settings.forEach((setting) => {
+                        this.map.setLayoutProperty(
+                            `timm-area-layer-${item.layer}-${setting.id}-${mapStyle}`,
+                            'visibility',
+                            this.state.activeLayers.has(item.layer) ? 'visible' : 'none'
+                        )
+                    })
+                    otherLayers.forEach((name) => {
+                        this.map.setLayoutProperty(`timm-area-layer-${item.layer}-${name}`, 'visibility', this.state.activeLayers.has(item.layer) ? 'visible' : 'none')
+                    })
+
+                    let source = this.map.getSource(`area-source-${item.layer}`)
+                    if (this.state.activeLayers.has(item.layer)) {
+                        source.minzoom = 0
+                    } else {
+                        source.minzoom = 24
+                    }
                 })
             }
         )
@@ -1146,6 +1170,7 @@ export default class Campaign extends React.Component {
 
     renderRightMenu() {
         let submaps = this.props?.campaign?.SubMaps ?? []
+        let activeLayers = this.getActiveLayer()
         return (
             <div className="grid-y grid-frame">
                 <div className="cell shrink">
@@ -1164,10 +1189,7 @@ export default class Campaign extends React.Component {
                                 </li>
                                 <li>
                                     <a href="javascript:void">
-                                        <label
-                                            htmlFor="import"
-                                            style={{ display: 'inherit', 'font-size': 'inherit', 'font-weight': 'inherit', 'line-height': 'inherit', color: 'inherit' }}
-                                        >
+                                        <label htmlFor="import" style={{ display: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit', color: 'inherit' }}>
                                             <i className="fa fa-cloud-upload"></i> Import
                                         </label>
                                     </a>
@@ -1199,6 +1221,7 @@ export default class Campaign extends React.Component {
                                                 id="Z3"
                                                 onChange={this.onClassificationsChange}
                                                 checked={this.state.activeLayers.has('Z3')}
+                                                disabled={!this.state.allowedLayers.has('Z3')}
                                             />
                                             <label
                                                 htmlFor="Z3"
@@ -1218,6 +1241,7 @@ export default class Campaign extends React.Component {
                                                 id="Z5"
                                                 onChange={this.onClassificationsChange}
                                                 checked={this.state.activeLayers.has('Z5')}
+                                                disabled={!this.state.allowedLayers.has('Z5')}
                                             />
                                             <label
                                                 htmlFor="Z5"
@@ -1237,6 +1261,7 @@ export default class Campaign extends React.Component {
                                                 id="PremiumCRoute"
                                                 onChange={this.onClassificationsChange}
                                                 checked={this.state.activeLayers.has('PremiumCRoute')}
+                                                disabled={!this.state.allowedLayers.has('PremiumCRoute')}
                                             />
                                             <label
                                                 htmlFor="PremiumCRoute"
