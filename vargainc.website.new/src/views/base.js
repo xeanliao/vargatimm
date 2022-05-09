@@ -244,11 +244,9 @@ export const onFormChange = function (e) {
 export const onDialogClose = function () {
     this.publish('showDialog')
 }
-
 export const closeDialog = function () {
     this.publish('showDialog')
 }
-
 export const randomColor = function (index) {
     const schema = [
         '#d62728',
@@ -313,7 +311,12 @@ export const randomColor = function (index) {
     }
     return schema[index % schema.length]
 }
-
+export const formatNumber = function (number, digits = 2) {
+    if (isNaN(number)) {
+        return 'N/A'
+    }
+    return new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 3, maximumFractionDigits: digits }).format(number)
+}
 export default {
     getDefaultProps,
     on,
@@ -329,4 +332,5 @@ export default {
     onDialogClose,
     closeDialog: closeDialog,
     randomColor,
+    formatNumber,
 }

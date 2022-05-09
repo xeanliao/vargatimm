@@ -3,9 +3,11 @@ import React from 'react'
 import 'react.backbone'
 import moment from 'moment'
 import $ from 'jquery'
+import axios from 'axios'
 
 import TaskModel from 'models/task'
 import BaseView from 'views/base'
+import ReportView from './task'
 
 export default React.createBackboneClass({
     mixins: [BaseView],
@@ -43,11 +45,19 @@ export default React.createBackboneClass({
             })
         })
     },
-    onOpenReport: function (campaignId) {
+    onOpenCampaignReport: function (campaignId) {
         window.open(`index.html#print/${campaignId}/report`)
     },
-    onGotoReport: function (taskId) {
-        window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId
+    onOpenTaskReport: function (campaignId, taskId) {
+        axios.get(`task/report/${campaignId}/${taskId}`).then((result) => {
+            this.publish('showDialog', {
+                view: ReportView,
+                params: { campaignName: result?.data?.campaignName, taskName: result?.data?.taskName, reports: result?.data?.reports },
+                options: {
+                    size: 'large',
+                },
+            })
+        })
     },
     onGotoReview: function (campaignId, taskName, taskId) {
         window.open(`index.html#campaign/${campaignId}/${taskName}/${taskId}/edit`)
@@ -97,7 +107,7 @@ export default React.createBackboneClass({
                 <div className="small-2 medium-3 columns">
                     <span className="show-for-large">{model.get('AreaDescription')}</span>
                     <div className="float-right tool-bar">
-                        <a className="button row-button" onClick={self.onOpenReport.bind(null, campaignId)}>
+                        <a className="button row-button" onClick={self.onOpenCampaignReport.bind(null, campaignId)}>
                             <i className="fa fa-print"></i>
                             <small>Print</small>
                         </a>
@@ -121,7 +131,7 @@ export default React.createBackboneClass({
                                         <td onClick={self.onGotoReview.bind(null, campaignId, taskName, task.Id)}>{task.Name}</td>
                                         <td>
                                             <div className="float-right tool-bar">
-                                                <a className="button row-button" onClick={self.onGotoReport.bind(null, task.Id)}>
+                                                <a className="button row-button" onClick={self.onOpenTaskReport.bind(null, campaignId, task.Id)}>
                                                     <i className="fa fa-file-text-o"></i>
                                                     <small>Report</small>
                                                 </a>

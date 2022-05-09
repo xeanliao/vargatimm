@@ -140,13 +140,13 @@ const Classification = new Map([
 
 export default class Campaign extends React.Component {
     static propTypes = {
-        campaigin: PropTypes.object,
+        campaign: PropTypes.object,
     }
 
     constructor(props) {
         super(props)
         this.state = {
-            mapInited: false,
+            mapInit: false,
             mapReady: false,
             activeLayers: new Set(),
             allowedLayers: new Set(['Z3', 'Z5', 'PremiumCRoute']),
@@ -225,7 +225,7 @@ export default class Campaign extends React.Component {
     onInitMap(mapContainer) {
         if (mapContainer) {
             this.setState((state) => {
-                if (state.mapInited == false) {
+                if (state.mapInit == false) {
                     mapboxgl.accessToken = MapboxToken
                     let zoom = this.props.campaign.ZoomLevel ?? 8
                     let center = [this.props.campaign.Longitude ?? -73.987378, this.props.campaign.Latitude ?? 40.744556]
@@ -242,7 +242,7 @@ export default class Campaign extends React.Component {
                     this.map.once('load', this.onMapLoad)
                     log.info(`mapbox inited`)
                 }
-                return { mapInited: true }
+                return { mapInit: true }
             })
         }
     }

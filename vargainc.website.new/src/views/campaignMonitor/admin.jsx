@@ -89,7 +89,7 @@ export default React.createBackboneClass({
             )
         })
 
-        this.subscribe('Map.Popup.ConfirmMergeTask', (tasks) => {
+        this.subscribe('Map.Popup.ConfirmMergeTask', () => {
             var model = self.getModel()
             var tasks = model && model.get('Tasks')
             if (tasks && tasks.size && self.state.mergeTasks.length == 2) {

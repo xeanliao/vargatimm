@@ -24,6 +24,7 @@ const config = {
     externals: {
         jquery: 'jQuery',
         'jquery-ui': '',
+        Foundation: 'Foundation',
     },
     module: {
         rules: [

@@ -273,7 +273,6 @@ export default React.createBackboneClass({
         return null
     },
     render: function () {
-        var model = this.getModel()
         var mainView = this.getMainView()
         var dialogView = this.getDialogView(this.state.dialogView, this.state.dialogParams, this.onCloseDialog)
         var dialogClass = classNames(`reveal dialog ${this.state.dialogSize} ${this.state.dialogCustomClass}`, {
@@ -284,28 +283,25 @@ export default React.createBackboneClass({
             hide: dialogModalView == null,
         })
 
+        var mainMenuClassName = ''
+        var menu = null
         if (this.state.showMenu === true) {
-            var mainMenuClassName = 'left-menu'
-            var menu = <MenuView ref="sideMenu" />
-        } else {
-            var mainMenuClassName = ''
-            var menu = null
+            mainMenuClassName = 'left-menu'
+            menu = <MenuView ref="sideMenu" />
         }
+        var search = null
         if (this.state.showSearch === true) {
-            var search = (
+            search = (
                 <span className="title-bar-center">
                     <div className="topSearchBar hide-for-small-only">
                         <input type="text" placeholder="Search" onChange={this.fullTextSearch} />
                     </div>
                 </span>
             )
-        } else {
-            var search = null
         }
+        var user = null
         if (this.state.showUser === true) {
-            var user = <UserView model={this.props.user} />
-        } else {
-            var user = null
+            user = <UserView model={this.props.user} />
         }
         var loadingDisplay = this.state.loading ? 'block' : 'none'
 
