@@ -96,6 +96,7 @@
     <Compile Include="Task\GtuInfo.cs" />
     <Compile Include="Task\Task.cs" />
     <Compile Include="Task\TaskGtuInfoMapping.cs" />
+    <Compile Include="Task\TaskGtuInfoMappingHistory.cs" />
     <Compile Include="Task\TaskTime.cs" />
     <Compile Include="User\Company.cs" />
     <Compile Include="User\Group.cs" />

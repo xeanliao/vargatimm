@@ -142,5 +142,6 @@ namespace Vargainc.Timm.Models
         }
         public string GtuUniqueID { get; set; }
         public virtual TaskGtuInfoMapping TaskGtuInfoMapping { get; set; }
+        public virtual TaskGtuInfoMappingHistory TaskGtuInfoMappingHistory { get; set; }
     }
 }

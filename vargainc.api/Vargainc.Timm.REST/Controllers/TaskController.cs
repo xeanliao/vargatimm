@@ -25,6 +25,14 @@ namespace Vargainc.Timm.REST.Controllers
     {
         private TimmContext db = new TimmContext();
 
+        #region static member
+        public static string FormatTaskName(Models.Task task)
+        {
+            return $"{task.Date.ToString("MMddyy")}-{task.Name}";
+        }
+
+        #endregion
+
         public static bool CheckTaskIsStop(int taskId)
         {
             using(var db = new TimmContext())
@@ -391,6 +399,7 @@ namespace Vargainc.Timm.REST.Controllers
         [HttpPut]
         public async Task<IHttpActionResult> SetTaskStop(int taskId)
         {
+            var now = DateTime.Now;
             var dbTask = await db.Tasks.FindAsync(taskId);
             if (dbTask == null)
             {
@@ -399,13 +408,27 @@ namespace Vargainc.Timm.REST.Controllers
             db.TaskTimes.Add(new Models.TaskTime
             {
                 Task = dbTask,
-                Time = DateTime.Now,
+                Time = now,
                 TimeType = 1
             });
 
             var assignedGtuList = await db.TaskGtuInfoMappings
                 .Where(i => i.TaskId == taskId && i.UserId != null)
                 .ToListAsync();
+
+            db.TaskGtuInfoMappingHistories.Where(i => i.TaskId == taskId).Delete();
+            
+            var history = assignedGtuList.Select(i => new TaskGtuInfoMappingHistory
+            {
+                Id = i.Id,
+                TaskId = i.TaskId,
+                GTUId = i.GTUId,
+                UserId = i.UserId,
+                UserColor = i.UserColor,
+                InsertedTime = now
+            }).ToList();
+
+            db.TaskGtuInfoMappingHistories.BulkInsert(history);
 
             foreach(var item in assignedGtuList)
             {
@@ -520,165 +543,167 @@ namespace Vargainc.Timm.REST.Controllers
 
         }
 
-        [Route("report/{taskId}")]
+        [Route("report/{campaignId}/{taskId}")]
         [HttpGet]
-        public async Task<IHttpActionResult> Report(int taskId)
+        public async Task<IHttpActionResult> Report(int campaignId, int taskId)
         {
-            //var userIdArray = db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId)
-            //    .Select(i => i.GTU.UserId).Distinct().ToList();
-            //var userGroup = db.Users.Where(i => userIdArray.Contains(i.Id)).Include(i => i.Groups).ToDictionary(k => k.Id, v => v.Groups);
+            var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
+            var campaignName = CampaignController.FormantCampaignName(campaign);
 
-            var gtuInfo = await db.TaskGtuInfoMappings.Where(i => i.TaskId == taskId).SelectMany(i => i.GtuInfos).ToListAsync();
-            Dictionary<string, List<GtuInfo>> result = new Dictionary<string, List<GtuInfo>>();
+            var task = await db.Tasks.FindAsync(taskId).ConfigureAwait(false);
+            var taskName = TaskController.FormatTaskName(task);
 
-            gtuInfo.ForEach(info =>
+            var userIdArray = db.TaskGtuInfoMappingHistories.Where(i => i.TaskId == taskId)
+                .Select(i => i.UserId).Distinct().ToList();
+            var userRoles = db.Users.Where(i => userIdArray.Contains(i.Id)).Select(i=>new { i.Id, i.Role}).ToList();
+            Dictionary<UserRoles?, List<int?>> roleUserGroup = new Dictionary<UserRoles?, List<int?>>();
+            userRoles.ForEach(user =>
             {
-                if (!result.ContainsKey(info.Code))
+                switch (user.Role)
                 {
-                    result.Add(info.Code, new List<GtuInfo>());
+                    case UserRoles.Walker:
+                    case UserRoles.Driver:
+                    case UserRoles.Auditor:
+                        if (!roleUserGroup.ContainsKey(user.Role))
+                        {
+                            roleUserGroup.Add(user.Role, new List<int?>());
+                        }
+                        roleUserGroup[user.Role].Add(user.Id);
+                        break;
                 }
-                result[info.Code].Add(info);
             });
 
+            var result = new Dictionary<string, dynamic>();
 
+            foreach (var kv in roleUserGroup)
+            {
+                var summaryInCampaign = await GetReportByCampaign(campaignId, kv.Value).ConfigureAwait(false);
+                var summaryInLastYear = GetReportByUserInLastYear(kv.Value);
+                var summaryInAllTime = GetReportByUserInAllTime(kv.Value);
+                var detail = new List<dynamic>();
+                var users = db.Users.Where(i => kv.Value.Contains(i.Id)).Select(i => new { i.Id, i.FullName }).ToDictionary(k => k.Id, v => v.FullName);
+                foreach(var userId in kv.Value)
+                {
+                    var detailInCampaign = await GetReportByCampaign(campaignId, new List<int?> { userId }).ConfigureAwait(false);
+                    var detailInLastYear = GetReportByUserInLastYear(new List<int?> { userId });
+                    var detailInAllTime = GetReportByUserInAllTime(new List<int?> { userId });
+                    detail.Add(new { userId = userId, fullName= users[userId], campaign = detailInCampaign, year = detailInLastYear, all = detailInAllTime });
+                }
 
-            return null;
+                result.Add(kv.Key.ToString(), new
+                {
+                    summary = new
+                    {
+                        campaign = summaryInCampaign,
+                        year = summaryInLastYear,
+                        all = summaryInAllTime
+                    },
+                    detail = detail
+                });
+            }
+
+            return Json(new { campaignName = campaignName , taskName = taskName, reports = result});
         }
 
-        private async Task<List<TaskReport>> GetReportByCampaign(int campaignId)
+        private async Task<TaskReport> GetReportByCampaign(int campaignId, List<int?> users)
         {
             var subMaps = await db.Campaigns.Where(i=>i.Id == campaignId).SelectMany(i=>i.SubMaps).Select(i=>i.Id).ToListAsync().ConfigureAwait(false);
             var dMaps = await db.DistributionMaps.Where(i=>subMaps.Contains(i.SubMapId)).Select(i=>i.Id).ToListAsync().ConfigureAwait(false);
-            var tasks = await db.Tasks.Where(i=>dMaps.Contains(i.DistributionMapId)).Include(i=>i.TaskTimes).ToListAsync().ConfigureAwait(false);
-            var result = tasks.SelectMany(task =>
+            var tasks = await db.Tasks.Where(i=>dMaps.Contains(i.DistributionMapId)).Include(i=>i.TaskTimes).Where(i=>i.TaskTimes.Count > 0).ToListAsync().ConfigureAwait(false);
+            var records = tasks.SelectMany(task =>
             {
-                var startTime = task.TaskTimes.Where(i => i.TimeType == 0).OrderBy(i => i.Time).FirstOrDefault().Time;
-                var endTime = task.TaskTimes.Where(i => i.TimeType == 1).OrderByDescending(i => i.Time).FirstOrDefault().Time;
+                var startTimeRecord = task?.TaskTimes.Where(i => i.TimeType == 0).OrderBy(i => i.Time).FirstOrDefault();
+                var endTimeRecord = task?.TaskTimes.Where(i => i.TimeType == 1).OrderByDescending(i => i.Time).FirstOrDefault();
+
+                var startTime = startTimeRecord.Time;
+                var endTime = endTimeRecord?.Time ?? DateTime.Now;
+
                 var taskId = task.Id;
-                var campaignQuery = db.TaskGtuInfoMappings
-                    .Where(i => i.TaskId == taskId)
+                var debug = db.TaskGtuInfoMappingHistories
+                    .Where(i => i.TaskId == taskId && users.Contains(i.UserId))
                     .Include(i => i.GtuInfos)
                     .SelectMany(i => i.GtuInfos)
-                    .Where(i => i.dtReceivedTime >= startTime && i.dtReceivedTime <= endTime);
+                    .Where(i => i != null && i.dtReceivedTime >= startTime && i.dtReceivedTime <= endTime)
+                    .GroupBy(i => i.TaskGtuInfoMappingHistory.TaskId).ToString();
 
-                var summary = campaignQuery
-                    .GroupBy(i => i.GtuUniqueID)
-                    .Select(g => new
+                return db.TaskGtuInfoMappingHistories
+                    .Where(i => i.TaskId == taskId && users.Contains(i.UserId))
+                    .Include(i => i.GtuInfos)
+                    .SelectMany(i => i.GtuInfos)
+                    .Where(i => i != null && i.dtReceivedTime >= startTime && i.dtReceivedTime <= endTime)
+                    .GroupBy(i => i.TaskGtuInfoMappingHistory.TaskId)
+                    .Select(g => new TaskReport
                     {
-                        GtuUniqueID = g.Key,
+                        Count = g.Count(),
                         SpeedAvg = g.Average(i => i.dwSpeed),
                         SpeedHigh = g.Max(i => i.dwSpeed),
-                        SpeedLow = g.Min(i => i.dwSpeed),
+                        SpeedLow = g.Where(i=>i.dwSpeed > 0).Min(i => i.dwSpeed),
                         GroundAvg = g.Average(i => i.Distance),
                         GroundHigh = g.Max(i => i.Distance),
-                        GroundLow = g.Min(i => i.Distance),
-                        Stop = 0
-                    })
-                    .ToList();
-
-                var stopCount = campaignQuery.Where(i => i.Status == 1).GroupBy(i => i.GtuUniqueID)
-                    .Select(g => new
-                    {
-                        GtuUniqueID = g.Key,
-                        AvgCount = g.Count()
-                    })
-                    .ToDictionary(k => k.GtuUniqueID, v => v.AvgCount);
-
-                return summary.Select(i => new TaskReport
-                {
-                    GtuUniqueID = i.GtuUniqueID,
-                    SpeedAvg = i.SpeedAvg,
-                    SpeedHigh = i.SpeedHigh,
-                    SpeedLow = i.SpeedLow,
-                    GroundAvg = i.GroundAvg,
-                    GroundHigh = i.GroundHigh,
-                    GroundLow = i.GroundLow,
-                    Stop = stopCount.ContainsKey(i.GtuUniqueID) ? stopCount[i.GtuUniqueID] : 0
-                });
+                        GroundLow = g.Where(i => i.Distance > 0).Min(i => i.Distance),
+                        Stop = g.Where(i => i.Status == 1).Count(),
+                    });
             })
-                .ToList()
-                .GroupBy(i => i.GtuUniqueID)
-                .Select(g => new TaskReport
-                {
-                    GtuUniqueID = g.Key,
-                    SpeedAvg = g.Average(i => i.SpeedAvg),
-                    SpeedHigh = g.Max(i => i.SpeedHigh),
-                    SpeedLow = g.Min(i => i.SpeedLow),
-                    GroundAvg = g.Average(i => i.GroundAvg),
-                    GroundHigh = g.Max(i => i.GroundHigh),
-                    GroundLow = g.Min(i => i.GroundLow),
-                    Stop = (int)Math.Round(g.Average(i => i.Stop) ?? 0),
-                })
-                .ToList();
-            return result;
+            .ToList();
+
+            return new TaskReport
+            {
+                SpeedAvg = records.Sum(i => i.Count) > 0 ? records.Sum(i => i.SpeedAvg * i.Count) / records.Sum(i=>i.Count): null,
+                SpeedHigh = records.Max(i => i.SpeedHigh),
+                SpeedLow = records.Min(i => i.SpeedLow),
+                GroundAvg = records.Sum(i => i.Count) > 0 ? records.Sum(i => i.GroundAvg * i.Count) / records.Sum(i => i.Count) : null,
+                GroundHigh = records.Max(i => i.GroundHigh),
+                GroundLow = records.Min(i => i.GroundLow),
+                StopAvg = records.Average(i => i.Stop) ?? 0,
+                StopHigh = records.Max(i=>i.Stop) ?? 0,
+                StopLow = records.Min(i=>i.Stop) ?? 0
+            };
         }
 
-        private async Task<List<TaskReport>> GetReportByYear(List<int?> users)
+        private TaskReport GetReportByUserInLastYear(List<int?> users)
         {
             var endTime = DateTime.Now;
             var startTime = endTime.AddYears(-1);
+            var query = db.GtuInfos
+                .Include(i => i.TaskGtuInfoMappingHistory)
+                .Where(i => users.Contains(i.TaskGtuInfoMappingHistory.UserId) && i.dtReceivedTime < endTime && i.dtReceivedTime >= startTime);
 
-            var taskIds = await db.TaskGtuInfoMappings.Where(i => users.Contains(i.UserId)).Select(i => i.TaskId).ToListAsync();
-            var tasks = await db.Tasks.Where(i => taskIds.Contains(i.Id)).Include(i => i.TaskTimes).ToListAsync().ConfigureAwait(false);
-            var result = tasks.SelectMany(task =>
+            var stopRecords = query.Where(i => i.Status == 1).GroupBy(i => i.TaskGtuInfoMapping.TaskId).Select(g => new { TaskId = g.Key, Stop = g.Count() }).ToList();
+
+            return new TaskReport
             {
-                var taskId = task.Id;
-                var campaignQuery = db.TaskGtuInfoMappings
-                    .Where(i => i.TaskId == taskId)
-                    .Include(i => i.GtuInfos)
-                    .SelectMany(i => i.GtuInfos)
-                    .Where(i => i.dtReceivedTime >= startTime && i.dtReceivedTime <= endTime);
+                SpeedAvg = query.Average(i => i.dwSpeed),
+                SpeedHigh = query.Max(i => i.dwSpeed),
+                SpeedLow = query.Where(i => i.dwSpeed > 0).Min(i => i.dwSpeed),
+                GroundAvg = query.Average(i => i.Distance),
+                GroundHigh = query.Max(i => i.Distance),
+                GroundLow = query.Where(i => i.Distance > 0).Min(i => i.Distance),
+                StopAvg = stopRecords.Count > 0 ? stopRecords.Average(i => i.Stop) : 0,
+                StopHigh = stopRecords.Count > 0 ? stopRecords.Max(i => i.Stop) : 0,
+                StopLow = stopRecords.Count > 0 ? stopRecords.Min(i => i.Stop) : 0,
+            };
+        }
 
-                var summary = campaignQuery
-                    .GroupBy(i => i.GtuUniqueID)
-                    .Select(g => new
-                    {
-                        GtuUniqueID = g.Key,
-                        SpeedAvg = g.Average(i => i.dwSpeed),
-                        SpeedHigh = g.Max(i => i.dwSpeed),
-                        SpeedLow = g.Min(i => i.dwSpeed),
-                        GroundAvg = g.Average(i => i.Distance),
-                        GroundHigh = g.Max(i => i.Distance),
-                        GroundLow = g.Min(i => i.Distance),
-                        Stop = 0
-                    })
-                    .ToList();
+        private TaskReport GetReportByUserInAllTime(List<int?> users)
+        {
+            var query = db.GtuInfos
+                .Include(i => i.TaskGtuInfoMappingHistory)
+                .Where(i => users.Contains(i.TaskGtuInfoMappingHistory.UserId));
 
-                var stopCount = campaignQuery.Where(i => i.Status == 1).GroupBy(i => i.GtuUniqueID)
-                    .Select(g => new
-                    {
-                        GtuUniqueID = g.Key,
-                        AvgCount = g.Count()
-                    })
-                    .ToDictionary(k => k.GtuUniqueID, v => v.AvgCount);
+            var stopRecords = query.Where(i => i.Status == 1).GroupBy(i => i.TaskGtuInfoMappingHistory.TaskId).Select(g => new { TaskId = g.Key, Stop = g.Count() }).ToList();
 
-                return summary.Select(i => new TaskReport
-                {
-                    GtuUniqueID = i.GtuUniqueID,
-                    SpeedAvg = i.SpeedAvg,
-                    SpeedHigh = i.SpeedHigh,
-                    SpeedLow = i.SpeedLow,
-                    GroundAvg = i.GroundAvg,
-                    GroundHigh = i.GroundHigh,
-                    GroundLow = i.GroundLow,
-                    Stop = stopCount.ContainsKey(i.GtuUniqueID) ? stopCount[i.GtuUniqueID] : 0
-                });
-            })
-                .ToList()
-                .GroupBy(i => i.GtuUniqueID)
-                .Select(g => new TaskReport
-                {
-                    GtuUniqueID = g.Key,
-                    SpeedAvg = g.Average(i => i.SpeedAvg),
-                    SpeedHigh = g.Max(i => i.SpeedHigh),
-                    SpeedLow = g.Min(i => i.SpeedLow),
-                    GroundAvg = g.Average(i => i.GroundAvg),
-                    GroundHigh = g.Max(i => i.GroundHigh),
-                    GroundLow = g.Min(i => i.GroundLow),
-                    Stop = (int)Math.Round(g.Average(i => i.Stop) ?? 0),
-                })
-                .ToList();
-            return result;
+            return new TaskReport
+            {
+                SpeedAvg = query.Average(i => i.dwSpeed),
+                SpeedHigh = query.Max(i => i.dwSpeed),
+                SpeedLow = query.Where(i => i.dwSpeed > 0).Min(i => i.dwSpeed),
+                GroundAvg = query.Average(i => i.Distance),
+                GroundHigh = query.Max(i => i.Distance),
+                GroundLow = query.Where(i => i.Distance > 0).Min(i => i.Distance),
+                StopAvg = stopRecords.Count > 0 ? stopRecords.Average(i => i.Stop) : 0,
+                StopHigh = stopRecords.Count > 0 ? stopRecords.Max(i => i.Stop) : 0,
+                StopLow = stopRecords.Count > 0 ? stopRecords.Min(i => i.Stop) : 0,
+            };
         }
 
         protected override void Dispose(bool disposing)
