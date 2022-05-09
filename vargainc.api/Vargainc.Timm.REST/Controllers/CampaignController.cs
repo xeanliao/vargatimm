@@ -26,6 +26,19 @@ namespace Vargainc.Timm.REST.Controllers
     [RoutePrefix("campaign")]
     public class CampaignController : BaseController
     {
+        #region static memeber
+        public static string FormantCampaignName(Campaign campaign)
+        {
+            var parts = new string[]{
+                campaign.Date.Value.ToString("MMddyy"),
+                campaign.ClientCode,
+                campaign.UserName,
+                campaign.AreaDescription,
+                campaign.Sequence.ToString()
+            };
+            return String.Join("-", parts);
+        }
+        #endregion
 
         #region Calculate Total need base campaign AreaDescription(APT ONLY/HOME ONLY/APT + HOME)
         private const string APT = "APT ONLY";

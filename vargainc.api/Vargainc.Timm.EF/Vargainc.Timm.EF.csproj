@@ -90,6 +90,7 @@
     <Compile Include="Config\SubMapRecordConfig.cs" />
     <Compile Include="Config\TaskConfig.cs" />
     <Compile Include="Config\TaskGtuInfoMappingConfig.cs" />
+    <Compile Include="Config\TaskGtuInfoMappingHistoryConfig.cs" />
     <Compile Include="Config\TaskTimeConfig.cs" />
     <Compile Include="Config\ThreeZipAreaConfig.cs" />
     <Compile Include="Config\ThreeZipCoordinateConfig.cs" />

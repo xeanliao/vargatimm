@@ -60,6 +60,7 @@ namespace Vargainc.Timm.EF
             modelBuilder.Configurations.Add(new GTUConfig());
             modelBuilder.Configurations.Add(new GTUBagConfig());
             modelBuilder.Configurations.Add(new TaskGtuInfoMappingConfig());
+            modelBuilder.Configurations.Add(new TaskGtuInfoMappingHistoryConfig());
             modelBuilder.Configurations.Add(new GtuInfoConfig());
             modelBuilder.Configurations.Add(new NdAddressCoordinateConfig());
             modelBuilder.Configurations.Add(new NdAddressConfig());
@@ -111,6 +112,7 @@ namespace Vargainc.Timm.EF
         public DbSet<GTU> GTUs { get; set; }
         public DbSet<GTUBag> GTUBags { get; set; }
         public DbSet<TaskGtuInfoMapping> TaskGtuInfoMappings { get; set; }
+        public DbSet<TaskGtuInfoMappingHistory> TaskGtuInfoMappingHistories { get; set; }
         public DbSet<GtuInfo> GtuInfos { get; set; }
 
         public DbSet<NdAddress> NdAddresses { get; set; }
