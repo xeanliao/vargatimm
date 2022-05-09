@@ -43,6 +43,9 @@ export default React.createBackboneClass({
             })
         })
     },
+    onOpenReport: function (campaignId) {
+        window.open(`index.html#print/${campaignId}/report`)
+    },
     onGotoReport: function (taskId) {
         window.location.hash = 'frame/ReportsTask.aspx?tid=' + taskId
     },
@@ -83,7 +86,8 @@ export default React.createBackboneClass({
         var self = this,
             model = this.getModel(),
             date = model.get('Date'),
-            displayDate = date ? moment(date).format('MMM DD, YYYY') : ''
+            displayDate = date ? moment(date).format('MMM DD, YYYY') : '',
+            campaignId = model.get('Id')
 
         return (
             <div className="row scroll-list-item">
@@ -93,7 +97,7 @@ export default React.createBackboneClass({
                 <div className="small-2 medium-3 columns">
                     <span className="show-for-large">{model.get('AreaDescription')}</span>
                     <div className="float-right tool-bar">
-                        <a className="button row-button" href={'#frame/handler/PhantomjsPrintHandler.ashx?campaignId=' + model.get('Id') + '&type=print'}>
+                        <a className="button row-button" onClick={self.onOpenReport.bind(null, campaignId)}>
                             <i className="fa fa-print"></i>
                             <small>Print</small>
                         </a>

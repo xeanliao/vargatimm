@@ -125,7 +125,7 @@ module.exports = (env, args) => {
                     // },
                     '/api/**': {
                         target: 'http://localhost:8091',
-                        pathRewrite: { '^/api': '' },
+                        pathRewrite: { '/api': '' },
                         agent: new ProxyAgent(),
                         changeOrigin: true,
                     },
