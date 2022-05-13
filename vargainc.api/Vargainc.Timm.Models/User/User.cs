@@ -27,19 +27,12 @@ namespace Vargainc.Timm.Models
         public string Token { get; set; }
         public DateTime? LastLoginTime { get; set; }
 
-        public User()
-        {
-            //Role = new UserRoles();
-            //Groups = new List<Group>();
-            //Status = new List<StatusInfo>();
-        }
-
         public virtual UserRoles? Role { get; set; }
 
         public virtual ICollection<Group> Groups { get; set; }
 
         public virtual ICollection<StatusInfo> Status { get; set; }
 
-        public Company Company { get; set; }
+        public virtual Company Company { get; set; }
     }
 }

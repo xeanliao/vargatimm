@@ -41,19 +41,20 @@ namespace Vargainc.Timm.REST.Controllers
 
         protected TimmContext db;
 
-        protected new JsonResult<T> Json<T>(T content)
+        protected new JsonResult<T> Json<T>(T content, bool ignoreNull = true)
         {
             JsonSerializerSettings config = new JsonSerializerSettings() {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateFormatString = "MM-dd-yyyy",
                 //ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                NullValueHandling = NullValueHandling.Ignore,
+                NullValueHandling = ignoreNull ? NullValueHandling.Ignore : NullValueHandling.Include,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
             config.Converters.Add(new StringEnumConverter());
             return base.Json<T>(content, config, Encoding.UTF8);
         }
+
 
         protected string GetETag()
         {
