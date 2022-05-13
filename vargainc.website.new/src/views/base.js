@@ -198,6 +198,9 @@ export const confirm = function (content) {
         )
         self.publish('showDialogModal', {
             view: view,
+            options: {
+                size: 'tiny',
+            },
         })
     })
 }
@@ -240,6 +243,23 @@ export const onFormChange = function (e) {
     if (model) {
         model[e.currentTarget.name] = e.currentTarget.value
     }
+}
+export const onFormChangeUseState = function (e, isNumber = false) {
+    let el = e.currentTarget
+    let name = el.name
+    if (!name) {
+        return
+    }
+    let value = (el.value ?? '').trim()
+    if (isNumber) {
+        value = new Number(value).valueOf()
+    }
+    if ((el?.tagName ?? '').toLowerCase() == 'input' && (el?.type ?? '').toLowerCase() == 'checkbox' && Array.isArray(this.state?.[name])) {
+        let arrayValues = new Set(this.state?.[name])[el.checked ? 'add' : 'remove'](value)
+        this.setState({ [name]: Array.from(arrayValues) })
+        return
+    }
+    this.setState({ [name]: value })
 }
 export const onDialogClose = function () {
     this.publish('showDialog')
@@ -329,6 +349,7 @@ export default {
     confirm,
     alert,
     onFormChange,
+    onFormChangeUseState,
     onDialogClose,
     closeDialog: closeDialog,
     randomColor,

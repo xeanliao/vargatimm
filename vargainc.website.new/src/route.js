@@ -21,6 +21,7 @@ export default Backbone.Router.extend({
         'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
         'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
         'campaign/import': 'importCampaign',
+        'user/list': 'userList',
         'frame/:page': 'frameAction',
         'frame/*page?*queryString': 'frameAction',
         '*actions': 'defaultAction',
@@ -296,6 +297,27 @@ export default Backbone.Router.extend({
                 view: View,
                 params: {
                     collection: new Collection(),
+                },
+            },
+        })
+    },
+    userList: function () {
+        let View = require('views/user/list').default
+        Topic.publish({
+            channel: 'View',
+            topic: 'loadView',
+            data: {
+                view: View,
+                params: {
+                    registeredTopic: {},
+                    registeredEvents: [],
+                },
+                options: {
+                    showMenu: true,
+                    showUser: true,
+                    showSearch: false,
+                    showZipSearch: false,
+                    pageTitle: `User management`,
                 },
             },
         })
