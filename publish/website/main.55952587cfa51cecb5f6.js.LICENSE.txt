@@ -40,6 +40,10 @@ object-assign
  * http://adamwdraper.github.com/Numeral-js/
  */
 
+/*! DataTables 1.11.5
+ * ©2008-2021 SpryMedia Ltd - datatables.net/license
+ */
+
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /**
