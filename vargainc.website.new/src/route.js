@@ -7,6 +7,7 @@ import axios from 'axios'
 export default Backbone.Router.extend({
     routes: {
         campaign: 'defaultAction',
+        'campaign/import': 'importCampaign',
         'campaign/:campaignId': 'campaignAction',
         'campaign/:campaignId/dmap': 'dMapAction',
         distribution: 'distributionAction',
@@ -20,7 +21,7 @@ export default Backbone.Router.extend({
         'print/:campaignId/:printType': 'printAction',
         'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
         'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
-        'campaign/import': 'importCampaign',
+
         'user/list': 'userList',
         'frame/:page': 'frameAction',
         'frame/*page?*queryString': 'frameAction',

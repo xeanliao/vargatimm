@@ -1,44 +1,44 @@
 import Backbone from 'backbone'
 import React from 'react'
 import 'react.backbone'
-import $ from 'jquery'
 import { map, isEmpty, trimEnd } from 'lodash'
-
+import axios from 'axios'
+import moment from 'moment'
 import BaseView from 'views/base'
 
 export default React.createBackboneClass({
     mixins: [BaseView],
+    getInitialState: function () {
+        return {
+            sourceUrl: '',
+        }
+    },
     onSearch: function () {
-        var url = '//timm.vargainc.com/' + this.refs.sourceUrl.value + '/api/campaign'
-        if (_.isEmpty(url)) {
+        let url = `//timm.vargainc.com/${this.state.sourceUrl}/api/campaign`
+        if (isEmpty(url)) {
             this.alert('Please input source url')
             return
         }
         var self = this,
             collection = this.getCollection()
         collection.reset()
-        $.ajax({
-            url: url,
-            method: 'GET',
-            dataType: 'json',
-            cache: false,
-            success: (result) => {
-                var data = map(result, (i) => {
-                    return {
-                        Id: i.Id,
-                        ClientName: i.ClientName,
-                        ClientCode: i.ClientCode,
-                        Date: i.Date,
-                        AreaDescription: i.AreaDescription,
-                    }
-                })
-                if (isEmpty(data)) {
-                    collection.add(data)
-                    self.setState({
-                        srcUrl: url,
-                    })
+        axios.get(url).then((resp) => {
+            let result = resp?.data ?? []
+            var data = map(result, (i) => {
+                return {
+                    Id: i.Id,
+                    ClientName: i.ClientName,
+                    ClientCode: i.ClientCode,
+                    Date: i.Date,
+                    AreaDescription: i.AreaDescription,
                 }
-            },
+            })
+            if (isEmpty(data)) {
+                collection.add(data)
+                self.setState({
+                    srcUrl: url,
+                })
+            }
         })
     },
     onImportFailed: function () {
@@ -49,15 +49,18 @@ export default React.createBackboneClass({
         var exportUrl = trimEnd(this.state.srcUrl, '/') + '/' + campaignId + '/export',
             importUrl = '../api/campaign/import',
             self = this
-        $.getJSON(exportUrl)
-            .then((campaign) => {
-                return $.post(importUrl, campaign).then((response) => {
-                    if (response && response.success) {
-                        self.alert('copy success. please refresh control center!')
-                        return Promise.resolve()
-                    }
-                    return Promise.reject(new Error('server method failed'))
-                })
+        axios
+            .get(exportUrl)
+            .then((resp) => {
+                let campaign = resp?.data
+                return axios.post(importUrl, campaign)
+            })
+            .then((resp) => {
+                if (resp?.data?.success) {
+                    self.alert('copy success. please refresh control center!')
+                    return Promise.resolve()
+                }
+                return Promise.reject(new Error('server method failed'))
             })
             .catch(() => {
                 self.onImportFailed()
@@ -88,9 +91,11 @@ export default React.createBackboneClass({
                             <div className="small-12 column">
                                 <div className="input-group">
                                     <input
-                                        ref="sourceUrl"
                                         className="input-group-field"
                                         type="text"
+                                        onChange={(evt) => {
+                                            this.setState({ sourceUrl: evt.currentTarget.value })
+                                        }}
                                         placeholder="Please input server address and query campaign from this server."
                                     />
                                     <div className="input-group-button">
@@ -116,7 +121,7 @@ export default React.createBackboneClass({
                                     <div className="small-2 columns">{moment(item.get('Date'), moment.ISO_8601).format('MMM DD, YYYY')}</div>
                                     <div className="small-2 columns">{item.get('AreaDescription')}</div>
                                     <div className="small-2 columns">
-                                        <button class="button" onClick={self.onImport.bind(self, item.get('Id'))}>
+                                        <button className="button" onClick={self.onImport.bind(self, item.get('Id'))}>
                                             Import
                                         </button>
                                     </div>
