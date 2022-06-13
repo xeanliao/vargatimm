@@ -53,29 +53,15 @@ export default React.createClass({
                                 </div>
                                 <div className="column">
                                     <div className="callout secondary">
-                                        <a href="#frame/GtuAdmin.aspx?AssignNameToGTUFlag=true">
+                                        <a href="#admin/gtu/task">
                                             <span>GTU Management</span>
                                         </a>
                                     </div>
                                 </div>
                                 <div className="column">
                                     <div className="callout secondary">
-                                        <a href="#admin/gtu">
+                                        <a href="#admin/gtu/available">
                                             <span>GTU Available List</span>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="column">
-                                    <div className="callout secondary">
-                                        <a href="#frame/AdminGtuToBag.aspx">
-                                            <span>GTU bag Management </span>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="column">
-                                    <div className="callout secondary">
-                                        <a href="#frame/AdminGtuBagToAuditor.aspx">
-                                            <span>Assign GTU-Bags to Auditors</span>
                                         </a>
                                     </div>
                                 </div>
