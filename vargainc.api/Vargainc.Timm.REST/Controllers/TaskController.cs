@@ -44,7 +44,23 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 return task.Status == 1;
             }
-        } 
+        }
+
+        [Route("active")]
+        public async Task<IHttpActionResult> GetAtiveTasks()
+        {
+            var result = await db.Tasks
+                .Where(i => i.Status == 0)
+                .OrderBy(i => i.Id)
+                .Select(i=>new { 
+                    i.Id,
+                    i.Name,
+                    i.Date
+                })
+                .ToListAsync()
+                .ConfigureAwait(false);
+            return Json(result);
+        }
 
         [Route("{taskId}")]
         [HttpGet]
@@ -604,6 +620,8 @@ namespace Vargainc.Timm.REST.Controllers
 
             return Json(new { campaignName = campaignName , taskName = taskName, reports = result});
         }
+
+        
 
         private async Task<TaskReport> GetReportByCampaign(int campaignId, List<int?> users)
         {

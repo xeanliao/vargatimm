@@ -245,14 +245,27 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 else if (geom.GeometryType == "MultiPolygon")
                 {
-                    var data = ((MultiPolygon)geom).ToArray().Select(p => new {
-                        name = result.Name,
-                        apt = result.APT,
-                        home = result.Home,
-                        lat = p.Centroid.Y,
-                        lng = p.Centroid.X,
-                    });
-                    return new { success = true, result = data };
+                    // find max area polygon
+                    Polygon maxArea = null;
+                    foreach(Polygon polygon in ((MultiPolygon)geom).Geometries)
+                    {
+                        if(maxArea == null || maxArea.Area < polygon.Area)
+                        {
+                            maxArea = polygon;
+                        }
+                    }
+                    return new
+                    {
+                        success = true,
+                        result = new
+                        {
+                            name = result.Name,
+                            apt = result.APT,
+                            home = result.Home,
+                            lat = maxArea.Centroid.Y,
+                            lng = maxArea.Centroid.X,
+                        }
+                    };
                 }
             }
             return new { success = false };

@@ -41,6 +41,10 @@ namespace Vargainc.Timm.REST.Controllers
             Dictionary<string, Polygon> recordsInSubmap = new Dictionary<string, Polygon>();
             foreach (var item in subMaps)
             {
+                if(item == null || item.SubMapCoordinates == null || item.SubMapCoordinates.Count == 0)
+                {
+                    continue;
+                }
                 var points = item.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
                 if (points.Count == 0)
                 {
