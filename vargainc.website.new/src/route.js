@@ -17,7 +17,8 @@ export default Backbone.Router.extend({
         report: 'reportAction',
         'report/:taskId': 'reportAction',
         admin: 'adminAction',
-        'admin/gtu': 'availableGTUAction',
+        'admin/gtu/task': 'listGroupByTaskAction',
+        'admin/gtu/available': 'availableGTUAction',
         'print/:campaignId/:printType': 'printAction',
         'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
         'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
@@ -449,6 +450,19 @@ export default Backbone.Router.extend({
                     },
                 },
             })
+        })
+    },
+    listGroupByTaskAction: function () {
+        let View = require('views/admin/gtu').default
+        Topic.publish({
+            channel: 'View',
+            topic: 'loadView',
+            data: {
+                view: View,
+                options: {
+                    showSearch: false,
+                },
+            },
         })
     },
 })

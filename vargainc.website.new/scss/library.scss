@@ -8,10 +8,12 @@ $fa-font-path: '~font-awesome/fonts/';
 @import 'motion-ui/src/motion-ui';
 //begin select 2
 @import 'core';
+@import '../public/style/select2-foundation-theme.css';
 //fix select2 style
 .select2-container input {
     height: 1.75rem !important;
 }
+
 //end select2
 
 @import 'foundation-sites/scss/foundation';
