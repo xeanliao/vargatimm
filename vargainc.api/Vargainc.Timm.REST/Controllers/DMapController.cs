@@ -80,7 +80,7 @@ namespace Vargainc.Timm.REST.Controllers
 
                 item.SubMapRecords.ToList().ForEach(record =>
                 {
-                    if (!recordsInSubmap.ContainsKey(record.Code))
+                    if (record != null && !string.IsNullOrWhiteSpace(record.Code) && !recordsInSubmap.ContainsKey(record.Code))
                     {
                         recordsInSubmap.Add(record.Code, polygon);
                     }
@@ -239,9 +239,12 @@ namespace Vargainc.Timm.REST.Controllers
                             .ConfigureAwait(false);
                         break;
                 }
-
-                records.ForEach(recordItem =>
+                foreach(var recordItem in records)
                 {
+                    if(recordItem  == null || string.IsNullOrWhiteSpace(recordItem.Code) || !recordsInSubmap.ContainsKey(recordItem.Code))
+                    {
+                        continue;
+                    }
                     var geom = WKTReader.Read(recordItem.Geom.AsText());
                     var submapPolygon = recordsInSubmap[recordItem.Code];
                     geom = geom.Intersection(submapPolygon);
@@ -283,7 +286,7 @@ namespace Vargainc.Timm.REST.Controllers
                             { "classification", ((Classifications)item.Key).ToString() }
                         }
                     });
-                });
+                }
             }
 
             var eTag = GetETag();
