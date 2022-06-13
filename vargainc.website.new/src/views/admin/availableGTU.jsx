@@ -100,8 +100,8 @@ export default React.createBackboneClass({
                 return m.gtuId == showGtu
             }),
             self = this
-        console.log('search', showGtu, marker.gtuId, marker.getPosition().lat(), marker.getPosition().lng())
         if (marker) {
+            console.log('search', showGtu, marker.gtuId, marker.getPosition().lat(), marker.getPosition().lng())
             googleMap.setCenter(marker.getPosition())
             googleMap.setZoom(22)
             setTimeout(() => {
@@ -170,7 +170,7 @@ export default React.createBackboneClass({
             <div>
                 <div className="section row">
                     <div className="small-12 columns">
-                        <div className="section-header">
+                        <div className="section-header ">
                             <div className="small-10 small-centered columns">
                                 <select id="gtuFilter"></select>
                             </div>
