@@ -25,14 +25,10 @@ export default React.createBackboneClass({
         e.preventDefault()
         e.stopPropagation()
         $(e.currentTarget).closest('.dropdown-pane').foundation('close')
-        var model = this.getModel(),
-            self = this
+        var model = this.getModel()
         model.copy().then((response) => {
             if (response && response.success) {
-                var copiedModel = new Model(response.data)
-                model.collection.add(copiedModel, {
-                    at: 0,
-                })
+                this.publish('camapign/refresh')
             }
         })
     },

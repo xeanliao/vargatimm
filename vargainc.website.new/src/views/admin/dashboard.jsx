@@ -25,8 +25,8 @@ export default React.createClass({
                     </div>
                 </div>
                 <div className="small-12 columns">
-                    <div className="row" style={{ marginTop: '120px' }}>
-                        <div className="small-7 small-centered">
+                    <div className="row align-center" style={{ marginTop: '120px' }}>
+                        <div className="small-7">
                             <div className="row">
                                 <div className="small-12 column">
                                     <div className="callout secondary">
@@ -37,41 +37,42 @@ export default React.createClass({
                                 </div>
                                 <div className="small-12 column">
                                     <div className="callout secondary">
-                                        <a href="#campaign/import">
-                                            <span>Import Campaign</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row small-up-2 medium-up-2 large-up-2">
-                                <div className="column">
-                                    <div className="callout secondary">
-                                        <a href="#frame/NonDeliverables.aspx">
-                                            <span>Non-Deliverables</span>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="column">
-                                    <div className="callout secondary">
                                         <a href="#admin/gtu/task">
                                             <span>GTU Management</span>
                                         </a>
                                     </div>
                                 </div>
-                                <div className="column">
+                                <div className="small-12 column">
                                     <div className="callout secondary">
                                         <a href="#admin/gtu/available">
                                             <span>GTU Available List</span>
                                         </a>
                                     </div>
                                 </div>
-                                <div className="column">
+                                {/* <div className="small-12 column">
+                                    <div className="callout secondary">
+                                        <a href="#campaign/import">
+                                            <span>Import Campaign</span>
+                                        </a>
+                                    </div>
+                                </div> */}
+                            </div>
+                            <div className="row small-up-2 medium-up-2 large-up-2">
+                                {/* <div className="column">
+                                    <div className="callout secondary">
+                                        <a href="#frame/NonDeliverables.aspx">
+                                            <span>Non-Deliverables</span>
+                                        </a>
+                                    </div>
+                                </div> */}
+
+                                {/* <div className="column">
                                     <div className="callout secondary">
                                         <a href="#frame/AdminDistributorCompany.aspx">
                                             <span>Distributor Management</span>
                                         </a>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>
