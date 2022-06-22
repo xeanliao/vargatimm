@@ -245,9 +245,23 @@ namespace Vargainc.Timm.REST.Controllers
                     {
                         continue;
                     }
-                    var geom = WKTReader.Read(recordItem.Geom.AsText());
-                    var submapPolygon = recordsInSubmap[recordItem.Code];
-                    geom = geom.Intersection(submapPolygon);
+                    Geometry geom = null;
+                    try
+                    {
+                        geom = WKTReader.Read(recordItem.Geom.AsText());
+                        var submapPolygon = recordsInSubmap[recordItem.Code];
+                        geom = geom.Intersection(submapPolygon);
+
+                        if (geom.IsEmpty)
+                        {
+                            continue;
+                        }
+                    }
+                    catch(Exception)
+                    {
+                        continue;
+                    }
+                    
                     var areaId = $"{((Classifications)item.Key).ToString()}-{recordItem.Id}";
                     layers.Add(new Feature
                     {
