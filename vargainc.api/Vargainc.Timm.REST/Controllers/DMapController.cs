@@ -250,7 +250,7 @@ namespace Vargainc.Timm.REST.Controllers
                     {
                         geom = WKTReader.Read(recordItem.Geom.AsText());
                         var submapPolygon = recordsInSubmap[recordItem.Code];
-                        geom = geom.Intersection(submapPolygon);
+                        geom = geom.Buffer(0).Intersection(submapPolygon);
 
                         if (geom.IsEmpty)
                         {
