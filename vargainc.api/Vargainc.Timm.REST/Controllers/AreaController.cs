@@ -119,6 +119,7 @@ namespace Vargainc.Timm.REST.Controllers
                         Geom = (SqlGeometry)sqlReader.GetValue(6),
                     });
                 }
+                sqlReader.Close();
 
                 var tree = new VectorTileTree();
                 List<Feature> features = new List<Feature>();
