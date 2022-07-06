@@ -101,6 +101,12 @@ ADD [geom] GEOMETRY
 GO
 
 UPDATE [dbo].[varga_final]
+SET [Geom] = GEOMETRY::STGeomFromText(CONCAT ('POLYGON(' , substring(Geom.STAsText( ), 12, LEN(Geom.STAsText( ))) , ')'), 4326)
+where [Geom].InstanceOf('LINESTRING') = 1 and Geom.STIsClosed() = 1;
+
+GO
+
+UPDATE [dbo].[varga_final]
 SET [geom] = [ogr_geometry].STBuffer(0).MakeValid()
 ```
 
@@ -312,5 +318,9 @@ ADD [Code] NVARCHAR(10);
 ALTER TABLE [dbo].[campaigntractimported]
 ADD [Code] NVARCHAR(10);
 ```
-2. 
+2. 2022-06-29
+```sql
+ALTER TABLE [dbo].[customareas] 
+ALTER COLUMN [IsEnabled] BIT;
+```
 3. 
