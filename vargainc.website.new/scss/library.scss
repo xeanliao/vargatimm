@@ -2,6 +2,8 @@ $fa-font-path: '~font-awesome/fonts/';
 @import '~font-awesome/scss/font-awesome';
 
 @import 'mapbox-gl/dist/mapbox-gl.css';
+@import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+@import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 @import 'settings';
 
@@ -30,6 +32,10 @@ $fa-font-path: '~font-awesome/fonts/';
 // .reveal {
 //     pointer-events: all;
 // }
+
+table tr.is-active{
+    background-color: $primary-color !important;
+}
 
 @import 'simplebar/dist/simplebar.min.css';
 @import 'datatables.net-dt';
