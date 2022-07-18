@@ -8,12 +8,6 @@ namespace Vargainc.Timm.EF.Config
         public NdAddressConfig()
         {
             HasKey(i => i.Id).ToTable("ndaddresses");
-
-            HasMany(i => i.NdAddressCoordinates)
-                .WithRequired()
-                .HasForeignKey(i => i.NdAddressId);
-
-            Ignore(i => i.Locations);
         }
     }
 }
