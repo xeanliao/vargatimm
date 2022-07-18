@@ -4,7 +4,6 @@ import 'react.backbone'
 import BaseView from 'views/base'
 import L from 'leaflet'
 import $ from 'jquery'
-import Promise from 'bluebird'
 import { map, each } from 'lodash'
 var monitorMap = null
 export default React.createBackboneClass({

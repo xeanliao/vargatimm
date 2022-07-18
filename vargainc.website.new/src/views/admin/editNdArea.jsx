@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import Helper from 'views/base'
 
-export default class EditCustomArea extends React.Component {
+export default class EditNdArea extends React.Component {
     constructor(props) {
         super(props)
 

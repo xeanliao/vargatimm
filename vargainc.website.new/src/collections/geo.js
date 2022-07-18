@@ -1,5 +1,4 @@
 import Backbone from 'backbone'
-import Promise from 'bluebird'
 import { each } from 'lodash'
 
 import Model from 'models/geo'

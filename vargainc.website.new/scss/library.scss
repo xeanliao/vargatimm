@@ -5,6 +5,17 @@ $fa-font-path: '~font-awesome/fonts/';
 @import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 @import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
+// fix search input margin issue
+.mapboxgl-ctrl-geocoder mapboxgl-ctrl{
+    max-width: 640px;
+    width: 640px;
+}
+.mapboxgl-ctrl-geocoder--input{
+    margin: 0 !important;
+    padding: 6px 35px !important;
+    width: 640px;
+}
+
 @import 'settings';
 
 @import 'motion-ui/src/motion-ui';
@@ -14,6 +25,9 @@ $fa-font-path: '~font-awesome/fonts/';
 //fix select2 style
 .select2-container input {
     height: 1.75rem !important;
+}
+.mapboxgl-ctrl-geocoder--icon{
+    top: 10px !important;
 }
 
 //end select2

@@ -8,7 +8,8 @@ import classnames from 'classnames'
 import Helper from 'views/base'
 import Logger from 'logger.mjs'
 
-import AreaEditor from './editCustomArea'
+import AreaEditor from './editNdArea'
+import AddressEditor from './editNdAddress'
 
 const log = new Logger('views:dnd')
 
@@ -32,6 +33,7 @@ export default class NoneDeliverables extends React.Component {
         this.onSwitchMapStyle = this.onSwitchMapStyle.bind(this)
         this.onInitLeftMenuScrollbar = this.onInitLeftMenuScrollbar.bind(this)
         this.onCreateNewCustomArea = this.onCreateNewCustomArea.bind(this)
+        this.onCreateNewAddress = this.onCreateNewAddress.bind(this)
 
         this.onActiveNd = this.onActiveNd.bind(this)
     }
@@ -65,13 +67,18 @@ export default class NoneDeliverables extends React.Component {
                             polygon: true,
                             trash: true,
                         },
-                        defaultMode: 'draw_polygon',
+                        defaultMode: 'simple_select',
                     })
 
-                    this.map.addControl(this.draw)
+                    this.geocoder = new MapboxGeocoder({
+                        accessToken: mapboxgl.accessToken,
+                        mapboxgl: mapboxgl,
+                        placeholder: 'street, zip code',
+                        language: 'en',
+                    })
 
-                    this.geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl })
                     this.map.addControl(this.geocoder)
+                    this.map.addControl(this.draw)
 
                     this.draw.deleteAll()
 
@@ -272,6 +279,23 @@ export default class NoneDeliverables extends React.Component {
         }
     }
 
+    onCreateNewAddress(evt) {
+        evt.preventDefault()
+        const center = this.geocoder?.mapMarker?._lngLat
+        const address = this.geocoder?.inputString ?? ''
+        const addressArray = address.split(',')
+        const street = addressArray?.[0]
+        const zipCode = addressArray?.[1]
+
+        if (center && street && zipCode) {
+            Helper.publish('showDialog', {
+                view: <AddressEditor geom={center} street={street} zipCode={zipCode} />,
+            })
+        } else {
+            Helper.alert('plz search street, zip then add again')
+        }
+    }
+
     onSwitchMapStyle(style) {
         if (!this.state.mapReady) {
             return
@@ -375,7 +399,7 @@ export default class NoneDeliverables extends React.Component {
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="button clear" href="javascript:void" onClick={this.onNewSubmap} title="New">
+                                    <a className="button clear" href="javascript:void" onClick={this.onCreateNewAddress} title="New">
                                         <i className="fa fa-file-text-o fi-list"></i>
                                         <span>Zip Code Area</span>
                                     </a>

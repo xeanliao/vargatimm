@@ -1,5 +1,4 @@
 import Backbone from 'backbone'
-import Promise from 'bluebird'
 import { extend, concat, map } from 'lodash'
 
 export default Backbone.Model.extend({

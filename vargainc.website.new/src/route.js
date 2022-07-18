@@ -1,7 +1,6 @@
 import Backbone from 'backbone'
 import React from 'react'
 import Topic from 'postal'
-import Promise from 'bluebird'
 import axios from 'axios'
 
 export default Backbone.Router.extend({

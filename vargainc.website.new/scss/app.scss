@@ -840,3 +840,19 @@ iframe {
     top: 0;
     bottom: 0;
 }
+
+
+.none-deliverables{
+    .mapboxgl-ctrl-top-right{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: flex-start;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .mapboxgl-ctrl{
+        display: flex;
+    }
+}
