@@ -136,6 +136,7 @@ namespace Vargainc.Timm.REST.Controllers
                 i.UniqueID,
                 i.ShortUniqueID,
                 i.IsEnabled,
+                i.Model,
                 BagId = i.Bag.Id
             }).ToListAsync();
 
@@ -145,6 +146,7 @@ namespace Vargainc.Timm.REST.Controllers
                 i.UniqueID,
                 i.ShortUniqueID,
                 i.IsEnabled,
+                i.Model,
                 IsOnline = onlineGTU.ContainsKey(i.UniqueID),
                 Location = onlineGTU.ContainsKey(i.UniqueID) ? onlineGTU[i.UniqueID] : null,
                 OutOfBoundary = onlineGTU.ContainsKey(i.UniqueID) ? !dmapPolygon.Contains(new Point(onlineGTU[i.UniqueID].Longitude ?? 0, onlineGTU[i.UniqueID].Latitude ?? 0)) : true,
@@ -480,6 +482,50 @@ namespace Vargainc.Timm.REST.Controllers
                 Longitude = gtuLocation.ContainsKey(i.UniqueID) ? gtuLocation[i.UniqueID].Value.Longitude : null
             }).ToList()
             );
+        }
+
+        [Route("bag/none")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetGtuNotInBag()
+        {
+            var result = await db.GTUs
+                .Where(i => i.BagId == null)
+                .Select(i => new { i.Id, i.UniqueID, i.ShortUniqueID })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return Json(result);
+        }
+
+        [Route("bag/{bagId:int}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetGtuInBag(int? bagId)
+        {
+            var result = await db.GTUs
+                .Where(i => i.BagId == bagId)
+                .Select(i => new { i.Id, i.UniqueID, i.ShortUniqueID })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return Json(result);
+        }
+
+        [Route("bag/{bagId:int}")]
+        [HttpPost]
+        public IHttpActionResult UpdateGtuInBag(int? bagId, [FromBody]List<int?> gtus)
+        {
+            var targetGtus = gtus.ToHashSet();
+            using (var tran = db.Database.BeginTransaction())
+            {
+                db.GTUs.Where(i => i.BagId == bagId).UpdateFromQuery(i => new GTU { BagId = null});
+                if(targetGtus.Count > 0)
+                {
+                    db.GTUs.Where(i => targetGtus.Contains(i.Id)).UpdateFromQuery(i => new GTU { BagId = bagId });
+                }
+
+                tran.Commit();
+            }
+            return Json(new { success = true });
         }
 
         protected override void Dispose(bool disposing)

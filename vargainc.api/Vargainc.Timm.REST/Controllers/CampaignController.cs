@@ -984,7 +984,8 @@ namespace Vargainc.Timm.REST.Controllers
                                     SubMap = newSubmap,
                                     AreaId = i.AreaId,
                                     Classification = i.Classification,
-                                    Value = i.Value
+                                    Value = i.Value,
+                                    Code = i.Code,
                                 });
                                 db.SubMapRecords.AddRange(submapRecords);
                                 await db.SaveChangesAsync();
@@ -996,7 +997,7 @@ namespace Vargainc.Timm.REST.Controllers
                                 {
                                     SubMap = newSubmap,
                                     Latitude = i.Latitude,
-                                    Longitude = i.Longitude
+                                    Longitude = i.Longitude,
                                 });
                                 db.SubMapCoordinates.AddRange(submapCoordinates);
                                 await db.SaveChangesAsync();

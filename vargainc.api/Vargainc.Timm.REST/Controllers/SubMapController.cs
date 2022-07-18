@@ -14,6 +14,9 @@ using Vargainc.Timm.Extentions;
 using Vargainc.Timm.Models;
 using Vargainc.Timm.REST.ViewModel;
 using System.Data.Entity.Spatial;
+using System.Data.SqlClient;
+using Microsoft.SqlServer.Types;
+using System.Text;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -186,11 +189,11 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 case Classifications.Z5:
                     needRemoveRecords = await db.FiveZipAreas.Where(i => removeAreas.Contains(i.Code)).Select(i => i.Id).ToListAsync().ConfigureAwait(false);
-                    needAddRecords = await db.FiveZipAreas.Where(i => addAreas.Contains(i.Code)).Select(i => i.Id ).ToListAsync().ConfigureAwait(false);
+                    needAddRecords = await db.FiveZipAreas.Where(i => addAreas.Contains(i.Code)).Select(i => i.Id).ToListAsync().ConfigureAwait(false);
                     break;
                 case Classifications.PremiumCRoute:
-                    needRemoveRecords = await db.PremiumCRoutes.Where(i => removeAreas.Contains(i.Code)).Select(i => i.Id ).ToListAsync().ConfigureAwait(false);
-                    needAddRecords = await db.PremiumCRoutes.Where(i => addAreas.Contains(i.Code)).Select(i => i.Id ).ToListAsync().ConfigureAwait(false);
+                    needRemoveRecords = await db.PremiumCRoutes.Where(i => removeAreas.Contains(i.Code)).Select(i => i.Id).ToListAsync().ConfigureAwait(false);
+                    needAddRecords = await db.PremiumCRoutes.Where(i => addAreas.Contains(i.Code)).Select(i => i.Id).ToListAsync().ConfigureAwait(false);
                     break;
             }
             if (needRemoveRecords.Count == 0 && needAddRecords.Count == 0)
@@ -287,14 +290,64 @@ namespace Vargainc.Timm.REST.Controllers
             }
 
             // fill holes
-            finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+            if (finalPolygon.Holes.Length > 0)
+            {
+                finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+                var sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
+                switch (targetClassification)
+                {
+                    case Classifications.Z5:
+                        {
+                            sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[fivezipareas_all] WITH(INDEX(IX_fivezipareas_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
+                        }
+                        break;
+                    case Classifications.PremiumCRoute:
+                        {
+                            sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[premiumcroutes_all] WITH(INDEX(IX_premiumcroutes_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
+                        }
+                        break;
+                }
+                var sqlCmd = db.Database.Connection.CreateCommand();
+                sqlCmd.CommandTimeout = 300;
+                sqlCmd.CommandText = sql.ToString();
+                SqlParameter p = new SqlParameter()
+                {
+                    ParameterName = "@p0",
+                    Value = finalPolygon.AsText(),
+                    SqlDbType = System.Data.SqlDbType.NVarChar
+                };
+                sqlCmd.Parameters.Add(p);
+                await db.Database.Connection.OpenAsync().ConfigureAwait(false);
+                var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
+                var existsArea = cachedGeometry.Select(i => (i.UserData as Record).Id).ToHashSet();
+                while (sqlReader.Read())
+                {
+                    var id = sqlReader.GetInt32(0);
+                    if (!existsArea.Contains(id))
+                    {
+                        var geom = WKTReader.Read(((SqlGeometry)sqlReader.GetValue(4)).ToString());
+                        geom = geom.Buffer(0);
+                        geom.Normalize();
+
+                        geom.UserData = new Record
+                        {
+                            Id = id,
+                            Code = sqlReader.GetString(1),
+                            APT = sqlReader.GetInt32(2),
+                            Home = sqlReader.GetInt32(3),
+                        };
+                        cachedGeometry.Add(geom);
+                    }
+                }
+                sqlReader.Close();
+            }
 
             if (finalPolygon == null)
             {
                 throw new Exception("merge failed. the merge area is not polygon");
             }
 
-            
+
 
             // calc apt home
             float? apt = 0;
@@ -356,6 +409,7 @@ namespace Vargainc.Timm.REST.Controllers
 
                 transaction.Commit();
             }
+
 
             return Json(new { sucess = true });
         }

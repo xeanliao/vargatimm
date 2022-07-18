@@ -442,6 +442,24 @@ namespace Vargainc.Timm.REST.Controllers
             return Json(new { draw = draw, recordsTotal = total, recordsFiltered = filterTotal, data = result }, false);
         }
 
+        [Route("list/all")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ListAll()
+        {
+            var result = await db.Users
+                .Include(i => i.Groups)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.FullName,
+                    i.UserName,
+                    Groups = i.Groups.Select(g => g.Name)
+                })
+                .ToListAsync()
+                .ConfigureAwait(false);
+            return Json(result);
+        }
+
         [Route("{userId:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> Get(int? userId)

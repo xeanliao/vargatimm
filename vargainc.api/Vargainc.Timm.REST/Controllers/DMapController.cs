@@ -41,6 +41,10 @@ namespace Vargainc.Timm.REST.Controllers
             Dictionary<string, Polygon> recordsInSubmap = new Dictionary<string, Polygon>();
             foreach (var item in subMaps)
             {
+                if(item == null || item.SubMapCoordinates == null || item.SubMapCoordinates.Count == 0)
+                {
+                    continue;
+                }
                 var points = item.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
                 if (points.Count == 0)
                 {
@@ -76,7 +80,7 @@ namespace Vargainc.Timm.REST.Controllers
 
                 item.SubMapRecords.ToList().ForEach(record =>
                 {
-                    if (!recordsInSubmap.ContainsKey(record.Code))
+                    if (record != null && !string.IsNullOrWhiteSpace(record.Code) && !recordsInSubmap.ContainsKey(record.Code))
                     {
                         recordsInSubmap.Add(record.Code, polygon);
                     }
@@ -235,12 +239,29 @@ namespace Vargainc.Timm.REST.Controllers
                             .ConfigureAwait(false);
                         break;
                 }
-
-                records.ForEach(recordItem =>
+                foreach(var recordItem in records)
                 {
-                    var geom = WKTReader.Read(recordItem.Geom.AsText());
-                    var submapPolygon = recordsInSubmap[recordItem.Code];
-                    geom = geom.Intersection(submapPolygon);
+                    if(recordItem  == null || string.IsNullOrWhiteSpace(recordItem.Code) || !recordsInSubmap.ContainsKey(recordItem.Code))
+                    {
+                        continue;
+                    }
+                    Geometry geom = null;
+                    try
+                    {
+                        geom = WKTReader.Read(recordItem.Geom.AsText());
+                        var submapPolygon = recordsInSubmap[recordItem.Code];
+                        geom = geom.Buffer(0).Intersection(submapPolygon);
+
+                        if (geom.IsEmpty)
+                        {
+                            continue;
+                        }
+                    }
+                    catch(Exception)
+                    {
+                        continue;
+                    }
+                    
                     var areaId = $"{((Classifications)item.Key).ToString()}-{recordItem.Id}";
                     layers.Add(new Feature
                     {
@@ -279,7 +300,7 @@ namespace Vargainc.Timm.REST.Controllers
                             { "classification", ((Classifications)item.Key).ToString() }
                         }
                     });
-                });
+                }
             }
 
             var eTag = GetETag();
