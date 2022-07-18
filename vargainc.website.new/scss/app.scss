@@ -49,9 +49,9 @@ body {
     text-align: center;
     position: fixed;
 }
-
+$sidebar-width: 50px;
 .sidebar {
-    width: 50px !important;
+    width: $sidebar-width !important;
     overflow: visible;
     position: fixed;
     bottom: 0;
@@ -152,10 +152,14 @@ $top-bar-height: 45px;
         padding-top: $top-bar-height;
         overflow: hidden;
 
-        &.campaign, &.dmap {
+        &.campaign, &.dmap, &.none-deliverables {
             top: $top-bar-height !important;
             padding-top: 0 !important;
             height: calc(100vh - #{$top-bar-height}) !important;
+        }
+
+        &.none-deliverables{
+            width: calc(100vw - #{$sidebar-width}) !important;
         }
     }
 }
@@ -691,6 +695,8 @@ $A3LeftRightMargin: 0.5in;
     }
 }
 
+
+
 .gtu-monitor {
     .dropdown-pane {
         padding: 0;
@@ -833,4 +839,20 @@ iframe {
     width: 100%;
     top: 0;
     bottom: 0;
+}
+
+
+.none-deliverables{
+    .mapboxgl-ctrl-top-right{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: flex-start;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .mapboxgl-ctrl{
+        display: flex;
+    }
 }

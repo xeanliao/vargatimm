@@ -1,6 +1,5 @@
 import Backbone from 'backbone'
 import Model from 'models/campaign'
-import Promise from 'bluebird'
 import { extend } from 'lodash'
 
 export default Backbone.Collection.extend({

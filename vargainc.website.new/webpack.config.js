@@ -14,7 +14,7 @@ const config = {
         devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
     },
     resolve: {
-        preferRelative: true,
+        preferRelative: false,
         modules: ['node_modules', path.resolve(__dirname, 'src')],
         extensions: ['*', '.js', '.jsx'],
         alias: {

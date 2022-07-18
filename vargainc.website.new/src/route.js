@@ -1,7 +1,6 @@
 import Backbone from 'backbone'
 import React from 'react'
 import Topic from 'postal'
-import Promise from 'bluebird'
 import axios from 'axios'
 
 export default Backbone.Router.extend({
@@ -19,6 +18,7 @@ export default Backbone.Router.extend({
         admin: 'adminAction',
         'admin/gtu/task': 'listGroupByTaskAction',
         'admin/gtu/available': 'availableGTUAction',
+        'admin/none-deliverables': 'noneDeliverables',
         'print/:campaignId/:printType': 'printAction',
         'campaign/:campaignId/:taskName/:taskId/edit': 'gtuEditAction',
         'campaign/:campaignId/:taskName/:taskId/monitor': 'gtuMonitorAction',
@@ -454,6 +454,19 @@ export default Backbone.Router.extend({
     },
     listGroupByTaskAction: function () {
         let View = require('views/admin/gtu').default
+        Topic.publish({
+            channel: 'View',
+            topic: 'loadView',
+            data: {
+                view: View,
+                options: {
+                    showSearch: false,
+                },
+            },
+        })
+    },
+    noneDeliverables: function () {
+        let View = require('views/admin/noneDeliverables').default
         Topic.publish({
             channel: 'View',
             topic: 'loadView',

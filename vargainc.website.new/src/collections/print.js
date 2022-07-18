@@ -1,6 +1,5 @@
 import Backbone from 'backbone'
 import $ from 'jquery'
-import Promise from 'bluebird'
 import { extend, each } from 'lodash'
 import BaseModel from 'models/print/base'
 import FooterModel from 'models/print/footer'

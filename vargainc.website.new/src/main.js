@@ -8,7 +8,6 @@ import { isFunction, startsWith } from 'lodash'
 import AppRouter from 'route'
 import UserModel from 'models/user'
 import LayoutView from 'views/layout/main'
-import Promise from 'bluebird'
 import Axios from 'axios'
 
 /**

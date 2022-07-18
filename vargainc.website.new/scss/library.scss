@@ -2,6 +2,19 @@ $fa-font-path: '~font-awesome/fonts/';
 @import '~font-awesome/scss/font-awesome';
 
 @import 'mapbox-gl/dist/mapbox-gl.css';
+@import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+@import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+
+// fix search input margin issue
+.mapboxgl-ctrl-geocoder mapboxgl-ctrl{
+    max-width: 640px;
+    width: 640px;
+}
+.mapboxgl-ctrl-geocoder--input{
+    margin: 0 !important;
+    padding: 6px 35px !important;
+    width: 640px;
+}
 
 @import 'settings';
 
@@ -12,6 +25,9 @@ $fa-font-path: '~font-awesome/fonts/';
 //fix select2 style
 .select2-container input {
     height: 1.75rem !important;
+}
+.mapboxgl-ctrl-geocoder--icon{
+    top: 10px !important;
 }
 
 //end select2
@@ -30,6 +46,10 @@ $fa-font-path: '~font-awesome/fonts/';
 // .reveal {
 //     pointer-events: all;
 // }
+
+table tr.is-active{
+    background-color: $primary-color !important;
+}
 
 @import 'simplebar/dist/simplebar.min.css';
 @import 'datatables.net-dt';

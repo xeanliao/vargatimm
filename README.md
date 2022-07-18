@@ -24,7 +24,18 @@
    Or you can use ssh client with private domain name in EC2 instance
    e.g. `ssh root@timm2022.timm -i ~/.ssh/varga.pem`
 
-# Database restore
+# Database backup and restore
+
+```sql
+RESTORE DATABASE [Timm202202] FROM DISK = N'/var/opt/mssql/backup/timm202202_20220714.bak' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5
+```
+
+```sql
+BACKUP DATABASE [Timm202202] TO DISK = N'/var/opt/mssql/backup/timm202202_20220714.bak' WITH NOFORMAT, NOINIT, SKIP, NOREWIND, NOUNLOAD, STATS = 10
+```
+
+
+# Database restore for old version database
 1. scp database back file to mssql server
 scp -i <replace to you private key file path> <replace to local bak file> root@<replace to mssql server ip>:/var/opt/mssql/data/ 
 Or
@@ -67,11 +78,11 @@ The full command run in linux is
 ```bash
 /opt/mssql-tools/bin/sqlcmd \
   -S localhost -U sa -P '<repace to password>' \
-  -Q '
+  -Q "
 SELECT session_id as SPID, command, a.text AS Query, start_time, percent_complete, dateadd(second,estimated_completion_time/1000, getdate()) as estimated_completion_time
 FROM sys.dm_exec_requests r CROSS APPLY sys.dm_exec_sql_text(r.sql_handle) a
-WHERE r.command in ("BACKUP DATABASE","RESTORE DATABASE")
-'
+WHERE r.command in ('BACKUP DATABASE','RESTORE DATABASE')
+"
 ```
 5. After success run the restore command you can see something like this
 ```bash
@@ -97,6 +108,12 @@ Then fix the geom data
 ```sql
 ALTER TABLE [dbo].[varga_final]
 ADD [geom] GEOMETRY
+
+GO
+
+UPDATE [dbo].[varga_final]
+SET [Geom] = GEOMETRY::STGeomFromText(CONCAT ('POLYGON(' , substring(Geom.STAsText( ), 12, LEN(Geom.STAsText( ))) , ')'), 4326)
+where [Geom].InstanceOf('LINESTRING') = 1 and Geom.STIsClosed() = 1;
 
 GO
 
@@ -312,5 +329,9 @@ ADD [Code] NVARCHAR(10);
 ALTER TABLE [dbo].[campaigntractimported]
 ADD [Code] NVARCHAR(10);
 ```
-2. 
+2. 2022-06-29
+```sql
+ALTER TABLE [dbo].[customareas] 
+ALTER COLUMN [IsEnabled] BIT;
+```
 3. 

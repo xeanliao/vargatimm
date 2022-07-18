@@ -1,7 +1,6 @@
 import Backbone from 'backbone'
 import BaseModel from 'models/print/base'
 import $ from 'jquery'
-import Promise from 'bluebird'
 
 export default BaseModel.extend({
     urlRoot: 'map',

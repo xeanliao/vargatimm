@@ -1,6 +1,5 @@
 import Backbone from 'backbone'
 import Model from 'models/gtu'
-import Promise from 'bluebird'
 import { extend, each } from 'lodash'
 
 export default Backbone.Collection.extend({

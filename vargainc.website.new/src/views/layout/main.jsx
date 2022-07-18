@@ -223,7 +223,7 @@ export default React.createBackboneClass({
                 return this.state.mainView
             } else {
                 var MainView = React.createFactory(this.state.mainView)
-                return MainView(this.state.mainParams)
+                return MainView(Object.assign({ registeredTopic: [] }, this.state.mainParams))
             }
         }
         return null

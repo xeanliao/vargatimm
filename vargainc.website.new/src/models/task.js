@@ -1,6 +1,5 @@
 import Backbone from 'backbone'
 import $ from 'jquery'
-import Promise from 'bluebird'
 import { extend } from 'lodash'
 
 export default Backbone.Model.extend({

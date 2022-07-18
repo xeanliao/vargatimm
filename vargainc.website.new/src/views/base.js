@@ -1,7 +1,6 @@
 import Backbone from 'backbone'
 import React from 'react'
 import Topic from 'postal'
-import Promise from 'bluebird'
 import { assign, unset, each, isString, isFunction, isObject } from 'lodash'
 import $ from 'jquery'
 import 'foundation-sites'

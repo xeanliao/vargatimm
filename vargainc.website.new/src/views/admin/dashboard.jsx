@@ -49,30 +49,13 @@ export default React.createClass({
                                         </a>
                                     </div>
                                 </div>
-                                {/* <div className="small-12 column">
+                                <div className="small-12 column">
                                     <div className="callout secondary">
-                                        <a href="#campaign/import">
-                                            <span>Import Campaign</span>
-                                        </a>
-                                    </div>
-                                </div> */}
-                            </div>
-                            <div className="row small-up-2 medium-up-2 large-up-2">
-                                {/* <div className="column">
-                                    <div className="callout secondary">
-                                        <a href="#frame/NonDeliverables.aspx">
+                                        <a href="#admin/none-deliverables">
                                             <span>Non-Deliverables</span>
                                         </a>
                                     </div>
-                                </div> */}
-
-                                {/* <div className="column">
-                                    <div className="callout secondary">
-                                        <a href="#frame/AdminDistributorCompany.aspx">
-                                            <span>Distributor Management</span>
-                                        </a>
-                                    </div>
-                                </div> */}
+                                </div>
                             </div>
                         </div>
                     </div>
