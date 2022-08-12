@@ -290,9 +290,11 @@ namespace Vargainc.Timm.REST.Controllers
             }
 
             // fill holes
-            if (finalPolygon.Holes.Length > 0)
+            finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+
+            // add missed area
+            if (finalPolygon != null)
             {
-                finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
                 var sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
                 switch (targetClassification)
                 {
@@ -313,7 +315,7 @@ namespace Vargainc.Timm.REST.Controllers
                 SqlParameter p = new SqlParameter()
                 {
                     ParameterName = "@p0",
-                    Value = finalPolygon.AsText(),
+                    Value = finalPolygon.Buffer(-0.000001).AsText(),
                     SqlDbType = System.Data.SqlDbType.NVarChar
                 };
                 sqlCmd.Parameters.Add(p);
@@ -341,6 +343,42 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 sqlReader.Close();
             }
+
+            // merge again
+            mergedPolygon = finalPolygon;
+
+            cachedGeometry.ForEach(geom =>
+            {
+                mergedPolygon = mergedPolygon.Union(geom);
+            });
+
+            // find max area polygon
+            finalPolygon = null;
+            if (mergedPolygon.GeometryType == "MultiPolygon")
+            {
+                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
+                {
+                    Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                    if (geom.IsValid && !geom.IsEmpty)
+                    {
+                        if (finalPolygon == null)
+                        {
+                            finalPolygon = geom;
+                        }
+                        else
+                        {
+                            finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
+                        }
+                    }
+                }
+            }
+            else if (mergedPolygon.GeometryType == "Polygon")
+            {
+                finalPolygon = (Polygon)mergedPolygon;
+            }
+
+            // fill holes
+            finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
 
             if (finalPolygon == null)
             {

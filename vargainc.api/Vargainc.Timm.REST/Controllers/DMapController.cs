@@ -37,8 +37,8 @@ namespace Vargainc.Timm.REST.Controllers
 
             var subMaps = await db.SubMaps.Include(i => i.SubMapRecords).Where(i => i.CampaignId == campaignId).ToListAsync().ConfigureAwait(false);
             var subMapIds = subMaps.Select(i => i.Id).ToList();
-            var subMapRecords = subMaps.SelectMany(i => i.SubMapRecords.Select(j => new { j.Classification, j.AreaId, j.SubMapId })).ToList();
-            Dictionary<string, Polygon> recordsInSubmap = new Dictionary<string, Polygon>();
+            //var subMapRecords = subMaps.SelectMany(i => i.SubMapRecords.Select(j => new { j.Classification, j.AreaId, j.SubMapId })).ToList();
+            List<Tuple<int?, Polygon, int?, List<int?>>> subMapRecords = new List<Tuple<int?, Polygon, int?, List<int?>>>();
             foreach (var item in subMaps)
             {
                 if(item == null || item.SubMapCoordinates == null || item.SubMapCoordinates.Count == 0)
@@ -78,13 +78,10 @@ namespace Vargainc.Timm.REST.Controllers
                     }
                 });
 
-                item.SubMapRecords.ToList().ForEach(record =>
-                {
-                    if (record != null && !string.IsNullOrWhiteSpace(record.Code) && !recordsInSubmap.ContainsKey(record.Code))
-                    {
-                        recordsInSubmap.Add(record.Code, polygon);
-                    }
-                });
+                var records = item.SubMapRecords.Select(i => i.AreaId).ToList();
+                var recordsType = item.SubMapRecords.FirstOrDefault()?.Classification;
+
+                subMapRecords.Add(new Tuple<int?, Polygon, int?, List<int?>>(item.Id, polygon, recordsType, records));
             }
 
 
@@ -189,21 +186,25 @@ namespace Vargainc.Timm.REST.Controllers
             }
             
 
-            var recordGroup = subMapRecords
-                .GroupBy(i => i.Classification)
-                .ToDictionary(i => i.Key, i => i.Select(j => j.AreaId).ToList());
+            //var recordGroup = subMapRecords
+            //    .GroupBy(i => i.Classification)
+            //    .ToDictionary(i => i.Key, i => i.Select(j => j.AreaId).ToList());
 
-            var recordSubMap = subMapRecords
-                .GroupBy(k => $"{(Classifications)k.Classification}-{k.AreaId}", v => v.SubMapId)
-                .ToDictionary(k => k.Key, v => v.FirstOrDefault());
+            //var recordSubMap = subMapRecords
+            //    .GroupBy(k => $"{(Classifications)k.Classification}-{k.AreaId}", v => v.SubMapId)
+            //    .ToDictionary(k => k.Key, v => v.FirstOrDefault());
 
 
-            foreach (var item in recordGroup)
+            foreach (var item in subMapRecords)
             {
-                List<Record> records = new List<Record>();
-                var areaIds = item.Value;
+                var submapId = item.Item1;
+                var submapPolygon = item.Item2;
+                var recordType = item.Item3;
+                var areaIds = item.Item4;
 
-                switch (item.Key)
+                List<Record> records = new List<Record>();
+
+                switch (recordType)
                 {
                     case (int)Classifications.Z5:
                         records = await db.FiveZipAreas
@@ -241,7 +242,7 @@ namespace Vargainc.Timm.REST.Controllers
                 }
                 foreach(var recordItem in records)
                 {
-                    if(recordItem  == null || string.IsNullOrWhiteSpace(recordItem.Code) || !recordsInSubmap.ContainsKey(recordItem.Code))
+                    if(recordItem  == null)
                     {
                         continue;
                     }
@@ -249,7 +250,6 @@ namespace Vargainc.Timm.REST.Controllers
                     try
                     {
                         geom = WKTReader.Read(recordItem.Geom.AsText());
-                        var submapPolygon = recordsInSubmap[recordItem.Code];
                         geom = geom.Buffer(0).Intersection(submapPolygon);
 
                         if (geom.IsEmpty)
@@ -262,7 +262,7 @@ namespace Vargainc.Timm.REST.Controllers
                         continue;
                     }
                     
-                    var areaId = $"{((Classifications)item.Key).ToString()}-{recordItem.Id}";
+                    var areaId = $"{((Classifications)recordType).ToString()}-{recordItem.Id}";
                     layers.Add(new Feature
                     {
                         Geometry = geom,
@@ -273,13 +273,13 @@ namespace Vargainc.Timm.REST.Controllers
                             { "id", areaId },
                             { "oid", recordItem.Id },
                             { "vid", areaId },
-                            { "sid", recordSubMap[areaId] },
+                            { "sid", submapId },
                             { "name", recordItem.Name },
                             { "zip", recordItem.Zip },
                             { "home", recordItem.Home },
                             { "apt", recordItem.APT },
                             { "business", recordItem.Business },
-                            { "classification", ((Classifications)item.Key).ToString() }
+                            { "classification", ((Classifications)recordType).ToString() }
                         }
                     });
                     layers.Add(new Feature
@@ -291,13 +291,13 @@ namespace Vargainc.Timm.REST.Controllers
                             { "id", $"area-centroid-{areaId}" },
                             { "oid", recordItem.Id },
                             { "vid", areaId },
-                            { "sid", recordSubMap[areaId] },
+                            { "sid", submapId },
                             { "name", recordItem.Name },
                             { "zip", recordItem.Zip },
                             { "home", recordItem.Home },
                             { "apt", recordItem.APT },
                             { "business", recordItem.Business },
-                            { "classification", ((Classifications)item.Key).ToString() }
+                            { "classification", ((Classifications)recordType).ToString() }
                         }
                     });
                 }
@@ -450,31 +450,6 @@ namespace Vargainc.Timm.REST.Controllers
                 }
             });
 
-            // find max area polygon
-            Polygon finalPolygon = null;
-            if (mergedPolygon.GeometryType == "MultiPolygon")
-            {
-                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
-                {
-                    Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
-                    if (geom.IsValid && !geom.IsEmpty)
-                    {
-                        if (finalPolygon == null)
-                        {
-                            finalPolygon = geom;
-                        }
-                        else
-                        {
-                            finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
-                        }
-                    }
-                }
-            }
-            else if (mergedPolygon.GeometryType == "Polygon")
-            {
-                finalPolygon = (Polygon)mergedPolygon;
-            }
-
             // dmap should in submap
             var submapId = dMap.SubMapId;
             var submapCoordinates = db.SubMapCoordinates
@@ -485,12 +460,138 @@ namespace Vargainc.Timm.REST.Controllers
                 .Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0))
                 .ToArray();
 
-            var dmapPolygon = GeometryFactory.CreatePolygon(submapCoordinates);
+            var subMapPolygon = GeometryFactory.CreatePolygon(submapCoordinates);
 
-            finalPolygon = (Polygon)dmapPolygon.Intersection(finalPolygon);
+            mergedPolygon = subMapPolygon.Intersection(mergedPolygon);
 
+            // find max area polygon
+            Polygon finalPolygon = null;
+            if (mergedPolygon.GeometryType == "MultiPolygon" || mergedPolygon.GeometryType == "GeometryCollection")
+            {
+                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
+                {
+                    try
+                    {
+                        Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                        if (geom.IsValid && !geom.IsEmpty)
+                        {
+                            if (finalPolygon == null)
+                            {
+                                finalPolygon = geom;
+                            }
+                            else
+                            {
+                                finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
+                            }
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                    
+                }
+            }
+            else if (mergedPolygon.GeometryType == "Polygon")
+            {
+                finalPolygon = (Polygon)mergedPolygon;
+            }
+            
             // fill holes
             finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+
+            // add missed area
+            if (finalPolygon != null && finalPolygon.Area > 0)
+            {
+                var sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
+                switch (targetClassification)
+                {
+                    case Classifications.Z5:
+                        {
+                            sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[fivezipareas_all] WITH(INDEX(IX_fivezipareas_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
+                        }
+                        break;
+                    case Classifications.PremiumCRoute:
+                        {
+                            sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[premiumcroutes_all] WITH(INDEX(IX_premiumcroutes_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
+                        }
+                        break;
+                }
+                var sqlCmd = db.Database.Connection.CreateCommand();
+                sqlCmd.CommandTimeout = 300;
+                sqlCmd.CommandText = sql.ToString();
+                SqlParameter p = new SqlParameter()
+                {
+                    ParameterName = "@p0",
+                    Value = finalPolygon.Buffer(-0.000001).AsText(),
+                    SqlDbType = System.Data.SqlDbType.NVarChar
+                };
+                sqlCmd.Parameters.Add(p);
+                await db.Database.Connection.OpenAsync().ConfigureAwait(false);
+                var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
+                var existsArea = cachedGeometry.Select(i => (i.UserData as Record).Id).ToHashSet();
+                while (sqlReader.Read())
+                {
+                    var id = sqlReader.GetInt32(0);
+                    if (!existsArea.Contains(id))
+                    {
+                        var geom = WKTReader.Read(((SqlGeometry)sqlReader.GetValue(4)).ToString());
+                        geom = geom.Buffer(0);
+                        geom.Normalize();
+
+                        geom.UserData = new Record
+                        {
+                            Id = id,
+                            Code = sqlReader.GetString(1),
+                            APT = sqlReader.GetInt32(2),
+                            Home = sqlReader.GetInt32(3),
+                        };
+                        cachedGeometry.Add(geom);
+                    }
+                }
+                sqlReader.Close();
+            }
+
+            // merge again
+            mergedPolygon = finalPolygon;
+
+            cachedGeometry.ForEach(geom =>
+            {
+                mergedPolygon = mergedPolygon.Union(geom);
+            });
+
+            // find max area polygon
+            finalPolygon = null;
+            if (mergedPolygon.GeometryType == "MultiPolygon" || mergedPolygon.GeometryType == "GeometryCollection")
+            {
+                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
+                {
+                    try
+                    {
+                        Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                        if (geom.IsValid && !geom.IsEmpty)
+                        {
+                            if (finalPolygon == null)
+                            {
+                                finalPolygon = geom;
+                            }
+                            else
+                            {
+                                finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
+                            }
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+
+                }
+            }
+            else if (mergedPolygon.GeometryType == "Polygon")
+            {
+                finalPolygon = (Polygon)mergedPolygon;
+            }
 
             if (finalPolygon == null)
             {

@@ -69,6 +69,7 @@
     <Compile Include="Config\CampaignRecordConfig.cs" />
     <Compile Include="Config\CampaignTractImportedConfig.cs" />
     <Compile Include="Config\CompanyConfig.cs" />
+    <Compile Include="Config\NdAreaConfig.cs" />
     <Compile Include="Config\DistributionJobConfig.cs" />
     <Compile Include="Config\DistributionMapConfig.cs" />
     <Compile Include="Config\DistributionMapCoordinateConfig.cs" />

@@ -85,6 +85,7 @@
     <Compile Include="DistributionMap\DistributionMapCoordinate.cs" />
     <Compile Include="DistributionMap\DistributionMapRecord.cs" />
     <Compile Include="Enum\CampaignStatusEnum.cs" />
+    <Compile Include="NDAddresses\NdArea.cs" />
     <Compile Include="NDAddresses\NdAddress.cs" />
     <Compile Include="NDAddresses\NdAddressCoordinate.cs" />
     <Compile Include="SubMap\SubMap.cs" />

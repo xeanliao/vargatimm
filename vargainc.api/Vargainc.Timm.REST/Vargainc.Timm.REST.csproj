@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build"
-  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -212,6 +211,7 @@
     <Compile Include="Controllers\DMapController.cs" />
     <Compile Include="Controllers\GTUController.cs" />
     <Compile Include="Controllers\MapImageController.cs" />
+    <Compile Include="Controllers\NdController.cs" />
     <Compile Include="Controllers\PDFController.cs" />
     <Compile Include="Controllers\PrintController.cs" />
     <Compile Include="Controllers\StatusController.cs" />
