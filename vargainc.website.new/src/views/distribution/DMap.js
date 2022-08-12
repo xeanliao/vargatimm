@@ -671,7 +671,7 @@ export default class DMap extends React.Component {
                         ])
                     }
 
-                    return { selectedSubmapId: subMap.Id, selectedDMapId: null }
+                    return { selectedSubmapId: subMap.Id, selectedDMapId: null, selectedShapes: new Map() }
                 },
                 () => {
                     //set selected layer fill color as submap color
@@ -680,6 +680,13 @@ export default class DMap extends React.Component {
                     this.map.setFilter('timm-submap-layer-highlight', ['all', ['==', 'sid', subMap.Id], ['==', 'type', 'submap']])
                     this.map.setPaintProperty('timm-submap-layer-highlight', 'line-color', highlightColor)
                     this.map.setLayoutProperty('timm-submap-layer-highlight', 'visibility', 'visible')
+
+                    this.map.setLayoutProperty(`timm-area-layer-remove`, 'visibility', 'none')
+                    this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'none')
+                    this.map.setFilter(`timm-area-layer-remove`, ['in', ['get', 'vid'], ['literal', []]])
+                    this.map.setFilter(`timm-area-layer-selected`, ['in', ['get', 'vid'], ['literal', []]])
+                    this.map.setLayoutProperty(`timm-area-layer-remove`, 'visibility', 'visible')
+                    this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'visible')
 
                     return resolve()
                 }
@@ -696,8 +703,14 @@ export default class DMap extends React.Component {
         }
         let subMap = this.props.campaign.SubMaps.filter((s) => s.Id == dMap.SubMapId)?.[0]
         this.onSubmapSelect(subMap).then(() => {
-            this.setState({ selectedDMapId: dMap.Id }, () => {
+            this.setState({ selectedDMapId: dMap.Id, selectedShapes: new Map() }, () => {
+                this.map.setLayoutProperty(`timm-area-layer-remove`, 'visibility', 'none')
+                this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'none')
                 this.map.setPaintProperty(`timm-area-layer-selected`, 'fill-color', color(`#${dMap.ColorString}`).toString())
+                this.map.setFilter(`timm-area-layer-remove`, ['in', ['get', 'vid'], ['literal', []]])
+                this.map.setFilter(`timm-area-layer-selected`, ['in', ['get', 'vid'], ['literal', []]])
+                this.map.setLayoutProperty(`timm-area-layer-remove`, 'visibility', 'visible')
+                this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'visible')
             })
         })
     }
@@ -712,26 +725,30 @@ export default class DMap extends React.Component {
         // oid: shape primary key in database
         // vid: classification + oid
         // sid: submap id
-        let oid = e.features?.[0]?.properties?.oid
-        let vid = e.features?.[0]?.properties?.vid
-        let sid = e.features?.[0]?.properties?.sid
-        let classification = e.features?.[0]?.properties?.classification
+        let properties = e.features?.[0]?.properties
+        let oid = properties?.oid
+        let vid = properties?.vid
+        let sid = properties?.sid
+        let classification = properties?.classification
+        let apt = properties?.apt ?? 0
+        let home = properties?.home ?? 0
         if (sid != subMapId) {
             return
         }
 
-        // check layer is in not in other dmap
         let submaps = this.props?.campaign?.SubMaps ?? []
-        let otherDMapAreas = submaps
-            .filter((s) => s.Id == subMapId)
-            .flatMap((s) => s.DMaps ?? [])
-            .filter((d) => d.Id != dMapId)
-            .flatMap((d) => d.DMapRecords ?? [])
-            .map((r) => r.AreaId)
 
-        if (new Set(otherDMapAreas).has(oid)) {
-            return
-        }
+        // check layer is in not in other dmap
+        // let otherDMapAreas = submaps
+        //     .filter((s) => s.Id == subMapId)
+        //     .flatMap((s) => s.DMaps ?? [])
+        //     .filter((d) => d.Id != dMapId)
+        //     .flatMap((d) => d.DMapRecords ?? [])
+        //     .map((r) => r.AreaId)
+
+        // if (new Set(otherDMapAreas).has(oid)) {
+        //     return
+        // }
 
         let currentDMapAreas = submaps
             .filter((s) => s.Id == subMapId)
@@ -748,7 +765,7 @@ export default class DMap extends React.Component {
                 if (selectedShapes.has(vid)) {
                     selectedShapes.delete(vid)
                 } else {
-                    selectedShapes.set(vid, { Classification: classification, Id: oid, Value: !currentDMapAreas.has(oid), vid: vid })
+                    selectedShapes.set(vid, { Classification: classification, Id: oid, Value: !currentDMapAreas.has(oid), vid: vid, apt: apt, home: home })
                 }
                 return {
                     selectedShapes: selectedShapes,
@@ -954,6 +971,7 @@ export default class DMap extends React.Component {
     }
 
     renderRightMenu() {
+        let areaDescription = this.props?.campaign?.AreaDescription
         let submaps = this.props?.campaign?.SubMaps ?? []
         return (
             <div className="grid-y" style={{ height: '100%' }}>
@@ -997,6 +1015,7 @@ export default class DMap extends React.Component {
                                 let subMapButtonClassName = ClassNames('button expanded border-none padding-0 margin-0 text-left', {
                                     hollow: this.state.selectedSubmapId != s.Id,
                                 })
+
                                 let result = [
                                     <div
                                         style={{ cursor: 'pointer', marginBottom: '5px' }}
@@ -1024,8 +1043,27 @@ export default class DMap extends React.Component {
                                         height: '28px',
                                         backgroundColor: `#${d.ColorString}`,
                                     }
+
                                     let fixTotal = (d.Total ?? 0) + (d.TotalAdjustment ?? 0)
                                     let fixTarget = (d.Penetration ?? 0) + (d.CountAdjustment ?? 0)
+
+                                    if (this.state.selectedDMapId == d.Id) {
+                                        // calc select shapes
+                                        Array.from(this.state.selectedShapes.values()).forEach((i) => {
+                                            switch (areaDescription) {
+                                                case 'APT ONLY':
+                                                    fixTotal = i.Value === true ? fixTotal + i.apt : fixTotal - i.apt
+                                                    break
+                                                case 'HOME ONLY':
+                                                    fixTotal = i.Value === true ? fixTotal + i.home : fixTotal - i.home
+                                                    break
+                                                case 'APT + HOME':
+                                                    fixTotal = i.Value === true ? fixTotal + i.apt + i.home : fixTotal - i.apt - i.home
+                                                    break
+                                            }
+                                        })
+                                    }
+
                                     let fixPercent = fixTotal > 0 ? ceil(fixTarget / fixTotal, 4) : 0
                                     let fixTotalWithFormat = fixTotal.toLocaleString('en-US', { minimumFractionDigits: 0 })
                                     let fixTargetWithFormat = fixTarget.toLocaleString('en-US', { minimumFractionDigits: 0 })
