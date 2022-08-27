@@ -81,6 +81,7 @@
     <Compile Include="Campaign\CampaignTractImported.cs" />
     <Compile Include="Campaign\DistributionJob.cs" />
     <Compile Include="Campaign\StatusInfo.cs" />
+    <Compile Include="DistributionMap\DistributionMapHole.cs" />
     <Compile Include="DistributionMap\DistributionMap.cs" />
     <Compile Include="DistributionMap\DistributionMapCoordinate.cs" />
     <Compile Include="DistributionMap\DistributionMapRecord.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="SubMap\SubMap.cs" />
     <Compile Include="SubMap\SubMapCoordinate.cs" />
     <Compile Include="SubMap\SubMapDetailItem.cs" />
+    <Compile Include="SubMap\SubMapHole.cs" />
     <Compile Include="SubMap\SubMapRecord.cs" />
     <Compile Include="Task\GTU.cs" />
     <Compile Include="Task\GTUBag.cs" />

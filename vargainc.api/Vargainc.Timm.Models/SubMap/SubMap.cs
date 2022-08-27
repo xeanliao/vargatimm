@@ -55,7 +55,7 @@ namespace Vargainc.Timm.Models
         public virtual ICollection<SubMapDetailItem> FiveZipAreas { get; set; }
         public virtual ICollection<SubMapDetailItem> Tracts { get; set; }
         public virtual ICollection<SubMapDetailItem> PremiumCRoutes { get; set; }
-
+        public virtual ICollection<SubMapHole> Holes { get; set; }
         public virtual List<GtuInfo> GtuInfos { get; set; }
     }
 }

@@ -44,5 +44,7 @@ namespace Vargainc.Timm.Models
         public virtual ICollection<GtuInfo> GtuInfo { get; set; }
         public virtual ICollection<NdAddress> NdAddress { get; set; }
         public virtual ICollection<DistributionJob> DistributionJob { get; set; }
+        public virtual ICollection<DistributionMapHole> Holes { get; set; }
+        
     }
 }

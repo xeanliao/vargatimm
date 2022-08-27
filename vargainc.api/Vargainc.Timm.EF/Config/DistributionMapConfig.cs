@@ -23,6 +23,11 @@ namespace Vargainc.Timm.EF.Config
                 .HasForeignKey(i => i.DistributionMapId)
                 .WillCascadeOnDelete(true);
 
+            HasMany(i => i.Holes)
+                .WithOptional()
+                .HasForeignKey(i => i.DistributionMapId)
+                .WillCascadeOnDelete(true);
+
             HasMany(i => i.DistributionJob)
                 .WithMany()
                 .Map(k => {

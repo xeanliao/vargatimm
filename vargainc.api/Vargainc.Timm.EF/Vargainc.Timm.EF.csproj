@@ -69,6 +69,7 @@
     <Compile Include="Config\CampaignRecordConfig.cs" />
     <Compile Include="Config\CampaignTractImportedConfig.cs" />
     <Compile Include="Config\CompanyConfig.cs" />
+    <Compile Include="Config\DistributionMapHoleConfig.cs" />
     <Compile Include="Config\NdAreaConfig.cs" />
     <Compile Include="Config\DistributionJobConfig.cs" />
     <Compile Include="Config\DistributionMapConfig.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Config\StatusInfoConfig.cs" />
     <Compile Include="Config\SubMapConfig.cs" />
     <Compile Include="Config\SubMapCoordinateConfig.cs" />
+    <Compile Include="Config\SubMapHoleConfig.cs" />
     <Compile Include="Config\SubMapRecordConfig.cs" />
     <Compile Include="Config\TaskConfig.cs" />
     <Compile Include="Config\TaskGtuInfoMappingConfig.cs" />

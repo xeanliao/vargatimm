@@ -24,6 +24,11 @@ namespace Vargainc.Timm.EF.Config
                 .HasForeignKey(i => i.SubMapId)
                 .WillCascadeOnDelete(true);
 
+            HasMany(i => i.Holes)
+                .WithOptional()
+                .HasForeignKey(i => i.SubmapId)
+                .WillCascadeOnDelete(true);
+
             Ignore(i => i.FiveZipAreas);
             Ignore(i => i.BlockGroups);
             Ignore(i => i.Tracts);

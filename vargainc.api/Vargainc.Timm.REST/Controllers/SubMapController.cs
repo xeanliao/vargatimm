@@ -201,6 +201,9 @@ namespace Vargainc.Timm.REST.Controllers
                 return BadRequest();
             }
 
+            var oldSubMapCoordinate = submap.SubMapCoordinates.Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToArray();
+            var oldSubMap = GeometryFactory.CreatePolygon(oldSubMapCoordinate);
+
             var subMapRecords = submap.SubMapRecords
                 .Select(i => i.AreaId)
                 .ToList();
@@ -237,15 +240,42 @@ namespace Vargainc.Timm.REST.Controllers
                     }
                     break;
             }
+
             List<Geometry> cachedGeometry = new List<Geometry>();
+            List<SubMapHole> holes = new List<SubMapHole>();
+
             Geometry mergedPolygon = null;
             Polygon finalPolygon = GeometryFactory.CreatePolygon();
 
             dbGeoms.ForEach(i =>
             {
                 var geom = WKTReader.Read(i.Item5.AsText());
-                geom = geom.Buffer(0);
-                geom.Normalize();
+
+                switch (geom.GeometryType)
+                {
+                    case "Polygon":
+                        geom = GeometryFactory.CreatePolygon(((Polygon)geom).Shell);
+                        geom = geom.Buffer(0);
+                        geom.Normalize();
+                        break;
+                    case "MultiPolygon":
+                        var fixGeom = (MultiPolygon)geom;
+                        Polygon[] geomCollection = new Polygon[fixGeom.NumGeometries];
+                        for (var n = 0; n < fixGeom.NumGeometries; n++)
+                        {
+                            var partGeom = (Polygon)fixGeom.GetGeometryN(n);
+                            partGeom = GeometryFactory.CreatePolygon(partGeom.Shell);
+                            var fixPartGeom = partGeom.Buffer(0);
+                            fixPartGeom.Normalize();
+                            geomCollection[n] = (Polygon)fixPartGeom;
+                        }
+                        geom = GeometryFactory.CreateMultiPolygon(geomCollection);
+                        break;
+                    default:
+                        geom = geom.Buffer(0);
+                        geom.Normalize();
+                        break;
+                }
 
                 geom.UserData = new Record
                 {
@@ -265,11 +295,34 @@ namespace Vargainc.Timm.REST.Controllers
                 }
             });
 
-            if (mergedPolygon != null)
+            if (mergedPolygon == null)
             {
-                // find max area polygon
-                
-                if (mergedPolygon.GeometryType == "MultiPolygon")
+                throw new Exception("merge failed. the merge area is not polygon");
+            }
+
+            // find max area polygon or connect old submap
+            if (mergedPolygon.GeometryType == "MultiPolygon")
+            {
+                bool marched = false;
+                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
+                {
+                    try
+                    {
+                        Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                        if (geom.IsValid && !geom.IsEmpty && geom.Contains(oldSubMap))
+                        {
+                            finalPolygon = geom;
+                            marched = true;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                if (!marched)
                 {
                     for (var i = 0; i < mergedPolygon.NumGeometries; i++)
                     {
@@ -287,130 +340,68 @@ namespace Vargainc.Timm.REST.Controllers
                         }
                     }
                 }
-                else if (mergedPolygon.GeometryType == "Polygon")
-                {
-                    finalPolygon = (Polygon)mergedPolygon;
-                }
+            }
+            else if (mergedPolygon.GeometryType == "Polygon")
+            {
+                finalPolygon = (Polygon)mergedPolygon;
+            }
 
-                // fill holes
-                finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+            if (finalPolygon == null)
+            {
+                throw new Exception("merge failed. the merge area is not polygon");
+            }
 
-                // add missed area
-                if (finalPolygon != null)
-                {
-                    var sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
-                    switch (targetClassification)
+            // fill holes
+            finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+
+            // find holes area
+            var sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
+            switch (targetClassification)
+            {
+                case Classifications.Z5:
                     {
-                        case Classifications.Z5:
-                            {
-                                sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[fivezipareas_all] WITH(INDEX(IX_fivezipareas_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
-                            }
-                            break;
-                        case Classifications.PremiumCRoute:
-                            {
-                                sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[premiumcroutes_all] WITH(INDEX(IX_premiumcroutes_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
-                            }
-                            break;
+                        sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT FROM [dbo].[fivezipareas_all] WITH(INDEX(IX_fivezipareas_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
                     }
-                    var sqlCmd = db.Database.Connection.CreateCommand();
-                    sqlCmd.CommandTimeout = 300;
-                    sqlCmd.CommandText = sql.ToString();
-                    SqlParameter p = new SqlParameter()
+                    break;
+                case Classifications.PremiumCRoute:
                     {
-                        ParameterName = "@p0",
-                        Value = finalPolygon.Buffer(-0.000001).AsText(),
-                        SqlDbType = System.Data.SqlDbType.NVarChar
-                    };
-                    sqlCmd.Parameters.Add(p);
-                    await db.Database.Connection.OpenAsync().ConfigureAwait(false);
-                    var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
-                    var existsArea = cachedGeometry.Select(i => (i.UserData as Record).Id).ToHashSet();
-                    while (sqlReader.Read())
-                    {
-                        var id = sqlReader.GetInt32(0);
-                        if (!existsArea.Contains(id))
-                        {
-                            var geom = WKTReader.Read(((SqlGeometry)sqlReader.GetValue(4)).ToString());
-                            geom = geom.Buffer(0);
-                            geom.Normalize();
-
-                            geom.UserData = new Record
-                            {
-                                Id = id,
-                                Code = sqlReader.GetString(1),
-                                APT = sqlReader.GetInt32(2),
-                                Home = sqlReader.GetInt32(3),
-                            };
-                            cachedGeometry.Add(geom);
-                        }
+                        sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT FROM [dbo].[premiumcroutes_all] WITH(INDEX(IX_premiumcroutes_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
                     }
-                    sqlReader.Close();
-                }
-
-                // merge again
-                mergedPolygon = finalPolygon;
-
-                cachedGeometry.ForEach(geom =>
+                    break;
+            }
+            var sqlCmd = db.Database.Connection.CreateCommand();
+            sqlCmd.CommandTimeout = 300;
+            sqlCmd.CommandText = sql.ToString();
+            SqlParameter p = new SqlParameter()
+            {
+                ParameterName = "@p0",
+                Value = finalPolygon.Buffer(-0.000001).AsText(),
+                SqlDbType = System.Data.SqlDbType.NVarChar
+            };
+            sqlCmd.Parameters.Add(p);
+            await db.Database.Connection.OpenAsync().ConfigureAwait(false);
+            var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
+            var existsArea = cachedGeometry.Select(i => (i.UserData as Record).Id).ToHashSet();
+            while (sqlReader.Read())
+            {
+                var id = sqlReader.GetInt32(0);
+                if (!existsArea.Contains(id))
                 {
-                    mergedPolygon = mergedPolygon.Union(geom);
-                });
+                    var code = sqlReader.GetString(1);
+                    var holeApt = sqlReader.IsDBNull(2) ? null : new int?(sqlReader.GetInt32(2));
+                    var holeHome = sqlReader.IsDBNull(3) ? null : new int?(sqlReader.GetInt32(3));
 
-                // find max area polygon or connect old submap
-                var oldSubMapCoordinate = submap.SubMapCoordinates.Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToArray();
-                var oldSubMap = GeometryFactory.CreatePolygon(oldSubMapCoordinate);
-                finalPolygon = null;
-                if (mergedPolygon.GeometryType == "MultiPolygon")
-                {
-                    bool marched = false;
-                    for (var i = 0; i < mergedPolygon.NumGeometries; i++)
-                    {
-                        try
-                        {
-                            Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
-                            if (geom.IsValid && !geom.IsEmpty && geom.Contains(oldSubMap))
-                            {
-                                finalPolygon = geom;
-                                marched = true;
-                                break;
-                            }
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-
-                    if (!marched)
-                    {
-                        for (var i = 0; i < mergedPolygon.NumGeometries; i++)
-                        {
-                            Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
-                            if (geom.IsValid && !geom.IsEmpty)
-                            {
-                                if (finalPolygon == null)
-                                {
-                                    finalPolygon = geom;
-                                }
-                                else
-                                {
-                                    finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
-                                }
-                            }
-                        }
-                    }
+                    holes.Add(new SubMapHole { SubmapId = submapId, AreaId = id, Code = code, Apt = holeApt, Home = holeHome });
                 }
-                else if (mergedPolygon.GeometryType == "Polygon")
-                {
-                    finalPolygon = (Polygon)mergedPolygon;
-                }
+            }
+            sqlReader.Close();
 
-                // fill holes
-                finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+            await db.SubMapHoles.Where(i => i.SubmapId == submapId).DeleteAsync().ConfigureAwait(false);
 
-                if (finalPolygon == null)
-                {
-                    throw new Exception("merge failed. the merge area is not polygon");
-                }
+            if (holes.Count > 0)
+            {
+                db.SubMapHoles.AddRange(holes);
+                await db.SaveChangesAsync().ConfigureAwait(false);
             }
 
             // calc apt home
@@ -474,8 +465,7 @@ namespace Vargainc.Timm.REST.Controllers
                 transaction.Commit();
             }
 
-
-            return Json(new { sucess = true });
+            return Json(new { success = true, holes = holes });
         }
 
         [HttpDelete]
@@ -490,6 +480,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var tran = db.Database.BeginTransaction())
             {
+                await db.SubMapHoles.Where(i => i.SubmapId == submapId).DeleteAsync().ConfigureAwait(false);
                 await db.SubMapRecords.Where(i=>i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
                 await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
                 await db.SubMaps.Where(i => i.Id == submapId).DeleteAsync().ConfigureAwait(false);
@@ -512,6 +503,7 @@ namespace Vargainc.Timm.REST.Controllers
 
             using (var tran = db.Database.BeginTransaction())
             {
+                await db.SubMapHoles.Where(i=>i.SubmapId == submapId).DeleteAsync().ConfigureAwait(false);
                 await db.SubMapRecords.Where(i => i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
                 await db.SubMapCoordinates.Where(i => i.SubMapId == submapId).DeleteAsync().ConfigureAwait(false);
                 

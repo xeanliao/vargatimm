@@ -48,6 +48,7 @@ namespace Vargainc.Timm.EF
             modelBuilder.Configurations.Add(new SubMapConfig());
             modelBuilder.Configurations.Add(new SubMapCoordinateConfig());
             modelBuilder.Configurations.Add(new SubMapRecordConfig());
+            modelBuilder.Configurations.Add(new SubMapHoleConfig()); ;
 
             modelBuilder.Configurations.Add(new RadiusesConfig());
             modelBuilder.Configurations.Add(new AddressConfig());
@@ -55,6 +56,7 @@ namespace Vargainc.Timm.EF
             modelBuilder.Configurations.Add(new DistributionMapConfig());
             modelBuilder.Configurations.Add(new DistributionMapCoordinateConfig());
             modelBuilder.Configurations.Add(new DistributionMapRecordConfig());
+            modelBuilder.Configurations.Add(new DistributionMapHoleConfig());
             modelBuilder.Configurations.Add(new DistributionJobConfig());
 
             modelBuilder.Configurations.Add(new GTUConfig());
@@ -96,6 +98,7 @@ namespace Vargainc.Timm.EF
         public DbSet<SubMap> SubMaps { get; set; }
         public DbSet<SubMapRecord> SubMapRecords { get; set; }
         public DbSet<SubMapCoordinate> SubMapCoordinates { get; set; }
+        public DbSet<SubMapHole> SubMapHoles { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Radiuses> Radiuses { get; set; }
         public DbSet<Campaign> Campaigns { get; set; }
@@ -103,6 +106,7 @@ namespace Vargainc.Timm.EF
         public DbSet<DistributionMap> DistributionMaps { get; set; }
         public DbSet<DistributionMapCoordinate> DistributionMapCoordinates { get; set; }
         public DbSet<DistributionMapRecord> DistributionMapRecords { get; set; }
+        public DbSet<DistributionMapHole> DistributionMapHoles { get; set; }
         public DbSet<DistributionJob> DistributionJobs { get; set; }
 
         public DbSet<Task> Tasks { get; set; }

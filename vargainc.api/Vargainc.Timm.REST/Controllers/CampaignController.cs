@@ -305,10 +305,11 @@ namespace Vargainc.Timm.REST.Controllers
         public async Task<IHttpActionResult> GetCampaignWithSubMap(int campaignId)
         {
             var campaign = await db.Campaigns
-                .Include(i=>i.SubMaps)
-                .Include(i=>i.Addresses)
+                .Include(i => i.SubMaps)
+                .Include(i => i.Addresses)
                 .Include(i => i.SubMaps.Select(y => y.SubMapRecords))
-                .Where(i=>i.Id == campaignId)
+                .Include(i => i.SubMaps.Select(y => y.Holes))
+                .Where(i => i.Id == campaignId)
                 .Select(i => new
                 {
                     i.Id,
@@ -320,33 +321,35 @@ namespace Vargainc.Timm.REST.Controllers
                     i.Latitude,
                     i.AreaDescription,
                     i.ZoomLevel,
-                    Addresses = i.Addresses.Select(a=>new 
-                    { 
-                        a.AddressName, 
-                        a.Color, 
-                        a.Radiuses, 
-                        a.ZipCode, 
-                        a.Id, 
-                        a.Latitude, 
+                    Addresses = i.Addresses.Select(a => new
+                    {
+                        a.AddressName,
+                        a.Color,
+                        a.Radiuses,
+                        a.ZipCode,
+                        a.Id,
+                        a.Latitude,
                         a.Longitude
-                    }).OrderBy(a=>a.AddressName).ToList(),
-                    SubMaps = i.SubMaps.Select(s=>new
-                    { 
-                        s.Id, 
-                        s.ColorString, 
-                        s.CountAdjustment, 
-                        s.Name, 
-                        s.OrderId, 
+                    }).OrderBy(a => a.AddressName).ToList(),
+                    SubMaps = i.SubMaps.Select(s => new
+                    {
+                        s.Id,
+                        s.ColorString,
+                        s.CountAdjustment,
+                        s.Name,
+                        s.OrderId,
                         s.Total,
-                        s.Penetration, 
-                        s.Percentage, 
+                        s.Penetration,
+                        s.Percentage,
                         s.TotalAdjustment,
                         s.CampaignId,
-                        SubMapRecords = s.SubMapRecords.Select(r=>new { 
+                        SubMapRecords = s.SubMapRecords.Select(r => new
+                        {
                             r.Classification,
                             r.AreaId
-                        }).ToList()
-                    }).OrderBy(s=>s.OrderId).ToList()
+                        }).ToList(),
+                        Holes = s.Holes.ToList()
+                    }).OrderBy(s => s.OrderId).ToList()
                 })
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
@@ -360,7 +363,13 @@ namespace Vargainc.Timm.REST.Controllers
             var campaign = await db.Campaigns.FindAsync(campaignId).ConfigureAwait(false);
             var submaps = await db.SubMaps.Include(i=>i.SubMapRecords).Where(i=>i.CampaignId == campaignId).ToListAsync().ConfigureAwait(false);
             var submapIds = submaps.Select(i => i.Id).ToArray();
-            var dmaps = await db.DistributionMaps.Include(i=>i.DistributionMapRecords).Where(i=>submapIds.Contains(i.SubMapId)).OrderBy(i=>i.SubMapId).ToListAsync().ConfigureAwait(false);
+            var dmaps = await db.DistributionMaps
+                .Include(i=>i.DistributionMapRecords)
+                .Include(i=>i.Holes)
+                .Where(i=>submapIds.Contains(i.SubMapId))
+                .OrderBy(i=>i.SubMapId)
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             var submapResults = submaps.Select(s => new
             {
@@ -378,19 +387,21 @@ namespace Vargainc.Timm.REST.Controllers
                     r.Classification,
                     r.AreaId
                 }).ToList(),
-                DMaps = dmaps.Where(d=>d.SubMapId == s.Id).Select(d=> new { 
-                    d.Id,
-                    s.CampaignId,
-                    d.SubMapId,
-                    d.Name,
-                    d.ColorString,
-                    d.Total,
-                    d.Penetration,
-                    d.Percentage,
-                    d.TotalAdjustment,
-                    d.CountAdjustment,
-                    DMapRecords = d.DistributionMapRecords.Select(r => new { Classification = s.SubMapRecords.First().Classification ,r.AreaId })
-                })
+                DMaps = dmaps.Where(d=>d.SubMapId == s.Id)
+                    .Select(d=> new { 
+                        d.Id,
+                        s.CampaignId,
+                        d.SubMapId,
+                        d.Name,
+                        d.ColorString,
+                        d.Total,
+                        d.Penetration,
+                        d.Percentage,
+                        d.TotalAdjustment,
+                        d.CountAdjustment,
+                        DMapRecords = d.DistributionMapRecords.Select(r => new { Classification = s.SubMapRecords.First().Classification ,r.AreaId }).ToList(),
+                        Holes = d.Holes.ToList()
+                    })
             }).OrderBy(s=>s.OrderId).ToList();
 
             var result = new
