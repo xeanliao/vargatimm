@@ -154,6 +154,8 @@ export default class Campaign extends React.Component {
             selectedSubmapId: null,
             campaignSource: { features: [] },
             mapStyle: 'streets',
+            holes: [],
+            showHole: null,
         }
 
         this.onInitSubMapScrollbar = this.onInitSubMapScrollbar.bind(this)
@@ -190,6 +192,9 @@ export default class Campaign extends React.Component {
         this.clearPopup = this.clearPopup.bind(this)
 
         this.getActiveLayer = this.getActiveLayer.bind(this)
+
+        this.onShowHole = this.onShowHole.bind(this)
+        this.onSwitchHole = this.onSwitchHole.bind(this)
 
         this.map = null
 
@@ -414,7 +419,6 @@ export default class Campaign extends React.Component {
                     'source-layer': item.layer,
                     minzoom: item.zoom[0],
                     maxzoom: item.zoom[1],
-                    // layout: { visibility: 'none' },
                     paint: {
                         'fill-pattern': 'remove_pattern',
                     },
@@ -565,6 +569,27 @@ export default class Campaign extends React.Component {
             labelLayer
         )
 
+        // holes layer
+        layersDefine.forEach((item) => {
+            this.map.addLayer(
+                {
+                    id: `timm-area-layer-${item.layer}-holes`,
+                    type: 'fill',
+                    source: `area-source-${item.layer}`,
+                    'source-layer': item.layer,
+                    minzoom: item.zoom[0],
+                    maxzoom: item.zoom[1],
+                    paint: {
+                        // 'fill-pattern': 'remove_pattern',
+                        'fill-color': '#ffffff',
+                        'fill-opacity': 1,
+                    },
+                    filter: ['==', 'name', ''],
+                },
+                labelLayer
+            )
+        })
+
         // fit all submap
         let mapBbox = (this.state.campaignSource.features ?? [])
             .filter((i) => i.properties?.type == 'submap')
@@ -706,7 +731,7 @@ export default class Campaign extends React.Component {
                     ])
                 }
 
-                return { selectedSubmapId: submap.Id, allowedLayers: allowedLayers, activeLayers: activeLayers, selectedShapes: new Map() }
+                return { selectedSubmapId: submap.Id, allowedLayers: allowedLayers, activeLayers: activeLayers, selectedShapes: new Map(), holes: submap.Holes }
             },
             () => {
                 //set selected layer fill color as submap color
@@ -761,9 +786,11 @@ export default class Campaign extends React.Component {
         if (!this.state.selectedSubmapId) {
             return
         }
-
-        let id = e.features?.[0]?.properties?.id
-        let name = e.features?.[0]?.properties?.name
+        let properties = e.features?.[0]?.properties
+        let id = properties?.id
+        let name = properties?.name
+        let apt = properties?.apt ?? 0
+        let home = properties?.home ?? 0
 
         // check is allowed layer
         let activeLayer = this.getActiveLayer()
@@ -788,7 +815,7 @@ export default class Campaign extends React.Component {
                 if (selectedShapes.has(id)) {
                     selectedShapes.delete(id)
                 } else {
-                    selectedShapes.set(id, { Classification: activeLayer, Id: id, Value: !currentShapes.has(id), Name: name })
+                    selectedShapes.set(id, { Classification: activeLayer, Id: id, Value: !currentShapes.has(id), Name: name, apt: apt, home: home })
                 }
 
                 let allowedLayers = new Set([activeLayer])
@@ -945,10 +972,13 @@ export default class Campaign extends React.Component {
             }
         })
         let url = `campaign/${this.props.campaign.Id}/submap/${this.state.selectedSubmapId}/merge`
-        axios.post(url, data).then(() => {
-            this.loadSubmapList()
-            this.loadCampaignGeojson()
-            this.clearSelectedShapes()
+        axios.post(url, data).then((rep) => {
+            if (rep.data.success == true) {
+                this.loadSubmapList()
+                this.loadCampaignGeojson()
+                this.clearSelectedShapes()
+                this.setState({ holes: rep.data.holes })
+            }
         })
     }
 
@@ -1109,7 +1139,7 @@ export default class Campaign extends React.Component {
     }
 
     onSearchZip(searchKey) {
-        if (searchKey == null || searchKey.trim().length != 5) {
+        if (searchKey == null || searchKey.trim().length == 0) {
             return
         }
         axios.get(`area/zip/${searchKey}`).then((resp) => {
@@ -1163,18 +1193,50 @@ export default class Campaign extends React.Component {
         window.open(`api/campaign/${this.props?.campaign?.Id}/penetration`)
     }
 
+    onShowHole(code) {
+        let activeLayer = this.getActiveLayer()
+
+        if (code == this.state.showHole) {
+            this.setState({ showHole: null })
+            this.map.setFilter(`timm-area-layer-${activeLayer}-holes`, ['==', ['get', 'name'], ''])
+        } else {
+            this.setState({ showHole: code })
+            this.map.setFilter(`timm-area-layer-${activeLayer}-holes`, ['==', ['get', 'name'], code])
+        }
+    }
+
+    onSwitchHole(hole) {
+        let selectedShapes = new Map(this.state.selectedShapes)
+        if (selectedShapes.has(hole.AreaId)) {
+            selectedShapes.delete(hole.AreaId)
+        } else {
+            var subMap = this.props.campaign.SubMaps.filter((s) => s.Id == this.state.selectedSubmapId)?.[0]
+            selectedShapes.set(hole.AreaId, {
+                Classification: subMap.SubMapRecords?.[0]?.Classification,
+                Id: hole.AreaId,
+                Value: true,
+                Name: hole.Code,
+                apt: hole.Apt,
+                home: hole.Home,
+            })
+        }
+
+        this.setState({ selectedShapes: selectedShapes })
+    }
+
     render() {
         return (
             <div className="campaign full-container">
                 <div className="grid-x grid-margin-x medium-margin-collapse" style={{ height: '100%' }}>
                     <div className="small-8 medium-9 large-10 cell">{this.renderMapbox()}</div>
-                    <div className="small-4 medium-3 large-2 cell">{this.renderRightMenu()}</div>
+                    <div className="small-4 medium-3 large-2 cell bordered">{this.renderRightMenu()}</div>
                 </div>
             </div>
         )
     }
 
     renderRightMenu() {
+        let areaDescription = this.props?.campaign?.AreaDescription
         let submaps = this.props?.campaign?.SubMaps ?? []
         return (
             <div className="grid-y grid-frame">
@@ -1339,6 +1401,24 @@ export default class Campaign extends React.Component {
                                     backgroundColor: `#${s.ColorString}`,
                                 }
                                 let fixTotal = (s.Total ?? 0) + (s.TotalAdjustment ?? 0)
+
+                                if (this.state.selectedSubmapId == s.Id) {
+                                    // calc select shapes
+                                    Array.from(this.state.selectedShapes.values()).forEach((i) => {
+                                        switch (areaDescription) {
+                                            case 'APT ONLY':
+                                                fixTotal = i.Value === true ? fixTotal + i.apt : fixTotal - i.apt
+                                                break
+                                            case 'HOME ONLY':
+                                                fixTotal = i.Value === true ? fixTotal + i.home : fixTotal - i.home
+                                                break
+                                            case 'APT + HOME':
+                                                fixTotal = i.Value === true ? fixTotal + i.apt + i.home : fixTotal - i.apt - i.home
+                                                break
+                                        }
+                                    })
+                                }
+
                                 let fixTarget = (s.Penetration ?? 0) + (s.CountAdjustment ?? 0)
                                 let fixPercent = fixTotal > 0 ? ceil(fixTarget / fixTotal, 4) : 0
                                 let fixTotalWithFormat = fixTotal.toLocaleString('en-US', { minimumFractionDigits: 0 })
@@ -1405,6 +1485,47 @@ export default class Campaign extends React.Component {
                     </div>
                 </div>
                 <div className="map-top-center"></div>
+                {this.renderHolesMenu()}
+            </div>
+        )
+    }
+
+    renderHolesMenu() {
+        if (this.state.holes.length == 0) {
+            return null
+        }
+        return (
+            <div
+                className="map-right-center bg-white padding-1 bordered"
+                style={{ right: '-1px', borderRight: '#f8f8f8', backgroundColor: '#f8f8f8', maxHeight: '400px', overflowY: 'auto' }}
+            >
+                <p className="h6 text-center">HOLES</p>
+                <ul className="vertical menu">
+                    {this.state.holes.map((i) => {
+                        let checked = this.state.selectedShapes.has(i.AreaId)
+                        return (
+                            <li key={i.AreaId} className="flex-container align-middle" style={{ marginBottom: '2px' }}>
+                                <div className="switch tiny-small margin-0 display-inline">
+                                    <input
+                                        className="switch-input"
+                                        id={`hole-${i.AreaId}`}
+                                        type="checkbox"
+                                        name="hole"
+                                        checked={checked}
+                                        value={i.AreaId}
+                                        onChange={() => {
+                                            this.onSwitchHole(i)
+                                        }}
+                                    />
+                                    <label className="switch-paddle" htmlFor={`hole-${i.AreaId}`}></label>
+                                </div>
+                                <a className="padding-0" onClick={() => this.onShowHole(i.Code)} style={{ marginLeft: '5px' }} title={`APT: ${i.Apt} HOME: ${i.Home}`}>
+                                    <span>{i.Code}</span>
+                                </a>
+                            </li>
+                        )
+                    })}
+                </ul>
             </div>
         )
     }

@@ -26,6 +26,13 @@
         top: 5px;
     }
 
+    .map-right-center {
+        position: absolute;
+        right: 0;
+        margin-right: 0;
+        top: 50%;
+    }
+
     @mixin geoinput {
         opacity: 1;
         text-align: left;

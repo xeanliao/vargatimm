@@ -243,6 +243,9 @@ FakesAssemblies/
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
 
+# vs code bookmark
+**/.vscode/bookmarks.json
+
 # Paket dependency manager
 .paket/paket.exe
 

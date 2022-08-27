@@ -269,3 +269,38 @@ table .select2-container{
         z-index: 9999;
     }
 }
+
+
+@mixin switch-size(
+  $font-size: 1rem,
+  $switch-height: 2rem,
+  $paddle-offset: 0.25rem
+) {
+
+  $switch-width: $switch-height * 2;
+  $paddle-width: $switch-height - ($paddle-offset * 2);
+  $paddle-height: $switch-height - ($paddle-offset * 2);
+  $paddle-active-offest: $switch-width - $paddle-width - $paddle-offset;
+
+  height: $switch-height;
+
+  .switch-paddle {
+    width: $switch-width;
+    height: $switch-height;
+    font-size: $font-size;
+  }
+
+  .switch-paddle::after {
+    top: $paddle-offset;
+    left: 2px;
+    width: $paddle-width;
+    height: $paddle-height;
+  }
+
+  input:checked ~ .switch-paddle::after {
+    left: 18px;
+  }
+}
+.switch.tiny-small {
+    @include switch-size(0.1rem, 1rem, 0.1rem);
+}

@@ -6,7 +6,6 @@ import { color } from 'd3-color'
 import axios from 'axios'
 import Logger from 'logger.mjs'
 import ClassNames from 'classnames'
-import moment from 'moment'
 import { ceil } from 'lodash'
 
 import Helper from 'views/base'
@@ -128,11 +127,11 @@ const layersDefine = [
     },
 ]
 
-const Classification = new Map([
-    [0, 'Z3'],
-    [1, 'Z5'],
-    [15, 'PremiumCRoute'],
-])
+// const Classification = new Map([
+//     [0, 'Z3'],
+//     [1, 'Z5'],
+//     [15, 'PremiumCRoute'],
+// ])
 
 export default class DMap extends React.Component {
     static propTypes = {
@@ -142,15 +141,16 @@ export default class DMap extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            mapInited: false,
+            mapInit: false,
             mapReady: false,
             activeLayers: new Set(),
             allowedLayers: new Set(['Z3', 'Z5', 'PremiumCRoute']),
             selectedShapes: new Map(),
             selectedSubmapId: null,
-            campaginSource: { features: [] },
-            // mapStyle: 'satellite',
-            mapStyle: 'streets',
+            // campaignSource: { features: [] },
+            mapStyle: 'streets', //'satellite'
+            holes: [],
+            showHole: null,
         }
 
         this.onInitMenuScrollbar = this.onInitMenuScrollbar.bind(this)
@@ -174,6 +174,9 @@ export default class DMap extends React.Component {
 
         this.onSearchZip = this.onSearchZip.bind(this)
         this.clearPopup = this.clearPopup.bind(this)
+
+        this.onShowHole = this.onShowHole.bind(this)
+        this.onSwitchHole = this.onSwitchHole.bind(this)
 
         this.subscribe = Helper.subscribe.bind(this)
         this.doUnsubscribe = Helper.doUnsubscribe.bind(this)
@@ -199,7 +202,7 @@ export default class DMap extends React.Component {
     onInitMap(mapContainer) {
         if (mapContainer) {
             this.setState((state) => {
-                if (state.mapInited == false) {
+                if (state.mapInit == false) {
                     mapboxgl.accessToken = MapboxToken
                     let zoom = this.props.campaign.ZoomLevel ?? 8
                     let center = [this.props.campaign.Longitude ?? -73.987378, this.props.campaign.Latitude ?? 40.744556]
@@ -215,9 +218,9 @@ export default class DMap extends React.Component {
                         // style: 'mapbox://styles/mapbox/navigation-preview-night-v4',
                     })
                     this.map.on('load', this.onMapLoad)
-                    log.info(`mapbox inited`)
+                    log.info(`mapbox init`)
                 }
-                return { mapInited: true }
+                return { mapInit: true }
             })
         }
     }
@@ -605,6 +608,20 @@ export default class DMap extends React.Component {
                     labelLayer
                 )
 
+                // holes layer
+                this.map.addLayer(
+                    {
+                        id: 'timm-area-layer-holes',
+                        type: 'fill',
+                        source: 'map-source',
+                        paint: {
+                            'fill-color': '#ffffff',
+                        },
+                        filter: ['==', ['get', 'name'], ''],
+                    },
+                    labelLayer
+                )
+
                 // event
                 this.map.on('click', `timm-area-layer-fill`, this.onShapeSelect)
                 this.map.off('contextmenu', `timm-area-layer-fill`, this.onShowShapePopup)
@@ -649,6 +666,7 @@ export default class DMap extends React.Component {
         this.setState({ selectedShapes: new Map() }, () => {
             this.map.setFilter(`timm-area-layer-remove`, ['==', 'vid', ''])
             this.map.setFilter(`timm-area-layer-selected`, ['==', 'vid', ''])
+            this.map.setFilter(`timm-area-layer-holes`, ['==', 'name', ''])
         })
     }
 
@@ -703,7 +721,7 @@ export default class DMap extends React.Component {
         }
         let subMap = this.props.campaign.SubMaps.filter((s) => s.Id == dMap.SubMapId)?.[0]
         this.onSubmapSelect(subMap).then(() => {
-            this.setState({ selectedDMapId: dMap.Id, selectedShapes: new Map() }, () => {
+            this.setState({ selectedDMapId: dMap.Id, selectedShapes: new Map(), holes: dMap.Holes }, () => {
                 this.map.setLayoutProperty(`timm-area-layer-remove`, 'visibility', 'none')
                 this.map.setLayoutProperty(`timm-area-layer-selected`, 'visibility', 'none')
                 this.map.setPaintProperty(`timm-area-layer-selected`, 'fill-color', color(`#${dMap.ColorString}`).toString())
@@ -908,9 +926,40 @@ export default class DMap extends React.Component {
             }
         })
         let url = `campaign/${this.props.campaign.Id}/dmap/${this.state.selectedDMapId}/merge`
-        axios.post(url, data).then(() => {
-            this.onRefresh()
+        axios.post(url, data).then((rep) => {
+            if (rep.data.success) {
+                this.setState({ holes: rep.data.holes }, this.onRefresh)
+            }
         })
+    }
+
+    onShowHole(code) {
+        if (code == this.state.showHole) {
+            this.setState({ showHole: null })
+            this.map.setFilter(`timm-area-layer-holes`, ['==', 'name', ''])
+        } else {
+            this.setState({ showHole: code })
+            this.map.setFilter(`timm-area-layer-holes`, ['==', 'name', code])
+        }
+    }
+
+    onSwitchHole(hole) {
+        let selectedShapes = new Map(this.state.selectedShapes)
+        if (selectedShapes.has(hole.AreaId)) {
+            selectedShapes.delete(hole.AreaId)
+        } else {
+            var dMap = this.props.campaign.SubMaps.flatMap((s) => s.DMaps).filter((d) => d.Id == this.state.selectedDMapId)?.[0]
+            selectedShapes.set(hole.AreaId, {
+                Classification: dMap.DMapRecords?.[0]?.Classification,
+                Id: hole.AreaId,
+                Value: true,
+                Name: hole.Code,
+                apt: hole.Apt,
+                home: hole.Home,
+            })
+        }
+
+        this.setState({ selectedShapes: selectedShapes })
     }
 
     onSearchZip(searchKey) {
@@ -964,7 +1013,7 @@ export default class DMap extends React.Component {
             <div className="dmap full-container">
                 <div className="grid-x grid-margin-x medium-margin-collapse" style={{ height: '100%' }}>
                     <div className="small-10 cell">{this.renderMapbox()}</div>
-                    <div className="small-2 cell">{this.renderRightMenu()}</div>
+                    <div className="small-2 cell bordered">{this.renderRightMenu()}</div>
                 </div>
             </div>
         )
@@ -1128,6 +1177,47 @@ export default class DMap extends React.Component {
                     </div>
                 </div>
                 <div className="map-top-center"></div>
+                {this.renderHolesMenu()}
+            </div>
+        )
+    }
+
+    renderHolesMenu() {
+        if (this.state.holes.length == 0) {
+            return null
+        }
+        return (
+            <div
+                className="map-right-center bg-white padding-1 bordered"
+                style={{ right: '-1px', borderRight: '#f8f8f8', backgroundColor: '#f8f8f8', maxHeight: '400px', overflowY: 'auto' }}
+            >
+                <p className="h6 text-center">HOLES</p>
+                <ul className="vertical menu">
+                    {this.state.holes.map((i) => {
+                        let checked = this.state.selectedShapes.has(i.AreaId)
+                        return (
+                            <li key={i.AreaId} className="flex-container align-middle" style={{ marginBottom: '2px' }}>
+                                <div className="switch tiny-small margin-0 display-inline">
+                                    <input
+                                        className="switch-input"
+                                        id={`hole-${i.AreaId}`}
+                                        type="checkbox"
+                                        name="hole"
+                                        checked={checked}
+                                        value={i.AreaId}
+                                        onChange={() => {
+                                            this.onSwitchHole(i)
+                                        }}
+                                    />
+                                    <label className="switch-paddle" htmlFor={`hole-${i.AreaId}`}></label>
+                                </div>
+                                <a className="padding-0" onClick={() => this.onShowHole(i.Code)} style={{ marginLeft: '5px' }} title={`APT: ${i.Apt} HOME: ${i.Home}`}>
+                                    <span>{i.Code}</span>
+                                </a>
+                            </li>
+                        )
+                    })}
+                </ul>
             </div>
         )
     }
