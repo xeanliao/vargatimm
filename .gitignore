@@ -259,3 +259,4 @@ _Pvt_Extensions
 .scripts_cache
 
 **/*.tar.gz
+!publish/**/bin/**
