@@ -371,7 +371,7 @@ namespace Vargainc.Timm.REST.Controllers
         public async Task<IHttpActionResult> MergeAreas(int campaignId, int dMapId, [FromBody] List<AreaRecord> records)
         {
             var campaign = await db.Campaigns.FindAsync(campaignId);
-            var dMap = await db.DistributionMaps.Where(i => i.Id == dMapId).FirstOrDefaultAsync().ConfigureAwait(false);
+            var dMap = await db.DistributionMaps.Where(i => i.Id == dMapId).Include(i=>i.SubMap).FirstOrDefaultAsync().ConfigureAwait(false);
             if (campaign == null || dMap == null)
             {
                 return BadRequest();
@@ -386,6 +386,10 @@ namespace Vargainc.Timm.REST.Controllers
             {
                 return BadRequest();
             }
+
+            var otherDMaps = dMap.SubMap.DistributionMaps.Where(i=>i.Id != dMapId).Select(i => i.Id).ToHashSet();
+            var otherDMapRecords = db.DistributionMapRecords.Where(i => otherDMaps.Contains(i.DistributionMapId)).Select(i => i.AreaId).ToHashSet();
+            needAddRecords = needAddRecords.Where(i => !otherDMapRecords.Contains(i)).ToList();
 
             var dMapRecords = dMap.DistributionMapRecords
                 .Select(i => i.AreaId)
@@ -425,6 +429,7 @@ namespace Vargainc.Timm.REST.Controllers
             }
             List<Geometry> cachedGeometry = new List<Geometry>();
             Geometry mergedPolygon = null;
+            Polygon finalPolygon = GeometryFactory.CreatePolygon();
 
             dbGeoms.ForEach(i =>
             {
@@ -450,152 +455,181 @@ namespace Vargainc.Timm.REST.Controllers
                 }
             });
 
-            // dmap should in submap
-            var submapId = dMap.SubMapId;
-            var submapCoordinates = db.SubMapCoordinates
-                .Where(i => i.SubMapId == submapId)
-                .OrderBy(i => i.Id)
-                .Select(i => new { i.Longitude, i.Latitude })
-                .ToList()
-                .Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0))
-                .ToArray();
-
-            var subMapPolygon = GeometryFactory.CreatePolygon(submapCoordinates);
-
-            mergedPolygon = subMapPolygon.Intersection(mergedPolygon);
-
-            // find max area polygon
-            Polygon finalPolygon = null;
-            if (mergedPolygon.GeometryType == "MultiPolygon" || mergedPolygon.GeometryType == "GeometryCollection")
+            if (mergedPolygon != null)
             {
-                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
+                // dmap should in submap
+                var submapId = dMap.SubMapId;
+                var submapCoordinates = db.SubMapCoordinates
+                    .Where(i => i.SubMapId == submapId)
+                    .OrderBy(i => i.Id)
+                    .Select(i => new { i.Longitude, i.Latitude })
+                    .ToList()
+                    .Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0))
+                    .ToArray();
+
+                var subMapPolygon = GeometryFactory.CreatePolygon(submapCoordinates);
+
+                mergedPolygon = subMapPolygon.Intersection(mergedPolygon);
+
+                // find max area polygon
+                
+                if (mergedPolygon.GeometryType == "MultiPolygon" || mergedPolygon.GeometryType == "GeometryCollection")
                 {
-                    try
+                    for (var i = 0; i < mergedPolygon.NumGeometries; i++)
                     {
-                        Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
-                        if (geom.IsValid && !geom.IsEmpty)
+                        try
                         {
-                            if (finalPolygon == null)
+                            Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                            if (geom.IsValid && !geom.IsEmpty)
+                            {
+                                if (finalPolygon == null)
+                                {
+                                    finalPolygon = geom;
+                                }
+                                else
+                                {
+                                    finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
+                                }
+                            }
+                        }
+                        catch
+                        {
+
+                        }
+
+                    }
+                }
+                else if (mergedPolygon.GeometryType == "Polygon")
+                {
+                    finalPolygon = (Polygon)mergedPolygon;
+                }
+
+                // fill holes
+                finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
+
+                // add missed area
+                if (finalPolygon != null && finalPolygon.Area > 0)
+                {
+                    var sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
+                    switch (targetClassification)
+                    {
+                        case Classifications.Z5:
+                            {
+                                sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[fivezipareas_all] WITH(INDEX(IX_fivezipareas_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
+                            }
+                            break;
+                        case Classifications.PremiumCRoute:
+                            {
+                                sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[premiumcroutes_all] WITH(INDEX(IX_premiumcroutes_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
+                            }
+                            break;
+                    }
+                    var sqlCmd = db.Database.Connection.CreateCommand();
+                    sqlCmd.CommandTimeout = 300;
+                    sqlCmd.CommandText = sql.ToString();
+                    SqlParameter p = new SqlParameter()
+                    {
+                        ParameterName = "@p0",
+                        Value = finalPolygon.Buffer(-0.000001).AsText(),
+                        SqlDbType = System.Data.SqlDbType.NVarChar
+                    };
+                    sqlCmd.Parameters.Add(p);
+                    await db.Database.Connection.OpenAsync().ConfigureAwait(false);
+                    var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
+                    var existsArea = cachedGeometry.Select(i => (i.UserData as Record).Id).ToHashSet();
+                    while (sqlReader.Read())
+                    {
+                        var id = sqlReader.GetInt32(0);
+                        if (!existsArea.Contains(id))
+                        {
+                            var geom = WKTReader.Read(((SqlGeometry)sqlReader.GetValue(4)).ToString());
+                            geom = geom.Buffer(0);
+                            geom.Normalize();
+
+                            geom.UserData = new Record
+                            {
+                                Id = id,
+                                Code = sqlReader.GetString(1),
+                                APT = sqlReader.GetInt32(2),
+                                Home = sqlReader.GetInt32(3),
+                            };
+                            cachedGeometry.Add(geom);
+                        }
+                    }
+                    sqlReader.Close();
+                }
+
+                // merge again
+                mergedPolygon = finalPolygon;
+
+                cachedGeometry.ForEach(geom =>
+                {
+                    mergedPolygon = mergedPolygon.Union(geom);
+                });
+
+                // find connect old dmap or max area polygon
+                // load old dmap
+                var oldDMapCoordinate = dMap.DistributionMapCoordinates.Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToArray();
+                var oldDMap = GeometryFactory.CreatePolygon(oldDMapCoordinate);
+
+                finalPolygon = null;
+                if (mergedPolygon.GeometryType == "MultiPolygon" || mergedPolygon.GeometryType == "GeometryCollection")
+                {
+                    bool marched = false;
+                    for (var i = 0; i < mergedPolygon.NumGeometries; i++)
+                    {
+                        try
+                        {
+                            Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                            if (geom.IsValid && !geom.IsEmpty && geom.Contains(oldDMap))
                             {
                                 finalPolygon = geom;
+                                marched = true;
+                                break;
                             }
-                            else
+                        }
+                        catch
+                        {
+
+                        }
+
+                    }
+                    if (!marched)
+                    {
+                        for (var i = 0; i < mergedPolygon.NumGeometries; i++)
+                        {
+                            try
                             {
-                                finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
+                                Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
+                                if (geom.IsValid && !geom.IsEmpty)
+                                {
+                                    if (finalPolygon == null)
+                                    {
+                                        finalPolygon = geom;
+                                    }
+                                    else
+                                    {
+                                        finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
+                                    }
+                                }
                             }
-                        }
-                    }
-                    catch
-                    {
-
-                    }
-                    
-                }
-            }
-            else if (mergedPolygon.GeometryType == "Polygon")
-            {
-                finalPolygon = (Polygon)mergedPolygon;
-            }
-            
-            // fill holes
-            finalPolygon = GeometryFactory.CreatePolygon(finalPolygon.Shell);
-
-            // add missed area
-            if (finalPolygon != null && finalPolygon.Area > 0)
-            {
-                var sql = new StringBuilder($"DECLARE @g geometry = geometry::STPolyFromText(@p0, {SRID_DB});");
-                switch (targetClassification)
-                {
-                    case Classifications.Z5:
-                        {
-                            sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[fivezipareas_all] WITH(INDEX(IX_fivezipareas_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
-                        }
-                        break;
-                    case Classifications.PremiumCRoute:
-                        {
-                            sql.AppendLine($"SELECT Id, Code, APT_COUNT, HOME_COUNT, Geom FROM [dbo].[premiumcroutes_all] WITH(INDEX(IX_premiumcroutes_all_Geom)) WHERE Geom.STIntersects(@g) = 1");
-                        }
-                        break;
-                }
-                var sqlCmd = db.Database.Connection.CreateCommand();
-                sqlCmd.CommandTimeout = 300;
-                sqlCmd.CommandText = sql.ToString();
-                SqlParameter p = new SqlParameter()
-                {
-                    ParameterName = "@p0",
-                    Value = finalPolygon.Buffer(-0.000001).AsText(),
-                    SqlDbType = System.Data.SqlDbType.NVarChar
-                };
-                sqlCmd.Parameters.Add(p);
-                await db.Database.Connection.OpenAsync().ConfigureAwait(false);
-                var sqlReader = await sqlCmd.ExecuteReaderAsync().ConfigureAwait(false);
-                var existsArea = cachedGeometry.Select(i => (i.UserData as Record).Id).ToHashSet();
-                while (sqlReader.Read())
-                {
-                    var id = sqlReader.GetInt32(0);
-                    if (!existsArea.Contains(id))
-                    {
-                        var geom = WKTReader.Read(((SqlGeometry)sqlReader.GetValue(4)).ToString());
-                        geom = geom.Buffer(0);
-                        geom.Normalize();
-
-                        geom.UserData = new Record
-                        {
-                            Id = id,
-                            Code = sqlReader.GetString(1),
-                            APT = sqlReader.GetInt32(2),
-                            Home = sqlReader.GetInt32(3),
-                        };
-                        cachedGeometry.Add(geom);
-                    }
-                }
-                sqlReader.Close();
-            }
-
-            // merge again
-            mergedPolygon = finalPolygon;
-
-            cachedGeometry.ForEach(geom =>
-            {
-                mergedPolygon = mergedPolygon.Union(geom);
-            });
-
-            // find max area polygon
-            finalPolygon = null;
-            if (mergedPolygon.GeometryType == "MultiPolygon" || mergedPolygon.GeometryType == "GeometryCollection")
-            {
-                for (var i = 0; i < mergedPolygon.NumGeometries; i++)
-                {
-                    try
-                    {
-                        Polygon geom = (Polygon)mergedPolygon.GetGeometryN(i);
-                        if (geom.IsValid && !geom.IsEmpty)
-                        {
-                            if (finalPolygon == null)
+                            catch
                             {
-                                finalPolygon = geom;
+
                             }
-                            else
-                            {
-                                finalPolygon = finalPolygon.Area > geom.Area ? finalPolygon : geom;
-                            }
+
                         }
                     }
-                    catch
-                    {
-
-                    }
-
                 }
-            }
-            else if (mergedPolygon.GeometryType == "Polygon")
-            {
-                finalPolygon = (Polygon)mergedPolygon;
-            }
+                else if (mergedPolygon.GeometryType == "Polygon")
+                {
+                    finalPolygon = (Polygon)mergedPolygon;
+                }
 
-            if (finalPolygon == null)
-            {
-                throw new Exception("merge failed. the merge area is not polygon");
+                if (finalPolygon == null)
+                {
+                    throw new Exception("merge failed. the merge area is not polygon");
+                }
             }
 
             // calc apt home
