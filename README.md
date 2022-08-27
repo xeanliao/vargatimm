@@ -334,4 +334,23 @@ ADD [Code] NVARCHAR(10);
 ALTER TABLE [dbo].[customareas] 
 ALTER COLUMN [IsEnabled] BIT;
 ```
-3. 
+3. 2022-08-26
+CREATE TABLE [dbo].[submapholes](
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[SubmapId] INT NOT NULL,
+  [AreaId] INT NOT NULL,
+	[Code] NVARCHAR(64) NOT NULL,
+  [Apt] INT NULL,
+  [Home] INT NULL
+)
+GO
+CREATE TABLE [dbo].[distributionmapholes](
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[DistributionMapId] INT NOT NULL,
+  [AreaId] INT NOT NULL,
+	[Code] NVARCHAR(64) NOT NULL,
+  [Apt] INT NULL,
+  [Home] INT NULL
+)
+GO
+1. 
