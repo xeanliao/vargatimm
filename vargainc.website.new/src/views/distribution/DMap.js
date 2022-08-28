@@ -127,11 +127,11 @@ const layersDefine = [
     },
 ]
 
-// const Classification = new Map([
-//     [0, 'Z3'],
-//     [1, 'Z5'],
-//     [15, 'PremiumCRoute'],
-// ])
+const Classification = new Map([
+    [0, 'Z3'],
+    [1, 'Z5'],
+    [15, 'PremiumCRoute'],
+])
 
 export default class DMap extends React.Component {
     static propTypes = {
@@ -747,6 +747,7 @@ export default class DMap extends React.Component {
         let oid = properties?.oid
         let vid = properties?.vid
         let sid = properties?.sid
+        let name = properties?.name
         let classification = properties?.classification
         let apt = properties?.apt ?? 0
         let home = properties?.home ?? 0
@@ -755,18 +756,6 @@ export default class DMap extends React.Component {
         }
 
         let submaps = this.props?.campaign?.SubMaps ?? []
-
-        // check layer is in not in other dmap
-        // let otherDMapAreas = submaps
-        //     .filter((s) => s.Id == subMapId)
-        //     .flatMap((s) => s.DMaps ?? [])
-        //     .filter((d) => d.Id != dMapId)
-        //     .flatMap((d) => d.DMapRecords ?? [])
-        //     .map((r) => r.AreaId)
-
-        // if (new Set(otherDMapAreas).has(oid)) {
-        //     return
-        // }
 
         let currentDMapAreas = submaps
             .filter((s) => s.Id == subMapId)
@@ -783,7 +772,7 @@ export default class DMap extends React.Component {
                 if (selectedShapes.has(vid)) {
                     selectedShapes.delete(vid)
                 } else {
-                    selectedShapes.set(vid, { Classification: classification, Id: oid, Value: !currentDMapAreas.has(oid), vid: vid, apt: apt, home: home })
+                    selectedShapes.set(vid, { Classification: classification, Id: oid, Value: !currentDMapAreas.has(oid), Name: name, vid: vid, apt: apt, home: home })
                 }
                 return {
                     selectedShapes: selectedShapes,
@@ -944,22 +933,31 @@ export default class DMap extends React.Component {
     }
 
     onSwitchHole(hole) {
+        var dMap = this.props.campaign.SubMaps.flatMap((s) => s.DMaps).filter((d) => d.Id == this.state.selectedDMapId)?.[0]
+        let classification = dMap.DMapRecords?.[0]?.Classification
+        let classificationName = Classification.get(classification)
+        let id = `${classificationName}-${hole.AreaId}`
         let selectedShapes = new Map(this.state.selectedShapes)
-        if (selectedShapes.has(hole.AreaId)) {
-            selectedShapes.delete(hole.AreaId)
+        if (selectedShapes.has(id)) {
+            selectedShapes.delete(id)
         } else {
-            var dMap = this.props.campaign.SubMaps.flatMap((s) => s.DMaps).filter((d) => d.Id == this.state.selectedDMapId)?.[0]
-            selectedShapes.set(hole.AreaId, {
-                Classification: dMap.DMapRecords?.[0]?.Classification,
+            selectedShapes.set(id, {
+                Classification: classification,
                 Id: hole.AreaId,
                 Value: true,
                 Name: hole.Code,
+                vid: id,
                 apt: hole.Apt,
                 home: hole.Home,
             })
         }
 
-        this.setState({ selectedShapes: selectedShapes })
+        this.setState({ selectedShapes: selectedShapes }, () => {
+            let shapes = Array.from(this.state.selectedShapes.values())
+            let addShapes = shapes.filter((i) => i.Value == true).map((i) => i.vid)
+
+            this.map.setFilter(`timm-area-layer-selected`, ['in', ['get', 'vid'], ['literal', addShapes]])
+        })
     }
 
     onSearchZip(searchKey) {
@@ -1186,6 +1184,7 @@ export default class DMap extends React.Component {
         if (this.state.holes.length == 0) {
             return null
         }
+        let selectedShapes = new Set(Array.from(this.state.selectedShapes.values()).map((i) => i.Name))
         return (
             <div
                 className="map-right-center bg-white padding-1 bordered"
@@ -1194,7 +1193,6 @@ export default class DMap extends React.Component {
                 <p className="h6 text-center">HOLES</p>
                 <ul className="vertical menu">
                     {this.state.holes.map((i) => {
-                        let checked = this.state.selectedShapes.has(i.AreaId)
                         return (
                             <li key={i.AreaId} className="flex-container align-middle" style={{ marginBottom: '2px' }}>
                                 <div className="switch tiny-small margin-0 display-inline">
@@ -1203,7 +1201,7 @@ export default class DMap extends React.Component {
                                         id={`hole-${i.AreaId}`}
                                         type="checkbox"
                                         name="hole"
-                                        checked={checked}
+                                        checked={selectedShapes.has(i.Code)}
                                         value={i.AreaId}
                                         onChange={() => {
                                             this.onSwitchHole(i)
@@ -1211,9 +1209,9 @@ export default class DMap extends React.Component {
                                     />
                                     <label className="switch-paddle" htmlFor={`hole-${i.AreaId}`}></label>
                                 </div>
-                                <a className="padding-0" onClick={() => this.onShowHole(i.Code)} style={{ marginLeft: '5px' }} title={`APT: ${i.Apt} HOME: ${i.Home}`}>
-                                    <span>{i.Code}</span>
-                                </a>
+                                <label htmlFor={`hole-${i.AreaId}`} style={{ paddingLeft: '5px', cursor: 'pointer' }} title={`APT: ${i.Apt} Home: ${i.Home}`}>
+                                    {i.Code}
+                                </label>
                             </li>
                         )
                     })}

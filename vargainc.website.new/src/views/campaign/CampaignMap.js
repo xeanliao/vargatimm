@@ -1206,22 +1206,28 @@ export default class Campaign extends React.Component {
     }
 
     onSwitchHole(hole) {
+        var subMap = this.props.campaign.SubMaps.filter((s) => s.Id == this.state.selectedSubmapId)?.[0]
+        let classification = Classification.get(subMap.SubMapRecords?.[0]?.Classification)
+        let id = `${classification}-${hole.AreaId}`
         let selectedShapes = new Map(this.state.selectedShapes)
-        if (selectedShapes.has(hole.AreaId)) {
-            selectedShapes.delete(hole.AreaId)
+        if (selectedShapes.has(id)) {
+            selectedShapes.delete(id)
         } else {
-            var subMap = this.props.campaign.SubMaps.filter((s) => s.Id == this.state.selectedSubmapId)?.[0]
-            selectedShapes.set(hole.AreaId, {
-                Classification: subMap.SubMapRecords?.[0]?.Classification,
-                Id: hole.AreaId,
+            selectedShapes.set(id, {
+                Classification: classification,
+                Id: id,
                 Value: true,
                 Name: hole.Code,
                 apt: hole.Apt,
                 home: hole.Home,
             })
         }
-
-        this.setState({ selectedShapes: selectedShapes })
+        let activeLayer = this.getActiveLayer()
+        this.setState({ selectedShapes: selectedShapes }, () => {
+            let shapes = Array.from(this.state.selectedShapes.values())
+            let addShapes = shapes.filter((i) => i.Value == true).map((i) => i.Id)
+            this.map.setFilter(`timm-area-layer-${activeLayer}-selected`, ['in', ['get', 'id'], ['literal', addShapes]])
+        })
     }
 
     render() {
@@ -1494,6 +1500,7 @@ export default class Campaign extends React.Component {
         if (this.state.holes.length == 0) {
             return null
         }
+        let selectedShapes = new Set(Array.from(this.state.selectedShapes.values()).map((i) => i.Name))
         return (
             <div
                 className="map-right-center bg-white padding-1 bordered"
@@ -1502,7 +1509,6 @@ export default class Campaign extends React.Component {
                 <p className="h6 text-center">HOLES</p>
                 <ul className="vertical menu">
                     {this.state.holes.map((i) => {
-                        let checked = this.state.selectedShapes.has(i.AreaId)
                         return (
                             <li key={i.AreaId} className="flex-container align-middle" style={{ marginBottom: '2px' }}>
                                 <div className="switch tiny-small margin-0 display-inline">
@@ -1511,7 +1517,7 @@ export default class Campaign extends React.Component {
                                         id={`hole-${i.AreaId}`}
                                         type="checkbox"
                                         name="hole"
-                                        checked={checked}
+                                        checked={selectedShapes.has(i.Code)}
                                         value={i.AreaId}
                                         onChange={() => {
                                             this.onSwitchHole(i)
@@ -1519,9 +1525,9 @@ export default class Campaign extends React.Component {
                                     />
                                     <label className="switch-paddle" htmlFor={`hole-${i.AreaId}`}></label>
                                 </div>
-                                <a className="padding-0" onClick={() => this.onShowHole(i.Code)} style={{ marginLeft: '5px' }} title={`APT: ${i.Apt} HOME: ${i.Home}`}>
-                                    <span>{i.Code}</span>
-                                </a>
+                                <label htmlFor={`hole-${i.AreaId}`} style={{ paddingLeft: '5px', cursor: 'pointer' }} title={`APT: ${i.Apt} Home: ${i.Home}`}>
+                                    {i.Code}
+                                </label>
                             </li>
                         )
                     })}
