@@ -94,9 +94,9 @@ namespace Vargainc.Timm.REST.Controllers
             var dMapIds = dMaps.Select(i => i.Id).ToList();
 
             var dMapPolygon = new List<Polygon>();
-            foreach (var item in dMaps)
+            foreach (var dmap in dMaps)
             {
-                var points = item.DistributionMapCoordinates.OrderBy(i=>i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
+                var points = dmap.DistributionMapCoordinates.OrderBy(i=>i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
                 if (points.Count == 0)
                 {
                     continue;
@@ -122,14 +122,14 @@ namespace Vargainc.Timm.REST.Controllers
                     Attributes = new AttributesTable
                     {
                         { "type", "dmap" },
-                        { "id", $"dmap-centroid-{item.Id}" },
-                        { "oid", item.Id },
-                        { "sid", item.Id },
-                        { "name", item.Name },
-                        { "color", $"#{item.ColorString}" },
-                        { "total", (item.Total ?? 0) + (item.TotalAdjustment ?? 0)},
-                        { "count", (item.Penetration ?? 0) + (item.CountAdjustment ?? 0)},
-                        { "pen", AreaHelper.CalcPercent(item.Total, item.TotalAdjustment, item.Penetration, item.CountAdjustment)}
+                        { "id", $"dmap-centroid-{dmap.Id}" },
+                        { "oid", dmap.Id },
+                        { "sid", dmap.Id },
+                        { "name", dmap.Name },
+                        { "color", $"#{dmap.ColorString}" },
+                        { "total", (dmap.Total ?? 0) + (dmap.TotalAdjustment ?? 0)},
+                        { "count", (dmap.Penetration ?? 0) + (dmap.CountAdjustment ?? 0)},
+                        { "pen", AreaHelper.CalcPercent(dmap.Total, dmap.TotalAdjustment, dmap.Penetration, dmap.CountAdjustment)}
                     }
                 });
                 layers.Add(new Feature
@@ -139,14 +139,70 @@ namespace Vargainc.Timm.REST.Controllers
                     Attributes = new AttributesTable
                     {
                         { "type", "dmap" },
-                        { "id", $"dmap-{item.Id}" },
-                        { "oid", item.Id },
-                        { "sid", item.Id },
-                        { "name", item.Name },
-                        { "color", $"#{item.ColorString}" },
+                        { "id", $"dmap-{dmap.Id}" },
+                        { "oid", dmap.Id },
+                        { "sid", dmap.Id },
+                        { "name", dmap.Name },
+                        { "color", $"#{dmap.ColorString}" },
                         
                     }
                 });
+
+                // holes
+                var holes = dmap.Holes.Select(i => i.AreaId).ToHashSet();
+                if (holes.Count > 0)
+                {
+                    List<Tuple<int?, string, int?, int?, DbGeometry>> dbGeoms = new List<Tuple<int?, string, int?, int?, DbGeometry>>();
+
+                    var classification = dmap.DistributionMapRecords.FirstOrDefault()?.Classification;
+                    if (classification != null && classification.HasValue)
+                    {
+                        var targetClassification = (Classifications)classification;
+                        switch (targetClassification)
+                        {
+                            case Classifications.Z5:
+                                {
+                                    var dbData = await db.FiveZipAreas
+                                        .Where(i => holes.Contains(i.Id))
+                                        .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+                                    dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+
+                                }
+                                break;
+                            case Classifications.PremiumCRoute:
+                                {
+                                    var dbData = await db.PremiumCRoutes
+                                        .Where(i => holes.Contains(i.Id))
+                                        .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+                                    dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+                                }
+                                break;
+                        }
+                    }
+                    dbGeoms.ForEach(i =>
+                    {
+                        var geom = WKTReader.Read(i.Item5.AsText());
+                        geom = geom.Buffer(-0.000001);
+                        geom = polygon.Intersection(geom);
+                        geom.Normalize();
+                        layers.Add(new Feature
+                        {
+                            Geometry = geom,
+                            BoundingBox = geom.EnvelopeInternal,
+                            Attributes = new AttributesTable
+                            {
+                                { "type", "dmap-holes" },
+                                { "id", $"dmap-{dmap.Id}-hole-{i.Item2}" },
+                            }
+                        });
+                    });
+                }
             }
             var dMapIntersectionLine = new List<LineString>();
             for (var i = 0; i < dMapPolygon.Count; i++)

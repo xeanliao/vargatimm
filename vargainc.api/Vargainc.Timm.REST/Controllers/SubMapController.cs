@@ -17,6 +17,7 @@ using System.Data.Entity.Spatial;
 using System.Data.SqlClient;
 using Microsoft.SqlServer.Types;
 using System.Text;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace Vargainc.Timm.REST.Controllers
 {
@@ -65,10 +66,11 @@ namespace Vargainc.Timm.REST.Controllers
         {
             var subMaps = await db.SubMaps.Where(i=>i.CampaignId == campaignId).ToListAsync().ConfigureAwait(false);
             var layers = new FeatureCollection();
+
             foreach (var subMap in subMaps)
             {
-                var points = subMap.SubMapCoordinates.OrderBy(i=>i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
-                if(points.Count == 0)
+                var points = subMap.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
+                if (points.Count == 0)
                 {
                     continue;
                 }
@@ -80,12 +82,13 @@ namespace Vargainc.Timm.REST.Controllers
                 var polygon = GeometryFactory.CreatePolygon(points.ToArray());
                 polygon.Normalize();
 
-                if(polygon == null)
+                if (polygon == null)
                 {
                     continue;
                 }
 
-                layers.Add(new Feature { 
+                layers.Add(new Feature
+                {
                     Geometry = polygon,
                     BoundingBox = polygon.EnvelopeInternal,
                     Attributes = new AttributesTable
@@ -98,6 +101,62 @@ namespace Vargainc.Timm.REST.Controllers
                         { "color", $"#{subMap.ColorString}" },
                     }
                 });
+
+                // holes
+                var holes = subMap.Holes.Select(i => i.AreaId).ToHashSet();
+                if (holes.Count > 0)
+                {
+                    List<Tuple<int?, string, int?, int?, DbGeometry>> dbGeoms = new List<Tuple<int?, string, int?, int?, DbGeometry>>();
+
+                    var classification = subMap.SubMapRecords.FirstOrDefault()?.Classification;
+                    if (classification != null && classification.HasValue)
+                    {
+                        var targetClassification = (Classifications)classification;
+                        switch (targetClassification)
+                        {
+                            case Classifications.Z5:
+                                {
+                                    var dbData = await db.FiveZipAreas
+                                        .Where(i => holes.Contains(i.Id))
+                                        .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+                                    dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+
+                                }
+                                break;
+                            case Classifications.PremiumCRoute:
+                                {
+                                    var dbData = await db.PremiumCRoutes
+                                        .Where(i => holes.Contains(i.Id))
+                                        .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+                                    dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+                                }
+                                break;
+                        }
+                    }
+                    dbGeoms.ForEach(i =>
+                    {
+                        var geom = WKTReader.Read(i.Item5.AsText());
+                        geom = geom.Buffer(-0.000001);
+                        geom = polygon.Intersection(geom);
+                        geom.Normalize();
+                        layers.Add(new Feature
+                        {
+                            Geometry = geom,
+                            BoundingBox = geom.EnvelopeInternal,
+                            Attributes = new AttributesTable
+                            {
+                                { "type", "submap-holes" },
+                                { "id", $"submap-{subMap.Id}-hole-{i.Item2}" },
+                            }
+                        });
+                    });
+                }
             }
 
             var eTag = GetETag();
