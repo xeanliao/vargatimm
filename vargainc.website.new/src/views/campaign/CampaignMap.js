@@ -577,7 +577,7 @@ export default class Campaign extends React.Component {
                 id: 'timm-submap-layer-holes-line',
                 type: 'line',
                 source: 'map-source',
-                layout: {},
+                layout: { visibility: 'none' },
                 paint: {
                     'line-color': '#ffffff',
                     'line-width': 2,
