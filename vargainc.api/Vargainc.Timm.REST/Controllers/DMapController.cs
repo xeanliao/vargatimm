@@ -39,13 +39,13 @@ namespace Vargainc.Timm.REST.Controllers
             var subMapIds = subMaps.Select(i => i.Id).ToList();
             //var subMapRecords = subMaps.SelectMany(i => i.SubMapRecords.Select(j => new { j.Classification, j.AreaId, j.SubMapId })).ToList();
             List<Tuple<int?, Polygon, int?, List<int?>>> subMapRecords = new List<Tuple<int?, Polygon, int?, List<int?>>>();
-            foreach (var item in subMaps)
+            foreach (var subMap in subMaps)
             {
-                if(item == null || item.SubMapCoordinates == null || item.SubMapCoordinates.Count == 0)
+                if(subMap == null || subMap.SubMapCoordinates == null || subMap.SubMapCoordinates.Count == 0)
                 {
                     continue;
                 }
-                var points = item.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
+                var points = subMap.SubMapCoordinates.OrderBy(i => i.Id).Select(i => new Coordinate(i.Longitude ?? 0, i.Latitude ?? 0)).ToList();
                 if (points.Count == 0)
                 {
                     continue;
@@ -70,18 +70,74 @@ namespace Vargainc.Timm.REST.Controllers
                     Attributes = new AttributesTable
                     {
                         { "type", "submap" },
-                        { "id", $"submap-{item.Id}" },
-                        { "oid", item.Id },
-                        { "sid", item.Id },
-                        { "name", item.Name },
-                        { "color", $"#{item.ColorString}" },
+                        { "id", $"submap-{subMap.Id}" },
+                        { "oid", subMap.Id },
+                        { "sid", subMap.Id },
+                        { "name", subMap.Name },
+                        { "color", $"#{subMap.ColorString}" },
                     }
                 });
 
-                var records = item.SubMapRecords.Select(i => i.AreaId).ToList();
-                var recordsType = item.SubMapRecords.FirstOrDefault()?.Classification;
+                var records = subMap.SubMapRecords.Select(i => i.AreaId).ToList();
+                var recordsType = subMap.SubMapRecords.FirstOrDefault()?.Classification;
 
-                subMapRecords.Add(new Tuple<int?, Polygon, int?, List<int?>>(item.Id, polygon, recordsType, records));
+                subMapRecords.Add(new Tuple<int?, Polygon, int?, List<int?>>(subMap.Id, polygon, recordsType, records));
+
+                // holes
+                var holes = subMap.Holes.Select(i => i.AreaId).ToHashSet();
+                if (holes.Count > 0)
+                {
+                    List<Tuple<int?, string, int?, int?, DbGeometry>> dbGeoms = new List<Tuple<int?, string, int?, int?, DbGeometry>>();
+
+                    var classification = subMap.SubMapRecords.FirstOrDefault()?.Classification;
+                    if (classification != null && classification.HasValue)
+                    {
+                        var targetClassification = (Classifications)classification;
+                        switch (targetClassification)
+                        {
+                            case Classifications.Z5:
+                                {
+                                    var dbData = await db.FiveZipAreas
+                                        .Where(i => holes.Contains(i.Id))
+                                        .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+                                    dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+
+                                }
+                                break;
+                            case Classifications.PremiumCRoute:
+                                {
+                                    var dbData = await db.PremiumCRoutes
+                                        .Where(i => holes.Contains(i.Id))
+                                        .Select(i => new { i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom })
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+                                    dbGeoms = dbData.Select(i => new Tuple<int?, string, int?, int?, DbGeometry>(i.Id, i.Code, i.APT_COUNT, i.HOME_COUNT, i.Geom)).ToList();
+                                }
+                                break;
+                        }
+                    }
+                    dbGeoms.ForEach(i =>
+                    {
+                        var geom = WKTReader.Read(i.Item5.AsText());
+                        geom = geom.Buffer(-0.000001);
+                        geom = polygon.Intersection(geom);
+                        geom.Normalize();
+                        layers.Add(new Feature
+                        {
+                            Geometry = geom,
+                            BoundingBox = geom.EnvelopeInternal,
+                            Attributes = new AttributesTable
+                            {
+                                { "type", "submap-holes" },
+                                { "id", $"submap-{subMap.Id}-hole-{i.Item2}" },
+                            }
+                        });
+                    });
+                }
             }
 
 
