@@ -534,6 +534,7 @@ export default class Campaign extends React.Component {
                     'fill-color': ['get', 'color'],
                     'fill-opacity': 0.5,
                 },
+                filter: ['==', ['get', 'type'], 'submap'],
             },
             labelLayer
         )
@@ -549,6 +550,7 @@ export default class Campaign extends React.Component {
                     'line-color': ['get', 'color'],
                     'line-width': 6,
                 },
+                filter: ['==', ['get', 'type'], 'submap'],
             },
             labelLayer
         )
@@ -569,7 +571,25 @@ export default class Campaign extends React.Component {
             labelLayer
         )
 
-        // holes layer
+        // holes boundary
+        this.map.addLayer(
+            {
+                id: 'timm-submap-layer-holes-line',
+                type: 'line',
+                source: 'map-source',
+                layout: {},
+                paint: {
+                    'line-color': '#ffffff',
+                    'line-width': 2,
+                    'line-dasharray': [2, 2],
+                    'line-offset': 2,
+                },
+                filter: ['==', ['get', 'type'], 'submap-holes'],
+            },
+            labelLayer
+        )
+
+        // holes highlight
         layersDefine.forEach((item) => {
             this.map.addLayer(
                 {
@@ -580,7 +600,6 @@ export default class Campaign extends React.Component {
                     minzoom: item.zoom[0],
                     maxzoom: item.zoom[1],
                     paint: {
-                        // 'fill-pattern': 'remove_pattern',
                         'fill-color': '#ffffff',
                         'fill-opacity': 1,
                     },
