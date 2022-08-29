@@ -608,7 +608,25 @@ export default class DMap extends React.Component {
                     labelLayer
                 )
 
-                // holes layer
+                // holes boundary
+                this.map.addLayer(
+                    {
+                        id: 'timm-dmap-layer-holes-line',
+                        type: 'line',
+                        source: 'map-source',
+                        layout: {},
+                        paint: {
+                            'line-color': '#ffffff',
+                            'line-width': 2,
+                            'line-dasharray': [2, 2],
+                            'line-offset': 2,
+                        },
+                        filter: ['==', ['get', 'type'], 'dmap-holes'],
+                    },
+                    labelLayer
+                )
+
+                // holes highlight
                 this.map.addLayer(
                     {
                         id: 'timm-area-layer-holes',
