@@ -87,6 +87,7 @@ namespace Vargainc.Timm.REST.Controllers
                 var holes = subMap.Holes.Select(i => i.AreaId).ToHashSet();
                 if (holes.Count > 0)
                 {
+                    int holeIndex = 0;
                     List<Tuple<int?, string, int?, int?, DbGeometry>> dbGeoms = new List<Tuple<int?, string, int?, int?, DbGeometry>>();
 
                     var classification = subMap.SubMapRecords.FirstOrDefault()?.Classification;
@@ -120,23 +121,57 @@ namespace Vargainc.Timm.REST.Controllers
                                 break;
                         }
                     }
+                    Geometry mergeHoles = null;
                     dbGeoms.ForEach(i =>
                     {
                         var geom = WKTReader.Read(i.Item5.AsText());
-                        geom = geom.Buffer(-0.000001);
-                        geom = polygon.Intersection(geom);
-                        geom.Normalize();
+                        mergeHoles = mergeHoles == null ? geom : mergeHoles.Union(geom);
+
+                    });
+                    if(mergeHoles.NumGeometries > 0)
+                    {
+                        for (var n = 0; n < mergeHoles.NumGeometries; n++)
+                        {
+                            var partHole = mergeHoles.GetGeometryN(n);
+                            partHole = partHole.Buffer(-0.000001);
+                            partHole = polygon.Intersection(partHole);
+                            if (partHole.IsEmpty)
+                            {
+                                continue;
+                            }
+                            partHole.Normalize();
+                            layers.Add(new Feature
+                            {
+                                Geometry = partHole,
+                                BoundingBox = partHole.EnvelopeInternal,
+                                Attributes = new AttributesTable
+                                {
+                                    { "type", "submap-holes" },
+                                    { "id", $"submap-{subMap.Id}-hole-{holeIndex++}" },
+                                }
+                            });
+                        }
+                    }
+                    else
+                    {
+                        mergeHoles = mergeHoles.Buffer(-0.000001);
+                        mergeHoles = polygon.Intersection(mergeHoles);
+                        if (mergeHoles.IsEmpty)
+                        {
+                            continue;
+                        }
+                        mergeHoles.Normalize();
                         layers.Add(new Feature
                         {
-                            Geometry = geom,
-                            BoundingBox = geom.EnvelopeInternal,
+                            Geometry = mergeHoles,
+                            BoundingBox = mergeHoles.EnvelopeInternal,
                             Attributes = new AttributesTable
                             {
                                 { "type", "submap-holes" },
-                                { "id", $"submap-{subMap.Id}-hole-{i.Item2}" },
+                                { "id", $"submap-{subMap.Id}-hole-{holeIndex++}" },
                             }
                         });
-                    });
+                    }
                 }
             }
 
@@ -303,16 +338,6 @@ namespace Vargainc.Timm.REST.Controllers
                     }
                 });
             }
-            
-
-            //var recordGroup = subMapRecords
-            //    .GroupBy(i => i.Classification)
-            //    .ToDictionary(i => i.Key, i => i.Select(j => j.AreaId).ToList());
-
-            //var recordSubMap = subMapRecords
-            //    .GroupBy(k => $"{(Classifications)k.Classification}-{k.AreaId}", v => v.SubMapId)
-            //    .ToDictionary(k => k.Key, v => v.FirstOrDefault());
-
 
             foreach (var item in subMapRecords)
             {
