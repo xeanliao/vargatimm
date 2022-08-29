@@ -608,6 +608,21 @@ export default class DMap extends React.Component {
                     labelLayer
                 )
 
+                // submap holes fill
+                this.map.addLayer(
+                    {
+                        id: 'timm-submap-layer-holes-fill',
+                        type: 'fill',
+                        source: 'map-source',
+                        paint: {
+                            'fill-color': '#ffffff',
+                            'fill-opacity': 0.85,
+                        },
+                        filter: ['==', ['get', 'type'], 'submap-holes'],
+                    },
+                    labelLayer
+                )
+
                 // submap holes boundary
                 this.map.addLayer(
                     {
@@ -615,9 +630,9 @@ export default class DMap extends React.Component {
                         type: 'line',
                         source: 'map-source',
                         paint: {
-                            'line-color': '#ffffff',
-                            'line-width': 2,
-                            'line-dasharray': [2, 2],
+                            'line-color': '#000000',
+                            'line-width': 1,
+                            'line-dasharray': [4, 1],
                             'line-offset': 2,
                         },
                         filter: ['==', ['get', 'type'], 'submap-holes'],
